@@ -1,0 +1,23 @@
+import logging
+from fire import Fire
+
+
+def main (file_path: str='extract/gitlab_deduplication/manifest_deduplication/t_gitlab_com_scd_advance_metadata_manifest.yml')->None:
+
+    """
+    Read table name from manifest file and decide if the table exist in the database. Check if the advance metadata column `_task_instance`
+    is present in the table.
+    Check for backup schema is present in snowflake.
+    Check for old backup table in snowflake and if present check if the creation date is older than 15 days. If yes drop backup table if not create a new backup table.
+    Once the backup is complete, create  table with deduplicate records.
+    Swap the table with original table.
+    Drop the swapped temp table.
+    """
+    
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    logging.getLogger("snowflake.connector.cursor").disabled = True
+    logging.getLogger("snowflake.connector.connection").disabled = True
+    Fire({"tap": main})
