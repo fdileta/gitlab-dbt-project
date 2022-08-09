@@ -1,7 +1,7 @@
 WITH source AS (
 
     SELECT *
-    FROM {{ ref('gitlab_dotcom_services_source') }}
+    FROM {{ ref('gitlab_dotcom_integrations_source') }}
 
 )
 
