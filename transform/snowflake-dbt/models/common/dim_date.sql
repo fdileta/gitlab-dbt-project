@@ -4,8 +4,13 @@
 
 WITH dates AS (
 
-  SELECT *
-  FROM {{ ref('date_details_source') }}
+  SELECT
+    {{ dbt_utils.star(
+           from=ref('prep_date'), 
+           except=['CREATED_BY','UPDATED_BY','MODEL_CREATED_DATE','MODEL_UPDATED_DATE','DBT_UPDATED_AT','DBT_CREATED_AT']
+           ) 
+      }}
+  FROM {{ ref('prep_date') }}
 
 ), final AS (
 
@@ -21,5 +26,5 @@ WITH dates AS (
     created_by="@msendal",
     updated_by="@pempey",
     created_date="2020-06-01",
-    updated_date="2022-07-22"
+    updated_date="2022-08-11"
 ) }}
