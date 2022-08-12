@@ -388,7 +388,7 @@
 
     SELECT *
     FROM {{ ref('gitlab_dotcom_projects_xf') }}
-    WHERE ARRAY_CONTAINS('PrometheusService'::VARIANT, active_service_types)
+    WHERE ARRAY_CONTAINS('Integrations::Prometheus'::VARIANT, active_service_types)
 
 ), projects_container_registry_enabled_source AS (
 
