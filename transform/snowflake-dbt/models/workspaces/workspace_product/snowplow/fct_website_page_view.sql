@@ -23,6 +23,14 @@
       user_snowplow_domain_id,
       page_view_id                                                                  AS event_id,
       'page_view'                                                                   AS event_name,
+      gsc_environment,
+      gsc_extra,
+      gsc_google_analytics_client_id,
+      gsc_namespace_id,
+      gsc_plan,
+      gsc_project_id,
+      gsc_pseudonymized_user_id,
+      gsc_source,
       min_tstamp                                                                    AS page_view_start_at,
       max_tstamp                                                                    AS page_view_end_at,
       time_engaged_in_s                                                             AS engaged_seconds
@@ -55,6 +63,16 @@
       event_id,
       user_snowplow_domain_id,
 
+      -- Google Keys
+      gsc_environment,
+      gsc_extra,
+      gsc_google_analytics_client_id,
+      gsc_namespace_id,
+      gsc_plan,
+      gsc_project_id,
+      gsc_pseudonymized_user_id,
+      gsc_source,
+
       -- Attributes
       event_name,
       NULL                                                                          AS sf_formid,
@@ -78,6 +96,13 @@
       event_id,
       user_snowplow_domain_id,
       event_name,
+      gsc_environment,
+      gsc_extra,
+      gsc_google_analytics_client_id,
+      gsc_namespace_id,
+      gsc_plan,
+      gsc_project_id,
+      gsc_pseudonymized_user_id,
       sf_formid,
       NULL                                                                          AS page_view_start_at,
       NULL                                                                          AS page_view_end_at,
@@ -113,6 +138,16 @@
       session_id,
       event_id,
       user_snowplow_domain_id,
+
+      -- Google Keys
+      gsc_environment,
+      gsc_extra,
+      gsc_google_analytics_client_id,
+      gsc_namespace_id,
+      gsc_plan,
+      gsc_project_id,
+      gsc_pseudonymized_user_id,
+      NULL                                                                          AS gsc_source,
 
       -- Attributes
       event_name,
