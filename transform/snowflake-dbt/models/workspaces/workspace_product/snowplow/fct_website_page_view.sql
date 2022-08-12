@@ -48,7 +48,7 @@
       --Time Attributes
       page_view_start_at,
       page_view_end_at,
-      NULL                                                                          AS collector_tstamp,
+      page_view_start_at                                                            AS behavior_at,
 
       -- Natural Keys
       session_id,
@@ -82,12 +82,12 @@
       NULL                                                                          AS page_view_start_at,
       NULL                                                                          AS page_view_end_at,
       NULL                                                                          AS engaged_seconds,
-      collector_tstamp
+      derived_tstamp                                                                AS behavior_at
     FROM unstruct_events
 
     {% if is_incremental() %}
 
-    WHERE collector_tstamp > (SELECT max(collector_tstamp) FROM {{ this }})
+    WHERE derived_tstamp > (SELECT max(behavior_at) FROM {{ this }})
 
     {% endif %}
 
@@ -97,7 +97,7 @@
 
     SELECT
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['event_id','collector_tstamp']) }}                AS website_page_view_pk,
+      {{ dbt_utils.surrogate_key(['event_id','behavior_at']) }}                     AS website_page_view_pk,
 
       -- Foreign Keys
       dim_website_page_sk,
@@ -107,7 +107,7 @@
       --Time Attributes
       page_view_start_at,
       page_view_end_at,
-      collector_tstamp,
+      behavior_at,
 
       -- Natural Keys
       session_id,
