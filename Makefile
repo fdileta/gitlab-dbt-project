@@ -8,6 +8,7 @@ DOCKER_UP = "export GIT_BRANCH=$(GIT_BRANCH) && docker-compose up"
 DOCKER_DOWN = "export GIT_BRANCH=$(GIT_BRANCH) && docker-compose down"
 DOCKER_RUN = "export GIT_BRANCH=$(GIT_BRANCH) && docker-compose run"
 DBT_DEPS = "cd transform/snowflake-dbt/ && poetry run dbt clean && poetry run dbt deps"
+PPATH = $$(which python3)
 
 .EXPORT_ALL_VARIABLES:
 DATA_TEST_BRANCH=main
@@ -109,6 +110,7 @@ update-containers:
 # DBT
 ########################################################################################################################
 prepare-dbt:
+	ln -s /etc/ssl/* /Library/Frameworks/Python.framework/Versions/3.9/etc/openssl
 	curl -k -sSL https://install.python-poetry.org/ | python3 -
 	cd transform/snowflake-dbt/ && poetry install
 	"$(DBT_DEPS)"
