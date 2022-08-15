@@ -1,7 +1,6 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "website_page_view_pk",
-        full_refresh = false
+        unique_key = "website_page_view_pk"
 ) }}
 
 {{ 
@@ -16,6 +15,7 @@
 
     SELECT
       {{ clean_url('page_url_path') }}                                              AS clean_url_path,
+      app_id,
       page_url_host,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)                 AS dim_namespace_id,
       REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1)                   AS dim_project_id,
@@ -23,14 +23,14 @@
       user_snowplow_domain_id,
       page_view_id                                                                  AS event_id,
       'page_view'                                                                   AS event_name,
-      page_view_start                                                               AS page_view_start_at,
-      page_view_end                                                                 AS page_view_end_at,
+      min_tstamp                                                                    AS page_view_start_at,
+      max_tstamp                                                                    AS page_view_end_at,
       time_engaged_in_s                                                             AS engaged_seconds
     FROM page_views
 
     {% if is_incremental() %}
 
-    WHERE page_view_end > (SELECT max(page_view_end_at) FROM {{ this }})
+    WHERE max_tstamp > (SELECT max(page_view_end_at) FROM {{ this }})
 
     {% endif %}
 
@@ -38,7 +38,7 @@
 
     SELECT
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['event_id','event_name']) }}                      AS website_page_view_pk,
+      {{ dbt_utils.surrogate_key(['event_id','page_view_end_at']) }}                AS website_page_view_pk,
 
       -- Foreign Keys
       dim_website_page_sk,
@@ -62,6 +62,7 @@
     FROM page_views_w_clean_url
     LEFT JOIN dim_website_page ON page_views_w_clean_url.clean_url_path = dim_website_page.clean_url_path
     AND page_views_w_clean_url.page_url_host = dim_website_page.page_url_host
+    AND page_views_w_clean_url.app_id = dim_website_page.app_id
 
 )
 
@@ -69,6 +70,7 @@
 
     SELECT
       {{ clean_url('page_url_path') }}                                              AS clean_url_path,
+      app_id,
       page_url_host,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)                 AS dim_namespace_id,
       REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1)                   AS dim_project_id,
@@ -95,7 +97,7 @@
 
     SELECT
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['event_id','event_name']) }}                      AS website_page_view_pk,
+      {{ dbt_utils.surrogate_key(['event_id','collector_tstamp']) }}                AS website_page_view_pk,
 
       -- Foreign Keys
       dim_website_page_sk,
@@ -119,6 +121,7 @@
     FROM unstruct_w_clean_url
     LEFT JOIN dim_website_page ON unstruct_w_clean_url.clean_url_path = dim_website_page.clean_url_path
     AND unstruct_w_clean_url.page_url_host = dim_website_page.page_url_host
+    AND unstruct_w_clean_url.app_id = dim_website_page.app_id
 
 )
 
@@ -137,5 +140,5 @@
     created_by="@chrissharp",
     updated_by="@chrissharp",
     created_date="2022-07-22",
-    updated_date="2022-07-22"
+    updated_date="2022-08-05"
 ) }}
