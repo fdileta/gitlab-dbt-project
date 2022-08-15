@@ -1,0 +1,20 @@
+generic_info:
+  backup_schema: TAP_POSTGRES_BKP
+  backup_retention_policy: 7 days
+  table_prefix: gitlab_db_
+  raw_schema: TAP_POSTGRES
+scd_tables:
+    - bulk_import_entities
+    - clusters_integration_prometheus
+    - elasticsearch_indexed_namespaces
+    - gitlab_subscriptions
+    - group_group_links
+    - group_import_states
+    - issue_links
+    - label_links
+    - lfs_file_locks
+    - members
+    - merge_request_reviewers
+    - path_locks
+    - project_group_links
+    - repository_languages
