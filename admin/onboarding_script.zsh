@@ -5,6 +5,12 @@ command -v brew >/dev/null 2>&1 || { echo "Installing Homebrew.."
   } >&2;
 echo "Homebrew successfully installed"
 
+echo "Adding homebrew link for m1 macs"
+echo "export PATH=$PATH:/opt/homebrew/bin" >> ~/.zshrc
+
+echo "Adding path fix to zshrc"
+echo "export if ! [[ ""$PATH"" =~ ""$HOME/.local/bin:$HOME/bin:"" ]] then PATH=""$HOME/.local/bin:$HOME/bin:$PATH"" fi export PATH" >> ~/.zshrc
+
 ## install git
 echo "Installing git.."
 brew install git
@@ -55,6 +61,7 @@ echo "VS Code successfully installed"
 echo "Installing miniforge.."
 brew install miniforge
 echo "export PATH=/usr/local/mambaforge/bin:"$PATH"" >> ~/.bash_profile
+echo "export PATH=/usr/local/mambaforge/bin:"$PATH"" >> ~/.zshrc
 echo "miniforge installed succesfully"
 
 ## Set up the computer to contribute to the handbook
