@@ -9,3 +9,18 @@ models:
           - unique
   - name: wk_mart_namespace_company_account
   - name: rpt_namespace_company_account
+  - name: map_project_namespace
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - dim_project_sk
+            - dim_namespace_sk
+    columns:
+      - name: dim_project_sk
+        tests:
+          - unique
+          - not_null
+      - name: dim_namespace_sk
+        tests:
+          - unique
+          - not_null
