@@ -1,6 +1,6 @@
 import logging
-from xmlrpc.client import boolean
 import yaml
+from datetime import datetime
 from fire import Fire
 from typing import Dict
 from gitlabdata.orchestration_utils import (snowflake_engine_factory,
@@ -19,16 +19,25 @@ def manifest_reader(file_path: str) -> Dict[str, Dict]:
 def build_table_name(table_name:str,table_prefix:str = None,table_suffix:str = None) -> str:
         return table_prefix+table_name+table_suffix
 
-def check_backup_table_exist(backup_schema_name:str,table_name:str,table_prefix:str) -> boolean:
+def create_backup_table(backup_schema_name:str,table_name:str,table_prefix:str) -> bool:
+    table_suffix="_"+datetime.now().strftime("%Y%m%d")
+    if table_prefix:
+        bkp_table_name=build_table_name(table_name,table_prefix,table_suffix)
+        original_table_name=build_table_name(table_name,table_prefix)
+    else:
+        bkp_table_name=build_table_name(table_name,table_suffix)
+        original_table_name=build_table_name(table_name)
+    create_backup_table=f"CREATE TABLE "
     return True
 
 
-def deduplicate_scd_tables(manifest_dict: Dict,table_name: str) -> boolean:
+def deduplicate_scd_tables(manifest_dict: Dict,table_name: str) -> bool:
         backup_schema_name=manifest_dict["generic_info"]["backup_schema"]
         backup_retention_policy=manifest_dict["generic_info"]["backup_retention_policy"]
         table_prefix=manifest_dict["generic_info"]["table_prefix"]
         raw_schema=manifest_dict["generic_info"]["raw_schema"]
-        check_backup_table_exist(backup_schema_name,table_name,table_prefix)
+
+        create_backup_table(backup_schema_name,table_name,table_prefix)
 
 def main(file_path: str = 't_gitlab_com_scd_advance_metadata_manifest.yml') -> None:
     """
