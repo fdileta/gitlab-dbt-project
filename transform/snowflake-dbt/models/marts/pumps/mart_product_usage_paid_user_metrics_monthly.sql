@@ -86,7 +86,7 @@
       most_recent_subscription_version.subscription_end_date,
       monthly_sm_metrics.snapshot_date_id,
       monthly_sm_metrics.ping_created_at,
-      monthly_sm_metrics.dim_usage_ping_id,
+      monthly_sm_metrics.dim_ping_instance_id                                      AS dim_usage_ping_id,
       monthly_sm_metrics.instance_type,
       monthly_sm_metrics.cleaned_version,
       location_country.country_name,
