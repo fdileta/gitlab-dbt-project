@@ -388,7 +388,7 @@
 
     SELECT *
     FROM {{ ref('gitlab_dotcom_projects_xf') }}
-    WHERE ARRAY_CONTAINS('PrometheusService'::VARIANT, active_service_types)
+    WHERE ARRAY_CONTAINS('Integrations::Prometheus'::VARIANT, active_service_types)
 
 ), projects_container_registry_enabled_source AS (
 
@@ -411,7 +411,7 @@
 ), services_source AS (
 
     SELECT *
-    FROM {{ ref('gitlab_dotcom_services') }}
+    FROM {{ ref('gitlab_dotcom_integrations') }}
     WHERE service_type != 'GitlabIssueTrackerService'
 
 ), successful_ci_pipelines_source AS (
