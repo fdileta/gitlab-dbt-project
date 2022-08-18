@@ -5,14 +5,25 @@
 {{ simple_cte([
     ('members','gitlab_dotcom_members_source'),
     ('projects_map','prep_map_project_namespace'),
-    ('access_levels','gitlab_dotcom_access_levels_source')
+    ('access_levels','gitlab_dotcom_access_levels_source'),
+    ('namespace','gitlab_dotcom_namespaces_snapshots_base')
 ]) }},
 
 remap_projects AS (
 
   SELECT
-    members.*,
-    access_levels.access_level_name,
+    members.member_id,
+    members.user_id,
+    members.access_level,
+    members.member_type,
+    members.created_at,
+    members.invite_accepted_at,
+    members.requested_at,
+    members.expires_at,
+    members.invite_token,
+    members.valid_from,
+    members.valid_to,
+    members.is_currently_valid,
     -- A project could be deleted
     COALESCE(IFF(members.member_source_type = 'Project',
       projects_map.project_namespace_id,
@@ -21,43 +32,75 @@ remap_projects AS (
   LEFT JOIN projects_map
     ON members.source_id = projects_map.project_id
       AND members.member_source_type = 'Project'
-  LEFT JOIN access_levels
-    ON members.access_level = access_levels.access_level_id
+
+),
+
+user_namespaces AS (
+  -- Owner membership of user namespace is only implied and not explicit in the members table.
+  SELECT
+    owner_id || namespace_id AS member_id,
+    owner_id AS user_id,
+    50 AS access_level,
+    'UserMember' AS member_type,
+    namespace_created_at AS created_at,
+    NULL AS invite_accepted_at,
+    NULL AS requested_at,
+    NULL AS expires_at,
+    NULL AS invite_token,
+    valid_from,
+    valid_to,
+    IFF(valid_to IS NULL, TRUE, FALSE) AS is_currently_valid,  -- add is_current flag to source
+    namespace_id
+  FROM namespace
+  WHERE namespace_type = 'User'
+
+),
+
+combine AS (
+  SELECT *
+  FROM remap_projects
+
+  UNION
+
+  SELECT *
+  FROM user_namespaces
 ),
 
 fct AS (
 
   SELECT
     -- Primary Key
-    {{ dbt_utils.surrogate_key(['remap_projects.member_id']) }} AS direct_member_pk,
+    {{ dbt_utils.surrogate_key(['combine.member_id']) }} AS direct_member_pk,
 
     -- Foreign Keys
-    {{ get_keyed_nulls(dbt_utils.surrogate_key(['remap_projects.user_id'])) }} AS dim_user_sk,
-    {{ get_keyed_nulls(dbt_utils.surrogate_key(['remap_projects.member_namespace_id'])) }} AS dim_namespace_sk,
+    {{ get_keyed_nulls(dbt_utils.surrogate_key(['combine.user_id'])) }} AS dim_user_sk,
+    {{ get_keyed_nulls(dbt_utils.surrogate_key(['combine.member_namespace_id'])) }} AS dim_namespace_sk,
 
     -- Legacy Keys
-    remap_projects.member_id,
-    remap_projects.user_id,
-    remap_projects.member_namespace_id AS namespace_id,
+    combine.member_id,
+    combine.user_id,
+    combine.member_namespace_id AS namespace_id,
 
     -- Degenerate Dimensions
-    remap_projects.access_level,
-    remap_projects.access_level_name,
-    remap_projects.member_type,
-    remap_projects.created_at AS membership_created_at, -- change to created_at
-    remap_projects.invite_accepted_at,
-    remap_projects.requested_at,
-    remap_projects.expires_at,
-    IFF(remap_projects.invite_token IS NOT NULL, TRUE, FALSE) AS is_invite,
-    IFF(remap_projects.invite_accepted_at IS NOT NULL, TRUE, FALSE) AS is_past_invite,
-    IFF(remap_projects.requested_at IS NOT NULL, TRUE, FALSE) AS is_request,
-    remap_projects.valid_from,
-    remap_projects.valid_to,
-    remap_projects.is_currently_valid
+    combine.access_level,
+    access_levels.access_level_name,
+    combine.member_type,
+    combine.created_at AS membership_created_at, -- change to created_at
+    combine.invite_accepted_at,
+    combine.requested_at,
+    combine.expires_at,
+    IFF(combine.invite_token IS NOT NULL, TRUE, FALSE) AS is_invite,
+    IFF(combine.invite_accepted_at IS NOT NULL, TRUE, FALSE) AS is_past_invite,
+    IFF(combine.requested_at IS NOT NULL, TRUE, FALSE) AS is_request,
+    combine.valid_from,
+    combine.valid_to,
+    combine.is_currently_valid
 
     -- Facts
 
-  FROM remap_projects
+  FROM combine
+  LEFT JOIN access_levels
+    ON combine.access_level = access_levels.access_level_id
 
 )
 
