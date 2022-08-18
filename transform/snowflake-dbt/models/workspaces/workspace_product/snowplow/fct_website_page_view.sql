@@ -15,6 +15,7 @@
 
     SELECT
       {{ clean_url('page_url_path') }}                                              AS clean_url_path,
+      page_url_path,
       app_id,
       page_url_host,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)                 AS dim_namespace_id,
@@ -33,7 +34,10 @@
       gsc_source,
       min_tstamp                                                                    AS page_view_start_at,
       max_tstamp                                                                    AS page_view_end_at,
-      time_engaged_in_s                                                             AS engaged_seconds
+      time_engaged_in_s                                                             AS engaged_seconds,
+      total_time_in_ms                                                              AS engaged_milliseconds,
+      page_view_index,
+      page_view_in_session_index
     FROM page_views
 
     {% if is_incremental() %}
@@ -74,9 +78,13 @@
       gsc_source,
 
       -- Attributes
+      page_url_path,
       event_name,
       NULL                                                                          AS sf_formid,
-      engaged_seconds
+      engaged_seconds,
+      engaged_milliseconds,
+      page_view_index,
+      page_view_in_session_index
     FROM page_views_w_clean_url
     LEFT JOIN dim_website_page ON page_views_w_clean_url.clean_url_path = dim_website_page.clean_url_path
     AND page_views_w_clean_url.page_url_host = dim_website_page.page_url_host
@@ -88,6 +96,7 @@
 
     SELECT
       {{ clean_url('page_url_path') }}                                              AS clean_url_path,
+      page_url_path,
       app_id,
       page_url_host,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)                 AS dim_namespace_id,
@@ -104,10 +113,14 @@
       gsc_project_id,
       gsc_pseudonymized_user_id,
       sf_formid,
+      NULL                                                                          AS gsc_source,
       NULL                                                                          AS page_view_start_at,
       NULL                                                                          AS page_view_end_at,
       NULL                                                                          AS engaged_seconds,
-      derived_tstamp                                                                AS behavior_at
+      NULL                                                                          AS engaged_milliseconds,
+      derived_tstamp                                                                AS behavior_at,
+      NULL                                                                          AS page_view_index,
+      NULL                                                                          AS page_view_in_session_index
     FROM unstruct_events
 
     {% if is_incremental() %}
@@ -147,12 +160,16 @@
       gsc_plan,
       gsc_project_id,
       gsc_pseudonymized_user_id,
-      NULL                                                                          AS gsc_source,
+      gsc_source,
 
       -- Attributes
+      page_url_path,
       event_name,
       sf_formid,
-      engaged_seconds
+      engaged_seconds,
+      engaged_milliseconds,
+      page_view_index,
+      page_view_in_session_index
     FROM unstruct_w_clean_url
     LEFT JOIN dim_website_page ON unstruct_w_clean_url.clean_url_path = dim_website_page.clean_url_path
     AND unstruct_w_clean_url.page_url_host = dim_website_page.page_url_host
