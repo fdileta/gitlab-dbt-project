@@ -472,7 +472,6 @@ WITH first_contact  AS (
         WHEN (sfdc_opportunity.new_logo_count = 1
           OR sfdc_opportunity.new_logo_count = -1
           )
-          AND sfdc_opportunity.is_edu_oss = FALSE 
           AND sfdc_account.is_jihu_account = FALSE
           THEN TRUE 
         ELSE FALSE
