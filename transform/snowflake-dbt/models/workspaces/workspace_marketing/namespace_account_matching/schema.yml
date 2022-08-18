@@ -24,3 +24,8 @@ models:
         tests:
           - unique
           - not_null
+  - name: wk_fct_direct_membership
+    columns:
+      - name: direct_member_pk
+        tests:
+          - unique

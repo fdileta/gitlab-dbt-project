@@ -3,7 +3,7 @@
 ) }}
 
 {{ simple_cte([
-    ('projects','gitlab_dotcom_projects_source')
+    ('projects','prep_map_project_namespace')
 ]) }},
 
 project_namespace_map AS (
