@@ -77,7 +77,7 @@
       prep_usage_ping_cte.*,
       prep_license.dim_license_id                                                                          AS dim_license_id,
       dim_date.date_id                                                                                     AS dim_ping_date_id,
-      COALESCE(license_subscription_id, prep_subscription.dim_subscription_id)                             AS dim_subscription_id,
+      COALESCE(prep_subscription.dim_subscription_id,license_subscription_id)                              AS dim_subscription_id,
       IFF(prep_usage_ping_cte.ping_created_at < license_trial_ends_on, TRUE, FALSE)                        AS is_trial,
       IFF(prep_license.dim_subscription_id IS NOT NULL, TRUE, FALSE)                                       AS is_license_mapped_to_subscription, -- does the license table have a value in both license_id and subscription_id
       IFF(prep_subscription.dim_subscription_id IS NULL, FALSE, TRUE)                                      AS is_license_subscription_id_valid   -- is the subscription_id in the license table valid (does it exist in the subscription table?)
