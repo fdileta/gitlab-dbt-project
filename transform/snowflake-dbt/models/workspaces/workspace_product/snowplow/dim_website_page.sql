@@ -18,6 +18,7 @@
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
       refr_medium                                                                   AS referrer_medium,
+      min(uploaded_at)                                                              AS min_event_timestamp,
       max(uploaded_at)                                                              AS max_event_timestamp
     FROM events
     WHERE event IN ('struct', 'page_view', 'unstruct')
@@ -47,6 +48,7 @@
       page_type,
       page_sub_type,
       referrer_medium,
+      min_event_timestamp,
       max_event_timestamp
     FROM page
 
