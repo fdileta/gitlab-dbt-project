@@ -1,7 +1,7 @@
 from asyncio.log import logger
 import logging
 import yaml
-import os
+from os import environ as env
 from datetime import datetime
 from fire import Fire
 from typing import Dict
@@ -67,6 +67,6 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("snowflake.connector.cursor").disabled = True
     logging.getLogger("snowflake.connector.connection").disabled = True
-    config_dict = os.env.copy()
+    config_dict = env.copy()
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
     Fire({"deduplication": main})
