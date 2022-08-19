@@ -69,4 +69,4 @@ if __name__ == "__main__":
     logging.getLogger("snowflake.connector.connection").disabled = True
     config_dict = env.copy()
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
-    Fire({"deduplication": main(config_dict)})
+    Fire({"deduplication": main})
