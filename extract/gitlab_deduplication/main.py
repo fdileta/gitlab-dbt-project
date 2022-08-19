@@ -57,7 +57,7 @@ def main(file_path: str = 't_gitlab_com_scd_advance_metadata_manifest.yml') -> N
     manifest_dict = manifest_reader(file_path)
     scd_tables_list=manifest_dict["scd_tables"]
     # Add raw database name to the manifest
-    manifest_dict.update({'raw_database' : os.env.copy().config_dict["SNOWFLAKE_LOAD_DATABASE"]})
+    manifest_dict.update({'raw_database' : env.copy().config_dict["SNOWFLAKE_LOAD_DATABASE"]})
     #iterate through each table and check if it exist 
     for table in scd_tables_list:
         deduplicate_scd_tables(manifest_dict,table)

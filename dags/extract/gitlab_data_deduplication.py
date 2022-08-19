@@ -30,7 +30,7 @@ pod_env_vars = {
 scd_cmd = f"""
             {clone_repo_cmd} &&
             cd analytics/extract/gitlab_deduplication/ &&
-            python main.py deduplication ../extract/gitlab_deduplication/manifest_deduplication/t_gitlab_com_deduplication_table_manifest.yaml 
+            python main.py deduplication manifest_deduplication/t_gitlab_com_deduplication_table_manifest.yaml 
 """
 default_args={
         "catchup": False,
