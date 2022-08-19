@@ -7,8 +7,8 @@ models:
         - name: id
           description: "Subcription Slug, SFDC Account ID, or SFDC Ultimate Parent Account ID"
           tests:
-              - not_null:
-                  severity: warn
+              - dbt_utils.not_null_proportion:
+                  at_least: 0.99999
         - name: level_
           description: "Subcription, SFDC Account, or SFDC Ultimate Parent Account"
           tests:
@@ -18,8 +18,8 @@ models:
         - name: arr
           description: "Annual Recurring Revenue (MRR * 12) for most recent month for which this is MRR that is not in the future."
           tests:
-              - not_null:
-                  severity: warn
+              - dbt_utils.not_null_proportion:
+                  at_least: 0.99999
         - name: arr_segmentation
           description: "ARR Segmentation"
           tests:
