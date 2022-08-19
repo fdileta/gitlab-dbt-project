@@ -201,6 +201,7 @@ dbt_results = KubernetesPodOperator(
 dbt_workspaces_command = f"""
     {pull_commit_hash} &&
     {dbt_install_deps_cmd} &&
+    export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_XL" &&
     dbt --no-use-colors run --profiles-dir profile --target prod --models workspaces.* --exclude workspaces.workspace_data_science.* workspaces.workspace_data.tdf.*; ret=$?;
     python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
 """
