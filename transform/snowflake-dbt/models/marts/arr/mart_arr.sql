@@ -141,6 +141,7 @@ WITH dim_billing_account AS (
       dim_subscription.was_purchased_through_reseller,
 
       --product info
+      dim_product_detail.dim_product_detail_id                                        AS dim_product_detail_id,
       dim_product_detail.product_tier_name                                            AS product_tier_name,
       dim_product_detail.product_delivery_type                                        AS product_delivery_type,
       dim_product_detail.product_ranking                                              AS product_ranking,
@@ -220,5 +221,5 @@ WITH dim_billing_account AS (
     created_by="@msendal",
     updated_by="@iweeks",
     created_date="2020-09-04",
-    updated_date="2022-08-17"
+    updated_date="2022-08-21"
 ) }}
