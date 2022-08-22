@@ -9,9 +9,9 @@
   ('customers_db_charges_xf', 'customers_db_charges_xf'),
   ('customers_db_trials', 'customers_db_trials'),
   ('customers_db_leads', 'customers_db_leads_source'),
-  ('gitlab_dotcom_daily_usage_data_events', 'gitlab_dotcom_daily_usage_data_events'),
-  ('gitlab_dotcom_xmau_metrics', 'gitlab_dotcom_xmau_metrics'),
-  ('services', 'gitlab_dotcom_integrations_source'),
+  ('fct_event_user_daily', 'fct_event_user_daily'),
+  ('map_gitlab_dotcom_xmau_metrics', 'map_gitlab_dotcom_xmau_metrics'),
+  ('services', 'gitlab_dotcom_services_source'),
   ('project', 'prep_project')
 ]) }}
 
@@ -144,14 +144,14 @@
       subscriptions.min_subscription_start_date,
       ARRAYAGG(DISTINCT events.stage_name)       AS list_of_stages,
       COUNT(DISTINCT events.stage_name)          AS active_stage_count
-    FROM gitlab_dotcom_daily_usage_data_events   AS events
+    FROM fct_event_user_daily   AS events
     INNER JOIN namespaces 
-      ON namespaces.dim_namespace_id = events.namespace_id 
-    LEFT JOIN gitlab_dotcom_xmau_metrics AS xmau 
-      ON xmau.events_to_include = events.event_name
+      ON namespaces.dim_namespace_id = events.dim_ultimate_parent_namespace_id 
+    LEFT JOIN map_gitlab_dotcom_xmau_metrics AS xmau 
+      ON xmau.common_events_to_include = events.event_name
     LEFT JOIN subscriptions 
       ON subscriptions.namespace_id = namespaces.dim_namespace_id
-    WHERE days_since_namespace_creation BETWEEN 0 AND 365
+    WHERE days_since_namespace_creation_at_event_date BETWEEN 0 AND 365
       AND events.plan_name_at_event_date IN ('trial','free', 'ultimate_trial') --Added in to only use events from a free or trial namespace (which filters based on the selection chose for the `free_or_trial` filter
       AND xmau.smau = TRUE
       AND events.event_date BETWEEN namespaces.namespace_created_at_date AND IFNULL(subscriptions.min_subscription_start_date,CURRENT_DATE)
@@ -268,16 +268,6 @@
     SELECT DISTINCT
       dim_marketing_contact_id,
       dim_subscription_id,
-      smau_manage_analytics_total_unique_counts_monthly,
-      smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly,
-      smau_create_repo_writes,
-      smau_verify_ci_pipelines_users_28_days,
-      smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly,
-      smau_release_release_creation_users_28_days,
-      smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly,
-      smau_monitor_incident_management_activer_user_28_days,
-      smau_secure_secure_scanners_users_28_days,
-      smau_protect_container_scanning_jobs_users_28_days,
       usage_umau_28_days_user,
       usage_action_monthly_active_users_project_repo_28_days_user,
       usage_merge_requests_28_days_user,
@@ -314,16 +304,6 @@
 
     SELECT 
       dim_marketing_contact_id,
-      SUM(smau_manage_analytics_total_unique_counts_monthly)                                        AS smau_manage_analytics_total_unique_counts_monthly,
-      SUM(smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly)         AS smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly,
-      SUM(smau_create_repo_writes)                                                                  AS smau_create_repo_writes,
-      SUM(smau_verify_ci_pipelines_users_28_days)                                                   AS smau_verify_ci_pipelines_users_28_days,
-      SUM(smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly)  AS smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly,
-      SUM(smau_release_release_creation_users_28_days)                                              AS smau_release_release_creation_users_28_days,
-      SUM(smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly)   AS smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly,
-      SUM(smau_monitor_incident_management_activer_user_28_days)                                    AS smau_monitor_incident_management_activer_user_28_days,
-      SUM(smau_secure_secure_scanners_users_28_days)                                                AS smau_secure_secure_scanners_users_28_days,
-      SUM(smau_protect_container_scanning_jobs_users_28_days)                                       AS smau_protect_container_scanning_jobs_users_28_days,
       SUM(usage_umau_28_days_user)                                                                  AS usage_umau_28_days_user,
       SUM(usage_action_monthly_active_users_project_repo_28_days_user)                              AS usage_action_monthly_active_users_project_repo_28_days_user,
       SUM(usage_merge_requests_28_days_user)                                                        AS usage_merge_requests_28_days_user,
@@ -774,16 +754,6 @@
       marketing_contact.zuora_active_state,
       marketing_contact.wip_is_valid_email_address,
       marketing_contact.wip_invalid_email_address_reason,
-      usage_metrics.smau_manage_analytics_total_unique_counts_monthly,
-      usage_metrics.smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly,
-      usage_metrics.smau_create_repo_writes,
-      usage_metrics.smau_verify_ci_pipelines_users_28_days,
-      usage_metrics.smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly,
-      usage_metrics.smau_release_release_creation_users_28_days,
-      usage_metrics.smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly,
-      usage_metrics.smau_monitor_incident_management_activer_user_28_days,
-      usage_metrics.smau_secure_secure_scanners_users_28_days,
-      usage_metrics.smau_protect_container_scanning_jobs_users_28_days,
       usage_metrics.usage_umau_28_days_user,
       usage_metrics.usage_action_monthly_active_users_project_repo_28_days_user,
       usage_metrics.usage_merge_requests_28_days_user,
@@ -900,16 +870,6 @@
       'pql_nbr_namespace_users',
       'wip_is_valid_email_address',
       'wip_invalid_email_address_reason',
-      'smau_manage_analytics_total_unique_counts_monthly',
-      'smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly',
-      'smau_create_repo_writes',
-      'smau_verify_ci_pipelines_users_28_days',
-      'smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly',
-      'smau_release_release_creation_users_28_days',
-      'smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly',
-      'smau_monitor_incident_management_activer_user_28_days',
-      'smau_secure_secure_scanners_users_28_days',
-      'smau_protect_container_scanning_jobs_users_28_days',
       'usage_umau_28_days_user',
       'usage_action_monthly_active_users_project_repo_28_days_user',
       'usage_merge_requests_28_days_user',
@@ -954,7 +914,7 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-09",
-    updated_date="2022-08-08"
+    updated_date="2022-08-18"
 ) }}
 
 

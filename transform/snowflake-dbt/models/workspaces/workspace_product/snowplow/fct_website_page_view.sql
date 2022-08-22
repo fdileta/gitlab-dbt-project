@@ -15,6 +15,7 @@
 
     SELECT
       {{ clean_url('page_url_path') }}                                              AS clean_url_path,
+      page_url_path,
       app_id,
       page_url_host,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)                 AS dim_namespace_id,
@@ -23,9 +24,20 @@
       user_snowplow_domain_id,
       page_view_id                                                                  AS event_id,
       'page_view'                                                                   AS event_name,
+      gsc_environment,
+      gsc_extra,
+      gsc_google_analytics_client_id,
+      gsc_namespace_id,
+      gsc_plan,
+      gsc_project_id,
+      gsc_pseudonymized_user_id,
+      gsc_source,
       min_tstamp                                                                    AS page_view_start_at,
       max_tstamp                                                                    AS page_view_end_at,
-      time_engaged_in_s                                                             AS engaged_seconds
+      time_engaged_in_s                                                             AS engaged_seconds,
+      total_time_in_ms                                                              AS engaged_milliseconds,
+      page_view_index,
+      page_view_in_session_index
     FROM page_views
 
     {% if is_incremental() %}
@@ -48,17 +60,31 @@
       --Time Attributes
       page_view_start_at,
       page_view_end_at,
-      NULL                                                                          AS collector_tstamp,
+      page_view_start_at                                                            AS behavior_at,
 
       -- Natural Keys
       session_id,
       event_id,
       user_snowplow_domain_id,
 
+      -- Google Keys
+      gsc_environment,
+      gsc_extra,
+      gsc_google_analytics_client_id,
+      gsc_namespace_id,
+      gsc_plan,
+      gsc_project_id,
+      gsc_pseudonymized_user_id,
+      gsc_source,
+
       -- Attributes
+      page_url_path,
       event_name,
       NULL                                                                          AS sf_formid,
-      engaged_seconds
+      engaged_seconds,
+      engaged_milliseconds,
+      page_view_index,
+      page_view_in_session_index
     FROM page_views_w_clean_url
     LEFT JOIN dim_website_page ON page_views_w_clean_url.clean_url_path = dim_website_page.clean_url_path
     AND page_views_w_clean_url.page_url_host = dim_website_page.page_url_host
@@ -70,6 +96,7 @@
 
     SELECT
       {{ clean_url('page_url_path') }}                                              AS clean_url_path,
+      page_url_path,
       app_id,
       page_url_host,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)                 AS dim_namespace_id,
@@ -78,16 +105,27 @@
       event_id,
       user_snowplow_domain_id,
       event_name,
+      gsc_environment,
+      gsc_extra,
+      gsc_google_analytics_client_id,
+      gsc_namespace_id,
+      gsc_plan,
+      gsc_project_id,
+      gsc_pseudonymized_user_id,
       sf_formid,
+      NULL                                                                          AS gsc_source,
       NULL                                                                          AS page_view_start_at,
       NULL                                                                          AS page_view_end_at,
       NULL                                                                          AS engaged_seconds,
-      collector_tstamp
+      NULL                                                                          AS engaged_milliseconds,
+      derived_tstamp                                                                AS behavior_at,
+      NULL                                                                          AS page_view_index,
+      NULL                                                                          AS page_view_in_session_index
     FROM unstruct_events
 
     {% if is_incremental() %}
 
-    WHERE collector_tstamp > (SELECT max(collector_tstamp) FROM {{ this }})
+    WHERE derived_tstamp > (SELECT max(behavior_at) FROM {{ this }})
 
     {% endif %}
 
@@ -97,7 +135,7 @@
 
     SELECT
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['event_id','collector_tstamp']) }}                AS website_page_view_pk,
+      {{ dbt_utils.surrogate_key(['event_id','behavior_at']) }}                     AS website_page_view_pk,
 
       -- Foreign Keys
       dim_website_page_sk,
@@ -107,17 +145,31 @@
       --Time Attributes
       page_view_start_at,
       page_view_end_at,
-      collector_tstamp,
+      behavior_at,
 
       -- Natural Keys
       session_id,
       event_id,
       user_snowplow_domain_id,
 
+      -- Google Keys
+      gsc_environment,
+      gsc_extra,
+      gsc_google_analytics_client_id,
+      gsc_namespace_id,
+      gsc_plan,
+      gsc_project_id,
+      gsc_pseudonymized_user_id,
+      gsc_source,
+
       -- Attributes
+      page_url_path,
       event_name,
       sf_formid,
-      engaged_seconds
+      engaged_seconds,
+      engaged_milliseconds,
+      page_view_index,
+      page_view_in_session_index
     FROM unstruct_w_clean_url
     LEFT JOIN dim_website_page ON unstruct_w_clean_url.clean_url_path = dim_website_page.clean_url_path
     AND unstruct_w_clean_url.page_url_host = dim_website_page.page_url_host
