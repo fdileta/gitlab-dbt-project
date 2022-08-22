@@ -9,6 +9,7 @@ models:
           tests:
               - not_null:
                   config:
+                    severity: error
                     error_if: ">1"
         - name: level_
           description: "Subcription, SFDC Account, or SFDC Ultimate Parent Account"
@@ -21,6 +22,7 @@ models:
           tests:
               - not_null:
                   config:
+                    severity: error
                     error_if: ">1"
         - name: arr_segmentation
           description: "ARR Segmentation"
