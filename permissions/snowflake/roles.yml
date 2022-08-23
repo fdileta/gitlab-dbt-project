@@ -2438,6 +2438,7 @@ roles:
             - analyst_people
             - bamboohr
             - bi_tool_eval_read
+            - restricted_safe
         warehouses:
             - dev_xs
 
