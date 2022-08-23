@@ -2436,12 +2436,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - atucker:
-        member_of:
-            - analyst_finance
-        warehouses:
-            - dev_xs
-
     - bbutterfield:
         member_of:
             - reporter
@@ -4367,11 +4361,6 @@ users:
         can_login: yes
         member_of:
             - aperez
-
-    - atucker:
-        can_login: yes
-        member_of:
-            - atucker
 
     - bi_tool_eval:
         can_login: yes
