@@ -3428,17 +3428,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - mhanks:
-        member_of:
-            - analyst_finance
-            - bamboohr_analytics
-            - customers_db
-            - analyst_marketing
-            - data_team_analyst
-            - restricted_safe
-        warehouses:
-            - dev_xs
-
     - mlaanen:
         member_of:
             - analyst_core
@@ -4577,11 +4566,6 @@ users:
         can_login: yes
         member_of:
             - mfleisher
-
-    - mhanks:
-        can_login: yes
-        member_of:
-            - mhanks
 
     - mlaanen:
         can_login: yes
