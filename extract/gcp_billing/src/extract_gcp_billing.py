@@ -40,7 +40,7 @@ def get_billing_data_query(start_date: str) -> str:
           cost_type,
           DATE(_PARTITIONTIME)
         FROM gitlab_com_billing.gcp_billing_export_v1_017B02_778F9C_493B83
-        WHERE DATE(_PARTITIONTIME)= '{start_date}'
+        WHERE export_time between '{execution_date}' and '{next_execution_date}'
     """
 
 
