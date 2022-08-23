@@ -2444,13 +2444,6 @@ roles:
         warehouses:
             - reporting
 
-    - cbalane:
-        member_of:
-            - reporter
-            - gitlab_dotcom_prep
-        warehouses:
-            - dev_xs
-
     - cbraza:
         member_of:
             - analyst_growth
@@ -4371,11 +4364,6 @@ users:
         can_login: yes
         member_of:
             - bbutterfield
-
-    - cbalane:
-        can_login: yes
-        member_of:
-            - cbalane
 
     - cbraza:
         can_login: yes
