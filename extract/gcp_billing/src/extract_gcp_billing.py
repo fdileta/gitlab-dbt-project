@@ -15,7 +15,7 @@ from gitlabdata.orchestration_utils import (
 config_dict = env.copy()
 
 
-def get_billing_data_query(start_date: str) -> str:
+def get_billing_data_query(start_time: str, end_time: str) -> str:
     """
     sql to run in bigquery for daily partition
     """
@@ -82,7 +82,9 @@ if __name__ == "__main__":
 
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    sql_statement = get_billing_data_query(start_time)
+    sql_statement = get_billing_data_query(start_time, end_time)
+
+    logging.info(sql_statement)
 
     df_result = bq.get_dataframe_from_sql(
         sql_statement,
