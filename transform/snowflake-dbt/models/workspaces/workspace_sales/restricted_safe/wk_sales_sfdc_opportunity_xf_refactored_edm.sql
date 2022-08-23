@@ -8,21 +8,7 @@ WITH sfdc_opportunity AS (
     FROM {{ref('sfdc_opportunity')}}
     --FROM  prod.restricted_safe_legacy.sfdc_opportunity
 
-), sfdc_opportunity_raw AS (
-    /*
-    JK 2022-06-16: Adding comp_new_logo_override__c directly from RAW SFDC object
-    This field is required for High Value First Order dashboard. I will create another MR so that
-    it is added to EDMs and when we do a source table migration from legacy to EDMs for Workspace Sales,
-    we can delete this connection and use the mart table directly.
-    */
-
-    SELECT
-        id AS opportunity_id,
-        comp_new_logo_override__c
-    --FROM raw.salesforce_stitch.opportunity
-    FROM {{ source('salesforce', 'opportunity') }}
-
- ), legacy_sfdc_opportunity_xf AS (
+), legacy_sfdc_opportunity_xf AS (
 
     SELECT *
     --FROM prod.restricted_safe_legacy.sfdc_opportunity_xf
@@ -524,13 +510,7 @@ WITH sfdc_opportunity AS (
     ELSE 0
     END                                 AS competitors_aws_flag,
 
-    -- JK 2022-06-16 temporary field for FO dashboard
-    -- CASE sfdc_opportunity_raw.comp_new_logo_override__c
-    -- WHEN 'Yes'
-    --     THEN 1
-    -- ELSE 0
-    -- END                                 AS is_comp_new_logo_override,
-    is_comp_new_logo_override,
+    edm_opty.is_comp_new_logo_override,
 
     CASE
     WHEN edm_opty.stage_name
@@ -696,9 +676,6 @@ WITH sfdc_opportunity AS (
     -- NF 20211105 resale partner
     LEFT JOIN sfdc_accounts_xf AS resale_account
       ON resale_account.account_id = sfdc_opportunity_xf.fulfillment_partner
-    -- JK 20220616 temp solution to add New Logo Override field
-    LEFT JOIN sfdc_opportunity_raw
-      ON sfdc_opportunity.opportunity_id = sfdc_opportunity_raw.opportunity_id
     -- NF 20210906 remove JiHu opties from the models
     WHERE sfdc_opportunity_xf.is_jihu_account = 0
         AND account.ultimate_parent_account_id NOT IN ('0016100001YUkWVAA1')            -- remove test account
@@ -970,12 +947,11 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
 
 
       -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
+      -- 2022-08-23 JK: using the central is_sao logic
       CASE
         WHEN oppty_final.sales_accepted_date IS NOT NULL
           AND oppty_final.is_edu_oss = 0
-          AND oppty_final.is_deleted = 0
-          AND oppty_final.is_renewal = 0
-          AND oppty_final.stage_name NOT IN ('00-Pre Opportunity','10-Duplicate', '9-Unqualified','0-Pending Acceptance')
+          AND oppty_final.stage_name NOT IN ('10-Duplicate')
             THEN 1
         ELSE 0
       END                                                         AS is_eligible_sao_flag,
