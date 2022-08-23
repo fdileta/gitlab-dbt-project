@@ -4042,6 +4042,7 @@ roles:
             - analyst_people
             - bamboohr
             - reporter
+            - restricted_safe
         warehouses:
             - dev_xs
 
