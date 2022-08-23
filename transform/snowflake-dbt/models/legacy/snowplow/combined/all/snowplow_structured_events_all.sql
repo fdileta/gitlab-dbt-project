@@ -1,6 +1,7 @@
 {{config({
     "materialized":"incremental",
-    "unique_key":"event_id"
+    "unique_key":"event_id",
+    "post-hook": ["DELETE FROM {{ this }} WHERE DATE_TRUNC(MONTH, derived_tstamp::DATE) < DATEADD(MONTH, -24, DATE_TRUNC(MONTH,CURRENT_DATE))"]
   })
 }}
 
