@@ -827,7 +827,7 @@ tables:
     import_query: |-
       SELECT user_id
       , job_title
-      , other_role
+      , NULL AS other_role
       , registration_objective
       FROM user_details
   users_security_dashboard_projects:
