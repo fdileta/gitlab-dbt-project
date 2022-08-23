@@ -4260,16 +4260,6 @@ roles:
                     - vprakash_prep.*.*
                     - vprakash_prod.*.*
 
-    - warias:
-        member_of:
-            - data_team_analyst
-            - analyst_core
-            - restricted_safe
-            - dbt_data_science
-            - snowplow
-        warehouses:
-            - dev_xs
-
     - webrahim:
         member_of:
             - analyst_finance
@@ -4732,11 +4722,6 @@ users:
             - accountadmin
             - securityadmin
             - vprakash
-
-    - warias:
-        can_login: yes
-        member_of:
-            - warias
 
     - webrahim:
         can_login: yes
