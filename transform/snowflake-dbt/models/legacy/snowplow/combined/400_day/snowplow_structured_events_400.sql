@@ -9,11 +9,13 @@
 
 {% if is_incremental() %}
 
+{% set days_to_look_back = 10 %}
+
 WITH filtered_table AS (
 
   SELECT *
   FROM {{ this }}
-  WHERE DATE_TRUNC(MONTH, derived_tstamp::DATE) >= DATEADD(MONTH, -10, DATE_TRUNC(MONTH,CURRENT_DATE)) 
+  WHERE derived_tstamp::DATE >= DATEADD(DAY, -{{days_to_look_back}}, CURRENT_DATE::DATE) 
 
 )
 
@@ -21,8 +23,12 @@ WITH filtered_table AS (
 
 SELECT *
 FROM {{ ref('snowplow_structured_events_all') }}
-WHERE DATE_TRUNC(MONTH, derived_tstamp::DATE) >= DATEADD(MONTH, -400, DATE_TRUNC(MONTH,CURRENT_DATE))
 
 {% if is_incremental() %}
+WHERE derived_tstamp::DATE >= DATEADD(DAY, -{{days_to_look_back}}, CURRENT_DATE::DATE)
   AND event_id NOT IN (SELECT event_id FROM filtered_table)
+
+{% else %}
+
+WHERE derived_tstamp::DATE >= DATEADD(DAY, -400, CURRENT_DATE::DATE)
 {% endif %}

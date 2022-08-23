@@ -25,7 +25,7 @@ filtered_table AS (
 
   SELECT *
   FROM {{ this }}
-  WHERE DATE_TRUNC(MONTH, derived_tstamp::DATE) >= DATEADD(MONTH, -{{day_limit}}, DATE_TRUNC(MONTH,CURRENT_DATE)) 
+  WHERE derived_tstamp::DATE >= DATEADD(DAY, -{{day_limit}}, CURRENT_DATE::DATE)
 
 ),
 
@@ -42,7 +42,7 @@ SELECT *
 FROM unioned_table
 
 {% if is_incremental() %}
-WHERE DATE_TRUNC(MONTH, derived_tstamp::DATE) >= DATEADD(MONTH, -{{day_limit}}, DATE_TRUNC(MONTH,CURRENT_DATE))
+WHERE derived_tstamp::DATE >= DATEADD(DAY, -{{day_limit}}, CURRENT_DATE::DATE)
   AND event_id NOT IN (SELECT event_id FROM filtered_table)
 
 {% else %}
