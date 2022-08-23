@@ -3773,12 +3773,6 @@ roles:
         warehouses:
             - admin
 
-    - pskorupa:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - rbacovic:
         member_of:
             - engineer
@@ -4643,11 +4637,6 @@ users:
             - permission_bot
             - securityadmin
             - sysadmin
-
-    - pskorupa:
-        can_login: yes
-        member_of:
-            - pskorupa
 
     - rbacovic:
         can_login: yes
