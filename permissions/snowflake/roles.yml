@@ -2427,12 +2427,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - amihaila:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - aperez:
         member_of:
             - analyst_people
@@ -4368,11 +4362,6 @@ users:
         can_login: yes
         member_of:
             - amartin
-
-    - amihaila:
-        can_login: yes
-        member_of:
-            - amihaila
 
     - aperez:
         can_login: yes
