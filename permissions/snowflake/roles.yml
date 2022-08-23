@@ -3599,12 +3599,6 @@ roles:
                     - mwawrzyniak_prep.*.*
                     - mwawrzyniak_prod.*.*
 
-    - mwielich:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - nbelokolodov:
         member_of:
             - analyst_growth
@@ -4591,11 +4585,6 @@ users:
         can_login: yes
         member_of:
             - mwawrzyniak
-
-    - mwielich:
-        can_login: yes
-        member_of:
-            - mwielich
 
     - nbelokolodov:
         can_login: yes
