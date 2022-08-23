@@ -4205,12 +4205,6 @@ roles:
                     - tnguyen_prep.*.*
                     - tnguyen_prod.*.*
 
-    - tvellishetty:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - vagrawal:
         member_of:
             - adaptive
@@ -4726,11 +4720,6 @@ users:
         can_login: yes
         member_of:
             - tnguyen
-
-    - tvellishetty:
-        can_login: yes
-        member_of:
-            - tvellishetty
 
     - vagrawal:
         can_login: yes
