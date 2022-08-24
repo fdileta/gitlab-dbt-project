@@ -9,6 +9,9 @@ ln -s /etc/ssl/* /Library/Frameworks/Python.framework/Versions/3.10/etc/openssl
 
 echo "Setting up path links for your new version of python"
 export PATH="$HOME/Library/Python/3.10/bin":"$PATH" >> ~/.zshrc
+# If you come from bash you might have to change your $PATH.
+export PATH=$HOME/bin:/usr/local/bin:$PATH >> ~/.zshrc
+export PATH="$HOME/.poetry/bin:$PATH" >> ~/.zshrc
 
 rm python-3.10.3-macos11.pkg
 echo "Python succesfully installed"
