@@ -215,8 +215,7 @@ Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credential
   - [ ] Ensure that you select the `dockerd` container runtime in `Kubernetes Settings`. 
   - [ ] Ensure that you select to create symbologic links to the docker command line path (`/usr/local/bin/docker`) in the `Supporting Utilities` section. 
   - [ ] Install the docker-compose cli by running through the below: 
-    - `sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
-    - `sudo chmod +x /usr/local/bin/docker-compose`
+    - `brew install docker docker-compose`
     - Confirm install
     - `docker-compose --version`
     - Optionally, install [command completion](https://docs.docker.com/compose/completion/) for the bash and zsh shell.
