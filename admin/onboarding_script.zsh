@@ -7,6 +7,9 @@ sudo installer -pkg python-3.10.3-macos11.pkg -target /
 echo "Setting up SSL links for your new version of python"
 ln -s /etc/ssl/* /Library/Frameworks/Python.framework/Versions/3.10/etc/openssl
 
+echo "Setting up path links for your new version of python"
+export PATH="$HOME/Library/Python/3.10/bin":"$PATH" >> ~/.zshrc
+
 rm python-3.10.3-macos11.pkg
 echo "Python succesfully installed"
 
