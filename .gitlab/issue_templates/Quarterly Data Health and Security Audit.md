@@ -60,11 +60,11 @@ Below checklist of activities would be run once for quarter to validate security
    * [ ] Check HAS_PASSWRD is set to ‘false’ in users table. If set to ‘false’ then there is not password set. Run below SQL script to perform the check.
    ```sql
     SELECT * 
-      FROM "SNOWFLAKE"."ACCOUNT_USAGE"."USERS"
-      WHERE has_password = 'true'
-      AND disabled = 'false'
-      AND deleted_on IS NULL
-      AND name NOT IN ('PERMISSION_BOT','FIVETRAN','GITLAB_CI','AIRFLOW','STITCH','SISENSE_RESTRICTED_SAFE','PERISCOPE','MELTANO','TARGET_SNOWFLAKE','GRAFANA','SECURITYBOTSNOWFLAKEAPI', 'GAINSIGHT','MELTANO_DEV','BI_TOOL_EVAL');
+   FROM "SNOWFLAKE"."ACCOUNT_USAGE"."USERS"
+   WHERE has_password = 'true'
+   AND disabled = 'false'
+   AND deleted_on IS NULL
+   AND name NOT IN ('PERMISSION_BOT','FIVETRAN','GITLAB_CI','AIRFLOW','STITCH','SISENSE_RESTRICTED_SAFE','PERISCOPE','MELTANO','TARGET_SNOWFLAKE','GRAFANA','SECURITYBOTSNOWFLAKEAPI', 'GAINSIGHT','MELTANO_DEV','BI_TOOL_EVAL','TABLEAU_RESTRICTED_SAFE','DATA_OBS_USER_1','TABLEAU');
 
  
     ```
