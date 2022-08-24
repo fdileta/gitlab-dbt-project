@@ -1,4 +1,16 @@
-## Install homebrew 
+echo "Downloading python 3.10.3"
+curl https://www.python.org/ftp/python/3.10.3/python-3.10.3-macos11.pkg >> python-3.10.3-macos11.pkg
+
+echo "Installing python 3.10.3"
+sudo installer -pkg python-3.10.3-macos11.pkg -target /
+
+echo "Setting up SSL links for your new version of python"
+ln -s /etc/ssl/* /Library/Frameworks/Python.framework/Versions/3.10/etc/openssl
+
+rm python-3.10.3-macos11.pkg
+echo "Python succesfully installed"
+
+## Install homebrew
 ## Check if exists
 command -v brew >/dev/null 2>&1 || { echo "Installing Homebrew.."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
