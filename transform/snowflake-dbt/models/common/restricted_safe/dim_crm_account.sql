@@ -25,6 +25,7 @@ WITH final AS (
       prep_crm_account.parent_crm_account_name,
       prep_crm_account.parent_crm_account_sales_segment,
       prep_crm_account.parent_crm_account_billing_country,
+      prep_crm_account.parent_crm_account_billing_country_code,
       prep_crm_account.parent_crm_account_industry,
       prep_crm_account.parent_crm_account_sub_industry,
       prep_crm_account.parent_crm_account_industry_hierarchy,
@@ -68,6 +69,7 @@ WITH final AS (
       prep_crm_account.crm_account_tsp_account_employees,
       prep_crm_account.crm_account_tsp_max_family_employees,
       prep_crm_account.crm_account_billing_country,
+      prep_crm_account.crm_account_billing_country_code,
       prep_crm_account.crm_account_type,
       prep_crm_account.crm_account_industry,
       prep_crm_account.crm_account_sub_industry,
@@ -127,6 +129,9 @@ WITH final AS (
       prep_crm_account.crm_account_zoom_info_parent_company_name,
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
+      prep_crm_account.crm_account_zoom_info_number_of_developers,
+      prep_crm_account.forbes_2000_rank,
+      prep_crm_account.decision_maker_count_linkedin,
 
       --measures (maintain for now to not break reporting)
       prep_crm_account.parent_crm_account_lam,

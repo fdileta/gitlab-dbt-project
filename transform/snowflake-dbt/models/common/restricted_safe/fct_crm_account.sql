@@ -47,6 +47,8 @@ WITH final AS (
       prep_crm_account.parent_crm_account_lam_dev_count,
       prep_crm_account.carr_this_account,
       prep_crm_account.carr_account_family,
+      prep_crm_account.potential_users,
+      prep_crm_account.number_of_licenses_this_account,
 
       --metadata
       prep_crm_account.created_by_id,
