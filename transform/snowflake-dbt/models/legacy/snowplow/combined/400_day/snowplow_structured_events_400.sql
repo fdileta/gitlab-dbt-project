@@ -5,8 +5,6 @@
   })
 }}
 
--- depends_on: {{ ref('snowplow_structured_events') }}
-
 {% if is_incremental() %}
 
 {% set days_to_look_back = 10 %}
