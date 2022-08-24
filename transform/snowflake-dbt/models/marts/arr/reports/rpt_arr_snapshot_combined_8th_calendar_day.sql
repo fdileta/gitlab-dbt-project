@@ -6,9 +6,7 @@
 {{ simple_cte([
     ('driveload_financial_metrics_program_phase_1_source','driveload_financial_metrics_program_phase_1_source'),
     ('dim_date','dim_date'),
-    ('mart_arr_snapshot_model','mart_arr_snapshot_model'),
-    ('dim_crm_account','dim_crm_account'),
-    ('zuora_account_source','zuora_account_source')
+    ('mart_arr_snapshot_model','mart_arr_snapshot_model')
 ]) }}
 
 , phase_one AS (
@@ -43,7 +41,8 @@
       CASE
         WHEN  driveload_financial_metrics_program_phase_1_source.delivery = 'Others' THEN 'SaaS'
         ELSE  driveload_financial_metrics_program_phase_1_source.delivery
-      END                                                                                          AS  product_delivery_type,
+      END                                                                                          AS product_delivery_type,
+      NULL                                                                                         AS product_ranking,
       driveload_financial_metrics_program_phase_1_source.service_type,
       driveload_financial_metrics_program_phase_1_source.unit_of_measure,
       driveload_financial_metrics_program_phase_1_source.mrr,
@@ -112,6 +111,7 @@
         WHEN  mart_arr_snapshot_model.product_delivery_type = 'Others' THEN 'SaaS'
         ELSE  mart_arr_snapshot_model.product_delivery_type
       END                                                                                       AS  product_delivery_type,
+      mart_arr_snapshot_model.product_ranking,
       mart_arr_snapshot_model.service_type,
       mart_arr_snapshot_model.unit_of_measure,
       mart_arr_snapshot_model.mrr,
@@ -187,6 +187,7 @@
       product_name,
       product_tier_name,
       product_delivery_type,
+      product_ranking,
       service_type,
       unit_of_measure,
       mrr,
@@ -208,5 +209,5 @@
     created_by="@iweeks",
     updated_by="@iweeks",
     created_date="2021-08-16",
-    updated_date="2021-08-16"
+    updated_date="2022-08-21"
 ) }}

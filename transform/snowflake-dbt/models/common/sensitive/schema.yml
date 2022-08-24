@@ -117,7 +117,7 @@ models:
         description: zuora billing account id of the marketing contact.
       - name: dim_subscription_id
         description: zuora subscription id of the marketing contact.
-        name: subscription_start_date
+      - name: subscription_start_date
         description: zuora subscription start date
       - name: subscription_end_date
         description: zuora subscription end date
