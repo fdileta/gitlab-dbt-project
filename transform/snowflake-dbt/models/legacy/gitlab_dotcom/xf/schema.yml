@@ -409,7 +409,7 @@ models:
         tests: 
           - not_null:
               config:
-                warn_if: ">5"
+                severity: warn
       - name: merge_request_id
         tests: 
           - not_null
