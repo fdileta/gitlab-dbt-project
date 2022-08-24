@@ -19,9 +19,9 @@ WITH source AS (
     region::VARCHAR AS region,
     role_type::VARCHAR AS role_type,
     start_date::DATE AS start_date,
-    end_date::DATE AS VARCHAR
+    end_date::DATE AS end_date
   FROM {{ source('sheetload','fy23_quota') }}
-  
+
         )
 SELECT * 
 FROM source
