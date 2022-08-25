@@ -376,6 +376,4 @@
 clone_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
-    - echo $DBT_MODELS
-    - OUTPUT=$(dbt ls --models $DBT_MODELS --output json --output-keys "database schema name")
-    - echo $OUTPUT
+    - dbt ls --models +dim_subscription --output json --output-keys "database schema name"
