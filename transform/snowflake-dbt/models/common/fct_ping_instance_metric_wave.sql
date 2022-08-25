@@ -65,11 +65,6 @@
       ON fct_ping_instance_metric_with_license.dim_ping_instance_id =  dim_ping_instance.dim_ping_instance_id
      WHERE fct_ping_instance_metric_with_license.dim_subscription_id IS NOT NULL
 
-    QUALIFY RANK() OVER (
-      PARTITION BY fct_ping_instance_metric_with_license.dim_ping_instance_id
-        ORDER BY fct_ping_instance_metric_with_license.ping_created_at DESC
-      ) = 1
-
 ), pivoted AS (
 
     SELECT
