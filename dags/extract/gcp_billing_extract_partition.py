@@ -70,7 +70,11 @@ billing_operator = KubernetesPodOperator(
         SNOWFLAKE_LOAD_WAREHOUSE,
         SNOWFLAKE_LOAD_PASSWORD,
     ],
-    env_vars={**pod_env_vars, "START_TIME": "{{ yesterday_ds }}"},
+    env_vars={
+        **pod_env_vars,
+        "START_TIME": "{{ execution_date }}",
+        "END_TIME": "{{ next_execution_date }}",
+    },
     affinity=get_affinity(False),
     tolerations=get_toleration(False),
     arguments=[billing_extract_command],
