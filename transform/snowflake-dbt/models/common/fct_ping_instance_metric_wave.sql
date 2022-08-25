@@ -4,8 +4,7 @@
 
 {{
     config({
-        "materialized": "incremental",
-        "unique_key": "dim_ping_instance_id"
+        "materialized": "table"
     })
 }}
 
@@ -109,7 +108,7 @@
 {{ dbt_audit(
     cte_ref="pivoted",
     created_by="@snalamaru",
-    updated_by="@snalamaru",
+    updated_by="@jpeguero",
     created_date="2022-07-06",
-    updated_date="2022-07-21"
+    updated_date="2022-08-25"
 ) }}
