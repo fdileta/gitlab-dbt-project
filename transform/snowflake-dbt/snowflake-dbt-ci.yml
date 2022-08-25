@@ -371,3 +371,10 @@
     - export LINT_LIST=$(git diff origin/master...HEAD --name-only -- '*.sql'  | awk -F 'transform/snowflake-dbt/' '{print tolower($NF)}' | sort | uniq )
     - echo $LINT_LIST
     - sqlfluff lint $LINT_LIST --config .sqlfluff-ci
+
+
+clone_dbt_select:
+  <<: *snowflake_dbt_jobs
+  script:
+    - SELECTED_FILES = $(dbt ls --models $DBT_MODELS --output json --output-keys "database schema name" | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
+    - echo "$SELECTED_FILES"

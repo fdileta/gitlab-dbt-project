@@ -127,11 +127,6 @@ clone_stop:
     - git clone $CI_REPOSITORY_URL
     - analytics/orchestration/manage_snowflake.py delete_clones
 
-🥩clone_dbt_select:
-  <<: *snowflake_start_clone
-  script:
-    - SELECTED_FILES = $(dbt ls --models $DBT_MODELS --output json --output-keys "database schema name" | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
-    - echo "$SELECTED_FILES"
 
 
 # ======
