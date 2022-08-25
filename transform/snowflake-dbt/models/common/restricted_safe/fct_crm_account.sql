@@ -49,6 +49,8 @@ WITH final AS (
       prep_crm_account.carr_account_family,
       prep_crm_account.potential_users,
       prep_crm_account.number_of_licenses_this_account,
+      prep_crm_account.crm_account_zoom_info_number_of_developers,
+      prep_crm_account.decision_maker_count_linkedin,
 
       --metadata
       prep_crm_account.created_by_id,

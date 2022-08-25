@@ -139,9 +139,7 @@
       dim_crm_account.crm_account_zoom_info_parent_company_name,
       dim_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       dim_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
-      dim_crm_account.crm_account_zoom_info_number_of_developers,
       dim_crm_account.forbes_2000_rank,
-      dim_crm_account.decision_maker_count_linkedin,
 
       --degenerative dimensions
       dim_crm_account.is_sdr_target_account,
@@ -201,6 +199,8 @@
       fct_crm_account.carr_account_family,
       fct_crm_account.potential_users,
       fct_crm_account.number_of_licenses_this_account,
+      fct_crm_account.crm_account_zoom_info_number_of_developers,
+      fct_crm_account.decision_maker_count_linkedin,
 
       --metadata
       fct_crm_account.created_by_id,

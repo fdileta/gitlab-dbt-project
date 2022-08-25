@@ -129,9 +129,7 @@ WITH final AS (
       prep_crm_account.crm_account_zoom_info_parent_company_name,
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
-      prep_crm_account.crm_account_zoom_info_number_of_developers,
       prep_crm_account.forbes_2000_rank,
-      prep_crm_account.decision_maker_count_linkedin,
 
       --measures (maintain for now to not break reporting)
       prep_crm_account.parent_crm_account_lam,
