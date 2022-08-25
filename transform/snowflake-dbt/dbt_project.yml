@@ -342,10 +342,21 @@ models:
         +database: "{{ env_var('SNOWFLAKE_PREP_DATABASE') }}" #PREP
         +schema: sensitive
         secure: true
-      restricted_safe:
-        +schema: restricted_safe_common
-        +tags: ["safe"]
-        secure: true
+      dimensions_shared:
+        restricted_safe:
+          +schema: restricted_safe_common
+          +tags: ["safe"]
+          secure: true
+      facts_financial:
+        restricted_safe:
+          +schema: restricted_safe_common
+          +tags: ["safe"]
+          secure: true
+      facts_sales_and_marketing:
+        restricted_safe:
+          +schema: restricted_safe_common
+          +tags: ["safe"]
+          secure: true
 
     common_mapping:
       +materialized: table
