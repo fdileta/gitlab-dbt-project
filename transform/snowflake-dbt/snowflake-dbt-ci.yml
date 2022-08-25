@@ -376,5 +376,7 @@
 clone_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
+    - *deps_and_seed
+    - echo $DBT_MODELS
     - OUTPUT=$(dbt ls --models $DBT_MODELS --output json --output-keys "database schema name" | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
     - echo $OUTPUT
