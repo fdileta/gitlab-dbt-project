@@ -376,4 +376,4 @@
 clone_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
-    - dbt ls --models +dim_subscription --output json --output-keys "database schema name"
+    - dbt ls --models +dim_subscription --output json --output-keys "database schema name"  --profiles-dir profile --target ci
