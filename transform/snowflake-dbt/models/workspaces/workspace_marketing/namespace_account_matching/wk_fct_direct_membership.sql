@@ -38,7 +38,7 @@ remap_projects AS (
 user_namespaces AS (
   -- Owner membership of user namespace is only implied and not explicit in the members table.
   SELECT
-    owner_id || namespace_id AS member_id,
+    (owner_id || namespace_id)::INT AS member_id,
     owner_id AS user_id,
     50 AS access_level,
     'UserMember' AS member_type,
