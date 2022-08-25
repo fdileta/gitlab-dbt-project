@@ -8,8 +8,6 @@
     })
 }}
 
-{% set gainsight_wave_metrics = dbt_utils.get_column_values(table=ref ('gainsight_wave_2_3_metrics'), column='metric_name', max_records=1000, default=['']) %}
-
 {{ simple_cte([
     ('fct_ping_instance', 'fct_ping_instance'),
     ('gainsight_wave_2_3_metrics','gainsight_wave_2_3_metrics'),
