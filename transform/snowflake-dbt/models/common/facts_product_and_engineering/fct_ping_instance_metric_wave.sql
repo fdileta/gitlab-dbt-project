@@ -4,12 +4,9 @@
 
 {{
     config({
-        "materialized": "incremental",
-        "unique_key": "dim_ping_instance_id"
+        "materialized": "table"
     })
 }}
-
-{% set gainsight_wave_metrics = dbt_utils.get_column_values(table=ref ('gainsight_wave_2_3_metrics'), column='metric_name', max_records=1000, default=['']) %}
 
 {{ simple_cte([
     ('fct_ping_instance', 'fct_ping_instance'),
@@ -97,17 +94,14 @@
       {{ ping_instance_wave_metrics() }}
 
     FROM final
-        QUALIFY ROW_NUMBER() OVER (
-      PARTITION BY final.dim_ping_instance_id
-        ORDER BY final.ping_created_at DESC
-      ) = 1
+    {{ dbt_utils.group_by(n=25)}}
 
 )
 
 {{ dbt_audit(
     cte_ref="pivoted",
     created_by="@snalamaru",
-    updated_by="@snalamaru",
+    updated_by="@jpeguero",
     created_date="2022-07-06",
-    updated_date="2022-07-21"
+    updated_date="2022-08-25"
 ) }}

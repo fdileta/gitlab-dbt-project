@@ -2427,24 +2427,12 @@ roles:
         warehouses:
             - dev_xs
 
-    - amihaila:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - aperez:
         member_of:
             - analyst_people
             - bamboohr
             - bi_tool_eval_read
             - restricted_safe
-        warehouses:
-            - dev_xs
-
-    - atucker:
-        member_of:
-            - analyst_finance
         warehouses:
             - dev_xs
 
@@ -2455,13 +2443,6 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - reporting
-
-    - cbalane:
-        member_of:
-            - reporter
-            - gitlab_dotcom_prep
-        warehouses:
-            - dev_xs
 
     - cbraza:
         member_of:
@@ -3447,17 +3428,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - mhanks:
-        member_of:
-            - analyst_finance
-            - bamboohr_analytics
-            - customers_db
-            - analyst_marketing
-            - data_team_analyst
-            - restricted_safe
-        warehouses:
-            - dev_xs
-
     - mlaanen:
         member_of:
             - analyst_core
@@ -3628,12 +3598,6 @@ roles:
                 write:
                     - mwawrzyniak_prep.*.*
                     - mwawrzyniak_prod.*.*
-
-    - mwielich:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
 
     - nbelokolodov:
         member_of:
@@ -3808,12 +3772,6 @@ roles:
     - permission_bot:
         warehouses:
             - admin
-
-    - pskorupa:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
 
     - rbacovic:
         member_of:
@@ -4247,12 +4205,6 @@ roles:
                     - tnguyen_prep.*.*
                     - tnguyen_prod.*.*
 
-    - tvellishetty:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - vagrawal:
         member_of:
             - adaptive
@@ -4308,16 +4260,6 @@ roles:
                     - vprakash_prep.*.*
                     - vprakash_prod.*.*
 
-    - warias:
-        member_of:
-            - data_team_analyst
-            - analyst_core
-            - restricted_safe
-            - dbt_data_science
-            - snowplow
-        warehouses:
-            - dev_xs
-
     - webrahim:
         member_of:
             - analyst_finance
@@ -4369,20 +4311,10 @@ users:
         member_of:
             - amartin
 
-    - amihaila:
-        can_login: yes
-        member_of:
-            - amihaila
-
     - aperez:
         can_login: yes
         member_of:
             - aperez
-
-    - atucker:
-        can_login: yes
-        member_of:
-            - atucker
 
     - bi_tool_eval:
         can_login: yes
@@ -4393,11 +4325,6 @@ users:
         can_login: yes
         member_of:
             - bbutterfield
-
-    - cbalane:
-        can_login: yes
-        member_of:
-            - cbalane
 
     - cbraza:
         can_login: yes
@@ -4612,11 +4539,6 @@ users:
         member_of:
             - mfleisher
 
-    - mhanks:
-        can_login: yes
-        member_of:
-            - mhanks
-
     - mlaanen:
         can_login: yes
         member_of:
@@ -4641,11 +4563,6 @@ users:
         can_login: yes
         member_of:
             - mwawrzyniak
-
-    - mwielich:
-        can_login: yes
-        member_of:
-            - mwielich
 
     - nbelokolodov:
         can_login: yes
@@ -4704,11 +4621,6 @@ users:
             - permission_bot
             - securityadmin
             - sysadmin
-
-    - pskorupa:
-        can_login: yes
-        member_of:
-            - pskorupa
 
     - rbacovic:
         can_login: yes
@@ -4799,11 +4711,6 @@ users:
         member_of:
             - tnguyen
 
-    - tvellishetty:
-        can_login: yes
-        member_of:
-            - tvellishetty
-
     - vagrawal:
         can_login: yes
         member_of:
@@ -4815,11 +4722,6 @@ users:
             - accountadmin
             - securityadmin
             - vprakash
-
-    - warias:
-        can_login: yes
-        member_of:
-            - warias
 
     - webrahim:
         can_login: yes
