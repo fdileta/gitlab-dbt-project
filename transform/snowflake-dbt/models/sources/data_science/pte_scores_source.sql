@@ -23,7 +23,7 @@ WITH source AS (
       data_by_row['grouping']::INT                          AS score_group,
       data_by_row['insights']::VARCHAR                      AS insights,
       uploaded_at::TIMESTAMP                                AS uploaded_at,
-      uptier_likely::BOOLEAN                                AS uptier_likely
+      data_by_row['uptier_likely']::BOOLEAN                 AS uptier_likely
 
     FROM intermediate
 
