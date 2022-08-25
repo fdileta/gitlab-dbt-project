@@ -61,11 +61,7 @@ docker-compose.yml  @jjstark @paul_armstrong @vedprakash2021
 /transform/snowflake-dbt/models/common/facts_general_and_administrative             @pempey @iweeks
 /transform/snowflake-dbt/models/common/facts_product_and_engineering                @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @pempey @iweeks
 /transform/snowflake-dbt/models/common/facts_sales_and_marketing                    @jeanpeguero @michellecooper @iweeks
-
-/transform/snowflake-dbt/models/common/restricted_safe/dimensions_local/financial             @jeanpeguero @michellecooper @iweeks
-/transform/snowflake-dbt/models/common/restricted_safe/dimensions_local/sales_and_marketing   @jeanpeguero @michellecooper @iweeks
-/transform/snowflake-dbt/models/common/restricted_safe/dimensions_shared                      @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
-/transform/snowflake-dbt/models/common/restricted_safe/facts_sales_and_marketing              @jeanpeguero @michellecooper @iweeks
+/transform/snowflake-dbt/models/common/facts_financial                              @jeanpeguero @michellecooper @iweeks
 
 /transform/snowflake-dbt/models/common_mapping/     @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
 /transform/snowflake-dbt/models/common_prep/        @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
