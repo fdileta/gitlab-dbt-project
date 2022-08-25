@@ -4,7 +4,7 @@
         app='dbt',
         dbt_version=dbt_version,
         invocation_id=invocation_id,
-        run_started_at=run_started_at.strftime("%Y-%m-%d"),
+        run_started_at=run_started_at.strftime("%Y-%m-%d %H:%M:%S"),
         is_full_refresh=flags.FULL_REFRESH,
         profile_name=target.get('profile_name'),
         target_name=target.get('target_name'),
