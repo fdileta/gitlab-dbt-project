@@ -1582,6 +1582,14 @@ models:
         description: '{{ doc("paid_license_search_28_days_user_desc") }}'
         tests:
           - dbt_utils.at_least_one
+      - name: compliance_frameworks_pipeline_all_time_event
+        description: '{{ doc("compliance_frameworks_pipeline_all_time_event_desc") }}'
+        tests:
+          - dbt_utils.at_least_one
+      - name: last_activity_28_days_user
+        description: '{{ doc("last_activity_28_days_user_desc") }}'
+        tests:
+          - dbt_utils.at_least_one
       - name: is_latest_data
         description: Flags the row with the most recently received data from Usage Ping
 
