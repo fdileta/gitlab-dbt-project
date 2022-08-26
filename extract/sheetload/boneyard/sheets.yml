@@ -36,6 +36,10 @@ sheets:
     owner: '@kwiebers'
     tabs:
       - gitlab_product_mrs_size
+  - name: low_touch_targets_fy23
+    owner: '@mfleisher'
+    tabs:
+      - targets  
   - name: opt_out_contacts
     owner: '@Jean Peguero'
     tabs:
