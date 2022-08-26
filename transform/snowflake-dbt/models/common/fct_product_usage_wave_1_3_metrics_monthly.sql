@@ -108,7 +108,7 @@
       usage_ping.user_container_scanning_jobs_28_days_user,
       usage_ping.object_store_packages_enabled,
       usage_ping.projects_with_packages_all_time_event,
-      usage_ping.projects_with_packages_28_days_user,
+      usage_ping.projects_with_packages_28_days_event,
       usage_ping.deployments_28_days_user,
       usage_ping.releases_28_days_user,
       usage_ping.epics_28_days_user,
@@ -291,5 +291,5 @@
     created_by="@ischweickartDD",
     updated_by="@mdrussell",
     created_date="2021-02-08",
-    updated_date="2022-07-27"
+    updated_date="2022-08-26"
 ) }}

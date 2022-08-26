@@ -188,8 +188,10 @@ models:
         description: Flags whether Object Storage is enabled for Uploads ([source](https://docs.gitlab.com/ee/development/usage_ping/dictionary.html#object_storepackagesenabled))
       - name: projects_with_packages_all_time_event
         description: All-time count of projects with package registry configured ([source](https://docs.gitlab.com/ee/development/usage_ping/dictionary.html#countsprojects_with_packages))
-      - name: projects_with_packages_28_days_user
-        description: Monthly count of unique users creating projects with package registry configured ([source](https://docs.gitlab.com/ee/development/usage_ping/dictionary.html#usage_activity_by_stage_monthlypackageprojects_with_packages))
+      - name: projects_with_packages_28_days_event
+        description: '{{ doc("projects_with_packages_28_days_event_desc") }}'
+        tests:
+          - dbt_utils.at_least_one
       - name: deployments_28_days_user
         description: Monthly count of unique users triggering deployments ([source](https://docs.gitlab.com/ee/development/usage_ping/dictionary.html#usage_activity_by_stage_monthlyreleasedeployments))
       - name: releases_28_days_user

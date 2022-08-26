@@ -338,3 +338,7 @@ Count of compliance frameworks that have a pipeline configuration. [link](https:
 {% docs last_activity_28_days_user_desc %}
 Users that have a last_activity_on date within the past 28 days. [link](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20220621085114_unique_active_users_monthly.yml)
 {% enddocs %}
+
+{% docs projects_with_packages_28_days_event_desc %}
+Projects with package registry enabled. [link](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216181055_projects_with_packages.yml)
+{% enddocs %}

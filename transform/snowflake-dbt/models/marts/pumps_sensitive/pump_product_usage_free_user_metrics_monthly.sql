@@ -39,7 +39,7 @@
       user_container_scanning_jobs_28_days_user,
       object_store_packages_enabled,
       projects_with_packages_all_time_event,
-      projects_with_packages_28_days_user,
+      projects_with_packages_28_days_event,
       deployments_28_days_user,
       releases_28_days_user,
       epics_28_days_user,
