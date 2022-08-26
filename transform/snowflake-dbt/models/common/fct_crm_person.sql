@@ -307,7 +307,7 @@ marketo_qualified_lead_date::timestamp
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@jpeguero",
+    updated_by="@lisvinueza",
     created_date="2020-12-01",
-    updated_date="2022-07-29"
+    updated_date="2022-08-26"
 ) }}
