@@ -18,10 +18,11 @@ echo "Python succesfully installed"
 
 ## Install homebrew
 ## Check if exists
-command -v brew >/dev/null 2>&1 || { echo "Installing Homebrew.."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-  } >&2;
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 echo "Homebrew successfully installed"
+
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 echo "Adding homebrew link for m1 macs"
 echo "export PATH=$PATH:/opt/homebrew/bin" >> ~/.zshrc
