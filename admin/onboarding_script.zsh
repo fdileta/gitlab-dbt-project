@@ -109,7 +109,7 @@ cd ~/Downloads
 mkdir -p ${HOME}/iterm2-colors
 cd ${HOME}/iterm2-colors
 curl -L https://github.com/mbadolato/iTerm2-Color-Schemes/zipball/master > iterm2-colors.zip
-unzip iterm2-colors.zip
+yes | unzip iterm2-colors.zip
 rm iterm2-colors.zip
 echo "iTerm2 + Colors installed"
 
