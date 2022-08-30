@@ -9,7 +9,7 @@
 
 {% if is_incremental() %}
 
-  {% set day_limit = 10 %}
+  {% set day_limit = 30 %}
 
 {% else %}
 

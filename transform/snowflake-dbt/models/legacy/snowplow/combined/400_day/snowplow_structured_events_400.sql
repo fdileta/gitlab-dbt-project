@@ -7,7 +7,7 @@
 
 {% if is_incremental() %}
 
-{% set days_to_look_back = 10 %}
+{% set days_to_look_back = 30 %}
 
 WITH filtered_table AS (
 
@@ -28,5 +28,5 @@ WHERE derived_tstamp::DATE >= DATEADD(DAY, -{{days_to_look_back}}, CURRENT_DATE:
 
 {% else %}
 
-WHERE derived_tstamp::DATE >= DATEADD(DAY, -400, CURRENT_DATE::DATE)
+WHERE derived_tstamp::DATE >= DATEADD(DAY, -402, CURRENT_DATE::DATE)
 {% endif %}
