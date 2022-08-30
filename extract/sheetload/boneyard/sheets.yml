@@ -39,7 +39,7 @@ sheets:
   - name: low_touch_targets_fy23
     owner: '@mfleisher'
     tabs:
-      - targets  
+      - low_touch_targets_fy23 
   - name: opt_out_contacts
     owner: '@Jean Peguero'
     tabs:
