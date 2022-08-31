@@ -3279,6 +3279,9 @@ roles:
     - lvinueza:
         member_of:
             - analyst_finance
+            - analyst_people
+            - bamboohr
+            - bamboohr_analytics
             - customers_db
             - data_team_analyst
             - restricted_safe
