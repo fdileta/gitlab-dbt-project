@@ -336,7 +336,7 @@ Below checklist of activities would be run once for quarter to validate security
             MAX(date_day) AS last_day_fq
           FROM "PROD"."COMMON"."DIM_DATE"
           --set the year and quarter you want to audit
-          WHERE fiscal_year = <--fiscal year-->
+          WHERE fiscal_year = (CASE WHEN MONTH(CURRENT_DATE()) IN ('2','3','4') THEN year(CURRENT_DATE()) ELSE year(CURRENT_DATE())+1 END)
           AND fiscal_quarter = <--fiscal quarter-->
         )
 
