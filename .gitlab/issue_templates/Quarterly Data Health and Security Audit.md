@@ -353,6 +353,7 @@ Below checklist of activities would be run once for quarter to validate security
         --AND model_name = 'bamboohr_budget_vs_actual'
         AND compilation_started_at >= first_day_fq
         AND compilation_started_at <= last_day_fq
+        AND model_name in ( SELECT distinct model_name FROM  "PROD"."WORKSPACE_DATA"."DBT_RUN_RESULTS"  where compilation_started_at BETWEEN dateadd('day', -7, CURRENT_DATE()) AND CURRENT_DATE AND RUN_STATUS = 'success' )
         )
 
         --select * from DISTINCT_SELECT
