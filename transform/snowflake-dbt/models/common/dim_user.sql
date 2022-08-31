@@ -27,7 +27,19 @@ WITH prep_user AS (
       public_email_domain_classification,
       commit_email_domain,
       commit_email_domain_classification,
-      identity_provider
+      identity_provider,
+      setup_for_company,               
+      role,
+      jobs_to_be_done,
+      for_business_use,                 
+      employees_count,
+      country,
+      state,
+      first_trial_start_date,
+      trials_count,
+      last_activity_date,              
+      last_sign_in_date               
+ 
     FROM {{ ref('prep_user') }}
     
     UNION ALL
@@ -59,14 +71,24 @@ WITH prep_user AS (
       'Missing public_email_domain_classification' AS public_email_domain_classification,
       'Missing commit_email_domain' AS commit_email_domain,
       'Missing commit_email_domain_classification' AS commit_email_domain_classification,
-      'Missing identity_provider' AS identity_provider
-
+      'Missing identity_provider' AS identity_provider,
+      'Missing setup_for_company' AS setup_for_company,               
+      'Missing role' AS role,
+      'Missing jobs_to_be_done' AS jobs_to_be_done,
+      'Missing for_business_use' AS for_business_use,                 
+      'Missing employees_count' AS employees_count,
+      'Missing country' AS country,
+      'Missing state' AS state,
+      'Missing first_trial_start_date' AS first_trial_start_date,
+      'Missing trials_count' AS trials_count,
+      'Missing last_activity_date' AS last_activity_date,              
+      'Missing last_sign_in_date' AS last_sign_in_date
 )
 
 {{ dbt_audit(
     cte_ref="prep_user",
     created_by="@mpeychet_",
-    updated_by="@iweeks",
+    updated_by="@tpoole",
     created_date="2021-06-28",
-    updated_date="2022-06-20"
+    updated_date="2022-08-31"
 ) }}
