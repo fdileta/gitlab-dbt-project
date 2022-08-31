@@ -37,6 +37,11 @@ WITH dim_date AS (
     SELECT *
     FROM {{ ref('dim_charge') }}
 
+), dim_crm_opportunity AS (
+
+    SELECT *
+    FROM {{ ref('dim_crm_opportunity') }}
+
 ), arr_agg AS (
 
     SELECT
@@ -130,6 +135,8 @@ WITH dim_date AS (
       ON arr_agg.dim_crm_account_id_invoice = dim_crm_account_invoice.dim_crm_account_id
     LEFT JOIN dim_crm_account AS dim_crm_account_subscription
       ON arr_agg.dim_crm_account_id_subscription = dim_crm_account_subscription.dim_crm_account_id
+    LEFT JOIN dim_crm_opportunity 
+      ON dim_crm_opportunity.dim_crm_opportunity_id = arr_agg.dim_crm_account_id_invoice
     WHERE dim_crm_account_subscription.is_jihu_account != 'TRUE'
     {{ dbt_utils.group_by(n=37) }}
     ORDER BY 3 DESC
