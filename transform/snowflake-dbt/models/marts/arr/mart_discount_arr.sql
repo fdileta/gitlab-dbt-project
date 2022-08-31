@@ -39,7 +39,13 @@ WITH dim_date AS (
 
 ), dim_crm_opportunity AS (
 
-    SELECT *
+    SELECT 
+      opportunity_owner_user_segment,
+      opportunity_owner_user_geo,
+      opportunity_owner_user_region,
+      opportunity_owner_user_area,
+      order_type,
+      growth_type
     FROM {{ ref('dim_crm_opportunity') }}
 
 ), arr_agg AS (
@@ -136,9 +142,9 @@ WITH dim_date AS (
     LEFT JOIN dim_crm_account AS dim_crm_account_subscription
       ON arr_agg.dim_crm_account_id_subscription = dim_crm_account_subscription.dim_crm_account_id
     LEFT JOIN dim_crm_opportunity 
-      ON dim_crm_opportunity.dim_crm_opportunity_id = arr_agg.dim_crm_account_id_invoice
+      ON zuora_subscription.dim_crm_opportunity_id = dim_crm_opportunity_id
     WHERE dim_crm_account_subscription.is_jihu_account != 'TRUE'
-    {{ dbt_utils.group_by(n=37) }}
+    {{ dbt_utils.group_by(n=43) }}
     ORDER BY 3 DESC
 
 ), final AS (
