@@ -37,13 +37,7 @@ WITH dim_date AS (
 
 ), dim_crm_opportunity AS (
 
-    SELECT 
-      opportunity_owner_user_segment,
-      opportunity_owner_user_geo,
-      opportunity_owner_user_region,
-      opportunity_owner_user_area,
-      order_type,
-      growth_type
+    SELECT *
     FROM {{ ref('dim_crm_opportunity') }}
 
 ), arr_agg AS (
@@ -129,6 +123,11 @@ WITH dim_date AS (
       dim_crm_opportunity.order_type                                    AS order_type,
       ARRAY_AGG(IFF(dim_subscription.created_by_id = '2c92a0fd55822b4d015593ac264767f2', -- All Self-Service / Web direct subscriptions are identified by that created_by_id
                    'Self-Service', 'Sales-Assisted'))                   AS subscription_sales_type,
+      dim_crm_opportunity.opportunity_owner_user_segment,
+      dim_crm_opportunity.opportunity_owner_user_geo,
+      dim_crm_opportunity.opportunity_owner_user_region,
+      dim_crm_opportunity.opportunity_owner_user_area,
+      dim_crm_opportunity.order_type,
       SUM(arr_agg.invoice_item_charge_amount)                           AS invoice_item_charge_amount,
       SUM(arr_agg.arr)/SUM(arr_agg.quantity)                            AS arpu,
       SUM(arr_agg.arr)                                                  AS arr,
