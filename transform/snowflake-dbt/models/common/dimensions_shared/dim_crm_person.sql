@@ -68,7 +68,21 @@ WITH crm_person AS (
       zoominfo_contact_country,
       zoominfo_company_city,
       zoominfo_company_state,
-      zoominfo_company_country
+      zoominfo_company_country,
+      account_demographics_sales_segment,
+      account_demographics_sales_segment_grouped,
+      account_demographics_geo,
+      account_demographics_region,
+      account_demographics_area,
+      account_demographics_segment_region_grouped,
+      account_demographics_territory,
+      account_demographics_employee_count,
+      account_demographics_max_family_employee,
+      account_demographics_upa_country,
+      account_demographics_upa_state,  
+      account_demographics_upa_city,
+      account_demographics_upa_street,
+      account_demographics_upa_postal_code
 
     FROM crm_person
 )
@@ -76,7 +90,7 @@ WITH crm_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@jjstark",
-    updated_by="@degan",
+    updated_by="@lisvinueza",
     created_date="2020-09-10",
-    updated_date="2022-08-09"
+    updated_date="2022-08-26"
 ) }}
