@@ -619,12 +619,12 @@
         WHEN MAX(marketing_contact_order.is_ultimate_parent_namespace_public) = TRUE
           THEN TRUE
         ELSE FALSE
-      END                                                                                        AS is_member_public_ultimate_parent_namespace,
+      END                                                                                        AS is_member_of_public_ultimate_parent_namespace,
       CASE
         WHEN MAX(marketing_contact_order.is_ultimate_parent_namespace_private) = TRUE
           THEN TRUE
         ELSE FALSE
-      END                                                                                        AS is_member_private_ultimate_parent_namespace,
+      END                                                                                        AS is_member_of_private_ultimate_parent_namespace,
       ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_public = TRUE, marketing_contact_order.dim_namespace_id, NULL))
                                                                                                  AS public_ultimate_parent_namespaces,
       ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_private = TRUE, marketing_contact_order.dim_namespace_id, NULL))
