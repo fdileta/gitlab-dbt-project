@@ -189,10 +189,7 @@
       free_user_metrics.projects_status_checks_all_time_event,
       free_user_metrics.external_status_checks_all_time_event,
       free_user_metrics.paid_license_search_28_days_user,
-<<<<<<< HEAD:transform/snowflake-dbt/models/marts/product/mart_product_usage_free_user_metrics_monthly.sql
-      free_user_metrics.last_activity_28_days_user,   
-=======
->>>>>>> master:transform/snowflake-dbt/models/common_mart_product/mart_product_usage_free_user_metrics_monthly.sql
+      free_user_metrics.last_activity_28_days_user,
       -- Data Quality Flag
       free_user_metrics.is_latest_data
     FROM free_user_metrics
@@ -376,10 +373,7 @@
         'projects_status_checks_all_time_event',
         'external_status_checks_all_time_event',
         'paid_license_search_28_days_user',
-<<<<<<< HEAD:transform/snowflake-dbt/models/marts/product/mart_product_usage_free_user_metrics_monthly.sql
-        'last_activity_28_days_user', 
-=======
->>>>>>> master:transform/snowflake-dbt/models/common_mart_product/mart_product_usage_free_user_metrics_monthly.sql
+        'last_activity_28_days_user',
         'is_latest_data'
     ]
 ) }}
