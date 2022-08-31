@@ -78,7 +78,7 @@
       
       --surrogate keys
       dim_crm_account.dim_parent_crm_account_id,
-      fct_crm_opportunity.dim_crm_user_id                                  AS dim_crm_sales_rep_id,
+      fct_crm_opportunity.dim_crm_user_id,
       dim_crm_opportunity.duplicate_opportunity_id,
       fct_crm_opportunity.merged_crm_opportunity_id,
       fct_crm_opportunity.record_type_id,
@@ -608,9 +608,9 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@michellecooper",
+    updated_by="@chrissharp",
     created_date="2020-12-07",
-    updated_date="2022-08-08"
+    updated_date="2022-08-31"
   ) }}
 
 
