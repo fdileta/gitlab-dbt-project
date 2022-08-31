@@ -37,7 +37,13 @@ WITH dim_date AS (
 
 ), dim_crm_opportunity AS (
 
-    SELECT *
+    SELECT 
+      opportunity_owner_user_segment,
+      opportunity_owner_user_geo,
+      opportunity_owner_user_region,
+      opportunity_owner_user_area,
+      order_type,
+      growth_type
     FROM {{ ref('dim_crm_opportunity') }}
 
 ), arr_agg AS (
