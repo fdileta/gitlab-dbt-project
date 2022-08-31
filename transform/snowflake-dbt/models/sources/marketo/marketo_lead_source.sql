@@ -27,7 +27,7 @@ WITH source AS (
       unsubscribed::BOOLEAN                     AS is_unsubscribed,
       compliance_segment_value::VARCHAR         AS compliance_segment_value,
       pql_product_qualified_lead_c::BOOLEAN     AS is_pql_marketo,
-      CDBISPAIDTIER_C::BOOLEAN                  AS is_paid_tier_marketo,
+      cdbispaidtier_c::BOOLEAN                  AS is_paid_tier_marketo,
       updated_at::TIMESTAMP                     AS updated_at
 
     FROM source
