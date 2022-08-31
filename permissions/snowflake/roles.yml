@@ -3937,6 +3937,13 @@ roles:
                 write:
                     - rparker_prep.*.*
                     - rparker_prod.*.*
+
+    - rrendon:
+        member_of:
+            - analyst_engineering
+        warehouses:
+            - dev_xs
+
     - schaturvedi:
         member_of:
             - engineer
@@ -4644,6 +4651,11 @@ users:
         member_of:
             - rparker
             - accountadmin
+
+    - rrendon:
+        can_login: yes 
+        member_of:
+            - rrendon
 
     - schaturvedi:
         can_login: yes

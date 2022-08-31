@@ -40,7 +40,7 @@ default_args = {
 }
 
 # Create the DAG
-dag = DAG("el_gcs_external", default_args=default_args, schedule_interval="0 3/8 * * *")
+dag = DAG("el_gcs_external", default_args=default_args, schedule_interval="0 3 * * *")
 
 airflow_home = env["AIRFLOW_HOME"]
 
