@@ -187,9 +187,9 @@ WITH final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@msendal",
-    updated_by="@michellecooper",
+    updated_by="@j_kim",
     created_date="2020-06-01",
-    updated_date="2022-08-10"
+    updated_date="2022-08-31"
 ) }}
 
 
