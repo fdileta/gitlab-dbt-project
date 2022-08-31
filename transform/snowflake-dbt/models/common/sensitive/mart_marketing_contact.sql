@@ -12,10 +12,8 @@
   ('fct_event_user_daily', 'fct_event_user_daily'),
   ('map_gitlab_dotcom_xmau_metrics', 'map_gitlab_dotcom_xmau_metrics'),
   ('services', 'gitlab_dotcom_integrations_source'),
-  ('marketo', 'marketo_lead_source'),
   ('project', 'prep_project')
 ]) }}
-
 -------------------------- Start of PQL logic: --------------------------
 
 , namespaces AS (
@@ -692,8 +690,8 @@
       IFF(is_saas_delivery
         OR is_self_managed_delivery,
         TRUE, FALSE)                                        AS is_paid_tier,
-      IFNULL(marketo.is_paid_tier_marketo, FALSE)           AS is_paid_tier_marketo,
-      IFF(is_paid_tier = TRUE OR (is_paid_tier = FALSE AND IFNULL(marketo.is_paid_tier_marketo, FALSE) = TRUE), TRUE, FALSE)
+      marketing_contact.is_paid_tier_marketo,
+      IFF(is_paid_tier = TRUE OR (is_paid_tier = FALSE AND marketing_contact.is_paid_tier_marketo = TRUE), TRUE, FALSE)
                                                             AS is_paid_tier_change,
       subscription_aggregate.min_subscription_start_date,
       subscription_aggregate.max_subscription_end_date,
@@ -752,8 +750,8 @@
       marketing_contact.customer_db_created_date,
       marketing_contact.customer_db_confirmed_date,
       IFF(latest_pql.email IS NOT NULL, TRUE, FALSE) AS is_pql,
-      IFNULL(marketo.is_pql_marketo, FALSE) AS is_pql_marketo,
-      IFF(is_pql = TRUE OR (is_pql = FALSE AND IFNULL(marketo.is_pql_marketo, FALSE) = TRUE), TRUE, FALSE)
+      marketing_contact.is_pql_marketo,
+      IFF(is_pql = TRUE OR (is_pql = FALSE AND marketing_contact.is_pql_marketo = TRUE), TRUE, FALSE)
                                             AS is_pql_change,
       latest_pql.pql_namespace_id,
       latest_pql.pql_namespace_name,
@@ -821,8 +819,6 @@
       ON services_by_email.email = marketing_contact.email_address
     LEFT JOIN users_role_by_email
       ON users_role_by_email.email = marketing_contact.email_address
-    LEFT JOIN marketo
-      ON marketo.email = marketing_contact.email_address
 )
 
 {{ hash_diff(
