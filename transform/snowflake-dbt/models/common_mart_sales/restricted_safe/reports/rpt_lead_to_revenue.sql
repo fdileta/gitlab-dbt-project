@@ -63,12 +63,15 @@
 ), person_order_type_final AS (
 
     SELECT DISTINCT
-      email_hash,
-      dim_crm_opportunity_id,
-      dim_parent_crm_account_id,
-      dim_crm_account_id,
-      person_order_type
+      person_order_type_base.email_hash,
+      dim_crm_person.sfdc_record_id,
+      person_order_type_base.dim_crm_opportunity_id,
+      person_order_type_base.dim_parent_crm_account_id,
+      person_order_type_base.dim_crm_account_id,
+      person_order_type_base.person_order_type
     FROM person_order_type_base
+    INNER JOIN dim_crm_person ON
+    person_order_type_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
     WHERE person_order_type_number=1
 
 ), mql_order_type_base AS (
