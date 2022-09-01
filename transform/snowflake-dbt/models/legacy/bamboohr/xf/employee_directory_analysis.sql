@@ -20,7 +20,13 @@ cleaned AS (
     full_name,
     work_email,
     gitlab_username,
-    region,
+    CASE
+        WHEN region = 'Americas' AND country IN ('United States', 'Canada','Mexico','United States of America') 
+          THEN 'NORAM'
+        WHEN region = 'Americas' AND country NOT IN ('United States', 'Canada','Mexico','United States of America') 
+          THEN 'LATAM'
+        ELSE region 
+    END AS region_modified,
     sales_geo_differential,
     jobtitle_speciality,
     job_role_modified,
