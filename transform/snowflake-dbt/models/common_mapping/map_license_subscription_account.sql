@@ -1,6 +1,6 @@
-{{ config(
+{# config(
     tags=["mnpi_exception"]
-) }}
+) #}
 
 {{ config({
         "materialized": "view",
