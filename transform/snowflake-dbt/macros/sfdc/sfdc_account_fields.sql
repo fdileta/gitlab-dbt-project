@@ -98,6 +98,7 @@ WITH map_merged_crm_account AS (
       account_id,
       account_name,
       billing_country,
+      billing_country_code,
       df_industry,
       industry,
       sub_industry,
@@ -165,6 +166,7 @@ WITH map_merged_crm_account AS (
       {{ sales_segment_cleaning('sfdc_account.ultimate_parent_sales_segment') }}
                                                                           AS parent_crm_account_sales_segment,
       ultimate_parent_account.billing_country                             AS parent_crm_account_billing_country,
+      ultimate_parent_account.billing_country_code                        AS parent_crm_account_billing_country_code,
       ultimate_parent_account.industry                                    AS parent_crm_account_industry,
       ultimate_parent_account.sub_industry                                AS parent_crm_account_sub_industry,
       sfdc_account.parent_account_industry_hierarchy                      AS parent_crm_account_industry_hierarchy,
@@ -219,6 +221,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.tsp_account_employees                                  AS crm_account_tsp_account_employees,
       sfdc_account.tsp_max_family_employees                               AS crm_account_tsp_max_family_employees,
       sfdc_account.billing_country                                        AS crm_account_billing_country,
+      sfdc_account.billing_country_code                                   AS crm_account_billing_country_code,
       sfdc_account.account_type                                           AS crm_account_type,
       sfdc_account.industry                                               AS crm_account_industry,
       sfdc_account.sub_industry                                           AS crm_account_sub_industry,
@@ -284,7 +287,9 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_parent_company_name                          AS crm_account_zoom_info_parent_company_name,
       sfdc_account.zoom_info_ultimate_parent_company_zi_id                AS crm_account_zoom_info_ultimate_parent_company_zi_id,
       sfdc_account.zoom_info_ultimate_parent_company_name                 AS crm_account_zoom_info_ultimate_parent_company_name,
-
+      sfdc_account.zoom_info_number_of_developers                         AS crm_account_zoom_info_number_of_developers,
+      sfdc_account.forbes_2000_rank,
+      
       --degenerative dimensions
       sfdc_account.is_sdr_target_account,
       IFF(sfdc_record_type.record_type_label = 'Partner'
@@ -413,6 +418,9 @@ WITH map_merged_crm_account AS (
       sfdc_account.potential_arr_lam,
       sfdc_account.carr_this_account,
       sfdc_account.carr_account_family,
+      sfdc_account.potential_users,
+      sfdc_account.number_of_licenses_this_account,
+      sfdc_account.decision_maker_count_linkedin,
       {%- if model_type == 'live' %}
       sfdc_account.lam                                                    AS parent_crm_account_lam,
       sfdc_account.lam_dev_count                                          AS parent_crm_account_lam_dev_count,
