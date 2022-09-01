@@ -51,7 +51,6 @@ docker-compose.yml  @jjstark @paul_armstrong @vedprakash2021
 /transform/snowflake-dbt/models/legacy/bamboohr/    @pempey @iweeks
 /transform/snowflake-dbt/models/legacy/covid19/     @pempey @iweeks
 
-/transform/snowflake-dbt/models/common/                                             @pempey @iweeks
 /transform/snowflake-dbt/models/common/bridge                                       @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
 /transform/snowflake-dbt/models/common/dimensions_local/financial                   @jeanpeguero @michellecooper @iweeks
 /transform/snowflake-dbt/models/common/dimensions_local/general_and_administrative  @pempey @iweeks
