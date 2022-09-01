@@ -8,6 +8,7 @@ DOCKER_UP = "export GIT_BRANCH=$(GIT_BRANCH) && docker-compose up"
 DOCKER_DOWN = "export GIT_BRANCH=$(GIT_BRANCH) && docker-compose down"
 DOCKER_RUN = "export GIT_BRANCH=$(GIT_BRANCH) && docker-compose run"
 DBT_DEPS = "cd transform/snowflake-dbt/ && poetry run dbt clean && poetry run dbt deps"
+PPATH = $$(which python3)
 
 .EXPORT_ALL_VARIABLES:
 DATA_TEST_BRANCH=main
