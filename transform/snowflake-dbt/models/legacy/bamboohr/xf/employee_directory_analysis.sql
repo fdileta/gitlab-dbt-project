@@ -7,8 +7,9 @@
 
 WITH employee_directory_intermediate AS (
 
-  SELECT * FROM {{ ref('employee_directory_intermediate') }}
-
+  SELECT team_member.*, manager.employee_id AS reports_to_id 
+  FROM {{ ref('employee_directory_intermediate') }} AS team_member, {{ ref('employee_directory_intermediate') }} AS manager
+  WHERE team_member.reports_to = manager.full_name
 ),
 
 cleaned AS (
@@ -17,6 +18,7 @@ cleaned AS (
     date_actual,
     employee_id,
     reports_to,
+    reports_to_id,
     full_name,
     work_email,
     gitlab_username,
