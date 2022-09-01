@@ -7,7 +7,7 @@
     })
 }}
 
-WITH license AS (
+WITH license AS (--
 
     SELECT
       dim_license_id,
