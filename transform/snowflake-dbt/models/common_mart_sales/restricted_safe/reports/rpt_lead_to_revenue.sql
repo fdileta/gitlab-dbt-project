@@ -44,8 +44,11 @@
     SELECT DISTINCT
       person_base.email_hash, 
       person_base.dim_crm_account_id,
+      person_base.mql_date_lastest_pt,
       upa_base.dim_parent_crm_account_id,
       opportunity_base.dim_crm_opportunity_id,
+      opportunity_base.close_date,
+      opportunity_base.order_type,
       CASE 
          WHEN is_first_order_available = False AND opportunity_base.order_type = '1. New - First Order' THEN '3. Growth'
          WHEN is_first_order_available = False AND opportunity_base.order_type != '1. New - First Order' THEN opportunity_base.order_type
@@ -63,15 +66,95 @@
 ), person_order_type_final AS (
 
     SELECT DISTINCT
-      email_hash,
-      dim_crm_opportunity_id,
-      dim_parent_crm_account_id,
-      dim_crm_account_id,
-      person_order_type
+      person_order_type_base.email_hash,
+      dim_crm_person.sfdc_record_id,
+      person_order_type_base.mql_date_lastest_pt,
+      person_order_type_base.dim_crm_opportunity_id,
+      person_order_type_base.close_date,
+      person_order_type_base.order_type,
+      person_order_type_base.dim_parent_crm_account_id,
+      person_order_type_base.dim_crm_account_id,
+      person_order_type_base.person_order_type
     FROM person_order_type_base
+    INNER JOIN dim_crm_person ON
+    person_order_type_base.email_hash=dim_crm_person.email_hash
     WHERE person_order_type_number=1
 
-), cohort_base AS (
+), mql_order_type_base AS (
+
+    SELECT DISTINCT
+      dim_crm_person.sfdc_record_id,
+      person_base.email_hash, 
+      CASE 
+         WHEN mql_date_lastest_pt < opportunity_base.close_date THEN opportunity_base.order_type
+         WHEN mql_date_lastest_pt > opportunity_base.close_date THEN '3. Growth'
+      ELSE null
+      END AS mql_order_type_historical,
+      ROW_NUMBER() OVER( PARTITION BY person_base.email_hash ORDER BY mql_order_type_historical) AS mql_order_type_number
+    FROM person_base
+    INNER JOIN dim_crm_person ON
+    person_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
+    FULL JOIN upa_base ON 
+    person_base.dim_crm_account_id=upa_base.dim_crm_account_id
+    LEFT JOIN accounts_with_first_order_opps ON
+    upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
+    FULL JOIN opportunity_base ON
+    upa_base.dim_parent_crm_account_id=opportunity_base.dim_parent_crm_account_id
+    
+), mql_order_type_final AS (
+  
+  SELECT *
+  FROM mql_order_type_base
+  WHERE mql_order_type_number=1
+    
+), inquiry_order_type_base AS (
+
+    SELECT DISTINCT
+      dim_crm_person.sfdc_record_id,
+      person_base.email_hash, 
+      CASE 
+         WHEN true_inquiry_date < opportunity_base.close_date THEN opportunity_base.order_type
+         WHEN true_inquiry_date > opportunity_base.close_date THEN '3. Growth'
+      ELSE null
+      END AS inquiry_order_type_historical,
+      ROW_NUMBER() OVER( PARTITION BY person_base.email_hash ORDER BY inquiry_order_type_historical) AS inquiry_order_type_number
+    FROM person_base
+    INNER JOIN dim_crm_person ON
+    person_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
+    FULL JOIN upa_base ON 
+    person_base.dim_crm_account_id=upa_base.dim_crm_account_id
+    LEFT JOIN accounts_with_first_order_opps ON
+    upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
+    FULL JOIN opportunity_base ON
+    upa_base.dim_parent_crm_account_id=opportunity_base.dim_parent_crm_account_id
+
+), inquiry_order_type_final AS (
+  
+  SELECT *
+  FROM inquiry_order_type_base
+  WHERE inquiry_order_type_number=1
+  
+), order_type_final AS (
+  
+  SELECT 
+    person_order_type_final.sfdc_record_id,
+    person_order_type_final.email_hash,
+    person_order_type_final.dim_crm_account_id,
+    person_order_type_final.mql_date_lastest_pt,
+    person_order_type_final.close_date,
+    person_order_type_final.dim_parent_crm_account_id,
+    person_order_type_final.dim_crm_opportunity_id,
+    person_order_type_final.order_type,
+    person_order_type_final.person_order_type,
+    inquiry_order_type_final.inquiry_order_type_historical,
+    mql_order_type_final.mql_order_type_historical
+  FROM person_order_type_final
+  LEFT JOIN inquiry_order_type_final ON
+  person_order_type_final.email_hash=inquiry_order_type_final.email_hash
+  LEFT JOIN mql_order_type_final ON
+  person_order_type_final.email_hash=mql_order_type_final.email_hash
+
+  ), cohort_base AS (
 
     SELECT DISTINCT
       person_base.email_hash,
@@ -91,7 +174,9 @@
       person_base.account_demographics_upa_country,
       person_base.account_demographics_territory,
       is_first_order_available,
-      person_order_type_final.person_order_type,
+      order_type_final.person_order_type,
+      order_type_final.inquiry_order_type_historical,
+      order_type_final.mql_order_type_historical,
       opp.order_type AS opp_order_type,
       opp.sales_qualified_source_name,
       opp.deal_path_name,
@@ -120,8 +205,8 @@
       ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
     FULL JOIN mart_crm_opportunity_stamped_hierarchy_hist opp
       ON upa_base.dim_parent_crm_account_id=opp.dim_parent_crm_account_id
-    LEFT JOIN person_order_type_final
-      ON person_base.email_hash=person_order_type_final.email_hash
+    LEFT JOIN order_type_final
+      ON person_base.email_hash=order_type_final.email_hash
 
 ), fo_inquiry_with_tp AS (
   
@@ -140,6 +225,8 @@
       WHEN cohort_base.person_order_type IS null THEN cohort_base.opp_order_type
       ELSE person_order_type
     END AS person_order_type,
+    cohort_base.inquiry_order_type_historical,
+    cohort_base.mql_order_type_historical,
     cohort_base.lead_source,    
     cohort_base.email_domain_type,
     cohort_base.is_mql,
@@ -227,5 +314,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-07-20",
-    updated_date="2022-08-09",
+    updated_date="2022-08-26",
   ) }}
