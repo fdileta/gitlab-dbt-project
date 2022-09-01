@@ -1459,3 +1459,15 @@ The data from this table will be used to create a mart tables - `mart_product_us
 Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
 
 {% enddocs %}
+
+{% docs fct_mrr_snapshot_model %}
+
+Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [fct_mrr](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.fct_mrr) model
+
+{% enddocs %}
+
+{% docs dim_subscription_snapshot_model %}
+
+Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [dim_subscription](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_subscription) model
+
+{% enddocs %}
