@@ -71,7 +71,7 @@
       person_order_type_base.person_order_type
     FROM person_order_type_base
     INNER JOIN dim_crm_person ON
-    person_order_type_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
+    person_order_type_base.email_hash=dim_crm_person.email_hash
     WHERE person_order_type_number=1
 
 ), mql_order_type_base AS (
