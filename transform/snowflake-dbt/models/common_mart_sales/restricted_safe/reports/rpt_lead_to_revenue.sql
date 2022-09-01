@@ -44,8 +44,11 @@
     SELECT DISTINCT
       person_base.email_hash, 
       person_base.dim_crm_account_id,
+      person_base.mql_date_lastest_pt,
       upa_base.dim_parent_crm_account_id,
       opportunity_base.dim_crm_opportunity_id,
+      opportunity_base.close_date,
+      opportunity_base.order_type,
       CASE 
          WHEN is_first_order_available = False AND opportunity_base.order_type = '1. New - First Order' THEN '3. Growth'
          WHEN is_first_order_available = False AND opportunity_base.order_type != '1. New - First Order' THEN opportunity_base.order_type
@@ -65,7 +68,10 @@
     SELECT DISTINCT
       person_order_type_base.email_hash,
       dim_crm_person.sfdc_record_id,
+      person_order_type_base.mql_date_lastest_pt,
       person_order_type_base.dim_crm_opportunity_id,
+      person_order_type_base.close_date,
+      person_order_type_base.order_type,
       person_order_type_base.dim_parent_crm_account_id,
       person_order_type_base.dim_crm_account_id,
       person_order_type_base.person_order_type
