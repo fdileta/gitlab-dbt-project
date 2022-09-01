@@ -3479,7 +3479,7 @@ models:
       - name: is_blocked_user
         description: TRUE if user_state is one of 'blocked' or 'banned', otherwise FALSE
       - name: setup_for_company  
-        description: Is the Product setup for Company use selected during registration
+        description: Is the Product setup for Company use selected during registration. This value is stored in the gitlab.com db user_preferences table.
       - name: role
         description: User role in company selected during registration
       - name: jobs_to_be_done
