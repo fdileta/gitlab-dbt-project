@@ -205,8 +205,8 @@
       ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
     FULL JOIN mart_crm_opportunity_stamped_hierarchy_hist opp
       ON upa_base.dim_parent_crm_account_id=opp.dim_parent_crm_account_id
-    LEFT JOIN person_order_type_final
-      ON person_base.email_hash=person_order_type_final.email_hash
+    LEFT JOIN order_type_final
+      ON person_base.email_hash=order_type_final.email_hash
 
 ), fo_inquiry_with_tp AS (
   
