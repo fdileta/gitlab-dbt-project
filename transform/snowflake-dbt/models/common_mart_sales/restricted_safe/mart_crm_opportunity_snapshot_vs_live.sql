@@ -31,7 +31,7 @@
     mart_crm_opportunity_daily_snapshot.dim_crm_account_id AS dim_crm_account_id_snapshot,
     mart_crm_opportunity.dim_crm_account_id AS dim_crm_account_id_live,
     mart_crm_opportunity_daily_snapshot.dim_crm_user_id AS dim_crm_user_id_snapshot,
-    mart_crm_opportunity.dim_crm_sales_rep_id AS dim_crm_user_id_live,
+    mart_crm_opportunity.dim_crm_user_id AS dim_crm_user_id_live,
     mart_crm_opportunity_daily_snapshot.duplicate_opportunity_id AS duplicate_opportunity_id_snapshot,
     mart_crm_opportunity.duplicate_opportunity_id AS duplicate_opportunity_id_live,
     mart_crm_opportunity_daily_snapshot.merged_opportunity_id AS merged_opportunity_id_snapshot,
@@ -868,7 +868,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@chrissharp",
     created_date="2022-08-08",
-    updated_date="2022-08-08"
+    updated_date="2022-08-31"
 ) }}
