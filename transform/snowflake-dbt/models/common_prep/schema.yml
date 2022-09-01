@@ -1520,19 +1520,19 @@ models:
       - name: is_blocked_user
         description: TRUE if user_state is one of 'blocked' or 'banned', otherwise FALSE
       - name: setup_for_company  
-        description: Is the Product setup for Company use
+        description: Is the Product setup for Company use selected during registration
       - name: role
-        description: User role in company
+        description: User role in company selected during registration
       - name: jobs_to_be_done
         description:  What the product is used for
       - name: for_business_use
-        description: Product is used for Business
+        description: Product is used for Business selected during registration
       - name: employees_count
-        description: Number of employees
+        description: Number of employees selected during registraion
       - name: country
-        description: User Country
+        description: User Country selected during registration
       - name: state
-        description: A state that is part of the given country
+        description: A state that is part of the given country selected during registeration
       - name: first_trial_start_date
         description: Date when first Trial was started
       - name: trials_count
