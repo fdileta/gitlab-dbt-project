@@ -2192,6 +2192,23 @@ roles:
                     - prep.saas_usage_ping.*
                     - raw.version_db.*
 
+    - workday:
+        warehouses:
+            - dev_xs
+        privileges:
+            databases:
+                read:
+                    - prep
+                    - raw
+            schemas:
+                read:
+                    - prep.workday
+                    - raw.workday
+            tables:
+                read:
+                    - prep.workday.*
+                    - raw.workday.*
+
     - xactly:
         warehouses:
             - dev_xs
