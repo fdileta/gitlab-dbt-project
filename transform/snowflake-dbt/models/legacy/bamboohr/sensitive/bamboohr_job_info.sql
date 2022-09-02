@@ -32,7 +32,7 @@ cleaned AS (
     SELECT 
       job_sequence,
       source.employee_id,
-      job_title,
+      source.job_title,
       source.effective_date, --the below case when statement is also used in employee_directory_analysis until we upgrade to 0.14.0 of dbt
       employee_name.employee_id AS reports_to_id,
       CASE WHEN division = 'Alliances' THEN 'Alliances'
