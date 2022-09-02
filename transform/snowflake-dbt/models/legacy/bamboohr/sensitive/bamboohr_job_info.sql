@@ -72,7 +72,7 @@ joined AS (
       cleaned.entity,
       cleaned.reports_to,
       sheetload_job_roles.job_role --- This will only appear for records prior to 2020-02-28 -- after this data populates in bamboohr_job_role
-    FROM cleaned 
+    FROM cleaned
     LEFT JOIN sheetload_job_roles
       ON sheetload_job_roles.job_title = cleaned.job_title
     LEFT JOIN bamboohr_employment_status
