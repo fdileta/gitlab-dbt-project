@@ -7,10 +7,10 @@
 
 WITH employee_directory_intermediate AS (
 
-  SELECT team_member.*, manager.employee_id AS reports_to_id 
-  FROM {{ ref('employee_directory_intermediate') }} AS team_member, {{ ref('employee_directory_intermediate') }} AS manager
-  WHERE team_member.reports_to = manager.full_name
+  SELECT * FROM {{ ref('employee_directory_intermediate') }}
+
 ),
+
 
 cleaned AS (
 

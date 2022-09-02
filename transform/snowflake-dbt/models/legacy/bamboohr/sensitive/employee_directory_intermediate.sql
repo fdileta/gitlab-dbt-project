@@ -181,6 +181,7 @@ enriched AS (
     department_info.division_mapped_current,
     department_info.division_grouping,
     department_info.reports_to,
+    department_info.reports_to_id,
     location_factor.location_factor AS location_factor,
     location_factor.locality,
     job_role.gitlab_username,
