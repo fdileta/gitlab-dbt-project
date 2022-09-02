@@ -972,7 +972,6 @@ The following Columns have a Varchar Data Type and are set up to handle Missing 
 * country
 * state
 
-
 {% enddocs %}
 
 {% docs dim_ci_runner %}

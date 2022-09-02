@@ -1536,7 +1536,7 @@ models:
       - name: country
         description: User Country selected during registration
       - name: state
-        description: A state that is part of the given country selected during registeration
+        description: A state that is part of the given country selected during registration 
 
   - name: prep_ci_build
     description: '{{ doc("prep_ci_build") }}'

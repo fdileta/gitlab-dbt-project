@@ -69,16 +69,7 @@ WITH prep_user AS (
       'Missing public_email_domain_classification' AS public_email_domain_classification,
       'Missing commit_email_domain' AS commit_email_domain,
       'Missing commit_email_domain_classification' AS commit_email_domain_classification,
-      'Missing identity_provider' AS identity_provider,
-      'Missing role' AS role,
-      'Missing last_activity_date' AS last_activity_date,              
-      'Missing last_sign_in_date' AS last_sign_in_date,
-      'Missing setup_for_company' AS setup_for_company,               
-      'Missing jobs_to_be_done' AS jobs_to_be_done,
-      'Missing for_business_use' AS for_business_use,                 
-      'Missing employee_count' AS employee_count,
-      'Missing country' AS country,
-      'Missing state' AS state
+      'Missing identity_provider' AS identity_provider
 
 )
 

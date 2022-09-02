@@ -3497,7 +3497,6 @@ models:
       - name: state
         description: A state that is part of the given country selected during registration
 
-
   - name: dim_ci_runner
     description: '{{ doc("dim_ci_runner") }}'
     columns:

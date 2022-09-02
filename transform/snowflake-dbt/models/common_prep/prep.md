@@ -458,7 +458,7 @@ Missing Column Values:
 * Unknown - Value is Null in source data
 * Not Found - Row Not found in source data
 The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:      
-* role
+* role 
 * last_activity_date             
 * last_sign_in_date 
 * setup_for_company       
