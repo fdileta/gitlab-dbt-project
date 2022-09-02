@@ -28,17 +28,15 @@ WITH prep_user AS (
       commit_email_domain,
       commit_email_domain_classification,
       identity_provider,
-      setup_for_company,               
       role,
+      last_activity_date,              
+      last_sign_in_date,               
+      setup_for_company,               
       jobs_to_be_done,
       for_business_use,                 
-      employees_count,
+      employee_count,
       country,
-      state,
-      first_trial_start_date,
-      trials_count,
-      last_activity_date,              
-      last_sign_in_date               
+      state
  
     FROM {{ ref('prep_user') }}
     
@@ -72,17 +70,16 @@ WITH prep_user AS (
       'Missing commit_email_domain' AS commit_email_domain,
       'Missing commit_email_domain_classification' AS commit_email_domain_classification,
       'Missing identity_provider' AS identity_provider,
-      'Missing setup_for_company' AS setup_for_company,               
       'Missing role' AS role,
+      'Missing last_activity_date' AS last_activity_date,              
+      'Missing last_sign_in_date' AS last_sign_in_date,
+      'Missing setup_for_company' AS setup_for_company,               
       'Missing jobs_to_be_done' AS jobs_to_be_done,
       'Missing for_business_use' AS for_business_use,                 
-      'Missing employees_count' AS employees_count,
+      'Missing employee_count' AS employee_count,
       'Missing country' AS country,
-      'Missing state' AS state,
-      'Missing first_trial_start_date' AS first_trial_start_date,
-      'Missing trials_count' AS trials_count,
-      'Missing last_activity_date' AS last_activity_date,              
-      'Missing last_sign_in_date' AS last_sign_in_date
+      'Missing state' AS state
+
 )
 
 {{ dbt_audit(

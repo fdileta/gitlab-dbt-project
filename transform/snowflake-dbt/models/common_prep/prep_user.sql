@@ -14,10 +14,9 @@
     ('email_classification', 'driveload_email_domain_classification_source'),
     ('identity','gitlab_dotcom_identities_source'),
     ('gitlab_dotcom_user_preferences_source','gitlab_dotcom_user_preferences_source'),
-    ('gitlab_dotcom_users','gitlab_dotcom_users'),
     ('gitlab_dotcom_user_details_source','gitlab_dotcom_user_details_source'),
-    ('customers_db_leads_source','customers_db_leads_source'),
-    ('customers_db_trials','customers_db_trials')
+    ('customers_db_leads_source','customers_db_leads_source')
+
 ]) }}, 
 
 email_classification_dedup AS (
@@ -53,17 +52,6 @@ user_preferences AS (
 
 ),
 
-users AS (
-
-  SELECT 
-    user_id AS user_id, 
-    COALESCE(role,'Unknown') AS role,
-    COALESCE(TO_DATE(last_activity_on)::VARCHAR,'Unknown') AS last_activity_date,
-    COALESCE(TO_DATE(last_sign_in_at)::VARCHAR,'Unknown')  AS last_sign_in_date        
-  FROM gitlab_dotcom_users
-
-),
-
 user_details AS (
 
   SELECT 
@@ -87,7 +75,7 @@ customer_leads AS (
   SELECT 
     user_id AS user_id,
     COALESCE(MAX(is_for_business_use)::VARCHAR,'Unknown') AS for_business_use,
-    COALESCE(MAX(employees_bucket)::VARCHAR,'Unknown') AS employees_count,
+    COALESCE(MAX(employees_bucket)::VARCHAR,'Unknown') AS employee_count,
     COALESCE(MAX(country)::VARCHAR,'Unknown') AS country,
     COALESCE(MAX(state)::VARCHAR,'Unknown') AS state
   FROM customers_db_leads_source
@@ -96,17 +84,6 @@ customer_leads AS (
 
 ),
 
-customer_trials AS (
-
-  SELECT 
-    gitlab_user_id AS gitlab_user_id,
-    COALESCE(MIN(trial_start_date)::VARCHAR,'Unknown') AS first_trial_start_date,
-    COALESCE(COUNT(distinct order_id)::VARCHAR,'Unknown') AS trials_count
-  FROM customers_db_trials                
-  GROUP BY
-      gitlab_user_id
-
-),
 
 renamed AS (
 
@@ -145,17 +122,15 @@ renamed AS (
     closest_provider.identity_provider AS identity_provider,
 
     -- Expanded Attributes  (Not Found = Joined Row Not found for the Attribute)
+    COALESCE(source.role,'Unknown') AS role,
+    COALESCE(TO_DATE(source.last_activity_on)::VARCHAR,'Unknown') AS last_activity_date,              
+    COALESCE(TO_DATE(source.last_sign_in_at)::VARCHAR,'Unknown')  AS last_sign_in_date,               
     COALESCE(user_preferences.setup_for_company,'Not Found') AS setup_for_company,               
-    COALESCE(users.role,'Not Found') AS role,
     COALESCE(user_details.jobs_to_be_done,'Not Found') AS jobs_to_be_done,
     COALESCE(customer_leads.for_business_use,'Not Found') AS for_business_use,                 
-    COALESCE(customer_leads.employees_count,'Not Found') AS employees_count,
+    COALESCE(customer_leads.employee_count,'Not Found') AS employee_count,
     COALESCE(customer_leads.country,'Not Found') AS country,
-    COALESCE(customer_leads.state,'Not Found') AS state,
-    COALESCE(customer_trials.first_trial_start_date,'Not Found') AS first_trial_start_date,
-    COALESCE(customer_trials.trials_count,'Not Found') AS trials_count,
-    COALESCE(users.last_activity_date,'Not Found') AS last_activity_date,              
-    COALESCE(users.last_sign_in_date,'Not Found') AS last_sign_in_date               
+    COALESCE(customer_leads.state,'Not Found') AS state
 
   FROM source
   LEFT JOIN dim_date
@@ -172,14 +147,10 @@ renamed AS (
     ON source.user_id = closest_provider.user_id  
   LEFT JOIN user_preferences  AS user_preferences
     ON source.user_id = user_preferences.user_id
-  LEFT JOIN users AS users
-    ON source.user_id = users.user_id
   LEFT JOIN user_details AS user_details
     ON source.user_id = user_details.user_id
   LEFT JOIN customer_leads AS customer_leads
     ON source.user_id = customer_leads.user_id
-  LEFT JOIN customer_trials AS customer_trials
-    ON source.user_id = customer_trials.gitlab_user_id
 
 )
 
