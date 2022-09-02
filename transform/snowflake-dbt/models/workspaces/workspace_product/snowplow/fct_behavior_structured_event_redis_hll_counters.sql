@@ -8,7 +8,7 @@
 
     SELECT *
     FROM fct_behavior_structured_event
-      WHERE event_action IN (
+    WHERE event_action IN (
     'g_analytics_valuestream',
     'action_active_users_project_repo',
     'push_package',
