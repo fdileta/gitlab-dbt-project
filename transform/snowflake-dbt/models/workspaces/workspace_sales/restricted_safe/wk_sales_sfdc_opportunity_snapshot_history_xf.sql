@@ -873,11 +873,11 @@ WITH date_details AS (
       sfdc_accounts_xf.account_demographics_territory,
       -- account_demographics_subarea_stamped        
 
-      sfdc_accounts_xf.account_demographics_sales_segment    AS upa_demographics_segment,
-      sfdc_accounts_xf.account_demographics_geo              AS upa_demographics_geo,
-      sfdc_accounts_xf.account_demographics_region           AS upa_demographics_region,
-      sfdc_accounts_xf.account_demographics_area             AS upa_demographics_area,
-      sfdc_accounts_xf.account_demographics_territory        AS upa_demographics_territory
+      upa.account_demographics_sales_segment    AS upa_demographics_segment,
+      upa.account_demographics_geo              AS upa_demographics_geo,
+      upa.account_demographics_region           AS upa_demographics_region,
+      upa.account_demographics_area             AS upa_demographics_area,
+      upa.account_demographics_territory        AS upa_demographics_territory
       
 
     FROM sfdc_opportunity_snapshot_history opp_snapshot
@@ -995,12 +995,11 @@ WITH date_details AS (
       END                                                      AS is_eligible_created_pipeline_flag,
 
       -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
+      -- 2022-08-23 JK: using the central is_sao logic
       CASE
         WHEN opp_snapshot.sales_accepted_date IS NOT NULL
           AND opp_snapshot.is_edu_oss = 0
-          AND opp_snapshot.is_deleted = 0
-          AND opp_snapshot.is_renewal = 0
-          AND opp_snapshot.stage_name NOT IN ('10-Duplicate', '9-Unqualified','0-Pending Acceptance')
+          AND opp_snapshot.stage_name NOT IN ('10-Duplicate')
             THEN 1
         ELSE 0
       END                                                     AS is_eligible_sao_flag,

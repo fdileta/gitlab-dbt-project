@@ -4,8 +4,7 @@
     ('namespace_lineage', 'prep_namespace'),
     ('project', 'prep_project'),
     ('gitlab_namespaces', 'gitlab_dotcom_namespaces_source'),
-    ('usage_ping_subscription_smau', 'fct_usage_ping_subscription_mapped_smau'),
-    ('product_usage_wave_1_3', 'fct_product_usage_wave_1_3_metrics_monthly')
+    ('instance_metric_wave', 'fct_ping_instance_metric_wave_monthly')
 ]) }}
 
 , namespace_project_visibility AS (
@@ -40,24 +39,7 @@
     WHERE is_subscription_active = TRUE
       OR dim_subscription_id IS NULL
 
-), usage_ping_subscription_smau_aggregate AS (
-
-    SELECT 
-      dim_subscription_id,
-      manage_analytics_total_unique_counts_monthly,
-      plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly,
-      create_repo_writes,
-      verify_ci_pipelines_users_28_days,
-      package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly,
-      release_release_creation_users_28_days,
-      configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly,
-      monitor_incident_management_activer_user_28_days,
-      secure_secure_scanners_users_28_days,
-      protect_container_scanning_jobs_users_28_days
-    FROM usage_ping_subscription_smau
-    WHERE snapshot_month = DATE_TRUNC(MONTH, CURRENT_DATE)
-
-), product_usage_wave_1_3_aggregate AS (
+), instance_metric_wave_aggregate AS (
 
     SELECT 
       dim_subscription_id,
@@ -90,7 +72,7 @@
       issues_28_days_user,
       instance_user_count_not_aligned,
       historical_max_users_not_aligned
-    FROM product_usage_wave_1_3
+    FROM instance_metric_wave
     WHERE snapshot_month = DATE_TRUNC(MONTH, CURRENT_DATE)
 
 ), prep AS (
@@ -262,50 +244,38 @@
 
     SELECT 
       prep.*,
-      usage_ping_subscription_smau_aggregate.manage_analytics_total_unique_counts_monthly                                         AS smau_manage_analytics_total_unique_counts_monthly,
-      usage_ping_subscription_smau_aggregate.plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly          AS smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly,
-      usage_ping_subscription_smau_aggregate.create_repo_writes                                                                   AS smau_create_repo_writes,
-      usage_ping_subscription_smau_aggregate.verify_ci_pipelines_users_28_days                                                    AS smau_verify_ci_pipelines_users_28_days,
-      usage_ping_subscription_smau_aggregate.package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly   AS smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly,
-      usage_ping_subscription_smau_aggregate.release_release_creation_users_28_days                                               AS smau_release_release_creation_users_28_days,
-      usage_ping_subscription_smau_aggregate.configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly    AS smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly,
-      usage_ping_subscription_smau_aggregate.monitor_incident_management_activer_user_28_days                                     AS smau_monitor_incident_management_activer_user_28_days,
-      usage_ping_subscription_smau_aggregate.secure_secure_scanners_users_28_days                                                 AS smau_secure_secure_scanners_users_28_days,
-      usage_ping_subscription_smau_aggregate.protect_container_scanning_jobs_users_28_days                                        AS smau_protect_container_scanning_jobs_users_28_days,
-      product_usage_wave_1_3_aggregate.umau_28_days_user                                                                          AS usage_umau_28_days_user,
-      product_usage_wave_1_3_aggregate.action_monthly_active_users_project_repo_28_days_user                                      AS usage_action_monthly_active_users_project_repo_28_days_user,
-      product_usage_wave_1_3_aggregate.merge_requests_28_days_user                                                                AS usage_merge_requests_28_days_user,
-      product_usage_wave_1_3_aggregate.commit_comment_all_time_event                                                              AS usage_commit_comment_all_time_event,
-      product_usage_wave_1_3_aggregate.source_code_pushes_all_time_event                                                          AS usage_source_code_pushes_all_time_event,
-      product_usage_wave_1_3_aggregate.ci_pipelines_28_days_user                                                                  AS usage_ci_pipelines_28_days_user,
-      product_usage_wave_1_3_aggregate.ci_internal_pipelines_28_days_user                                                         AS usage_ci_internal_pipelines_28_days_user,
-      product_usage_wave_1_3_aggregate.ci_builds_28_days_user                                                                     AS usage_ci_builds_28_days_user,
-      product_usage_wave_1_3_aggregate.ci_builds_all_time_user                                                                    AS usage_ci_builds_all_time_user,
-      product_usage_wave_1_3_aggregate.ci_builds_all_time_event                                                                   AS usage_ci_builds_all_time_event,
-      product_usage_wave_1_3_aggregate.ci_runners_all_time_event                                                                  AS usage_ci_runners_all_time_event,
-      product_usage_wave_1_3_aggregate.auto_devops_enabled_all_time_event                                                         AS usage_auto_devops_enabled_all_time_event,
-      product_usage_wave_1_3_aggregate.template_repositories_all_time_event                                                       AS usage_template_repositories_all_time_event,
-      product_usage_wave_1_3_aggregate.ci_pipeline_config_repository_28_days_user                                                 AS usage_ci_pipeline_config_repository_28_days_user,
-      product_usage_wave_1_3_aggregate.user_unique_users_all_secure_scanners_28_days_user                                         AS usage_user_unique_users_all_secure_scanners_28_days_user,
-      product_usage_wave_1_3_aggregate.user_container_scanning_jobs_28_days_user                                                  AS usage_user_container_scanning_jobs_28_days_user,
-      product_usage_wave_1_3_aggregate.user_sast_jobs_28_days_user                                                                AS usage_user_sast_jobs_28_days_user,
-      product_usage_wave_1_3_aggregate.user_dast_jobs_28_days_user                                                                AS usage_user_dast_jobs_28_days_user,
-      product_usage_wave_1_3_aggregate.user_dependency_scanning_jobs_28_days_user                                                 AS usage_user_dependency_scanning_jobs_28_days_user,
-      product_usage_wave_1_3_aggregate.user_license_management_jobs_28_days_user                                                  AS usage_user_license_management_jobs_28_days_user,
-      product_usage_wave_1_3_aggregate.user_secret_detection_jobs_28_days_user                                                    AS usage_user_secret_detection_jobs_28_days_user,
-      product_usage_wave_1_3_aggregate.projects_with_packages_all_time_event                                                      AS usage_projects_with_packages_all_time_event,
-      product_usage_wave_1_3_aggregate.projects_with_packages_28_days_user                                                        AS usage_projects_with_packages_28_days_user,
-      product_usage_wave_1_3_aggregate.deployments_28_days_user                                                                   AS usage_deployments_28_days_user,
-      product_usage_wave_1_3_aggregate.releases_28_days_user                                                                      AS usage_releases_28_days_user,
-      product_usage_wave_1_3_aggregate.epics_28_days_user                                                                         AS usage_epics_28_days_user,
-      product_usage_wave_1_3_aggregate.issues_28_days_user                                                                        AS usage_issues_28_days_user,
-      product_usage_wave_1_3_aggregate.instance_user_count_not_aligned                                                            AS usage_instance_user_count_not_aligned,
-      product_usage_wave_1_3_aggregate.historical_max_users_not_aligned                                                           AS usage_historical_max_users_not_aligned
+      instance_metric_wave_aggregate.umau_28_days_user                                                                          AS usage_umau_28_days_user,
+      instance_metric_wave_aggregate.action_monthly_active_users_project_repo_28_days_user                                      AS usage_action_monthly_active_users_project_repo_28_days_user,
+      instance_metric_wave_aggregate.merge_requests_28_days_user                                                                AS usage_merge_requests_28_days_user,
+      instance_metric_wave_aggregate.commit_comment_all_time_event                                                              AS usage_commit_comment_all_time_event,
+      instance_metric_wave_aggregate.source_code_pushes_all_time_event                                                          AS usage_source_code_pushes_all_time_event,
+      instance_metric_wave_aggregate.ci_pipelines_28_days_user                                                                  AS usage_ci_pipelines_28_days_user,
+      instance_metric_wave_aggregate.ci_internal_pipelines_28_days_user                                                         AS usage_ci_internal_pipelines_28_days_user,
+      instance_metric_wave_aggregate.ci_builds_28_days_user                                                                     AS usage_ci_builds_28_days_user,
+      instance_metric_wave_aggregate.ci_builds_all_time_user                                                                    AS usage_ci_builds_all_time_user,
+      instance_metric_wave_aggregate.ci_builds_all_time_event                                                                   AS usage_ci_builds_all_time_event,
+      instance_metric_wave_aggregate.ci_runners_all_time_event                                                                  AS usage_ci_runners_all_time_event,
+      instance_metric_wave_aggregate.auto_devops_enabled_all_time_event                                                         AS usage_auto_devops_enabled_all_time_event,
+      instance_metric_wave_aggregate.template_repositories_all_time_event                                                       AS usage_template_repositories_all_time_event,
+      instance_metric_wave_aggregate.ci_pipeline_config_repository_28_days_user                                                 AS usage_ci_pipeline_config_repository_28_days_user,
+      instance_metric_wave_aggregate.user_unique_users_all_secure_scanners_28_days_user                                         AS usage_user_unique_users_all_secure_scanners_28_days_user,
+      instance_metric_wave_aggregate.user_container_scanning_jobs_28_days_user                                                  AS usage_user_container_scanning_jobs_28_days_user,
+      instance_metric_wave_aggregate.user_sast_jobs_28_days_user                                                                AS usage_user_sast_jobs_28_days_user,
+      instance_metric_wave_aggregate.user_dast_jobs_28_days_user                                                                AS usage_user_dast_jobs_28_days_user,
+      instance_metric_wave_aggregate.user_dependency_scanning_jobs_28_days_user                                                 AS usage_user_dependency_scanning_jobs_28_days_user,
+      instance_metric_wave_aggregate.user_license_management_jobs_28_days_user                                                  AS usage_user_license_management_jobs_28_days_user,
+      instance_metric_wave_aggregate.user_secret_detection_jobs_28_days_user                                                    AS usage_user_secret_detection_jobs_28_days_user,
+      instance_metric_wave_aggregate.projects_with_packages_all_time_event                                                      AS usage_projects_with_packages_all_time_event,
+      instance_metric_wave_aggregate.projects_with_packages_28_days_user                                                        AS usage_projects_with_packages_28_days_user,
+      instance_metric_wave_aggregate.deployments_28_days_user                                                                   AS usage_deployments_28_days_user,
+      instance_metric_wave_aggregate.releases_28_days_user                                                                      AS usage_releases_28_days_user,
+      instance_metric_wave_aggregate.epics_28_days_user                                                                         AS usage_epics_28_days_user,
+      instance_metric_wave_aggregate.issues_28_days_user                                                                        AS usage_issues_28_days_user,
+      instance_metric_wave_aggregate.instance_user_count_not_aligned                                                            AS usage_instance_user_count_not_aligned,
+      instance_metric_wave_aggregate.historical_max_users_not_aligned                                                           AS usage_historical_max_users_not_aligned
     FROM prep
-    LEFT JOIN usage_ping_subscription_smau_aggregate
-      ON usage_ping_subscription_smau_aggregate.dim_subscription_id = prep.dim_subscription_id
-    LEFT JOIN product_usage_wave_1_3_aggregate
-      ON product_usage_wave_1_3_aggregate.dim_subscription_id = prep.dim_subscription_id
+    LEFT JOIN instance_metric_wave_aggregate
+      ON instance_metric_wave_aggregate.dim_subscription_id = prep.dim_subscription_id
 
 )
     
@@ -315,5 +285,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-04",
-    updated_date="2022-03-26"
+    updated_date="2022-08-18"
 ) }}
