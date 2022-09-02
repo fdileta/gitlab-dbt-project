@@ -2191,6 +2191,7 @@ roles:
                     - raw.saas_usage_ping.*
                     - prep.saas_usage_ping.*
                     - raw.version_db.*
+
     - workday:
         warehouses:
             - dev_xs
