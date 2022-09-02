@@ -33,8 +33,8 @@ cleaned AS (
       job_sequence,
       source.employee_id,
       job_title,
-      employee_name.full_name,
       source.effective_date, --the below case when statement is also used in employee_directory_analysis until we upgrade to 0.14.0 of dbt
+      employee_name.employee_id AS reports_to_id
       CASE WHEN division = 'Alliances' THEN 'Alliances'
            WHEN division = 'Customer Support' THEN 'Customer Support'
            WHEN division = 'Customer Service' THEN 'Customer Success'
@@ -52,7 +52,7 @@ cleaned AS (
       (LAG(DATEADD('day',-1,source.effective_date), 1) OVER (PARTITION BY source.employee_id ORDER BY source.effective_date DESC, job_sequence DESC)) AS effective_end_date
     FROM source
     LEFT JOIN employee_name
-      ON employee_name.employee_id = source.employee_id
+      ON employee_name.full_name = source.reports_to
 
     
 ),
