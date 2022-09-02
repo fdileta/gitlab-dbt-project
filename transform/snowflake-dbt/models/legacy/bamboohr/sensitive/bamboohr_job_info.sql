@@ -63,7 +63,6 @@ joined AS (
       cleaned.job_sequence,
       cleaned.employee_id,
       cleaned.job_title,
-      cleaned.full_name,
       cleaned.reports_to_id,
       cleaned.effective_date,
       COALESCE(bamboohr_employment_status.valid_to_date, cleaned.effective_end_date) as effective_end_date,
