@@ -60,25 +60,24 @@ cleaned AS (
 joined AS (
 
     SELECT 
-      team_member.job_sequence,
-      team_member.employee_id,
-      team_member.job_title,
-      team_member.full_name,
-      manager.employee_id AS reports_to_id
-      team_member.effective_date,
-      COALESCE(bamboohr_employment_status.valid_to_date, team_member.effective_end_date) as effective_end_date,
-      team_member.department,
-      team_member.division,
-      team_member.entity,
-      team_member.reports_to,
+      cleaned.job_sequence,
+      cleaned.employee_id,
+      cleaned.job_title,
+      cleaned.full_name,
+      cleaned.reports_to_id,
+      cleaned.effective_date,
+      COALESCE(bamboohr_employment_status.valid_to_date, cleaned.effective_end_date) as effective_end_date,
+      cleaned.department,
+      cleaned.division,
+      cleaned.entity,
+      cleaned.reports_to,
       sheetload_job_roles.job_role --- This will only appear for records prior to 2020-02-28 -- after this data populates in bamboohr_job_role
-    FROM cleaned AS team_member, cleaned AS manager
+    FROM cleaned 
     LEFT JOIN sheetload_job_roles
-      ON sheetload_job_roles.job_title = team_member.job_title
+      ON sheetload_job_roles.job_title = cleaned.job_title
     LEFT JOIN bamboohr_employment_status
-      ON bamboohr_employment_status.employee_id = team_member.employee_id 
-      AND bamboohr_employment_status.valid_to_date BETWEEN team_member.effective_date AND COALESCE(team_member.effective_end_date, {{max_date_in_bamboo_analyses()}})
-    WHERE team_member.reports_to = manager.full_name
+      ON bamboohr_employment_status.employee_id = cleaned.employee_id 
+      AND bamboohr_employment_status.valid_to_date BETWEEN cleaned.effective_date AND COALESCE(cleaned.effective_end_date, {{max_date_in_bamboo_analyses()}})
 
 )
 
