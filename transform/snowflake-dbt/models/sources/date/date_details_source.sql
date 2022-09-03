@@ -7,6 +7,16 @@ WITH date_spine AS (
      )
   }}
 
+), current_date_information AS (
+  
+    SELECT 
+      fiscal_year AS current_fiscal_year,
+      first_day_of_fiscal_year AS current_first_day_of_fiscal_year,
+      fiscal_quarter_name_fy AS current_fiscal_quarter_name_fy,
+      first_day_of_month AS current_first_day_of_month
+    FROM date_spine
+    WHERE CURRENT_DATE = date_actual
+
 ), calculated as (
 
     SELECT
@@ -111,8 +121,14 @@ WITH date_spine AS (
                 OR date_actual = first_day_of_fiscal_quarter) 
           THEN 1 
         ELSE 0 
-      END                                                                                     AS is_first_day_of_fiscal_quarter_week
+      END                                                                                     AS is_first_day_of_fiscal_quarter_week,
+      current_fiscal_year,
+      current_first_day_of_fiscal_year,
+      current_fiscal_quarter_name_fy,
+      current_first_day_of_month
+
     FROM date_spine
+    CROSS JOIN current_date_information
 
 )
 
@@ -166,6 +182,10 @@ SELECT
   day_of_fiscal_quarter_normalised,
   week_of_fiscal_quarter_normalised,
   day_of_fiscal_year_normalised,
-  is_first_day_of_fiscal_quarter_week
+  is_first_day_of_fiscal_quarter_week,
+  current_fiscal_year,
+  current_first_day_of_fiscal_year,
+  current_fiscal_quarter_name_fy,
+  current_first_day_of_month
 FROM calculated
 

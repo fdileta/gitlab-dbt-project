@@ -15,11 +15,6 @@ WITH first_contact  AS (
     FROM {{ ref('sfdc_bizible_attribution_touchpoint_source') }}
     WHERE is_deleted = 'FALSE'
 
-), dim_date AS (
-
-    SELECT *
-    FROM {{ ref('dim_date') }}
-
 ), linear_attribution_base AS ( --the number of attribution touches a given opp has in total
     --linear attribution IACV of an opp / all touches (count_touches) for each opp - weighted by the number of touches in the given bucket (campaign,channel,etc)
     SELECT
@@ -170,8 +165,8 @@ WITH first_contact  AS (
           THEN prep_crm_user.crm_user_area
         ELSE sfdc_opportunity_source.user_area_stamped
       END                                                                   AS opportunity_owner_user_area,
-      prep_crm_user.user_role_name                                      AS opportunity_owner_role,
-      prep_crm_user.title                                               AS opportunity_owner_title
+      prep_crm_user.user_role_name                                          AS opportunity_owner_role,
+      prep_crm_user.title                                                   AS opportunity_owner_title
   FROM {{ ref('sfdc_opportunity_source') }}
   INNER JOIN {{ ref('prep_crm_user') }}
     ON sfdc_opportunity_source.owner_id = prep_crm_user.dim_crm_user_id
@@ -283,6 +278,11 @@ WITH first_contact  AS (
     {%- endif %}
     WHERE user_id IS NOT NULL
 
+), dim_date AS (
+
+    SELECT *
+    FROM {{ ref('dim_date') }}
+
 ), final AS (
 
     SELECT
@@ -306,6 +306,13 @@ WITH first_contact  AS (
       {{ get_date_id('sfdc_opportunity.subscription_start_date') }}                               AS subscription_start_date_id,
       {{ get_date_id('sfdc_opportunity.subscription_end_date') }}                                 AS subscription_end_date_id,
       {{ get_date_id('sfdc_opportunity.sales_qualified_date') }}                                  AS sales_qualified_date_id,
+
+      -- account owner information
+      account_owner.user_segment AS crm_account_owner_sales_segment,
+      account_owner.user_geo AS crm_account_owner_geo,
+      account_owner.user_region AS crm_account_owner_region,
+      account_owner.user_area AS crm_account_owner_area,
+      account_owner.user_segment_geo_region_area AS crm_account_owner_sales_segment_geo_region_area,
 
 
       close_date.first_day_of_fiscal_quarter                                                      AS close_fiscal_quarter_date,
@@ -655,13 +662,13 @@ WITH first_contact  AS (
           THEN '0. Open' 
         ELSE 'N/A'
       END                                                                                         AS stage_category,
-      CASE 
-            WHEN sfdc_opportunity.order_type = '3. Growth' 
-                THEN '2. Growth'
-            WHEN sfdc_opportunity.order_type = '1. New - First Order' 
-                THEN '1. New'
-              ELSE '3. Other'
-          END                                                                                    AS deal_group,
+      CASE
+       WHEN sfdc_opportunity.order_type = '1. New - First Order'
+         THEN '1. New'
+       WHEN sfdc_opportunity.order_type IN ('2. New - Connected', '3. Growth', '5. Churn - Partial','6. Churn - Final','4. Contraction')
+         THEN '2. Growth'
+       ELSE '3. Other'
+     END                                                                   AS deal_group,
        CASE 
           WHEN sfdc_opportunity.order_type = '1. New - First Order' 
             THEN '1. New'
@@ -808,42 +815,35 @@ WITH first_contact  AS (
         WHEN is_credit = 1
           THEN 0
         ELSE 1
-      END                                               AS pipeline_calculated_deal_count,
+      END                                               AS calculated_deal_count,
       CASE 
         WHEN is_eligible_open_pipeline = 1
           AND is_stage_1_plus = 1
-            THEN pipeline_calculated_deal_count  
+            THEN calculated_deal_count  
         ELSE 0
       END                                               AS open_1plus_deal_count,
 
       CASE 
         WHEN is_eligible_open_pipeline = 1
           AND is_stage_3_plus = 1
-            THEN pipeline_calculated_deal_count
+            THEN calculated_deal_count
         ELSE 0
       END                                               AS open_3plus_deal_count,
 
       CASE 
         WHEN is_eligible_open_pipeline = 1
           AND is_stage_4_plus = 1
-            THEN pipeline_calculated_deal_count
+            THEN calculated_deal_count
         ELSE 0
       END                                               AS open_4plus_deal_count,
       CASE 
         WHEN sfdc_opportunity_stage.is_won = 1
-          THEN pipeline_calculated_deal_count
+          THEN calculated_deal_count
         ELSE 0
       END                                               AS booked_deal_count,
       CASE
-        WHEN (
-               (
-                is_renewal = 1
-                 AND is_lost = 1
-               )
-                OR sfdc_opportunity_stage.is_won = 1 
-             )
-            AND sfdc_opportunity.order_type IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
-        THEN pipeline_calculated_deal_count
+        WHEN is_eligible_churn_contraction_flag = 1
+          THEN calculated_deal_count
         ELSE 0
       END                                               AS churned_contraction_deal_count,
       CASE
@@ -855,23 +855,14 @@ WITH first_contact  AS (
                 OR sfdc_opportunity_stage.is_won = 1 
               )
               AND is_eligible_churn_contraction = 1
-          THEN pipeline_calculated_deal_count
+          THEN calculated_deal_count
         ELSE 0
       END                                                 AS booked_churned_contraction_deal_count,
       CASE
-        WHEN 
-          (
-            (
-              is_renewal = 1
-                AND is_lost = 1
-              )
-            OR sfdc_opportunity_stage.is_won = 1 
-            )
-            AND is_eligible_churn_contraction = 1
-        THEN net_arr
+        WHEN is_eligible_churn_contraction_flag = 1
+          THEN net_arr
         ELSE 0
-      END                                                 AS booked_churned_contraction_net_arr,
-
+      END                                                 AS churned_contraction_net_arr,
       CASE 
         WHEN is_eligible_open_pipeline = 1
           THEN net_arr
@@ -1034,7 +1025,7 @@ WITH first_contact  AS (
     CASE
       WHEN arr_created_date.fiscal_quarter_name_fy = sfdc_opportunity.snapshot_fiscal_quarter_name
         AND is_net_arr_pipeline_created = 1
-        THEN pipeline_calculated_deal_count
+        THEN calculated_deal_count
       ELSE 0
     END AS created_in_snapshot_quarter_deal_count,
     {%- endif %}
@@ -1138,20 +1129,40 @@ WITH first_contact  AS (
         THEN 1
       ELSE 0
     END AS competitors_aws_flag,
+   LOWER( 
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_segment
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+      END  
+    )                                                     AS report_opportunity_user_segment
     LOWER(
-      sfdc_opportunity.user_segment_stamped
-    ) AS report_opportunity_user_segment,
-    LOWER(
-      sfdc_opportunity.user_geo_stamped
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_geo
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+      END  
     ) AS report_opportunity_user_geo,
     LOWER(
-      sfdc_opportunity.user_region_stamped
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_region
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+      END  
     ) AS report_opportunity_user_region,
     LOWER(
-      sfdc_opportunity.user_area_stamped
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_area
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+      END  
     ) AS report_opportunity_user_area,
     LOWER(
-      sfdc_opportunity.crm_opp_owner_sales_segment_geo_region_area_stamped
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_segment_geo_region_area
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+      END
     ) AS report_user_segment_geo_region_area,
     LOWER(
       CONCAT(
@@ -1290,6 +1301,11 @@ WITH first_contact  AS (
     {%- endif %}
     LEFT JOIN sfdc_user
       ON sfdc_opportunity.dim_crm_user_id= sfdc_user.user_id
+    {%- if model_type == 'snapshot' %}
+        AND sfdc_opportunity.snapshot_id = sfdc_user.snapshot_id
+    {%- endif %}
+    LEFT JOIN sfdc_user AS account_owner
+      ON sfdc_account.owner_id = sfdc_user.user_id
     {%- if model_type == 'snapshot' %}
         AND sfdc_opportunity.snapshot_id = sfdc_user.snapshot_id
     {%- endif %}

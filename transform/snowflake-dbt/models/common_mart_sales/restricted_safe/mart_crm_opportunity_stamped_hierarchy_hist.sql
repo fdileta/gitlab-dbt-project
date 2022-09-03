@@ -56,7 +56,7 @@
 
 ), dim_crm_user_hierarchy_stamped_sales_segment AS (
 
-    SELECT DISTINCT
+    SELECT 
       dim_crm_opp_owner_sales_segment_stamped_id,
       crm_opp_owner_sales_segment_stamped,
       crm_opp_owner_sales_segment_stamped_grouped
@@ -337,16 +337,16 @@
       dim_crm_opportunity.sales_team_asm_level,
       dim_crm_opportunity.account_owner_team_stamped_cro_level,
       LOWER(
-      dim_crm_account_user_hierarchy_live_sales_segment.crm_user_sales_segment
+        dim_crm_opportunity.crm_account_owner_sales_segment
       ) AS account_owner_user_segment,
       LOWER(
-        dim_crm_account_user_hierarchy_live_geo.crm_user_geo
+        dim_crm_opportunity.crm_account_owner_geo
       ) AS account_owner_user_geo,
       LOWER(
-        dim_crm_account_user_hierarchy_live_region.crm_user_region
+        dim_crm_opportunity.crm_account_owner_region
       ) AS account_owner_user_region,
       LOWER(
-        dim_crm_account_user_hierarchy_live_area.crm_user_area
+        dim_crm_opportunity.crm_account_owner_area
       ) AS account_owner_user_area,
 
       -- channel fields
@@ -516,11 +516,11 @@
       arr_created_date.first_day_of_fiscal_quarter                    AS pipeline_created_fiscal_quarter_date,
       arr_created_date.fiscal_quarter_name_fy                         AS pipeline_created_fiscal_quarter_name,
       arr_created_date.fiscal_year                                    AS pipeline_created_fiscal_year,
-      created_date.date_actual                                        AS net_arr_created_date,
-      created_date.first_day_of_month                                 AS net_arr_created_month,
-      created_date.first_day_of_fiscal_quarter                        AS net_arr_created_fiscal_quarter_date,
-      created_date.fiscal_quarter_name_fy                             AS net_arr_created_fiscal_quarter_name,
-      created_date.fiscal_year                                        AS net_arr_created_fiscal_year,
+      arr_created_date.date_actual                                    AS net_arr_created_date,
+      arr_created_date.first_day_of_month                             AS net_arr_created_month,
+      arr_created_date.first_day_of_fiscal_quarter                    AS net_arr_created_fiscal_quarter_date,
+      arr_created_date.fiscal_quarter_name_fy                         AS net_arr_created_fiscal_quarter_name,
+      arr_created_date.fiscal_year                                    AS net_arr_created_fiscal_year,
       fct_crm_opportunity.days_in_0_pending_acceptance,
       fct_crm_opportunity.days_in_1_discovery,
       fct_crm_opportunity.days_in_2_scoping,
