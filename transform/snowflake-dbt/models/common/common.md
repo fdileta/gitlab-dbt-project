@@ -957,6 +957,21 @@ Easy to join with the following tables:
 {% docs dim_user %}
 
 Dimension table that contains all Gitlab.com Users.
+
+Missing Column Values:
+* Unknown - Value is Null in source data
+* Not Found - Row Not found in source data
+The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:
+* role
+* last_activity_date             
+* last_sign_in_date               
+* setup_for_company    
+* jobs_to_be_done
+* for_business_use                 
+* employee_count
+* country
+* state
+
 {% enddocs %}
 
 {% docs dim_ci_runner %}
@@ -1457,5 +1472,17 @@ The grain of this table is `hostname` per `dim_instance_id(uuid)` per `dim_subsc
 The data from this table will be used to create a mart tables - `mart_product_usage_wave_1_3_metrics_monthly`, `mart_product_usage_paid_user_metrics_monthly` and `mart_product_usage_wave_1_3_metrics_monthly_diff` for Gainsight Customer Product Insights.
 
 Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
+
+{% enddocs %}
+
+{% docs fct_mrr_snapshot_model %}
+
+Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [fct_mrr](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.fct_mrr) model
+
+{% enddocs %}
+
+{% docs dim_subscription_snapshot_model %}
+
+Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [dim_subscription](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_subscription) model
 
 {% enddocs %}

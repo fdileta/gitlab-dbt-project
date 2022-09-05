@@ -11,7 +11,7 @@
   ('customers_db_leads', 'customers_db_leads_source'),
   ('fct_event_user_daily', 'fct_event_user_daily'),
   ('map_gitlab_dotcom_xmau_metrics', 'map_gitlab_dotcom_xmau_metrics'),
-  ('services', 'gitlab_dotcom_services_source'),
+  ('services', 'gitlab_dotcom_integrations_source'),
   ('project', 'prep_project')
 ]) }}
 

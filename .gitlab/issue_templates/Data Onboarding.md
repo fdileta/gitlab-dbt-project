@@ -74,6 +74,7 @@ You will need access to several groups, applications, tools, and data sources fo
 |  Google Drive folder: SheetLoad | No |Yes | Yes | Yes | Yes |  ? |
 |  Google Drive folder: Boneyard | No |Yes | Yes | Yes | Yes |  ? |
 |  Service Account Credentials: Google Cloud | No | No | ? | No | Yes | ? |
+|  Monte Carlo Data | No | No | Editor | Editor | Editor | Access Request | 
 
 - [ ] Manager: Complete access requests for the new team member based on there assigned responsibilities following the provided method.
     - [ ] Snowflake - Access Request, [Example](https://gitlab.com/gitlab-com/team-member-epics/access-requests/-/issues/10857)
@@ -215,8 +216,7 @@ Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credential
   - [ ] Ensure that you select the `dockerd` container runtime in `Kubernetes Settings`. 
   - [ ] Ensure that you select to create symbologic links to the docker command line path (`/usr/local/bin/docker`) in the `Supporting Utilities` section. 
   - [ ] Install the docker-compose cli by running through the below: 
-    - `sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
-    - `sudo chmod +x /usr/local/bin/docker-compose`
+    - `brew install docker docker-compose`
     - Confirm install
     - `docker-compose --version`
     - Optionally, install [command completion](https://docs.docker.com/compose/completion/) for the bash and zsh shell.

@@ -2192,6 +2192,23 @@ roles:
                     - prep.saas_usage_ping.*
                     - raw.version_db.*
 
+    - workday:
+        warehouses:
+            - dev_xs
+        privileges:
+            databases:
+                read:
+                    - prep
+                    - raw
+            schemas:
+                read:
+                    - prep.workday
+                    - raw.workday
+            tables:
+                read:
+                    - prep.workday.*
+                    - raw.workday.*
+
     - xactly:
         warehouses:
             - dev_xs
@@ -3279,6 +3296,9 @@ roles:
     - lvinueza:
         member_of:
             - analyst_finance
+            - analyst_people
+            - bamboohr
+            - bamboohr_analytics
             - customers_db
             - data_team_analyst
             - restricted_safe
@@ -3937,6 +3957,13 @@ roles:
                 write:
                     - rparker_prep.*.*
                     - rparker_prod.*.*
+
+    - rrendon:
+        member_of:
+            - analyst_engineering
+        warehouses:
+            - dev_xs
+
     - schaturvedi:
         member_of:
             - engineer
@@ -4644,6 +4671,11 @@ users:
         member_of:
             - rparker
             - accountadmin
+
+    - rrendon:
+        can_login: yes 
+        member_of:
+            - rrendon
 
     - schaturvedi:
         can_login: yes
