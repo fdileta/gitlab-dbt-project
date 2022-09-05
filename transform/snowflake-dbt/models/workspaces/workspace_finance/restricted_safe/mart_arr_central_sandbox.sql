@@ -75,7 +75,6 @@ WITH dim_billing_account_central_sandbox AS (
       dim_crm_account.parent_crm_account_tsp_account_employees                          AS parent_crm_account_tsp_account_employees,
       dim_crm_account.parent_crm_account_tsp_max_family_employees                       AS parent_crm_account_tsp_max_family_employees,
       dim_crm_account.parent_crm_account_employee_count_band                            AS parent_crm_account_employee_count_band,
-      dim_crm_account.crm_account_tsp_sub_region                                        AS crm_account_tsp_sub_region,
       dim_crm_account.crm_account_tsp_area                                              AS crm_account_tsp_area,
       dim_crm_account.health_score                                                      AS health_score,
       dim_crm_account.health_score_color                                                AS health_score_color,

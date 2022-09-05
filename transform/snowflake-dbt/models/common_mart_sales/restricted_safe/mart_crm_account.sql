@@ -84,7 +84,6 @@
       dim_crm_account.crm_account_industry,
       dim_crm_account.crm_account_sub_industry,
       dim_crm_account.crm_account_sales_territory,
-      dim_crm_account.crm_account_tsp_sub_region,
       dim_crm_account.crm_account_tsp_area,
       dim_crm_account.tsp_max_hierarchy_sales_segment,
       dim_crm_account.crm_account_employee_count_band,
