@@ -200,7 +200,7 @@ models:
           tests:
               - not_null
               - accepted_values:
-                      values: ['Maintained', 'Upgraded', 'Downgraded', 'Cancelled']
+                      values: ['Maintained', 'Upgraded', 'Downgraded', 'Cancelled', 'Other']
         - name: arr_segmentation
           tests:
               - accepted_values:
