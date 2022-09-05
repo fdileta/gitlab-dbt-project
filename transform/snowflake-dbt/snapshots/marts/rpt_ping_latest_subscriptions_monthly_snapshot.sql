@@ -1,4 +1,4 @@
-{% snapshot mart_charge_snapshot %}
+{% snapshot rpt_ping_latest_subscriptions_monthly_snapshot %}
     -- Using dbt updated at field as we want a new set of data everyday.
     {{
         config(
