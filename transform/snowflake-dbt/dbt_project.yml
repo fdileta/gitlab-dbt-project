@@ -527,6 +527,7 @@ models:
             secure: true
 
       workspace_product:
+        +schema: workspace_product
         +tags: ["product"]
         source_1_on_1_copy:
           +schema: workspace_product
