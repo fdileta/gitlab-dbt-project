@@ -36,7 +36,6 @@
       dim_crm_account.parent_crm_account_name,
       dim_crm_account.parent_crm_account_owner_team,
       dim_crm_account.parent_crm_account_billing_country_code,
-      dim_crm_account.parent_crm_account_industry,
       dim_crm_account.parent_crm_account_sub_industry,
       dim_crm_account.parent_crm_account_industry_hierarchy,
       dim_crm_account.parent_crm_account_sales_territory,

@@ -157,7 +157,6 @@
       dim_crm_account.health_score_color,
       dim_crm_account.dim_parent_crm_account_id,
       dim_crm_account.parent_crm_account_name,
-      dim_crm_account.parent_crm_account_industry,
       dim_crm_account.parent_crm_account_owner_team,
       dim_crm_account.parent_crm_account_sales_territory,
       dim_crm_account.parent_crm_account_tsp_region,
