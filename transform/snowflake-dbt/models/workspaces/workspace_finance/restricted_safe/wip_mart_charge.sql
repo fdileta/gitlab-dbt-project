@@ -93,7 +93,6 @@ WITH dim_amendment AS (
       dim_crm_account.parent_crm_account_tsp_region                                   AS parent_crm_account_tsp_region,
       dim_crm_account.parent_crm_account_tsp_sub_region                               AS parent_crm_account_tsp_sub_region,
       dim_crm_account.parent_crm_account_tsp_area                                     AS parent_crm_account_tsp_area,
-      dim_crm_account.crm_account_tsp_area                                            AS crm_account_tsp_area,
       dim_crm_account.health_score                                                    AS health_score,
       dim_crm_account.health_score_color                                              AS health_score_color,
       dim_crm_account.health_number                                                   AS health_number,
