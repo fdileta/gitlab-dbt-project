@@ -163,7 +163,6 @@
       dim_crm_account.crm_account_sales_territory,
       dim_crm_account.crm_account_gtm_strategy,
       dim_crm_account.crm_account_focus_account,
-      dim_crm_account.health_score,
       dim_crm_account.health_number,
       dim_crm_account.health_score_color,
       dim_crm_account.dim_parent_crm_account_id,
