@@ -934,6 +934,21 @@ Easy to join with the following tables:
 {% docs dim_user %}
 
 Dimension table that contains all Gitlab.com Users.
+
+Missing Column Values:
+* Unknown - Value is Null in source data
+* Not Found - Row Not found in source data
+The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:
+* role
+* last_activity_date             
+* last_sign_in_date               
+* setup_for_company    
+* jobs_to_be_done
+* for_business_use                 
+* employee_count
+* country
+* state
+
 {% enddocs %}
 
 {% docs dim_ci_runner %}
