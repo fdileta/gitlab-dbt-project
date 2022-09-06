@@ -76,7 +76,6 @@ WITH dim_billing_account AS (
       dim_crm_account.crm_account_name                                                AS crm_account_name,
       dim_crm_account.dim_parent_crm_account_id                                       AS dim_parent_crm_account_id,
       dim_crm_account.parent_crm_account_name                                         AS parent_crm_account_name,
-      dim_crm_account.parent_crm_account_tsp_sub_region                               AS parent_crm_account_tsp_sub_region,
       dim_crm_account.parent_crm_account_tsp_area                                     AS parent_crm_account_tsp_area,
       dim_crm_account.parent_crm_account_tsp_account_employees                        AS parent_crm_account_tsp_account_employees,
       dim_crm_account.parent_crm_account_tsp_max_family_employees                     AS parent_crm_account_tsp_max_family_employees,
