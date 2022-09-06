@@ -89,6 +89,11 @@ databases:
     - judume_prep:
         shared: no
 
+    - juwong_prod:
+        shared: no
+    - juwong_prep:
+        shared: no  
+
     - kaguilar_prod:
         shared: no
     - kaguilar_prep:
@@ -3101,6 +3106,48 @@ roles:
                     - judume_prep.*.*
                     - judume_prod.*.*
 
+    - juwong:
+        member_of:
+            - engineer
+            - restricted_safe
+        warehouses:
+            - dev_xs
+            - dev_m
+            - loading
+            - reporting
+        owns:
+            databases:
+                - juwong_prep
+                - juwong_prod
+            schemas:
+                - juwong_prep.*
+                - juwong_prod.*
+            tables:
+                - juwong_prep.*.*
+                - juwong_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - juwong_prep
+                    - juwong_prod
+                write:
+                    - juwong_prep
+                    - juwong_prod
+            schemas:
+                read:
+                    - juwong_prep.*
+                    - juwong_prod.*
+                write:
+                    - juwong_prep.*
+                    - juwong_prod.*
+            tables:
+                read:
+                    - juwong_prep.*.*
+                    - juwong_prod.*.*
+                write:
+                    - juwong_prep.*.*
+                    - juwong_prod.*.*
+
     - kaguilar:
         member_of:
             - analyst_engineering
@@ -4005,6 +4052,7 @@ roles:
                 write:
                     - schaturvedi_prep.*.*
                     - schaturvedi_prod.*.*
+
     - sgladchun:
         member_of:
             - analyst_finance
@@ -4491,6 +4539,11 @@ users:
         can_login: yes
         member_of:
             - judume
+
+    - juwong:
+        can_login: yes
+        member_of:
+            - juwong
 
     - kaguilar:
         can_login: yes
