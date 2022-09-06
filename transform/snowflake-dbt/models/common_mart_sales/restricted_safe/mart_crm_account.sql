@@ -34,7 +34,6 @@
 
       ----ultimate parent crm account info
       dim_crm_account.parent_crm_account_name,
-      dim_crm_account.parent_crm_account_sales_segment,
       dim_crm_account.parent_crm_account_owner_team,
       dim_crm_account.parent_crm_account_billing_country,
       dim_crm_account.parent_crm_account_billing_country_code,
@@ -83,8 +82,6 @@
       dim_crm_account.crm_account_sub_industry,
       dim_crm_account.crm_account_sales_territory,
       dim_crm_account.crm_account_employee_count_band,
-      dim_crm_account.tsp_account_employees,
-      dim_crm_account.tsp_max_family_employees,
       dim_crm_account.partner_vat_tax_id,
       dim_crm_account.account_manager,
       dim_crm_account.business_development_rep,

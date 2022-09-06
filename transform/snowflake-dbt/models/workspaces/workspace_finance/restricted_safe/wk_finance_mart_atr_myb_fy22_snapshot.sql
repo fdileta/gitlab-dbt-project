@@ -99,7 +99,6 @@ WITH dim_billing_account AS (
      fct_charge.dim_product_detail_id,
      dim_crm_account.parent_crm_account_name,
      dim_crm_account.crm_account_name,
-     dim_crm_account.parent_crm_account_sales_segment,
      dim_product_detail.product_tier_name,
      dim_product_detail.product_delivery_type,
      dim_subscription.subscription_name,

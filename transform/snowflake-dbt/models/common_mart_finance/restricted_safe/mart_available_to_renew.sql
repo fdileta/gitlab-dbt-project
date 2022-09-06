@@ -193,7 +193,6 @@
       dim_crm_account.dim_parent_crm_account_id                                       AS dim_parent_crm_account_id,
       dim_crm_account.parent_crm_account_name                                         AS parent_crm_account_name,
       dim_crm_account.parent_crm_account_billing_country                              AS parent_crm_account_billing_country,
-      dim_crm_account.parent_crm_account_sales_segment                                AS parent_crm_account_sales_segment,
       dim_crm_account.parent_crm_account_industry                                     AS parent_crm_account_industry,
       dim_crm_account.parent_crm_account_owner_team                                   AS parent_crm_account_owner_team,
       dim_crm_account.parent_crm_account_sales_territory                              AS parent_crm_account_sales_territory,
