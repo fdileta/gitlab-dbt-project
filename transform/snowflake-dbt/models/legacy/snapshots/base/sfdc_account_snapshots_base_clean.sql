@@ -50,7 +50,6 @@ WITH sfdc_account_snapshots AS (
       next_renewal_date__c                       AS next_renewal_date,
       license_utilization__c                     AS license_utilization,
       products_purchased__c                      AS products_purchased,
-      support_level__c                           AS support_level,
       named_account__c                           AS named_account,
       billingcountry                             AS billing_country, 
       billingpostalcode                          AS billing_postal_code, 
