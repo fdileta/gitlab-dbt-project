@@ -58,6 +58,22 @@ WITH sfdc_opportunity AS (
 ), sfdc_opportunity_xf AS (
 
    SELECT
+    -- 
+    sfdc_opportunity_xf.stage_6_awaiting_signature_date,
+    -- line 380~ opportunity_owner_user_xxx --> user_segment_stamped is not in mart yet
+    
+    ----------------------------------------------------------------
+    ----------------------------------------------------------------
+    -- NF 20220727 These next fields are needed for custom logic down the line
+    sfdc_opportunity_xf.incremental_acv,
+    sfdc_opportunity_xf.net_incremental_acv,
+    sfdc_opportunity_xf.is_deleted,
+    -----------------------------------------------
+
+    -- to be dropped
+    sfdc_opportunity_xf.sales_segment AS sales_segment_deprecated,
+
+
     edm_opty.dbt_updated_at                   AS _last_dbt_run,
     edm_opty.dim_crm_account_id               AS account_id,
     edm_opty.dim_crm_opportunity_id           AS opportunity_id,
@@ -75,7 +91,6 @@ WITH sfdc_opportunity AS (
     edm_opty.merged_crm_opportunity_id,
     ----------------------------------------------------------
     ----------------------------------------------------------
-    --edm_opty.dim_crm_user_id                          AS owner_id,
     edm_opty.owner_id,
 
     opportunity_owner.name                          AS opportunity_owner,
@@ -148,9 +163,7 @@ WITH sfdc_opportunity AS (
     edm_opty.stage_3_technical_evaluation_date,
     edm_opty.stage_4_proposal_date,
     edm_opty.stage_5_negotiating_date,
-    
-    sfdc_opportunity_xf.stage_6_awaiting_signature_date,
-    
+    -- placeholder stage_6_awaiting_signature_date,
     edm_opty.stage_6_closed_won_date,
     edm_opty.stage_6_closed_lost_date,
     edm_opty.cp_champion,
@@ -174,11 +187,6 @@ WITH sfdc_opportunity AS (
     -- fields form opportunity source
     edm_opty.opportunity_category,
     edm_opty.product_category,
-
-    ----------------------------------------------------------
-    ----------------------------------------------------------
-    -- NF: why do we need these fields now?
-    sfdc_opportunity_xf.sales_segment, -- drop?
 
     ----------------------------------------------------------
     ----------------------------------------------------------
@@ -355,17 +363,17 @@ WITH sfdc_opportunity AS (
     iacv_created_date.fiscal_year                                        AS pipeline_created_fiscal_year,
     iacv_created_date.first_day_of_month                                 AS pipeline_created_date_month,
 
-    stage_1_date.date_actual                                AS stage_1_date,
-    stage_1_date.first_day_of_month                         AS stage_1_date_month,
-    stage_1_date.fiscal_year                                AS stage_1_fiscal_year,
-    stage_1_date.fiscal_quarter_name_fy                     AS stage_1_fiscal_quarter_name,
-    stage_1_date.first_day_of_fiscal_quarter                AS stage_1_fiscal_quarter_date,
+    stage_1_date.date_actual                                             AS stage_1_date,
+    stage_1_date.first_day_of_month                                      AS stage_1_date_month,
+    stage_1_date.fiscal_year                                             AS stage_1_fiscal_year,
+    stage_1_date.fiscal_quarter_name_fy                                  AS stage_1_fiscal_quarter_name,
+    stage_1_date.first_day_of_fiscal_quarter                             AS stage_1_fiscal_quarter_date,
 
-    stage_3_date.date_actual                                AS stage_3_date,
-    stage_3_date.first_day_of_month                         AS stage_3_date_month,
-    stage_3_date.fiscal_year                                AS stage_3_fiscal_year,
-    stage_3_date.fiscal_quarter_name_fy                     AS stage_3_fiscal_quarter_name,
-    stage_3_date.first_day_of_fiscal_quarter                AS stage_3_fiscal_quarter_date,
+    stage_3_date.date_actual                                             AS stage_3_date,
+    stage_3_date.first_day_of_month                                      AS stage_3_date_month,
+    stage_3_date.fiscal_year                                             AS stage_3_fiscal_year,
+    stage_3_date.fiscal_quarter_name_fy                                  AS stage_3_fiscal_quarter_name,
+    stage_3_date.first_day_of_fiscal_quarter                             AS stage_3_fiscal_quarter_date,
 
     -----------------------------------------------------------------------------------------------------
     -----------------------------------------------------------------------------------------------------
@@ -629,14 +637,8 @@ WITH sfdc_opportunity AS (
     WHEN edm_opty.dim_crm_opportunity_id IN ('0064M00000ZGpfQQAT','0064M00000ZGpfVQAT','0064M00000ZGpfGQAT')
         THEN 1
     ELSE 0
-    END                                                                       AS is_excluded_flag,
-    ----------------------------------------------------------------
-    ----------------------------------------------------------------
-    -- NF 20220727 These next fields are needed for custom logic down the line
-    sfdc_opportunity_xf.incremental_acv,
-    sfdc_opportunity_xf.net_incremental_acv,
-    sfdc_opportunity_xf.is_deleted
-    -----------------------------------------------
+    END                                                                       AS is_excluded_flag
+    
 
     FROM legacy_sfdc_opportunity_xf AS sfdc_opportunity_xf
 
