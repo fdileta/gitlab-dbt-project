@@ -368,7 +368,7 @@
         ELSE 0
       END AS won_linear_net_arr
     FROM rpt_sfdc_bizible_linear
-    {{ dbt_utils.group_by(n=41) }}
+    {{ dbt_utils.group_by(n=42) }}
 
 ), final AS (
 
