@@ -38,7 +38,6 @@
       dim_crm_account.parent_crm_account_industry_hierarchy,
       dim_crm_account.parent_crm_account_gtm_strategy,
       dim_crm_account.parent_crm_account_focus_account,
-      dim_crm_account.parent_crm_account_tsp_max_family_employees,
       dim_crm_account.parent_crm_account_employee_count_band,
       dim_crm_account.parent_crm_account_created_date,
       dim_crm_account.parent_crm_account_zi_technologies,
