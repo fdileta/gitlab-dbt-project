@@ -129,7 +129,7 @@ renamed AS (
     ce_instances__c AS count_ce_instances,
     active_ce_users__c AS count_active_ce_users,
     number_of_open_opportunities__c AS count_open_opportunities,
-    using_ce__c AS count_using_ce,
+    using_ce__c AS using_ce,
 
     --account based marketing fields
     abm_tier__c AS abm_tier,
