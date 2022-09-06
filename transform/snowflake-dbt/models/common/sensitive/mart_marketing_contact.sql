@@ -290,7 +290,7 @@
       usage_user_license_management_jobs_28_days_user,
       usage_user_secret_detection_jobs_28_days_user,
       usage_projects_with_packages_all_time_event,
-      usage_projects_with_packages_28_days_user,
+      usage_projects_with_packages_28_days_event,
       usage_deployments_28_days_user,
       usage_releases_28_days_user,
       usage_epics_28_days_user,
@@ -326,7 +326,7 @@
       SUM(usage_user_license_management_jobs_28_days_user)                                          AS usage_user_license_management_jobs_28_days_user,
       SUM(usage_user_secret_detection_jobs_28_days_user)                                            AS usage_user_secret_detection_jobs_28_days_user,
       SUM(usage_projects_with_packages_all_time_event)                                              AS usage_projects_with_packages_all_time_event,
-      SUM(usage_projects_with_packages_28_days_user)                                                AS usage_projects_with_packages_28_days_user,
+      SUM(usage_projects_with_packages_28_days_event)                                               AS usage_projects_with_packages_28_days_event,
       SUM(usage_deployments_28_days_user)                                                           AS usage_deployments_28_days_user,
       SUM(usage_releases_28_days_user)                                                              AS usage_releases_28_days_user,
       SUM(usage_epics_28_days_user)                                                                 AS usage_epics_28_days_user,
@@ -776,7 +776,7 @@
       usage_metrics.usage_user_license_management_jobs_28_days_user,
       usage_metrics.usage_user_secret_detection_jobs_28_days_user,
       usage_metrics.usage_projects_with_packages_all_time_event,
-      usage_metrics.usage_projects_with_packages_28_days_user,
+      usage_metrics.usage_projects_with_packages_28_days_event,
       usage_metrics.usage_deployments_28_days_user,
       usage_metrics.usage_releases_28_days_user,
       usage_metrics.usage_epics_28_days_user,
@@ -892,7 +892,7 @@
       'usage_user_license_management_jobs_28_days_user',
       'usage_user_secret_detection_jobs_28_days_user',
       'usage_projects_with_packages_all_time_event',
-      'usage_projects_with_packages_28_days_user',
+      'usage_projects_with_packages_28_days_event',
       'usage_deployments_28_days_user',
       'usage_releases_28_days_user',
       'usage_epics_28_days_user',
@@ -912,9 +912,9 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@trevor31",
-    updated_by="@jpeguero",
+    updated_by="@mdrussell",
     created_date="2021-02-09",
-    updated_date="2022-08-18"
+    updated_date="2022-08-26"
 ) }}
 
 
