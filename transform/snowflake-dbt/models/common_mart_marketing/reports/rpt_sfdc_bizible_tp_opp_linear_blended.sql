@@ -107,6 +107,8 @@
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_touchpoint_date_normalized,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_integrated_campaign_grouping,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_marketing_channel_path,
+      rpt_sfdc_bizible_tp_person_lifecycle.bizible_marketing_channel,
+      
       CASE
         WHEN rpt_sfdc_bizible_tp_person_lifecycle.region = 'NORAM' THEN 'AMER'
         ELSE rpt_sfdc_bizible_tp_person_lifecycle.region
