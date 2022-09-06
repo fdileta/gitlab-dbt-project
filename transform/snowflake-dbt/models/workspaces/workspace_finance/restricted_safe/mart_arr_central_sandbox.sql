@@ -64,7 +64,6 @@ WITH dim_billing_account_central_sandbox AS (
       dim_crm_account.crm_account_name                                                  AS crm_account_name,
       dim_crm_account.dim_parent_crm_account_id                                         AS dim_parent_crm_account_id,
       dim_crm_account.parent_crm_account_name                                           AS parent_crm_account_name,
-      dim_crm_account.parent_crm_account_tsp_area                                       AS parent_crm_account_tsp_area,
       dim_crm_account.parent_crm_account_tsp_account_employees                          AS parent_crm_account_tsp_account_employees,
       dim_crm_account.parent_crm_account_tsp_max_family_employees                       AS parent_crm_account_tsp_max_family_employees,
       dim_crm_account.parent_crm_account_employee_count_band                            AS parent_crm_account_employee_count_band,

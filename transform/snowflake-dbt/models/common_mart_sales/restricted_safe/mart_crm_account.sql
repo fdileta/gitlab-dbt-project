@@ -36,7 +36,6 @@
       dim_crm_account.parent_crm_account_name,
       dim_crm_account.parent_crm_account_billing_country_code,
       dim_crm_account.parent_crm_account_industry_hierarchy,
-      dim_crm_account.parent_crm_account_tsp_area,
       dim_crm_account.parent_crm_account_gtm_strategy,
       dim_crm_account.parent_crm_account_focus_account,
       dim_crm_account.parent_crm_account_tsp_account_employees,
