@@ -278,7 +278,6 @@ WITH map_merged_crm_account AS (
       sfdc_account.health_number,
       sfdc_account.health_score_color,
       sfdc_account.partner_account_iban_number,
-      sfdc_account.federal_account                                        AS federal_account,
       sfdc_account.fy22_new_logo_target_list,
       sfdc_account.gitlab_com_user,
       sfdc_account.zi_technologies                                        AS crm_account_zi_technologies,

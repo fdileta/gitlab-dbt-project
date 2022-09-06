@@ -171,7 +171,6 @@
       dim_crm_account.parent_crm_account_focus_account,
       dim_crm_account.crm_account_owner_user_segment,
       dim_crm_account.record_type_id,
-      dim_crm_account.federal_account,
       dim_crm_account.gitlab_com_user,
       dim_crm_account.crm_account_type,
       dim_crm_account.technical_account_manager,

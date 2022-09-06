@@ -33,7 +33,6 @@ renamed AS (
 
 
     -- key people GL side
-    federal_account__c AS federal_account,
     gitlab_com_user__c AS gitlab_com_user,
     account_manager__c AS account_manager,
     account_owner_calc__c AS account_owner,
