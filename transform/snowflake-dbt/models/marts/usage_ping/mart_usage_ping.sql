@@ -30,7 +30,6 @@
       dim_crm_account.crm_account_name,
       dim_crm_account.crm_account_billing_country,
       dim_crm_account.dim_parent_crm_account_id,
-      dim_crm_account.parent_crm_account_sales_territory,
       dim_date.date_actual,
       dim_date.first_day_of_month,
       dim_date.fiscal_quarter_name_fy,
