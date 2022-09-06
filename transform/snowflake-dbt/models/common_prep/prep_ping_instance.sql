@@ -59,9 +59,9 @@
         WHEN original_edition = 'EEP'                                    THEN 'Premium'
         WHEN original_edition = 'EEU'                                    THEN 'Ultimate'
         ELSE NULL END                                                                                                                             AS product_tier,
-        COALESCE(raw_usage_data.raw_usage_data_payload, usage_data.raw_usage_data_payload_reconstructed)                                          AS raw_usage_data_payload
+        raw_usage_data.raw_usage_data_payload                                                                                                     AS raw_usage_data_payload
     FROM usage_data
-    LEFT JOIN raw_usage_data
+    INNER JOIN raw_usage_data
       ON usage_data.raw_usage_data_id = raw_usage_data.raw_usage_data_id
 
 )
@@ -69,7 +69,7 @@
 {{ dbt_audit(
     cte_ref="joined_ping",
     created_by="@icooper-acp",
-    updated_by="@snalamaru",
+    updated_by="@chrissharp",
     created_date="2022-03-17",
-    updated_date="2022-05-05"
+    updated_date="2022-09-06"
 ) }}
