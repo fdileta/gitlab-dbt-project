@@ -539,7 +539,9 @@ roles:
             - analytics_engineer_core
             - analyst_people
             - analyst_engineering
+            - bamboohr
             - prometheus
+            - workday
 
     - analytics_engineer_gtm:
         member_of:
@@ -2455,6 +2457,7 @@ roles:
             - bamboohr
             - bi_tool_eval_read
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
 
@@ -3344,6 +3347,7 @@ roles:
         member_of:
             - analyst_finance
             - analyst_people
+            - analytics_engineer_ga
             - bamboohr
             - bamboohr_analytics
             - customers_db
@@ -3790,6 +3794,7 @@ roles:
     - pempey:
         member_of:
             - engineer
+            - analytics_engineer_ga
             - bi_tool_eval_db
         warehouses:
             - dev_xs
@@ -4077,6 +4082,7 @@ roles:
             - bamboohr
             - reporter
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
 
