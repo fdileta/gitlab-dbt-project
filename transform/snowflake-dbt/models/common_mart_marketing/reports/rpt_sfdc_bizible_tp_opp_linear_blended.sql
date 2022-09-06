@@ -206,6 +206,7 @@
       rpt_sfdc_bizible_linear.bizible_touchpoint_date_normalized AS opp_touchpoint_date_normalized,
       rpt_sfdc_bizible_linear.bizible_integrated_campaign_grouping AS opp_integrated_campaign_grouping,
       rpt_sfdc_bizible_linear.marketing_channel_path,
+      rpt_sfdc_bizible_linear.bizible_marketing_channel,
     CASE
       WHEN rpt_sfdc_bizible_linear.crm_user_region = 'NORAM' THEN 'AMER'
       ELSE rpt_sfdc_bizible_linear.crm_user_region
