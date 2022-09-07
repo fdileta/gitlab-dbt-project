@@ -37,7 +37,6 @@ WITH date_details AS (
       deal_group,
       opportunity_owner_manager,
       is_edu_oss,
-      account_owner_team_stamped,
 
       -- Opportunity Owner Stamped fields
       opportunity_owner_user_segment,

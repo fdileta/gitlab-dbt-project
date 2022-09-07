@@ -354,8 +354,6 @@ we can delete this connection and use the mart table directly.
       -- Opportunity User fields
       -- https://gitlab.my.salesforce.com/00N6100000ICcrD?setupid=OpportunityFields
 
-   
-
       -- Team Segment / ASM - RD 
       -- NF 2022-01-28 Data seems clean in SFDC, but leving the fallback just in case
       -- NF 2022-04-27 There are issues with the stamped field not reflecting the real owner of the opportunity
