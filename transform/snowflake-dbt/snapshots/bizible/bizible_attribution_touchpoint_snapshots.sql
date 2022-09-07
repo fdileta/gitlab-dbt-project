@@ -10,5 +10,6 @@
     
     SELECT * 
     FROM {{ source('bizible', 'biz_attribution_touchpoints') }}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY _modified_date DESC) = 1
     
 {% endsnapshot %}
