@@ -877,8 +877,7 @@ WITH date_details AS (
       upa.account_demographics_geo              AS upa_demographics_geo,
       upa.account_demographics_region           AS upa_demographics_region,
       upa.account_demographics_area             AS upa_demographics_area,
-      upa.account_demographics_territory        AS upa_demographics_territory
-      
+      upa.account_demographics_territory        AS upa_demographics_territory  
 
     FROM sfdc_opportunity_snapshot_history opp_snapshot
     INNER JOIN sfdc_opportunity_xf    
