@@ -340,7 +340,7 @@ WITH sfdc_opportunity AS (
     edm_opty.stage_name_4plus,
     edm_opty.deal_category,
     edm_opty.deal_group,
-    edm_opty.pipeline_calculated_deal_count                                  AS calculated_deal_count,
+    edm_opty.calculated_deal_count                                  AS calculated_deal_count,
 
     ----------------------------------------------------------------
     -- NF 2022-01-28 This is probably TO BE DEPRECATED too, need to align with Channel ops

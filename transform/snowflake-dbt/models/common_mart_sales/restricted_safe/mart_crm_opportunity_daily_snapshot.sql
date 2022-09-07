@@ -456,7 +456,7 @@ final AS (
     fct_crm_opportunity.open_4plus_net_arr,
     fct_crm_opportunity.booked_net_arr,
     fct_crm_opportunity.churned_contraction_net_arr,
-    fct_crm_opportunity.pipeline_calculated_deal_count,
+    fct_crm_opportunity.calculated_deal_count,
     fct_crm_opportunity.booked_churned_contraction_deal_count,
     fct_crm_opportunity.booked_churned_contraction_net_arr,
     fct_crm_opportunity.raw_net_arr,
@@ -530,5 +530,5 @@ final AS (
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-05-05",
-    updated_date="2022-08-08"
+    updated_date="2022-09-06"
   ) }}

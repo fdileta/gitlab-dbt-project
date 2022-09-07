@@ -297,16 +297,16 @@
       dim_crm_opportunity.sales_team_asm_level,
       dim_crm_opportunity.account_owner_team_stamped_cro_level,
       LOWER(
-      dim_crm_account_user_hierarchy_live_sales_segment.crm_user_sales_segment
+        dim_crm_opportunity.crm_account_owner_sales_segment
       ) AS account_owner_user_segment,
       LOWER(
-        dim_crm_account_user_hierarchy_live_geo.crm_user_geo
+        dim_crm_opportunity.crm_account_owner_geo
       ) AS account_owner_user_geo,
       LOWER(
-        dim_crm_account_user_hierarchy_live_region.crm_user_region
+        dim_crm_opportunity.crm_account_owner_region
       ) AS account_owner_user_region,
       LOWER(
-        dim_crm_account_user_hierarchy_live_area.crm_user_area
+        dim_crm_opportunity.crm_account_owner_area
       ) AS account_owner_user_area,
 
       -- Channel fields
@@ -511,7 +511,7 @@
       fct_crm_opportunity.open_4plus_net_arr,
       fct_crm_opportunity.booked_net_arr,
       fct_crm_opportunity.churned_contraction_net_arr,
-      fct_crm_opportunity.pipeline_calculated_deal_count,
+      fct_crm_opportunity.calculated_deal_count,
       fct_crm_opportunity.booked_churned_contraction_deal_count,
       fct_crm_opportunity.booked_churned_contraction_net_arr,
       fct_crm_opportunity.arr,
@@ -608,9 +608,9 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@chrissharp",
+    updated_by="@michellecooper",
     created_date="2020-12-07",
-    updated_date="2022-08-31"
+    updated_date="2022-09-06"
   ) }}
 
 

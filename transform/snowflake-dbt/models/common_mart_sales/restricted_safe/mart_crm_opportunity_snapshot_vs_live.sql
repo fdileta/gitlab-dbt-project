@@ -831,8 +831,8 @@
     mart_crm_opportunity.booked_net_arr AS booked_net_arr_live,
     mart_crm_opportunity_daily_snapshot.churned_contraction_net_arr AS churned_contraction_net_arr_snapshot,
     mart_crm_opportunity.churned_contraction_net_arr AS churned_contraction_net_arr_live,
-    mart_crm_opportunity_daily_snapshot.pipeline_calculated_deal_count AS pipeline_calculated_deal_count_snapshot,
-    mart_crm_opportunity.pipeline_calculated_deal_count AS pipeline_calculated_deal_count_live,
+    mart_crm_opportunity_daily_snapshot.calculated_deal_count AS calculated_deal_count_snapshot,
+    mart_crm_opportunity.calculated_deal_count AS calculated_deal_count_live,
     mart_crm_opportunity_daily_snapshot.booked_churned_contraction_deal_count AS booked_churned_contraction_deal_count_snapshot,
     mart_crm_opportunity.booked_churned_contraction_deal_count AS booked_churned_contraction_deal_count_live,
     mart_crm_opportunity_daily_snapshot.booked_churned_contraction_net_arr AS booked_churned_contraction_net_arr_snapshot,
@@ -868,7 +868,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@chrissharp",
+    updated_by="@michellecooper",
     created_date="2022-08-08",
-    updated_date="2022-08-31"
+    updated_date="2022-09-06"
 ) }}

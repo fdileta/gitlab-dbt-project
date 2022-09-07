@@ -10,22 +10,8 @@
     ('dim_channel_type', 'dim_channel_type'),
     ('dim_date', 'dim_date')
 ]) }}
-
-, current_fiscal_year AS (
   
-    SELECT fiscal_year AS current_fiscal_year
-    FROM dim_date
-    WHERE CURRENT_DATE = date_actual
-  
-), dim_date_extended AS (
-
-    SELECT
-      dim_date.*,
-      current_fiscal_year.current_fiscal_year
-    FROM dim_date
-    LEFT JOIN current_fiscal_year
-  
-), dim_crm_user_hierarchy_live_sales_segment AS (
+, dim_crm_user_hierarchy_live_sales_segment AS (
 
     SELECT DISTINCT
       dim_crm_user_sales_segment_id,
@@ -551,7 +537,7 @@
       fct_crm_opportunity.open_4plus_net_arr,
       fct_crm_opportunity.booked_net_arr,
       fct_crm_opportunity.churned_contraction_net_arr,
-      fct_crm_opportunity.pipeline_calculated_deal_count,
+      fct_crm_opportunity.calculated_deal_count,
       fct_crm_opportunity.booked_churned_contraction_deal_count,
       fct_crm_opportunity.booked_churned_contraction_net_arr,
       fct_crm_opportunity.arr,
@@ -604,9 +590,9 @@
       ON fct_crm_opportunity.dim_crm_account_user_region_id = dim_crm_account_user_hierarchy_live_region.dim_crm_user_region_id
     LEFT JOIN dim_crm_user_hierarchy_live_area                        AS dim_crm_account_user_hierarchy_live_area
       ON fct_crm_opportunity.dim_crm_account_user_area_id = dim_crm_account_user_hierarchy_live_area.dim_crm_user_area_id
-    LEFT JOIN dim_date_extended                                       AS dim_date_close_date
+    LEFT JOIN dim_date                                       AS dim_date_close_date
       ON fct_crm_opportunity.close_date = dim_date_close_date.date_day
-    LEFT JOIN dim_date_extended                                       AS dim_date_sao_date
+    LEFT JOIN dim_date                                       AS dim_date_sao_date
       ON fct_crm_opportunity.sales_accepted_date = dim_date_sao_date.date_day
     LEFT JOIN dim_date created_date
       ON fct_crm_opportunity.created_date_id = created_date.date_id
@@ -654,5 +640,5 @@
     created_by="@jeanpeguero",
     updated_by="@michellecooper",
     created_date="2022-02-28",
-    updated_date="2022-08-08"
+    updated_date="2022-09-06"
   ) }}

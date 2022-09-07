@@ -669,17 +669,17 @@ WITH first_contact  AS (
          THEN '2. Growth'
        ELSE '3. Other'
      END                                                                   AS deal_group,
-       CASE 
-          WHEN sfdc_opportunity.order_type = '1. New - First Order' 
-            THEN '1. New'
-          WHEN sfdc_opportunity.order_type IN ('2. New - Connected', '3. Growth') 
-            THEN '2. Growth' 
-          WHEN sfdc_opportunity.order_type IN ('4. Contraction')
-            THEN '3. Contraction'
-          WHEN sfdc_opportunity.order_type IN ('5. Churn - Partial','6. Churn - Final')
-            THEN '4. Churn'
-          ELSE '5. Other' 
-        END                                                                                       AS deal_category,
+     CASE 
+       WHEN sfdc_opportunity.order_type = '1. New - First Order' 
+         THEN '1. New'
+       WHEN sfdc_opportunity.order_type IN ('2. New - Connected', '3. Growth') 
+         THEN '2. Growth' 
+       WHEN sfdc_opportunity.order_type IN ('4. Contraction')
+         THEN '3. Contraction'
+       WHEN sfdc_opportunity.order_type IN ('5. Churn - Partial','6. Churn - Final')
+         THEN '4. Churn'
+       ELSE '5. Other' 
+      END                                                                                       AS deal_category,
       COALESCE(sfdc_opportunity.reason_for_loss, sfdc_opportunity.downgrade_reason)               AS reason_for_loss_staged,
       CASE 
         WHEN reason_for_loss_staged IN ('Do Nothing','Other','Competitive Loss','Operational Silos') 
@@ -842,7 +842,7 @@ WITH first_contact  AS (
         ELSE 0
       END                                               AS booked_deal_count,
       CASE
-        WHEN is_eligible_churn_contraction_flag = 1
+        WHEN is_eligible_churn_contraction = 1
           THEN calculated_deal_count
         ELSE 0
       END                                               AS churned_contraction_deal_count,
@@ -859,7 +859,21 @@ WITH first_contact  AS (
         ELSE 0
       END                                                 AS booked_churned_contraction_deal_count,
       CASE
-        WHEN is_eligible_churn_contraction_flag = 1
+        WHEN 
+          (
+            (
+              is_renewal = 1
+                AND is_lost = 1
+              )
+            OR sfdc_opportunity_stage.is_won = 1 
+            )
+            AND is_eligible_churn_contraction = 1
+          THEN net_arr
+        ELSE 0
+      END                                                 AS booked_churned_contraction_net_arr,
+
+      CASE
+        WHEN is_eligible_churn_contraction = 1
           THEN net_arr
         ELSE 0
       END                                                 AS churned_contraction_net_arr,
@@ -906,18 +920,6 @@ WITH first_contact  AS (
             THEN 1
           ELSE 0
       END                                                           AS is_booked_net_arr,
-      CASE
-        WHEN (
-               (
-                 is_renewal = 1
-                   AND is_lost = 1
-                )
-               OR sfdc_opportunity_stage.is_won = 1 
-              )
-            AND sfdc_opportunity.order_type IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
-        THEN net_arr
-        ELSE 0
-      END                                                 AS churned_contraction_net_arr,
       CASE
         WHEN sfdc_opportunity.deal_path = 'Channel' 
           THEN REPLACE(COALESCE(sfdc_opportunity.partner_track, partner_account.partner_track, fulfillment_partner.partner_track,'Open'),'select','Select')
@@ -1135,7 +1137,7 @@ WITH first_contact  AS (
           THEN account_owner.user_segment
         ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
       END  
-    )                                                     AS report_opportunity_user_segment
+    )                                                     AS report_opportunity_user_segment,
     LOWER(
       CASE 
         WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
@@ -1305,7 +1307,7 @@ WITH first_contact  AS (
         AND sfdc_opportunity.snapshot_id = sfdc_user.snapshot_id
     {%- endif %}
     LEFT JOIN sfdc_user AS account_owner
-      ON sfdc_account.owner_id = sfdc_user.user_id
+      ON sfdc_account.owner_id = account_owner.user_id
     {%- if model_type == 'snapshot' %}
         AND sfdc_opportunity.snapshot_id = sfdc_user.snapshot_id
     {%- endif %}

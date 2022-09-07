@@ -223,7 +223,7 @@
       sfdc_opportunity.open_4plus_net_arr,
       sfdc_opportunity.booked_net_arr,
       sfdc_opportunity.churned_contraction_net_arr,
-      sfdc_opportunity.pipeline_calculated_deal_count,
+      sfdc_opportunity.calculated_deal_count,
       sfdc_opportunity.booked_churned_contraction_deal_count,
       sfdc_opportunity.booked_churned_contraction_net_arr,
       sfdc_opportunity.renewal_amount,
@@ -273,5 +273,5 @@
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2020-11-30",
-    updated_date="2022-08-15"
+    updated_date="2022-09-06"
 ) }}
