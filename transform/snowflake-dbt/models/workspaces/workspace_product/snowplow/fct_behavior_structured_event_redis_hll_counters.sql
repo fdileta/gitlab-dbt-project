@@ -1,3 +1,8 @@
+{{ config(
+        materialized = "incremental",
+        unique_key = "behavior_unstructured_event_pk"
+) }}
+
 {{ 
     simple_cte([
     ('fct_behavior_structured_event', 'fct_behavior_structured_event')

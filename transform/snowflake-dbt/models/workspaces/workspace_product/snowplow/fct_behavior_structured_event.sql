@@ -6,24 +6,10 @@
 -- depends_on: {{ ref('snowplow_structured_events') }}
 {{ 
     simple_cte([
-    ('dim_website_page', 'dim_website_page')
+    ('prep_snowplow_structured_event_all_source', 'prep_snowplow_structured_event_all_source'),
+    ('dim_behavior_website_page', 'dim_behavior_website_page')
     ])
 }}
-
-, unioned_table AS (
-
-    {{ schema_union_all('snowplow_', 'snowplow_structured_events', database_name=env_var('SNOWFLAKE_PREP_DATABASE')) }}
-
-)
-
-, structured_events AS (
-
-    SELECT *
-    FROM unioned_table
-    --filter to the last rolling 24 months of data for query performance tuning
-    WHERE DATE_TRUNC(MONTH, derived_tstamp::DATE) >= DATEADD(MONTH, -24, DATE_TRUNC(MONTH,CURRENT_DATE)) 
-
-)
 
 , structured_events_w_clean_url AS (
 
@@ -33,13 +19,7 @@
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)     AS dim_namespace_id,
       REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1)   AS dim_project_id,
       derived_tstamp    AS behavior_at
-    FROM structured_events
-
-    {% if is_incremental() %}
-
-    WHERE max_tstamp > (SELECT max(derived_tstamp) FROM {{ this }})
-
-    {% endif %}
+    FROM prep_snowplow_structured_event_all_source
 
 )
 
@@ -51,7 +31,7 @@
       {{ dbt_utils.surrogate_key(['structured_events_w_clean_url.event_id']) }}   AS behavior_unstructured_event_pk,
 
       -- Foreign Keys
-      dim_website_page.dim_website_page_sk,
+      dim_behavior_website_page.dim_behavior_website_page_sk,
       structured_events_w_clean_url.dim_namespace_id,
       structured_events_w_clean_url.dim_project_id,
 
@@ -112,10 +92,10 @@
       structured_events_w_clean_url.gsc_source
 
     FROM structured_events_w_clean_url
-    LEFT JOIN dim_website_page 
-      ON structured_events_w_clean_url.clean_url_path = dim_website_page.clean_url_path
-        AND structured_events_w_clean_url.page_url_host = dim_website_page.page_url_host
-        AND structured_events_w_clean_url.app_id = dim_website_page.app_id
+    LEFT JOIN dim_behavior_website_page 
+      ON structured_events_w_clean_url.clean_url_path = dim_behavior_website_page.clean_url_path
+        AND structured_events_w_clean_url.page_url_host = dim_behavior_website_page.page_url_host
+        AND structured_events_w_clean_url.app_id = dim_behavior_website_page.app_id
 
 )
 
