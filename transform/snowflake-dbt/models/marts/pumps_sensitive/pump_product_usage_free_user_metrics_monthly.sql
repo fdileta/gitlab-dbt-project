@@ -39,7 +39,7 @@
       user_container_scanning_jobs_28_days_user,
       object_store_packages_enabled,
       projects_with_packages_all_time_event,
-      projects_with_packages_28_days_user,
+      projects_with_packages_28_days_event,
       deployments_28_days_user,
       releases_28_days_user,
       epics_28_days_user,
@@ -163,6 +163,7 @@
       audit_screen_view_28_days_user,
       instance_audit_screen_view_28_days_user,
       credential_inventory_view_28_days_user,
+      compliance_frameworks_pipeline_all_time_event,
       compliance_frameworks_pipeline_28_days_event,
       groups_streaming_destinations_all_time_event,
       groups_streaming_destinations_28_days_event,
@@ -171,6 +172,7 @@
       projects_status_checks_all_time_event,
       external_status_checks_all_time_event,
       paid_license_search_28_days_user,
+      last_activity_28_days_user,
       is_latest_data,
 
       -- METADATA COLUMNS FOR USE IN PUMP (NOT INTEGRATION)
