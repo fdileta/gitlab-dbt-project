@@ -26,7 +26,7 @@
 
     {% if is_incremental() %}
 
-    WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
+    AND uploaded_at > (SELECT max(max_event_timestamp) FROM {{ this }})
 
     {% endif %}
 
