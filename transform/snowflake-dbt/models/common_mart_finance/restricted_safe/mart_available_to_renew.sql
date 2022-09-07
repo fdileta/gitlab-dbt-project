@@ -972,7 +972,7 @@
 {{ dbt_audit(
     cte_ref="unioned",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@iweeks",
     created_date="2021-12-06",
-    updated_date="2022-06-10"
+    updated_date="2022-09-07"
 ) }}
