@@ -80,6 +80,12 @@
     FROM fct_behavior_structured_event
     WHERE event_action != 'assignment'
 
+    {% if is_incremental() %}
+
+    WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
+
+    {% endif %}
+
 
 )
 

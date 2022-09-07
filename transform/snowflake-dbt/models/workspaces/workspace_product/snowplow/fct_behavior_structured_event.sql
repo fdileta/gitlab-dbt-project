@@ -21,6 +21,12 @@
       derived_tstamp    AS behavior_at
     FROM prep_snowplow_structured_event_all_source
 
+    {% if is_incremental() %}
+
+    WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
+
+    {% endif %}
+
 )
 
 , structured_events_w_dim AS (

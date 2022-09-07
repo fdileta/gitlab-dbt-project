@@ -87,6 +87,12 @@
     INNER JOIN snowplow_gitlab_events_experiment_contexts
       ON fct_behavior_structured_event.event_id = snowplow_gitlab_events_experiment_contexts.event_id
 
+    {% if is_incremental() %}
+
+    WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
+
+    {% endif %}
+
 )
 
 {{ dbt_audit(

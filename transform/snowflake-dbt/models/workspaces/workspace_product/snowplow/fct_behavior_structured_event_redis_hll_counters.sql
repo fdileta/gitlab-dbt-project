@@ -85,6 +85,13 @@
     'ci_templates_unique',
     'p_terraform_state_api_unique_users',
     'i_search_paid'
+   
+    {% if is_incremental() %}
+
+    WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
+
+    {% endif %}
+
   )
 
 
