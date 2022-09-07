@@ -4,13 +4,13 @@
         config(
           unique_key='user_id',
           strategy='timestamp',
-          updated_at='_uploaded_at',
+          updated_at='uploaded_at',
           invalidate_hard_deletes=True
         )
     }}
 
-    SELECT *
+    SELECT *, TO_TIMESTAMP_NTZ(CAST(_uploaded_at TO INT)) as uploaded_at
     FROM {{ source('gitlab_dotcom', 'user_details') }}
-    QUALIFY (ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY _uploaded_at DESC) = 1)
+    QUALIFY (ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY uploaded_at DESC) = 1)
 
 {% endsnapshot %}
