@@ -133,7 +133,6 @@ WITH sfdc_opportunity_xf AS (
 ), deltas_consolidated AS (
 
     SELECT
-      'closed'          AS test_field,
       opportunity_id,
       report_date::date AS report_date,
       report_fiscal_quarter_date,
@@ -144,8 +143,8 @@ WITH sfdc_opportunity_xf AS (
       pipeline_category,
       deal_status,
       deal_status_group,
-      net_arr,
-      NULL              AS prev_net_arr,
+      --net_arr,
+     -- NULL              AS prev_net_arr,
       delta_net_arr,
       is_closed,
       is_open,
@@ -154,7 +153,6 @@ WITH sfdc_opportunity_xf AS (
     FROM closed_pipeline
     UNION ALL
     SELECT
-      'delta_arr'          AS test_field,
       opportunity_id,
       report_date::date AS report_date,
       report_fiscal_quarter_date,
@@ -165,8 +163,8 @@ WITH sfdc_opportunity_xf AS (
       pipeline_category,
       deal_status,
       deal_status_group,
-      net_arr,
-      prev_net_arr,
+     -- net_arr,
+     -- prev_net_arr,
       delta_net_arr,
       is_closed,
       is_open,
