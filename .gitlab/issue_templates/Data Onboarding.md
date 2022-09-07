@@ -124,6 +124,7 @@ There are many slack channels for communication of data team needs and informati
 | `analytics-pipelines` | No | No | Yes | No | No |
 | `data-prom-alerts` | No | No | No | No | Yes |
 | `bt-data-science` | No | No | No | Yes | No |
+| `data-pipelines` | No | No | No | No | Yes |
 
 </details>
 
