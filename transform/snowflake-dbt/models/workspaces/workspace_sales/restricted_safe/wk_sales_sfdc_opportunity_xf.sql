@@ -1,4 +1,4 @@
-{{ config(alias='sfdc_opportunity_xf_refactored_edm') }}
+{{ config(alias='sfdc_opportunity_xf') }}
 
 -- NF 20220907 Moved EDM Refactored model as base model, move original model to a deprecated model
 

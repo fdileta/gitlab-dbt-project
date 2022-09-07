@@ -1,4 +1,4 @@
-{{ config(alias='sfdc_opportunity_xf') }}
+{{ config(alias='sfdc_opportunity_xf_deprecated') }}
 
 -- NF 20220907 Original model, deprecated in favor of the one using EDM as source fields
 
