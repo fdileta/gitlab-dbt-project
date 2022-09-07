@@ -14,7 +14,7 @@
 , structured_events_w_clean_url AS (
 
     SELECT
-      structured_events.*, 
+      prep_snowplow_structured_event_all_source.*, 
       {{ clean_url('page_url_path') }}   AS clean_url_path,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)     AS dim_namespace_id,
       REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1)   AS dim_project_id,
