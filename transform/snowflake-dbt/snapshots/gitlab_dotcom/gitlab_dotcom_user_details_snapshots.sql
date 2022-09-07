@@ -9,7 +9,7 @@
         )
     }}
 
-    SELECT *, TO_TIMESTAMP_NTZ(CAST(_uploaded_at TO INT)) as uploaded_at
+    SELECT *, TO_TIMESTAMP_NTZ(CAST(_uploaded_at AS INT)) as uploaded_at
     FROM {{ source('gitlab_dotcom', 'user_details') }}
     QUALIFY (ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY uploaded_at DESC) = 1)
 
