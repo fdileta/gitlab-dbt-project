@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: rpt_delta_arr_parent_month_8th_calendar_day
+    description: '{{ doc("rpt_delta_arr_parent_month_8th_calendar_day") }}'
+
+  - name: rpt_delta_arr_parent_product_month_8th_calendar_day
+    description: '{{ doc("rpt_delta_arr_parent_product_month_8th_calendar_day") }}'

@@ -342,10 +342,21 @@ models:
         +database: "{{ env_var('SNOWFLAKE_PREP_DATABASE') }}" #PREP
         +schema: sensitive
         secure: true
-      restricted_safe:
-        +schema: restricted_safe_common
-        +tags: ["safe"]
-        secure: true
+      dimensions_shared:
+        restricted_safe:
+          +schema: restricted_safe_common
+          +tags: ["safe"]
+          secure: true
+      facts_financial:
+        restricted_safe:
+          +schema: restricted_safe_common
+          +tags: ["safe"]
+          secure: true
+      facts_sales_and_marketing:
+        restricted_safe:
+          +schema: restricted_safe_common
+          +tags: ["safe"]
+          secure: true
 
     common_mapping:
       +materialized: table
@@ -367,14 +378,38 @@ models:
         secure: true
 
     common_mart:
-      +materialized: table    
+      +materialized: table
       +schema: common_mart
       +tags: ["product"]
-      
+
     common_mart_product:
       +materialized: table
       +schema: common_mart_product
       +tags: ["product"]
+      restricted_safe:
+        +schema: restricted_safe_common_mart_product
+        +tags: ["safe", "product"]
+        secure: true
+
+    common_mart_sales:
+      +materialized: table
+      +schema: common_mart_sales
+      restricted_safe:
+        +schema: restricted_safe_common_mart_sales
+        +tags: ["safe"]
+        secure: true
+
+    common_mart_finance:
+      +materialized: table
+      +schema: common_mart_finance
+      restricted_safe:
+        +schema: restricted_safe_common_mart_finance
+        +tags: ["safe"]
+        secure: true
+
+    common_mart_marketing:
+      +materialized: table
+      +schema: common_mart_marketing
 
     # ------------------
     # Legacy (formerly Staging)
@@ -556,7 +591,7 @@ models:
     # ------------------
     marts:
       +materialized: table
-          
+
       arr:
         +schema: restricted_safe_legacy
         +tags: ["safe"]
@@ -570,20 +605,6 @@ models:
         users_emails:
           enabled: false
 
-      finance:
-        +schema: restricted_safe_common_mart_finance
-        +tags: ["safe"]
-        secure: true
-
-      product:
-        +tags: ["product"]
-        mart_ci_runner_activity_monthly:
-          +enabled: true
-        restricted_safe:
-          +schema: restricted_safe_common_mart_product
-          +tags: ["safe"]
-          secure: true
-
       pumps:
         +database: "{{ env_var('SNOWFLAKE_PROD_DATABASE') }}" #PROD
         +schema: pumps
@@ -593,13 +614,6 @@ models:
         +database: "{{ env_var('SNOWFLAKE_PROD_DATABASE') }}" #PROD
         +schema: pumps_sensitive
         +materialized: table
-
-      sales_funnel:
-        +schema: common_mart_sales
-        restricted_safe:
-          +schema: restricted_safe_common_mart_sales
-          +tags: ["safe"]
-          secure: true
 
       usage_ping:
         +tags: ["product"]

@@ -420,7 +420,9 @@ WITH date_details AS (
       edm_snapshot_opty.stage_1_discovery_month                  AS stage_1_date_month,
       edm_snapshot_opty.stage_1_discovery_fiscal_year            AS stage_1_fiscal_year,
       edm_snapshot_opty.stage_1_discovery_fiscal_quarter_name    AS stage_1_fiscal_quarter_name,
-      edm_snapshot_opty.stage_1_discovery_fiscal_quarter_date    AS stage_1_fiscal_quarter_date
+      edm_snapshot_opty.stage_1_discovery_fiscal_quarter_date    AS stage_1_fiscal_quarter_date,
+
+      edm_snapshot_opty.is_sao                                   AS is_eligible_sao_flag
 
 
     FROM {{ref('mart_crm_opportunity_daily_snapshot')}} AS edm_snapshot_opty
@@ -509,18 +511,7 @@ WITH date_details AS (
           AND opp_snapshot.sales_qualified_source  != 'Web Direct Generated'
               THEN 1
          ELSE 0
-      END                                                      AS is_eligible_created_pipeline_flag,
-
-      -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
-      CASE
-        WHEN opp_snapshot.sales_accepted_date IS NOT NULL
-          AND opp_snapshot.is_edu_oss = 0
-          AND opp_snapshot.is_deleted = 0
-          AND opp_snapshot.is_renewal = 0
-          AND opp_snapshot.stage_name NOT IN ('10-Duplicate', '9-Unqualified','0-Pending Acceptance')
-            THEN 1
-        ELSE 0
-      END                                                     AS is_eligible_sao_flag
+      END                                                      AS is_eligible_created_pipeline_flag
 
     FROM sfdc_opportunity_snapshot_history_xf opp_snapshot
       LEFT JOIN vision_opps

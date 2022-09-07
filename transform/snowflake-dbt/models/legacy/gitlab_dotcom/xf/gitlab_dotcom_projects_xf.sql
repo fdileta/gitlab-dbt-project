@@ -41,7 +41,7 @@ gitlab_subscriptions AS (
 active_services AS (
 
     SELECT *
-    FROM {{ref('gitlab_dotcom_services')}}
+    FROM {{ref('gitlab_dotcom_integrations')}}
     WHERE is_active = True
 
 ),

@@ -432,7 +432,8 @@ WITH sfdc_opportunity AS (
     edm_opty.is_eligible_churn_contraction          AS is_eligible_churn_contraction_flag,
     edm_opty.created_and_won_same_quarter_net_arr,
     edm_opty.churn_contraction_net_arr_bucket       AS churn_contracton_net_arr_bucket,  --typo in wk sales
-    edm_opty.reason_for_loss_calc
+    edm_opty.reason_for_loss_calc,
+    edm_opty.is_sao                                 AS is_eligible_sao_flag
 
 
     FROM legacy_sfdc_opportunity_xf AS sfdc_opportunity_xf
@@ -537,20 +538,7 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
           AND oppty_final.is_jihu_account = 0
          THEN 1
          ELSE 0
-      END                                                          AS is_eligible_created_pipeline_flag,
-
-
-      -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
-      CASE
-        WHEN oppty_final.sales_accepted_date IS NOT NULL
-          AND oppty_final.is_edu_oss = 0
-          AND oppty_final.is_deleted = 0
-          AND oppty_final.is_renewal = 0
-          AND oppty_final.stage_name NOT IN ('00-Pre Opportunity','10-Duplicate', '9-Unqualified','0-Pending Acceptance')
-            THEN 1
-        ELSE 0
-      END                                                         AS is_eligible_sao_flag
-
+      END                                                          AS is_eligible_created_pipeline_flag
 
 
     FROM oppty_final

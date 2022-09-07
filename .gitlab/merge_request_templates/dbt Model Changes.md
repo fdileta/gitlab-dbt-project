@@ -31,7 +31,8 @@ If you are the person who will be using this data and/or the dashboard it depend
 - [ ] If the periscope_query job failed, validate that the changes you've made don't affect the grain of the table or the expected output in Periscope.
 - [ ] If you are on the Data Team, please paste the output of `dbt test` when run locally below. Any failing tests should be fixed or explained prior to requesting a review.
 
-<summary> dbt test results </summary>
+<details>
+<summary> dbt Test Results </summary>
 
 <pre><code>
 
@@ -39,6 +40,7 @@ Paste the results of dbt test here, including the command.
 
 </code></pre>
 
+</details>
 
 #### Style & Structure
 

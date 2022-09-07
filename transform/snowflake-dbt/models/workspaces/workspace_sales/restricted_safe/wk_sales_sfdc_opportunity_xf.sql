@@ -942,12 +942,11 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
 
 
       -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
+      -- 2022-08-23 JK: using the central is_sao logic 
       CASE
         WHEN oppty_final.sales_accepted_date IS NOT NULL
           AND oppty_final.is_edu_oss = 0
-          AND oppty_final.is_deleted = 0
-          AND oppty_final.is_renewal = 0
-          AND oppty_final.stage_name NOT IN ('00-Pre Opportunity','10-Duplicate', '9-Unqualified','0-Pending Acceptance')
+          AND oppty_final.stage_name NOT IN ('10-Duplicate')
             THEN 1
         ELSE 0
       END                                                         AS is_eligible_sao_flag,

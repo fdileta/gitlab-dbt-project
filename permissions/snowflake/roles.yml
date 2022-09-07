@@ -89,6 +89,11 @@ databases:
     - judume_prep:
         shared: no
 
+    - juwong_prod:
+        shared: no
+    - juwong_prep:
+        shared: no  
+
     - kaguilar_prod:
         shared: no
     - kaguilar_prep:
@@ -173,6 +178,11 @@ databases:
         shared: no
     - rparker_prep:
         shared: no
+
+    - schaturvedi_prod:
+        shared: no
+    - schaturvedi_prep:
+        shared: no  
 
     - snalamaru_analytics:
         shared: no
@@ -529,7 +539,9 @@ roles:
             - analytics_engineer_core
             - analyst_people
             - analyst_engineering
+            - bamboohr
             - prometheus
+            - workday
 
     - analytics_engineer_gtm:
         member_of:
@@ -2187,6 +2199,23 @@ roles:
                     - prep.saas_usage_ping.*
                     - raw.version_db.*
 
+    - workday:
+        warehouses:
+            - dev_xs
+        privileges:
+            databases:
+                read:
+                    - prep
+                    - raw
+            schemas:
+                read:
+                    - prep.workday
+                    - raw.workday
+            tables:
+                read:
+                    - prep.workday.*
+                    - raw.workday.*
+
     - xactly:
         warehouses:
             - dev_xs
@@ -2422,23 +2451,13 @@ roles:
         warehouses:
             - dev_xs
 
-    - amihaila:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - aperez:
         member_of:
             - analyst_people
             - bamboohr
             - bi_tool_eval_read
-        warehouses:
-            - dev_xs
-
-    - atucker:
-        member_of:
-            - analyst_finance
+            - restricted_safe
+            - workday
         warehouses:
             - dev_xs
 
@@ -2449,13 +2468,6 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - reporting
-
-    - cbalane:
-        member_of:
-            - reporter
-            - gitlab_dotcom_prep
-        warehouses:
-            - dev_xs
 
     - cbraza:
         member_of:
@@ -3097,6 +3109,48 @@ roles:
                     - judume_prep.*.*
                     - judume_prod.*.*
 
+    - juwong:
+        member_of:
+            - engineer
+            - restricted_safe
+        warehouses:
+            - dev_xs
+            - dev_m
+            - loading
+            - reporting
+        owns:
+            databases:
+                - juwong_prep
+                - juwong_prod
+            schemas:
+                - juwong_prep.*
+                - juwong_prod.*
+            tables:
+                - juwong_prep.*.*
+                - juwong_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - juwong_prep
+                    - juwong_prod
+                write:
+                    - juwong_prep
+                    - juwong_prod
+            schemas:
+                read:
+                    - juwong_prep.*
+                    - juwong_prod.*
+                write:
+                    - juwong_prep.*
+                    - juwong_prod.*
+            tables:
+                read:
+                    - juwong_prep.*.*
+                    - juwong_prod.*.*
+                write:
+                    - juwong_prep.*.*
+                    - juwong_prod.*.*
+
     - kaguilar:
         member_of:
             - analyst_engineering
@@ -3292,6 +3346,10 @@ roles:
     - lvinueza:
         member_of:
             - analyst_finance
+            - analyst_people
+            - analytics_engineer_ga
+            - bamboohr
+            - bamboohr_analytics
             - customers_db
             - data_team_analyst
             - restricted_safe
@@ -3434,17 +3492,6 @@ roles:
     - mfleisher:
         member_of:
             - analyst_finance
-            - customers_db
-            - analyst_marketing
-            - data_team_analyst
-            - restricted_safe
-        warehouses:
-            - dev_xs
-
-    - mhanks:
-        member_of:
-            - analyst_finance
-            - bamboohr_analytics
             - customers_db
             - analyst_marketing
             - data_team_analyst
@@ -3623,12 +3670,6 @@ roles:
                     - mwawrzyniak_prep.*.*
                     - mwawrzyniak_prod.*.*
 
-    - mwielich:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - nbelokolodov:
         member_of:
             - analyst_growth
@@ -3753,6 +3794,7 @@ roles:
     - pempey:
         member_of:
             - engineer
+            - analytics_engineer_ga
             - bi_tool_eval_db
         warehouses:
             - dev_xs
@@ -3802,12 +3844,6 @@ roles:
     - permission_bot:
         warehouses:
             - admin
-
-    - pskorupa:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
 
     - rbacovic:
         member_of:
@@ -3974,6 +4010,54 @@ roles:
                     - rparker_prep.*.*
                     - rparker_prod.*.*
 
+    - rrendon:
+        member_of:
+            - analyst_engineering
+        warehouses:
+            - dev_xs
+
+    - schaturvedi:
+        member_of:
+            - engineer
+            - restricted_safe
+        warehouses:
+            - dev_xs
+            - dev_m
+            - loading
+            - reporting
+        owns:
+            databases:
+                - schaturvedi_prep
+                - schaturvedi_prod
+            schemas:
+                - schaturvedi_prep.*
+                - schaturvedi_prod.*
+            tables:
+                - schaturvedi_prep.*.*
+                - schaturvedi_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - schaturvedi_prep
+                    - schaturvedi_prod
+                write:
+                    - schaturvedi_prep
+                    - schaturvedi_prod
+            schemas:
+                read:
+                    - schaturvedi_prep.*
+                    - schaturvedi_prod.*
+                write:
+                    - schaturvedi_prep.*
+                    - schaturvedi_prod.*
+            tables:
+                read:
+                    - schaturvedi_prep.*.*
+                    - schaturvedi_prod.*.*
+                write:
+                    - schaturvedi_prep.*.*
+                    - schaturvedi_prod.*.*
+
     - sgladchun:
         member_of:
             - analyst_finance
@@ -3997,6 +4081,8 @@ roles:
             - analyst_people
             - bamboohr
             - reporter
+            - restricted_safe
+            - workday
         warehouses:
             - dev_xs
 
@@ -4200,12 +4286,6 @@ roles:
                     - tnguyen_prep.*.*
                     - tnguyen_prod.*.*
 
-    - tvellishetty:
-        member_of:
-            - analyst_growth
-        warehouses:
-            - dev_xs
-
     - vagrawal:
         member_of:
             - adaptive
@@ -4261,16 +4341,6 @@ roles:
                     - vprakash_prep.*.*
                     - vprakash_prod.*.*
 
-    - warias:
-        member_of:
-            - data_team_analyst
-            - analyst_core
-            - restricted_safe
-            - dbt_data_science
-            - snowplow
-        warehouses:
-            - dev_xs
-
     - webrahim:
         member_of:
             - analyst_finance
@@ -4322,20 +4392,10 @@ users:
         member_of:
             - amartin
 
-    - amihaila:
-        can_login: yes
-        member_of:
-            - amihaila
-
     - aperez:
         can_login: yes
         member_of:
             - aperez
-
-    - atucker:
-        can_login: yes
-        member_of:
-            - atucker
 
     - bi_tool_eval:
         can_login: yes
@@ -4346,11 +4406,6 @@ users:
         can_login: yes
         member_of:
             - bbutterfield
-
-    - cbalane:
-        can_login: yes
-        member_of:
-            - cbalane
 
     - cbraza:
         can_login: yes
@@ -4491,6 +4546,11 @@ users:
         member_of:
             - judume
 
+    - juwong:
+        can_login: yes
+        member_of:
+            - juwong
+
     - kaguilar:
         can_login: yes
         member_of:
@@ -4565,11 +4625,6 @@ users:
         member_of:
             - mfleisher
 
-    - mhanks:
-        can_login: yes
-        member_of:
-            - mhanks
-
     - mlaanen:
         can_login: yes
         member_of:
@@ -4594,11 +4649,6 @@ users:
         can_login: yes
         member_of:
             - mwawrzyniak
-
-    - mwielich:
-        can_login: yes
-        member_of:
-            - mwielich
 
     - nbelokolodov:
         can_login: yes
@@ -4658,11 +4708,6 @@ users:
             - securityadmin
             - sysadmin
 
-    - pskorupa:
-        can_login: yes
-        member_of:
-            - pskorupa
-
     - rbacovic:
         can_login: yes
         member_of:
@@ -4685,6 +4730,16 @@ users:
         member_of:
             - rparker
             - accountadmin
+
+    - rrendon:
+        can_login: yes 
+        member_of:
+            - rrendon
+
+    - schaturvedi:
+        can_login: yes
+        member_of:
+            - schaturvedi
 
     - securitybotsnowflakeapi:
         can_login: yes
@@ -4747,11 +4802,6 @@ users:
         member_of:
             - tnguyen
 
-    - tvellishetty:
-        can_login: yes
-        member_of:
-            - tvellishetty
-
     - vagrawal:
         can_login: yes
         member_of:
@@ -4763,11 +4813,6 @@ users:
             - accountadmin
             - securityadmin
             - vprakash
-
-    - warias:
-        can_login: yes
-        member_of:
-            - warias
 
     - webrahim:
         can_login: yes

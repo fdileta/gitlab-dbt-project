@@ -7,7 +7,7 @@ CASE
     THEN 'AWS'
   WHEN LOWER({{ fulfillment_partner_name }}) LIKE '%ibm (oem)%' OR LOWER({{ partner_account_name }}) LIKE '%ibm (oem)%'
     THEN 'IBM'
-  WHEN {{ resale_partner_track }} != 'Technology' AND {{ partner_track }} != 'Technology' AND {{ deal_path }} = 'Channel'
+  WHEN NOT EQUAL_NULL({{ resale_partner_track }}, 'Technology') AND NOT EQUAL_NULL({{ partner_track }}, 'Technology') AND {{ deal_path }} = 'Channel'
     THEN 'Channel Partners'
 END
 
