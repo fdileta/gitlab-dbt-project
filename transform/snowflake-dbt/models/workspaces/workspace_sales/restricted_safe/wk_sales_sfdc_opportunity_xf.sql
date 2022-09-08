@@ -70,6 +70,10 @@ WITH sfdc_opportunity AS (
     sfdc_opportunity_xf.incremental_acv,
     sfdc_opportunity_xf.net_incremental_acv,
     sfdc_opportunity_xf.is_deleted,
+
+    -- NF 20220909 Leaving this 2 to avoid breaking downstream models
+    --edm_opty.subscription_start_date 
+    --edm_opty.subscription_end_date 
     -----------------------------------------------
 
     edm_opty.dbt_updated_at                   AS _last_dbt_run,
@@ -83,6 +87,7 @@ WITH sfdc_opportunity AS (
     edm_opty.sales_qualified_date,
     edm_opty.subscription_start_date          AS quote_start_date,
     edm_opty.subscription_end_date            AS quote_end_date,
+
 
     edm_opty.days_in_stage,
     edm_opty.deployment_preference,
