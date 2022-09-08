@@ -123,6 +123,22 @@ tables:
       , license_starts_on
       , zuora_subscription_name
       FROM license_seat_links
+  license_versions:
+    advanced_metadata: true
+    export_db: EXPORT_DB
+    export_schema: 'customers'
+    export_table: 'license_versions'
+    export_table_primary_key: item_id
+    import_db: CUSTOMERS_DB
+    import_query: |-
+      SELECT item_id
+      , created_at
+      , item_type
+      , event
+      , whodunnit
+      , object
+      , object_changes
+      FROM license_versions
   licenses:
     advanced_metadata: true
     export_db: EXPORT_DB

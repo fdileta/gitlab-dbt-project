@@ -42,15 +42,16 @@ WITH map_merged_crm_account AS (
 
 ), sfdc_account AS (
 
-    SELECT 
+    SELECT
     {%- if model_type == 'live' %}
         *
     {%- elif model_type == 'snapshot' %}
         {{ dbt_utils.surrogate_key(['sfdc_account_snapshots_source.account_id','snapshot_dates.date_id'])}}   AS crm_account_snapshot_id,
         snapshot_dates.date_id                                                                                AS snapshot_id,
+        snapshot_dates.date_actual                                                                            AS snapshot_date,
         sfdc_account_snapshots_source.*
      {%- endif %}
-    FROM 
+    FROM
     {%- if model_type == 'live' %}
         {{ ref('sfdc_account_source') }}
     {%- elif model_type == 'snapshot' %}
@@ -63,7 +64,7 @@ WITH map_merged_crm_account AS (
 
 ), sfdc_users AS (
 
-    SELECT 
+    SELECT
       {%- if model_type == 'live' %}
         *
       {%- elif model_type == 'snapshot' %}
@@ -139,10 +140,11 @@ WITH map_merged_crm_account AS (
     SELECT
       --crm account information
       {%- if model_type == 'live' %}
-  
+
       {%- elif model_type == 'snapshot' %}
       sfdc_account.crm_account_snapshot_id,
       sfdc_account.snapshot_id,
+      sfdc_account.snapshot_date,
       {%- endif %}
       --primary key
       sfdc_account.account_id                                             AS dim_crm_account_id,
@@ -289,7 +291,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_ultimate_parent_company_name                 AS crm_account_zoom_info_ultimate_parent_company_name,
       sfdc_account.zoom_info_number_of_developers                         AS crm_account_zoom_info_number_of_developers,
       sfdc_account.forbes_2000_rank,
-      
+
       --degenerative dimensions
       sfdc_account.is_sdr_target_account,
       IFF(sfdc_record_type.record_type_label = 'Partner'
@@ -300,78 +302,78 @@ WITH map_merged_crm_account AS (
       sfdc_account.is_first_order_available,
       sfdc_account.is_key_account                                         AS is_key_account,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies,'ARE_USED: Jenkins') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies,'ARE_USED: Jenkins')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_jenkins_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: SVN') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: SVN')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_svn_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Tortoise SVN') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Tortoise SVN')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_tortoise_svn_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Google Cloud Platform') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Google Cloud Platform')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_gcp_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Atlassian') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Atlassian')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_atlassian_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: GitHub') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: GitHub')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_github_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: GitHub Enterprise') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: GitHub Enterprise')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_github_enterprise_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: AWS') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: AWS')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_aws_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Kubernetes') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Kubernetes')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_kubernetes_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Apache Subversion') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Apache Subversion')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_apache_subversion_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Apache Subversion (SVN)') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Apache Subversion (SVN)')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_apache_subversion_svn_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Hashicorp') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Hashicorp')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_hashicorp_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Amazon AWS CloudTrail') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: Amazon AWS CloudTrail')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_aws_cloud_trail_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: CircleCI') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: CircleCI')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_circle_ci_present,
       CASE
-        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: BitBucket') 
-          THEN 1 
+        WHEN CONTAINS (sfdc_account.zi_technologies, 'ARE_USED: BitBucket')
+          THEN 1
         ELSE 0
       END                                                                 AS is_zi_bit_bucket_present,
       sfdc_account.is_excluded_from_zoom_info_enrich,
@@ -456,7 +458,7 @@ WITH map_merged_crm_account AS (
       ON sfdc_account.owner_id = account_owner.user_id
     LEFT JOIN sfdc_users created_by
       ON sfdc_account.created_by_id = created_by.user_id
-    LEFT JOIN sfdc_users AS last_modified_by 
+    LEFT JOIN sfdc_users AS last_modified_by
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
     {%- elif model_type == 'snapshot' %}
     LEFT JOIN ultimate_parent_account
@@ -475,7 +477,7 @@ WITH map_merged_crm_account AS (
     LEFT JOIN sfdc_users AS created_by
       ON sfdc_account.created_by_id = created_by.user_id
         AND sfdc_account.snapshot_id = created_by.snapshot_id
-    LEFT JOIN sfdc_users AS last_modified_by 
+    LEFT JOIN sfdc_users AS last_modified_by
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
         AND sfdc_account.snapshot_id = last_modified_by.snapshot_id
     {%- endif %}

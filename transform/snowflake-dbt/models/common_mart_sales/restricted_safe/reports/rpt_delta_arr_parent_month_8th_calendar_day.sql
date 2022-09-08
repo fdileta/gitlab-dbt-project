@@ -10,6 +10,12 @@ WITH dim_product_detail AS (
     SELECT *
     FROM {{ ref('dim_crm_account') }}
 
+), dim_crm_account_snapshot AS (
+
+    SELECT *
+    FROM {{ ref('dim_crm_account_daily_snapshot') }}
+    WHERE snapshot_date = CURRENT_DATE
+
 ), dim_date AS (
 
     SELECT *
@@ -26,10 +32,10 @@ WITH dim_product_detail AS (
       rpt_arr_snapshot.arr_month,
       rpt_arr_snapshot.fiscal_quarter_name_fy,
       rpt_arr_snapshot.fiscal_year,
-      dim_crm_account.parent_crm_account_name,
-      dim_crm_account.dim_parent_crm_account_id,
-      rpt_arr_snapshot.product_tier_name                                                              AS product_category,
-      rpt_arr_snapshot.product_delivery_type                                                          AS delivery,
+      COALESCE(dim_crm_account.parent_crm_account_name, dim_crm_account_snapshot.parent_crm_account_name) AS parent_crm_account_name,
+      COALESCE(dim_crm_account.dim_parent_crm_account_id, dim_crm_account_snapshot.dim_parent_crm_account_id) AS dim_parent_crm_account_id,
+      rpt_arr_snapshot.product_tier_name AS product_category,
+      rpt_arr_snapshot.product_delivery_type AS delivery,
       --We started snapshoting the product ranking in August 2022. We need to use the live table to fill in historical data.
       COALESCE(rpt_arr_snapshot.product_ranking, dim_product_detail.product_ranking) AS product_ranking,
       rpt_arr_snapshot.mrr,
@@ -40,9 +46,12 @@ WITH dim_product_detail AS (
     /*
       Parent/child account hierarchies change over time. This creates inaccurate results in Snapshot models when doing month over
       delta calcs due to changing ultimate parent account ids. Therefore, we need to use the live hierarchy when doing delta arr calcs.
+      Some crm accounts are hard deleted in the live account source data, so we need to COALESCE with snapshotted data to fetch these values.
     */
     LEFT JOIN dim_crm_account
       ON dim_crm_account.dim_crm_account_id = rpt_arr_snapshot.dim_crm_account_id
+    LEFT JOIN dim_crm_account_snapshot
+      ON dim_crm_account_snapshot.dim_crm_account_id = rpt_arr_snapshot.dim_crm_account_id
 
 ), max_min_month AS (
 

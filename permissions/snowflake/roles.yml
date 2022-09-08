@@ -89,6 +89,11 @@ databases:
     - judume_prep:
         shared: no
 
+    - juwong_prod:
+        shared: no
+    - juwong_prep:
+        shared: no  
+
     - kaguilar_prod:
         shared: no
     - kaguilar_prep:
@@ -534,7 +539,9 @@ roles:
             - analytics_engineer_core
             - analyst_people
             - analyst_engineering
+            - bamboohr
             - prometheus
+            - workday
 
     - analytics_engineer_gtm:
         member_of:
@@ -1451,7 +1458,6 @@ roles:
                 read:
                     - prod.common_prep.prep_usage_ping_no_license_key
                     - prod.common_mart_product.mart_product_usage_wave_1_3_metrics_latest
-                    - prod.common_mart_product.mart_product_usage_wave_1_3_metrics_monthly
                     - prod.common_mart_product.mart_product_usage_wave_1_3_metrics_monthly_diff
                     - prod.common_mart_product.mart_saas_product_usage_metrics_monthly
                     - prod.common_mart_product.mart_product_usage_paid_user_metrics_monthly
@@ -2192,6 +2198,23 @@ roles:
                     - prep.saas_usage_ping.*
                     - raw.version_db.*
 
+    - workday:
+        warehouses:
+            - dev_xs
+        privileges:
+            databases:
+                read:
+                    - prep
+                    - raw
+            schemas:
+                read:
+                    - prep.workday
+                    - raw.workday
+            tables:
+                read:
+                    - prep.workday.*
+                    - raw.workday.*
+
     - xactly:
         warehouses:
             - dev_xs
@@ -2433,6 +2456,7 @@ roles:
             - bamboohr
             - bi_tool_eval_read
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
 
@@ -3084,6 +3108,48 @@ roles:
                     - judume_prep.*.*
                     - judume_prod.*.*
 
+    - juwong:
+        member_of:
+            - engineer
+            - restricted_safe
+        warehouses:
+            - dev_xs
+            - dev_m
+            - loading
+            - reporting
+        owns:
+            databases:
+                - juwong_prep
+                - juwong_prod
+            schemas:
+                - juwong_prep.*
+                - juwong_prod.*
+            tables:
+                - juwong_prep.*.*
+                - juwong_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - juwong_prep
+                    - juwong_prod
+                write:
+                    - juwong_prep
+                    - juwong_prod
+            schemas:
+                read:
+                    - juwong_prep.*
+                    - juwong_prod.*
+                write:
+                    - juwong_prep.*
+                    - juwong_prod.*
+            tables:
+                read:
+                    - juwong_prep.*.*
+                    - juwong_prod.*.*
+                write:
+                    - juwong_prep.*.*
+                    - juwong_prod.*.*
+
     - kaguilar:
         member_of:
             - analyst_engineering
@@ -3280,6 +3346,7 @@ roles:
         member_of:
             - analyst_finance
             - analyst_people
+            - analytics_engineer_ga
             - bamboohr
             - bamboohr_analytics
             - customers_db
@@ -3726,6 +3793,7 @@ roles:
     - pempey:
         member_of:
             - engineer
+            - analytics_engineer_ga
             - bi_tool_eval_db
         warehouses:
             - dev_xs
@@ -3988,6 +4056,7 @@ roles:
                 write:
                     - schaturvedi_prep.*.*
                     - schaturvedi_prod.*.*
+
     - sgladchun:
         member_of:
             - analyst_finance
@@ -4012,6 +4081,7 @@ roles:
             - bamboohr
             - reporter
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
 
@@ -4474,6 +4544,11 @@ users:
         can_login: yes
         member_of:
             - judume
+
+    - juwong:
+        can_login: yes
+        member_of:
+            - juwong
 
     - kaguilar:
         can_login: yes
