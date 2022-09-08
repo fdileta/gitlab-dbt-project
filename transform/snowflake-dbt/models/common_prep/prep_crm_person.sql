@@ -50,8 +50,8 @@ WITH biz_person AS (
 
     SELECT
       --id
-      {{ dbt_utils.surrogate_key(['contact_id']) }} AS dim_crm_person_id,
-      contact_id                                    AS sfdc_record_id,
+      {{ dbt_utils.surrogate_key(['sfdc_contacts.contact_id']) }} AS dim_crm_person_id,
+      sfdc_contacts.contact_id                      AS sfdc_record_id,
       bizible_person_id                             AS bizible_person_id,
       'contact'                                     AS sfdc_record_type,
       contact_email_hash                            AS email_hash,
@@ -117,7 +117,7 @@ WITH biz_person AS (
       account_demographics_upa_state,
       account_demographics_upa_city,
       account_demographics_upa_street,
-      account_demographics_upa_postal_code,
+      account_demographics_upa_postal_code
 
       NULL                                          AS crm_partner_id,
       NULL                                          AS ga_client_id,
