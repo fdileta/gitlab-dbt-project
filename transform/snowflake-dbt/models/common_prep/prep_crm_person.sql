@@ -117,8 +117,7 @@ WITH biz_person AS (
       account_demographics_upa_state,
       account_demographics_upa_city,
       account_demographics_upa_street,
-      account_demographics_upa_postal_code
-
+      account_demographics_upa_postal_code,
       NULL                                          AS crm_partner_id,
       NULL                                          AS ga_client_id,
       NULL                                          AS cognism_company_office_city,
