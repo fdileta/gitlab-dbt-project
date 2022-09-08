@@ -22,7 +22,6 @@ cleaned AS (
     full_name,
     work_email,
     gitlab_username,
-    region,
     region_modified,
     sales_geo_differential,
     jobtitle_speciality,
