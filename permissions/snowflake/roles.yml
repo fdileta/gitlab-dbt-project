@@ -29,6 +29,11 @@ databases:
     - testing_db:
         shared: no
 
+    - cbraza_prod:
+        shared: no
+    - cbraza_prep:
+        shared: no
+
     - csharp_prod:
         shared: no
     - csharp_prep:
@@ -2476,6 +2481,16 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - cbraza_prep
+                - cbraza_prod
+            schemas:
+                - cbraza_prep.*
+                - cbraza_prod.*
+            tables:
+                - cbraza_prep.*.*
+                - cbraza_prod.*.*
 
     - cmeddaugh:
         member_of:
