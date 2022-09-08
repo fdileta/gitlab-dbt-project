@@ -36,7 +36,8 @@ WITH sfdc_opportunity_xf AS (
         END AS pipeline_category,
 
         'Open' AS deal_status,
-        'Open' AS deal_status_group
+        'Open' AS deal_status_group,
+        'Expansion / Contraction' AS pipeline_motion
 
     FROM sfdc_opportunity_snapshot_history_xf snapshot_oppty
       INNER JOIN sfdc_opportunity_xf oppty -- we use the latest ARR Creaated date to accommodate corrections
@@ -62,6 +63,7 @@ WITH sfdc_opportunity_xf AS (
       pipeline_category,
       deal_status,
       deal_status_group,
+      pipeline_motion,
 
       is_closed,
       is_open,
@@ -108,6 +110,7 @@ WITH sfdc_opportunity_xf AS (
         ELSE 'Lost'
       END                                     AS deal_status,
       'Closed'                                AS deal_status_group,
+      'Removal'                               AS pipeline_motion,
 
       net_arr,
       CASE
@@ -143,6 +146,7 @@ WITH sfdc_opportunity_xf AS (
       pipeline_category,
       deal_status,
       deal_status_group,
+      pipeline_motion,
       --net_arr,
      -- NULL              AS prev_net_arr,
       delta_net_arr,
@@ -163,6 +167,7 @@ WITH sfdc_opportunity_xf AS (
       pipeline_category,
       deal_status,
       deal_status_group,
+      pipeline_motion,
      -- net_arr,
      -- prev_net_arr,
       delta_net_arr,
