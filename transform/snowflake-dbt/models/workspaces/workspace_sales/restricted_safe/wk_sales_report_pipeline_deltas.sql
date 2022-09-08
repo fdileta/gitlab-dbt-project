@@ -29,14 +29,20 @@ WITH sfdc_opportunity_xf AS (
         ELSE 0
       END AS is_pipeline_created_flag,
 
+      -- if the deal was not created in the snapshot quarter (or not eligible) we asume it was crerated
+      -- in previous quarters
       CASE
           WHEN is_pipeline_created_flag = 1
             THEN 'Pipe Gen'
           ELSE 'Existing Pipe'
         END AS pipeline_category,
 
+        -- Based on deal stage of the deal at the snapshot tiime
         'Open' AS deal_status,
         'Open' AS deal_status_group,
+        
+        -- This field track if the type of pipeline "motion", if it expands / contract / create pipeline, or if it closes
+        -- it
         'Expansion / Contraction' AS pipeline_motion
 
     FROM sfdc_opportunity_snapshot_history_xf snapshot_oppty
