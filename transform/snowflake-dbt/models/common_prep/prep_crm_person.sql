@@ -37,12 +37,14 @@ WITH biz_person AS (
     FROM {{ref('sfdc_lead_source')}}
     WHERE is_deleted = 'FALSE'
 
-),  was_converted_lead (
-    SELECT DISTINCT contact_id, 1 AS was_converted_lead
-    FROM {{ ref('sfdc_contact_source') }}
-    WHERE contact_id IN 
-        (SELECT converted_contact_id
-        FROM {{ ref('sfdc_lead_source') }})
+),  was_converted_lead AS (
+    SELECT
+        DISTINCT contact_id,
+        1 AS was_converted_lead     
+    FROM {{ ref('sfdc_contact_source') }}     
+    WHERE contact_id IN (
+        SELECT converted_contact_id         
+        FROM {{ ref('sfdc_lead_source') }} )
 
 ),  crm_person_final AS (
 
