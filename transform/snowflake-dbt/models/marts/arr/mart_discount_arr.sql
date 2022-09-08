@@ -139,12 +139,12 @@ WITH dim_date AS (
       ON arr_agg.dim_product_detail_id = dim_product_detail.dim_product_detail_id
     INNER JOIN dim_billing_account
       ON arr_agg.dim_billing_account_id_invoice = dim_billing_account.dim_billing_account_id
+    INNER JOIN dim_crm_opportunity 
+      ON dim_subscription.dim_crm_opportunity_id = dim_crm_opportunity.dim_crm_opportunity_id
     LEFT JOIN dim_crm_account AS dim_crm_account_invoice
       ON arr_agg.dim_crm_account_id_invoice = dim_crm_account_invoice.dim_crm_account_id
     LEFT JOIN dim_crm_account AS dim_crm_account_subscription
       ON arr_agg.dim_crm_account_id_subscription = dim_crm_account_subscription.dim_crm_account_id
-    LEFT JOIN dim_crm_opportunity 
-      ON dim_subscription.dim_crm_opportunity_id = dim_crm_opportunity.dim_crm_opportunity_id
     WHERE dim_crm_account_subscription.is_jihu_account != 'TRUE'
     {{ dbt_utils.group_by(n=42) }}
     ORDER BY 3 DESC
