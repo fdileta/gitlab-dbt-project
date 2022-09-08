@@ -37,7 +37,14 @@ WITH biz_person AS (
     FROM {{ref('sfdc_lead_source')}}
     WHERE is_deleted = 'FALSE'
 
-), crm_person_final AS (
+),  was_converted_lead (
+    SELECT DISTINCT contact_id, 1 AS was_converted_lead
+    FROM {{ ref('sfdc_contact_source') }}
+    WHERE contact_id IN 
+        (SELECT converted_contact_id
+        FROM {{ ref('sfdc_lead_source') }});
+
+),  crm_person_final AS (
 
     SELECT
       --id
@@ -67,6 +74,7 @@ WITH biz_person AS (
       contact_status                                AS status,
       lead_source,
       lead_source_type,
+      was_converted_lead.was_converted_lead         AS was_converted_lead,
       source_buckets,
       net_new_source_categories,
       bizible_touchpoint_position,
@@ -130,6 +138,8 @@ WITH biz_person AS (
     FROM sfdc_contacts
     LEFT JOIN biz_person_with_touchpoints
       ON sfdc_contacts.contact_id = biz_person_with_touchpoints.bizible_contact_id
+    LEFT JOIN was_converted_lead
+      ON was_converted_lead.contact_id = sfdc_contacts.contact_id
 
     UNION
 
@@ -161,6 +171,7 @@ WITH biz_person AS (
       lead_status                                AS status,
       lead_source,
       lead_source_type,
+      0                                          AS was_converted_lead,
       source_buckets,
       net_new_source_categories,
       bizible_touchpoint_position,

@@ -35,6 +35,7 @@ WITH crm_person AS (
       status,
       lead_source,
       lead_source_type,
+      was_converted_lead,
       source_buckets,
       net_new_source_categories,
       bizible_touchpoint_position,
