@@ -1,3 +1,7 @@
+{{ config(
+    tags=["product"]
+) }}
+
 {{ simple_cte([
     ('marketing_contact', 'dim_marketing_contact'),
     ('marketing_contact_role', 'bdg_marketing_contact_role'),
