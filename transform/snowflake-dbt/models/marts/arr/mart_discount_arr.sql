@@ -128,6 +128,8 @@ WITH dim_date AS (
       SUM(arr_agg.arr)                                                  AS arr,
       SUM(arr_agg.quantity)                                             AS quantity
     FROM arr_agg
+    INNER JOIN dim_subscription
+      ON arr_agg.dim_subscription_id = dim_subscription.dim_subscription_id
     INNER JOIN dim_product_detail
       ON arr_agg.dim_product_detail_id = dim_product_detail.dim_product_detail_id
     INNER JOIN dim_billing_account
