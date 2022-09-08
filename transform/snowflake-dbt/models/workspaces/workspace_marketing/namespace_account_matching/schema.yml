@@ -36,3 +36,9 @@ models:
       - name: group_share_pk
         tests:
           - unique
+
+  - name: wk_fct_user_membership
+    columns:
+      - name: user_membership_pk
+        tests:
+          - unique
