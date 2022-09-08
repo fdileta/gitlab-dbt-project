@@ -42,7 +42,7 @@ WITH biz_person AS (
     FROM {{ ref('sfdc_contact_source') }}
     WHERE contact_id IN 
         (SELECT converted_contact_id
-        FROM {{ ref('sfdc_lead_source') }});
+        FROM {{ ref('sfdc_lead_source') }})
 
 ),  crm_person_final AS (
 
