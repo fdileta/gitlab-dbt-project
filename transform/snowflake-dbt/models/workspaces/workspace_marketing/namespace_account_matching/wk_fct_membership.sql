@@ -1,6 +1,7 @@
 {{ config(
     materialized='table',
-    snowflake_warehouse = generate_warehouse_name('XL')
+    snowflake_warehouse = generate_warehouse_name('XL'),
+    enabled=false
 ) }}
 
 {{ simple_cte([
@@ -9,6 +10,13 @@
     ('lineage','gitlab_dotcom_namespace_lineage_scd'),
     ('access_levels','gitlab_dotcom_access_levels_source')
 ]) }},
+
+direct_membership_test AS (
+  SELECT *
+  FROM direct_membership
+  WHERE user_id IS NOT NULL
+    AND user_id in (9475165)
+)
 
 shared_groups AS (
 
@@ -35,14 +43,14 @@ all_membership AS (
 
   SELECT 
     member_id::INT AS share_id,
-    namespace_id,
-    user_id,
+    namespace_id AS shared_namespace_id,
+    user_id AS shared_with_id,
     'user' AS shared_with_type,
     access_level,
     membership_created_at AS created_at,
     valid_from,
     COALESCE(valid_to,CURRENT_DATE()) AS valid_to
-  FROM direct_membership
+  FROM direct_membership_test
 
 ),
 
@@ -110,7 +118,7 @@ inherited_membership AS (
              ELSE FALSE
            END) = TRUE
 ),
-/*
+
 shared_inheritance AS (
   SELECT
     inherited_membership.share_id,
@@ -140,7 +148,7 @@ shared_inheritance AS (
           ELSE FALSE
         END) = TRUE
 
-),*/
+),
 
 all_inheritance AS (
 
@@ -148,10 +156,10 @@ all_inheritance AS (
   FROM inherited_membership
   WHERE inherited_membership.shared_with_type = 'user'
   
-  /*UNION ALL
+  UNION ALL
   
   SELECT *
-  FROM shared_inheritance*/
+  FROM shared_inheritance
 ),
 
 fct AS (

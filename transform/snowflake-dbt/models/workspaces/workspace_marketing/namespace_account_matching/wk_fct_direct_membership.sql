@@ -25,9 +25,9 @@ remap_projects AS (
     members.valid_to,
     members.is_currently_valid,
     -- A project could be deleted
-    COALESCE(IFF(members.member_source_type = 'Project',
+    COALESCE(
       projects_map.project_namespace_id,
-      members.source_id), -1) AS member_namespace_id
+      members.source_id, -1) AS member_namespace_id
   FROM members
   LEFT JOIN projects_map
     ON members.source_id = projects_map.project_id
@@ -60,7 +60,7 @@ combine AS (
   SELECT *
   FROM remap_projects
 
-  UNION
+  UNION ALL
 
   SELECT *
   FROM user_namespaces
