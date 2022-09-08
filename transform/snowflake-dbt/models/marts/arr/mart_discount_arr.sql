@@ -90,7 +90,7 @@ WITH dim_date AS (
       dim_crm_account_subscription.dim_crm_account_id                   AS dim_crm_account_id_subscription,
       dim_crm_account_subscription.crm_account_name                     AS crm_account_name_subscription,
       dim_crm_account_subscription.crm_account_owner_team               AS crm_account_owner_team_subscription,
-      zuora_subscription.subscription_name,
+      dim_subscription.subscription_name,
       IFF(dim_subscription.zuora_renewal_subscription_name != '', TRUE, FALSE)
                                                                         AS is_myb,
       arr_agg.is_paid_in_full,
@@ -128,8 +128,6 @@ WITH dim_date AS (
       SUM(arr_agg.arr)                                                  AS arr,
       SUM(arr_agg.quantity)                                             AS quantity
     FROM arr_agg
-    INNER JOIN zuora_subscription
-      ON arr_agg.dim_subscription_id = dim_subscription.dim_subscription_id
     INNER JOIN dim_product_detail
       ON arr_agg.dim_product_detail_id = dim_product_detail.dim_product_detail_id
     INNER JOIN dim_billing_account
