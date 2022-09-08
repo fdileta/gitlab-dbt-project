@@ -17,7 +17,7 @@
       fct_behavior_structured_event.behavior_unstructured_event_pk,
 
       -- Foreign Keys
-      fct_behavior_structured_event.dim_website_page_sk,
+      fct_behavior_structured_event.dim_behavior_website_page_sk,
       fct_behavior_structured_event.dim_namespace_id,
       fct_behavior_structured_event.dim_project_id,
 
