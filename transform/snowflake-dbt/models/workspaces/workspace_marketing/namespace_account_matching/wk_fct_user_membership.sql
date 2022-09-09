@@ -83,7 +83,6 @@ direct_lineage AS (
 
 direct_lineage_flatten AS (
   SELECT DISTINCT
-    --direct_lineage.*,
     direct_lineage.namespace_id,
     direct_lineage.lineage_valid_from,
     lineage.value::INTEGER AS lineage_namespace_id
@@ -109,8 +108,6 @@ full_direct_membership AS (
   FROM direct_lineage_flatten
   INNER JOIN direct_share
     ON direct_lineage_flatten.lineage_namespace_id = direct_share.namespace_id
-      --AND direct_lineage_flatten.unique_id != direct_share.unique_id
-      --AND direct_lineage_flatten.namespace_id != direct_share.namespace_id
 
   UNION
 
@@ -166,7 +163,12 @@ fct AS (
   SELECT
     -- Primary Key
     {{ 
-      dbt_utils.surrogate_key(['combine.user_id','combine.namespace_id','combine.source_member_id','combine.source_share_id']) 
+      dbt_utils.surrogate_key([
+        'combine.user_id',
+        'combine.namespace_id',
+        'combine.source_member_id',
+        'combine.source_share_id'
+      ]) 
     }} AS user_membership_pk,
 
     -- Foreign Keys
@@ -176,21 +178,15 @@ fct AS (
     -- Legacy Keys
 
     combine.user_id,
-    combine.namespace_id AS namespace_id,
+    combine.namespace_id,
     combine.source_member_id,
     combine.source_share_id,
 
     -- Degenerate Dimensions
-    combine.unique_id,
     combine.access_level,
     access_levels.access_level_name,
     combine.membership_type,
-    combine.access_at,
-    combine.source_namespace_id
-
-    --combine.valid_from,
-    --combine.valid_to,
-    --combine.is_currently_valid
+    combine.access_at
 
     -- Facts
 
