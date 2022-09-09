@@ -76,6 +76,8 @@
       sfdc_opportunity.stage_4_proposal_date_id,
       sfdc_opportunity.stage_5_negotiating_date,
       sfdc_opportunity.stage_5_negotiating_date_id,
+      sfdc_opportunity.stage_6_awaiting_signature_date,
+      sfdc_opportunity.stage_6_awaiting_signature_date_id,
       sfdc_opportunity.stage_6_closed_won_date,
       sfdc_opportunity.stage_6_closed_won_date_id,
       sfdc_opportunity.stage_6_closed_lost_date,

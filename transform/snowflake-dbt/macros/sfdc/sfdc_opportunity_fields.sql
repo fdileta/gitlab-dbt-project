@@ -190,7 +190,7 @@ WITH first_contact  AS (
       close_date::DATE                                                   AS close_date,
       net_arr                                                            AS raw_net_arr,
     {%- if model_type == 'live' %}
-        {{ dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR"])}}
+        {{ dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"])}}
     {%- elif model_type == 'snapshot' %}
         {{ dbt_utils.surrogate_key(['sfdc_opportunity_snapshots_source.opportunity_id','snapshot_dates.date_id'])}}   AS crm_opportunity_snapshot_id,
         snapshot_dates.date_id                                                                                        AS snapshot_id,
@@ -201,7 +201,7 @@ WITH first_contact  AS (
         snapshot_dates.first_day_of_fiscal_quarter                                                                    AS snapshot_fiscal_quarter_date,
         snapshot_dates.day_of_fiscal_quarter_normalised                                                               AS snapshot_day_of_fiscal_quarter_normalised,
         snapshot_dates.day_of_fiscal_year_normalised                                                                  AS snapshot_day_of_fiscal_year_normalised,
-        {{ dbt_utils.star(from=ref('sfdc_opportunity_snapshots_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM", "SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR"])}}
+        {{ dbt_utils.star(from=ref('sfdc_opportunity_snapshots_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM", "SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"])}}
      {%- endif %}
     FROM 
     {%- if model_type == 'live' %}
@@ -299,6 +299,7 @@ WITH first_contact  AS (
       {{ get_date_id('sfdc_opportunity.stage_3_technical_evaluation_date') }}                     AS stage_3_technical_evaluation_date_id,
       {{ get_date_id('sfdc_opportunity.stage_4_proposal_date') }}                                 AS stage_4_proposal_date_id,
       {{ get_date_id('sfdc_opportunity.stage_5_negotiating_date') }}                              AS stage_5_negotiating_date_id,
+      {{ get_date_id('sfdc_opportunity.stage_6_awaiting_signature_date') }}                       AS stage_6_awaiting_signature_date_id,
       {{ get_date_id('sfdc_opportunity.stage_6_closed_won_date') }}                               AS stage_6_closed_won_date_id,
       {{ get_date_id('sfdc_opportunity.stage_6_closed_lost_date') }}                              AS stage_6_closed_lost_date_id,
       {{ get_date_id('sfdc_opportunity.technical_evaluation_date') }}                             AS technical_evaluation_date_id,
@@ -536,17 +537,19 @@ WITH first_contact  AS (
             THEN 1
         ELSE 0
       END                                                                                         AS is_eligible_sao,
-      CASE 
+      CASE
         WHEN sfdc_opportunity.is_edu_oss = 0
           AND sfdc_opportunity.is_deleted = 0
+          -- For ASP we care mainly about add on, new business, excluding contraction / churn
           AND sfdc_opportunity.order_type IN ('1. New - First Order','2. New - Connected','3. Growth')
+          -- Exclude Decomissioned as they are not aligned to the real owner
+          -- Contract Reset, Decomission
           AND sfdc_opportunity.opportunity_category IN ('Standard','Ramp Deal','Internal Correction')
-          AND ((sfdc_opportunity.is_web_portal_purchase = 1 
-                AND net_arr > 0)
-                OR sfdc_opportunity.is_web_portal_purchase = 0)
+          -- Exclude Deals with nARR < 0
+          AND net_arr > 0
             THEN 1
           ELSE 0
-      END                                                                                         AS is_eligible_asp_analysis,
+      END                                                           AS is_eligible_asp_analysis,
       CASE 
         WHEN sfdc_opportunity.is_edu_oss = 0
           AND sfdc_opportunity.is_deleted = 0
@@ -596,6 +599,8 @@ WITH first_contact  AS (
 
       {{ alliance_partner('fulfillment_partner.account_name', 'partner_account.account_name', 'sfdc_opportunity.close_date', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type,
       {{ alliance_partner_short('fulfillment_partner.account_name', 'partner_account.account_name', 'sfdc_opportunity.close_date', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type_short,
+
+      fulfillment_partner.account_name AS resale_partner_name,
 
       --  quote information
       quote.dim_quote_id,
@@ -737,6 +742,17 @@ WITH first_contact  AS (
             AND sfdc_opportunity.sales_qualified_source != 'Channel Generated' 
           THEN 'Partner Co-Sell'
       END                                                                                       AS deal_path_engagement,
+      CASE
+        WHEN net_arr > 0 AND net_arr < 5000
+          THEN '1 - Small (<5k)'
+        WHEN net_arr >=5000 AND net_arr < 25000
+          THEN '2 - Medium (5k - 25k)'
+        WHEN net_arr >=25000 AND net_arr < 100000
+          THEN '3 - Big (25k - 100k)'
+        WHEN net_arr >= 100000
+          THEN '4 - Jumbo (>100k)'
+        ELSE 'Other'
+      END                                                          AS deal_size,
       CASE 
         WHEN net_arr > 0 AND net_arr < 1000 
           THEN '1. (0k -1k)'
@@ -1142,54 +1158,52 @@ WITH first_contact  AS (
       CASE 
         WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
           THEN account_owner.user_geo
-        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_geo
       END  
     ) AS report_opportunity_user_geo,
     LOWER(
       CASE 
         WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
           THEN account_owner.user_region
-        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_region
       END  
     ) AS report_opportunity_user_region,
     LOWER(
       CASE 
         WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
           THEN account_owner.user_area
-        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_area
       END  
     ) AS report_opportunity_user_area,
     LOWER(
-      CASE 
-        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
-          THEN account_owner.user_segment_geo_region_area
-        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
-      END
+      CONCAT(
+        report_opportunity_user_segment,'-',report_opportunity_user_geo,'-',report_opportunity_user_region,'-',report_opportunity_user_area
+      ) 
     ) AS report_user_segment_geo_region_area,
+    COALESCE(sfdc_opportunity.sales_qualified_source, 'NA') AS key_sqs,
     LOWER(
       CONCAT(
         report_user_segment_geo_region_area,
         '-',
-        sfdc_opportunity.sales_qualified_source,
+        key_sqs,
         '-',
         sfdc_opportunity.order_type
       )
     ) AS report_user_segment_geo_region_area_sqs_ot,
-    report_opportunity_user_segment AS key_segment,
-    sfdc_opportunity.sales_qualified_source AS key_sqs,
-    deal_group AS key_ot,
-    report_opportunity_user_segment || '_' || sfdc_opportunity.sales_qualified_source AS key_segment_sqs,
-    report_opportunity_user_segment || '_' || deal_group AS key_segment_ot,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo AS key_segment_geo,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || sfdc_opportunity.sales_qualified_source AS key_segment_geo_sqs,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || deal_group AS key_segment_geo_ot,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region AS key_segment_geo_region,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || sfdc_opportunity.sales_qualified_source AS key_segment_geo_region_sqs,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || deal_group AS key_segment_geo_region_ot,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area AS key_segment_geo_region_area,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || sfdc_opportunity.sales_qualified_source AS key_segment_geo_region_area_sqs,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || deal_group AS key_segment_geo_region_area_ot,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_area AS key_segment_geo_area,
+    COALESCE(report_opportunity_user_segment, 'other') AS key_segment,
+    COALESCE(deal_group, 'other') AS key_ot,
+    COALESCE(report_opportunity_user_segment || '_' || key_sqs, 'other') AS key_segment_sqs,
+    COALESCE(report_opportunity_user_segment || '_' || deal_group, 'other') AS key_segment_ot,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo, 'other') AS key_segment_geo,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || key_sqs, 'other') AS key_segment_geo_sqs,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || deal_group, 'other') AS key_segment_geo_ot,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region, 'other') AS key_segment_geo_region,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || key_sqs, 'other') AS key_segment_geo_region_sqs,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || deal_group, 'other') AS key_segment_geo_region_ot,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area, 'other') AS key_segment_geo_region_area,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || key_sqs, 'other') AS key_segment_geo_region_area_sqs,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || deal_group, 'other') AS key_segment_geo_region_area_ot,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_area, 'other') AS key_segment_geo_area,
     COALESCE(
       report_opportunity_user_segment, 'other'
     ) AS sales_team_cro_level,
@@ -1309,7 +1323,7 @@ WITH first_contact  AS (
     LEFT JOIN sfdc_user AS account_owner
       ON sfdc_account.owner_id = account_owner.user_id
     {%- if model_type == 'snapshot' %}
-        AND sfdc_opportunity.snapshot_id = sfdc_user.snapshot_id
+        AND sfdc_opportunity.snapshot_id = account_owner.snapshot_id
     {%- endif %}
     LEFT JOIN live_opportunity_owner_fields
       ON sfdc_opportunity.dim_crm_opportunity_id = live_opportunity_owner_fields.dim_crm_opportunity_id

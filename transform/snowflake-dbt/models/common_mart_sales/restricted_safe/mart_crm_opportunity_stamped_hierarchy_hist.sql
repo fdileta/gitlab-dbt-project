@@ -42,7 +42,7 @@
 
 ), dim_crm_user_hierarchy_stamped_sales_segment AS (
 
-    SELECT 
+    SELECT DISTINCT
       dim_crm_opp_owner_sales_segment_stamped_id,
       crm_opp_owner_sales_segment_stamped,
       crm_opp_owner_sales_segment_stamped_grouped
@@ -143,6 +143,7 @@
       dim_crm_opportunity.churn_contraction_type,
       dim_crm_opportunity.churn_contraction_net_arr_bucket,
       dim_crm_opportunity.dim_crm_user_id AS owner_id,
+      dim_crm_opportunity.resale_partner_name,
       dim_deal_path.deal_path_name,
       dim_order_type.order_type_name                                       AS order_type,
       dim_order_type.order_type_grouped,
@@ -457,6 +458,11 @@
       stage_5_negotiating_date.first_day_of_fiscal_quarter            AS stage_5_negotiating_fiscal_quarter_date,
       stage_5_negotiating_date.fiscal_quarter_name_fy                 AS stage_5_negotiating_fiscal_quarter_name,
       stage_5_negotiating_date.fiscal_year                            AS stage_5_negotiating_fiscal_year,
+      stage_6_awaiting_signature_date.date_actual                     AS stage_6_awaiting_signature_date_date,
+      stage_6_awaiting_signature_date.first_day_of_month              AS stage_6_awaiting_signature_date_month,
+      stage_6_awaiting_signature_date.first_day_of_fiscal_quarter     AS stage_6_awaiting_signature_date_fiscal_quarter_date,
+      stage_6_awaiting_signature_date.fiscal_quarter_name_fy          AS stage_6_awaiting_signature_date_fiscal_quarter_name,
+      stage_6_awaiting_signature_date.fiscal_year                     AS stage_6_awaiting_signature_date_fiscal_year,
       stage_6_closed_won_date.date_actual                             AS stage_6_closed_won_date,
       stage_6_closed_won_date.first_day_of_month                      AS stage_6_closed_won_month,
       stage_6_closed_won_date.first_day_of_fiscal_quarter             AS stage_6_closed_won_fiscal_quarter_date,
@@ -612,6 +618,8 @@
       ON fct_crm_opportunity.stage_4_proposal_date_id = stage_4_proposal_date.date_id
     LEFT JOIN dim_date stage_5_negotiating_date
       ON fct_crm_opportunity.stage_5_negotiating_date_id = stage_5_negotiating_date.date_id
+    LEFT JOIN dim_date stage_6_awaiting_signature_date
+      ON fct_crm_opportunity.stage_6_awaiting_signature_date_id = stage_6_awaiting_signature_date.date_id
     LEFT JOIN dim_date stage_6_closed_won_date
       ON fct_crm_opportunity.stage_6_closed_won_date_id = stage_6_closed_won_date.date_id
     LEFT JOIN dim_date stage_6_closed_lost_date
