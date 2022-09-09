@@ -34,7 +34,7 @@
     SELECT
 
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['structured_events_w_clean_url.event_id']) }}   AS behavior_unstructured_event_pk,
+      {{ dbt_utils.surrogate_key(['structured_events_w_clean_url.event_id']) }}   AS behavior_structured_event_pk,
 
       -- Foreign Keys
       dim_behavior_website_page.dim_behavior_website_page_sk,
@@ -45,9 +45,7 @@
       structured_events_w_clean_url.event_id,
       structured_events_w_clean_url.app_id,
       structured_events_w_clean_url.session_id,
-      structured_events_w_clean_url.user_custom_id,
       structured_events_w_clean_url.user_snowplow_domain_id,
-      structured_events_w_clean_url.user_snowplow_crossdomain_id,
 
       -- Time Attributes
       structured_events_w_clean_url.dvce_created_tstamp,
@@ -61,6 +59,7 @@
       structured_events_w_clean_url.event_value,
       structured_events_w_clean_url.v_tracker,
       structured_events_w_clean_url.session_index,
+      structured_events.contexts,
 
       structured_events_w_clean_url.page_url,
       structured_events_w_clean_url.clean_url_path,
@@ -68,12 +67,6 @@
       structured_events_w_clean_url.page_url_host,
       structured_events_w_clean_url.page_url_path,
       structured_events_w_clean_url.page_url_fragment,
-
-      structured_events_w_clean_url.marketing_medium,
-      structured_events_w_clean_url.marketing_source,
-      structured_events_w_clean_url.marketing_term,
-      structured_events_w_clean_url.marketing_content,
-      structured_events_w_clean_url.marketing_campaign,
 
       structured_events_w_clean_url.browser_name,
       structured_events_w_clean_url.browser_major_version,
@@ -87,7 +80,7 @@
       structured_events_w_clean_url.device_type,
       structured_events_w_clean_url.device_is_mobile,
 
-      -- Google Keys
+      -- Gitlab Standard Context fields
       structured_events_w_clean_url.gsc_google_analytics_client_id,
       structured_events_w_clean_url.gsc_pseudonymized_user_id,
       structured_events_w_clean_url.gsc_environment,
