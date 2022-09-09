@@ -39,9 +39,10 @@ access_levels AS (
 ),
 
 -- Group and Project Share act as direct membership, 
--- uninonig them here includes them in inheritance checks on downstream memberships
+-- unioning them here includes them in inheritance checks on downstream memberships
 direct_share AS (
   SELECT
+    direct_membership.direct_member_pk AS unique_id,
     direct_membership.member_id,
     direct_membership.user_id,
     direct_membership.namespace_id,
@@ -53,6 +54,7 @@ direct_share AS (
   UNION ALL
 
   SELECT
+    group_share.group_share_pk,
     group_share.share_id,
     group_share.received_namespace_id, -- stand in for user_id
     group_share.shared_namespace_id,
@@ -65,6 +67,7 @@ direct_share AS (
 -- Backdoor into inheritance by looking for direct membership for any up stream namespaces
 direct_lineage AS (
   SELECT
+    direct_share.unique_id,
     direct_share.member_id,
     direct_share.user_id,
     direct_share.namespace_id,
@@ -79,18 +82,22 @@ direct_lineage AS (
 ),
 
 direct_lineage_flatten AS (
-  SELECT
-    direct_lineage.*,
+  SELECT DISTINCT
+    --direct_lineage.*,
+    direct_lineage.namespace_id,
+    direct_lineage.lineage_valid_from,
     lineage.value::INTEGER AS lineage_namespace_id
   FROM direct_lineage
   INNER JOIN LATERAL FLATTEN(INPUT =>upstream_lineage) AS lineage
+  WHERE lineage_namespace_id != direct_lineage.namespace_id
 ),
 
 full_direct_membership AS (
   SELECT
+    direct_share.unique_id,
     direct_share.user_id,
     direct_lineage_flatten.namespace_id,
-    LEAST(direct_lineage_flatten.access_level, direct_share.access_level) AS access_level,
+    direct_share.access_level,
     GREATEST(
       direct_lineage_flatten.lineage_valid_from,
       direct_share.membership_created_at
@@ -102,12 +109,13 @@ full_direct_membership AS (
   FROM direct_lineage_flatten
   INNER JOIN direct_share
     ON direct_lineage_flatten.lineage_namespace_id = direct_share.namespace_id
-      AND direct_lineage_flatten.member_id != direct_share.member_id
-      AND direct_lineage_flatten.namespace_id != direct_share.namespace_id
+      --AND direct_lineage_flatten.unique_id != direct_share.unique_id
+      --AND direct_lineage_flatten.namespace_id != direct_share.namespace_id
 
   UNION
 
   SELECT
+    unique_id,
     user_id,
     namespace_id,
     access_level,
@@ -121,12 +129,14 @@ full_direct_membership AS (
 
 combine AS (
   SELECT
+    unique_id,
     user_id,
     namespace_id,
     access_level,
     access_at,
+    source_member_id AS source_share_id,
     source_member_id,
-    namespace_id AS source_namespace_id,
+    source_namespace_id,
     membership_type
   FROM full_direct_membership
   WHERE source_member_type NOT IN ('Group', 'Project')
@@ -134,17 +144,20 @@ combine AS (
   UNION ALL
 
   SELECT
+    shared.unique_id,
     full_direct_membership.user_id,
     shared.namespace_id,
     LEAST(shared.access_level, full_direct_membership.access_level) AS access_level,
     GREATEST(shared.access_at, full_direct_membership.access_at) AS access_at,
-    shared.source_member_id,
+    shared.source_member_id AS source_share_id,
+    full_direct_membership.source_member_id,
     shared.user_id AS source_namespace_id,
     shared.membership_type AS membership_type
   FROM full_direct_membership
   INNER JOIN full_direct_membership AS shared
     ON shared.user_id = full_direct_membership.namespace_id
       AND shared.source_member_type IN ('Group', 'Project')
+  WHERE full_direct_membership.source_member_type NOT IN ('Group', 'Project')
 
 ),
 
@@ -153,7 +166,7 @@ fct AS (
   SELECT
     -- Primary Key
     {{ 
-      dbt_utils.surrogate_key(['combine.user_id','combine.namespace_id','combine.source_member_id']) 
+      dbt_utils.surrogate_key(['combine.user_id','combine.namespace_id','combine.source_member_id','combine.source_share_id']) 
     }} AS user_membership_pk,
 
     -- Foreign Keys
@@ -165,8 +178,10 @@ fct AS (
     combine.user_id,
     combine.namespace_id AS namespace_id,
     combine.source_member_id,
+    combine.source_share_id,
 
     -- Degenerate Dimensions
+    combine.unique_id,
     combine.access_level,
     access_levels.access_level_name,
     combine.membership_type,
