@@ -59,7 +59,7 @@
       structured_events_w_clean_url.event_value,
       structured_events_w_clean_url.v_tracker,
       structured_events_w_clean_url.session_index,
-      structured_events.contexts,
+      structured_events_w_clean_url.contexts,
 
       structured_events_w_clean_url.page_url,
       structured_events_w_clean_url.clean_url_path,
