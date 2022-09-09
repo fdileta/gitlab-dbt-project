@@ -50,6 +50,7 @@ sources,Related to sources
 social,Related to social media data
 tdf,Trusted Data Framework
 thanos,Prometheus Data pipeline
+true_up, Related to true ups
 user_snapshots, For CRM user snapshots
 workspace, Related to team workspaces
 version_db,Relates to the Version Database
