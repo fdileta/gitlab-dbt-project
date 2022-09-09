@@ -749,9 +749,6 @@ WITH date_details AS (
           THEN opp_snapshot.incremental_acv 
         ELSE 0 
       END                                                         AS created_in_snapshot_quarter_iacv,
-
-      -- field used for FY21 bookings reporitng
-      sfdc_opportunity_xf.account_owner_team_stamped, 
      
       -- temporary, to deal with global reports that use account_owner_team_stamp field
       CASE 
