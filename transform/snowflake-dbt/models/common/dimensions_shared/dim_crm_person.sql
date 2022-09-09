@@ -66,6 +66,7 @@ WITH crm_person AS (
       leandata_matched_account_billing_postal_code,
       leandata_matched_account_billing_country,
       leandata_matched_account_employee_count,
+      leandata_matched_account_sales_segment,
       zoominfo_contact_city,
       zoominfo_contact_state,
       zoominfo_contact_country,
@@ -96,5 +97,5 @@ WITH crm_person AS (
     created_by="@jjstark",
     updated_by="@rkohnke",
     created_date="2020-09-10",
-    updated_date="2022-09-07"
+    updated_date="2022-09-09"
 ) }}
