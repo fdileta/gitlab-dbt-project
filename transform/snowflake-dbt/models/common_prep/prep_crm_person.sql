@@ -94,6 +94,7 @@ WITH biz_person AS (
       mailing_country                               AS country,
       mailing_state                                 AS state,
       last_activity_date,
+      NULL                                          AS employee_bucket,
       account_demographics_sales_segment,
       account_demographics_sales_segment_grouped,
       account_demographics_geo,
@@ -117,15 +118,19 @@ WITH biz_person AS (
       NULL                                          AS cognism_city,
       NULL                                          AS cognism_state,
       NULL                                          AS cognism_country,
+      cognism_employee_count,
       NULL                                          AS leandata_matched_account_billing_state,
       NULL                                          AS leandata_matched_account_billing_postal_code,
       NULL                                          AS leandata_matched_account_billing_country,
+      NULL                                          AS leandata_matched_account_employee_count,
       zoominfo_contact_city,
       zoominfo_contact_state,
       zoominfo_contact_country,
       zoominfo_company_city,
       zoominfo_company_state,
-      zoominfo_company_country
+      zoominfo_company_country,
+      NULL                                           AS zoominfo_company_employee_count
+
 
     FROM sfdc_contacts
     LEFT JOIN biz_person_with_touchpoints
@@ -188,6 +193,7 @@ WITH biz_person AS (
       country,
       state,
       last_activity_date,
+      employee_bucket,
       account_demographics_sales_segment,
       account_demographics_sales_segment_grouped,
       account_demographics_geo,
@@ -210,15 +216,18 @@ WITH biz_person AS (
       cognism_city,
       cognism_state,
       cognism_country,
+      cognism_employee_count,
       leandata_matched_account_billing_state,
       leandata_matched_account_billing_postal_code,
       leandata_matched_account_billing_country,
+      leandata_matched_account_employee_count,
       zoominfo_contact_city,
       zoominfo_contact_state,
       zoominfo_contact_country,
       zoominfo_company_city,
       zoominfo_company_state,
-      zoominfo_company_country
+      zoominfo_company_country,
+      zoominfo_company_employee_count
 
     FROM sfdc_leads
     LEFT JOIN biz_person_with_touchpoints
@@ -248,7 +257,7 @@ WITH biz_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@degan",
+    updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-08-09"
+    updated_date="2022-09-07"
 ) }}
