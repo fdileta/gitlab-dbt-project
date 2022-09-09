@@ -2,14 +2,17 @@
     tags=["product", "mnpi_exception"]
 ) }}
 
+{{
+  config({
+    "materialized": "table"
+  })
+}}
+
 {{ simple_cte([
     ('bdg_subscription_product_rate_plan', 'bdg_subscription_product_rate_plan'),
     ('seat_link', 'fct_usage_self_managed_seat_link'),
-    ('ping_instance_wave', 'fct_ping_instance_metric_wave'),
-    ('dim_host_instance_type','dim_host_instance_type'),
-    ('dim_subscription', 'dim_subscription'),
-    ('dim_product_detail', 'dim_product_detail')
-
+    ('ping_instance_wave', 'wk_fct_ping_instance_metric_gainsight_wave'),
+    ('dim_host_instance_type','dim_host_instance_type')
 ]) }}
 
 , instance_type_ordering AS (
@@ -29,7 +32,9 @@
 , sm_subscriptions AS (
 
     SELECT DISTINCT
-      dim_subscription_id
+      dim_subscription_id,
+      dim_subscription_id_original,
+      dim_billing_account_id
     FROM bdg_subscription_product_rate_plan
     WHERE product_delivery_type = 'Self-Managed'
 
@@ -52,8 +57,8 @@
 
     SELECT 
       ping_instance_wave_sm.dim_subscription_id,
-      dim_subscription.dim_subscription_id_original,
-      dim_subscription.dim_billing_account_id,
+      sm_subscriptions.dim_subscription_id_original,
+      sm_subscriptions.dim_billing_account_id,
       ping_instance_wave_sm.ping_created_date_month                                                      AS snapshot_month,
       {{ get_date_id('ping_instance_wave_sm.ping_created_date_month') }}                                 AS snapshot_date_id,
       seat_link.report_date                                                                              AS seat_link_report_date,
@@ -104,7 +109,7 @@
       ping_instance_wave_sm.user_container_scanning_jobs_28_days_user,
       ping_instance_wave_sm.object_store_packages_enabled,
       ping_instance_wave_sm.projects_with_packages_all_time_event,
-      ping_instance_wave_sm.projects_with_packages_28_days_user,
+      ping_instance_wave_sm.projects_with_packages_28_days_event,
       ping_instance_wave_sm.deployments_28_days_user,
       ping_instance_wave_sm.releases_28_days_user,
       ping_instance_wave_sm.epics_28_days_user,
@@ -264,14 +269,12 @@
                                 ping_instance_wave_sm.dim_instance_id,
                                 ping_instance_wave_sm.hostname,
                                 is_data_in_subscription_month
-                               ORDER BY sm_subscriptions.snapshot_month DESC
+                               ORDER BY ping_instance_wave_sm.ping_created_date_month DESC
                             ) = 1,
           TRUE, FALSE)                                                                                   AS is_latest_data
     FROM ping_instance_wave_sm
     JOIN sm_subscriptions
       ON sm_subscriptions.dim_subscription_id = ping_instance_wave_sm.dim_subscription_id 
-    LEFT JOIN dim_subscription 
-      ON ping_instance_wave_sm.dim_subscription_id = dim_subscription.dim_subscription_id
     LEFT JOIN seat_link
       ON ping_instance_wave_sm.dim_subscription_id = seat_link.dim_subscription_id
       AND ping_instance_wave_sm.ping_created_date_month = seat_link.snapshot_month
@@ -281,7 +284,7 @@
     -- QUALIFY ROW_NUMBER() OVER (
     --   PARTITION BY 
     --     ping_instance_wave_sm.ping_created_date_month,
-    --     ping_instance_wave_sm.dim_subscription_id_original,
+    --     sm_subscriptions.dim_subscription_id_original,
     --     ping_instance_wave_sm.dim_instance_id,
     --     ping_instance_wave_sm.hostname
     --     ORDER BY 
