@@ -15,7 +15,8 @@
     ('dim_date','dim_date'),
     ('bdg_namespace_subscription','bdg_namespace_order_subscription_monthly'),
     ('gainsight_wave_metrics','gainsight_wave_metrics'),
-    ('instance_types', 'dim_host_instance_type')
+    ('instance_types', 'dim_host_instance_type'),
+    ('dim_subscription', 'dim_subscription')
 ]) }}
 
 , instance_types_ordering AS (
@@ -39,6 +40,7 @@
       prep_saas_usage_ping_namespace.counter_value,
       dim_date.first_day_of_month                           AS reporting_month, 
       bdg_namespace_subscription.dim_subscription_id,
+      dim_subscription.dim_subscription_id_original,
       instance_types_ordering.instance_type
     FROM prep_saas_usage_ping_namespace
     LEFT JOIN instance_types_ordering
@@ -51,15 +53,19 @@
       AND namespace_order_subscription_match_status = 'Paid All Matching'
     INNER JOIN gainsight_wave_metrics
       ON prep_saas_usage_ping_namespace.ping_name = gainsight_wave_metrics.metric_name
+    INNER JOIN dim_subscription
+      ON bdg_namespace_subscription.dim_subscription_id = dim_subscription.dim_subscription_id
     QUALIFY ROW_NUMBER() OVER (
       PARTITION BY 
         dim_date.first_day_of_month,
-        bdg_namespace_subscription.dim_subscription_id,
+        dim_subscription.dim_subscription_id_original,
         prep_saas_usage_ping_namespace.dim_namespace_id,
         prep_saas_usage_ping_namespace.ping_name
-        ORDER BY 
-          prep_saas_usage_ping_namespace.ping_date DESC,
-          instance_types_ordering.ordering_field ASC --prioritizing Production instances
+      ORDER BY 
+        prep_saas_usage_ping_namespace.ping_date DESC,
+        instance_types_ordering.ordering_field ASC, --prioritizing Production instances
+        dim_subscription.subscription_version DESC
+
     ) = 1
 
 ), pivoted AS (
@@ -67,12 +73,13 @@
     SELECT
       dim_namespace_id,
       dim_subscription_id,
+      dim_subscription_id_original,
       reporting_month,
       instance_type,
       MAX(ping_date)                                        AS ping_date,
       {{ dbt_utils.pivot('ping_name', gainsight_wave_metrics, then_value='counter_value') }}
     FROM joined
-    {{ dbt_utils.group_by(n=4)}}
+    {{ dbt_utils.group_by(n=5)}}
 
 )
 

@@ -9,7 +9,7 @@
 }}
 
 {{ simple_cte([
-    ('saas_usage_ping', 'wk_prep_saas_usage_ping_subscription_mapped_gainsight_metrics'),
+    ('saas_usage_ping', 'wk_fct_saas_usage_ping_subscription_mapped_gainsight_metrics'),
     ('bdg_subscription_product_rate_plan', 'bdg_subscription_product_rate_plan'),
     ('gitlab_subscriptions', 'gitlab_dotcom_gitlab_subscriptions_snapshots_namespace_id_base'),
     ('dates', 'dim_date'),
@@ -20,7 +20,6 @@
 
     SELECT DISTINCT
       bdg_subscription_product_rate_plan.dim_subscription_id,
-      bdg_subscription_product_rate_plan.dim_subscription_id_original,
       bdg_subscription_product_rate_plan.dim_billing_account_id
     FROM bdg_subscription_product_rate_plan
     LEFT JOIN charges 
@@ -59,7 +58,7 @@
 
     SELECT
       saas_usage_ping.dim_subscription_id,
-      saas_subscriptions.dim_subscription_id_original,
+      saas_usage_ping.dim_subscription_id_original,
       saas_subscriptions.dim_billing_account_id,
       saas_usage_ping.dim_namespace_id,
       saas_usage_ping.reporting_month                                                   AS snapshot_month,
@@ -256,7 +255,7 @@
                             ) = 1,
           TRUE, FALSE)                                                                        AS is_latest_data
     FROM saas_usage_ping
-    LEFT JOIN saas_subscriptions
+    JOIN saas_subscriptions
       ON saas_subscriptions.dim_subscription_id = saas_usage_ping.dim_subscription_id
     LEFT JOIN gitlab_seats
       ON saas_usage_ping.dim_namespace_id = gitlab_seats.namespace_id

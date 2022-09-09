@@ -11,14 +11,15 @@
 {{ simple_cte([
     ('fct_ping_instance', 'fct_ping_instance'),
     ('gainsight_wave_metrics','gainsight_wave_metrics'),
-    ('dim_ping_instance','dim_ping_instance')
+    ('dim_ping_instance','dim_ping_instance'),
+    ('fct_ping_instance_metric', 'fct_ping_instance_metric')
 
 ]) }}
 
 
 , fct_ping_instance_metric_with_license  AS (
     SELECT *
-    FROM {{ ref('fct_ping_instance_metric') }}
+    FROM fct_ping_instance_metric
     WHERE license_md5 IS NOT NULL
 )
 

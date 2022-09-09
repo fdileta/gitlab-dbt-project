@@ -281,16 +281,16 @@
     LEFT JOIN instance_type_ordering 
       ON ping_instance_wave_sm.dim_instance_id = instance_type_ordering.instance_uuid
       AND ping_instance_wave_sm.hostname = instance_type_ordering.instance_hostname
-    -- QUALIFY ROW_NUMBER() OVER (
-    --   PARTITION BY 
-    --     ping_instance_wave_sm.ping_created_date_month,
-    --     sm_subscriptions.dim_subscription_id_original,
-    --     ping_instance_wave_sm.dim_instance_id,
-    --     ping_instance_wave_sm.hostname
-    --     ORDER BY 
-    --       ping_instance_wave_sm.ping_created_at DESC,
-    --       instance_type_ordering.ordering_field ASC --prioritizing Production instances
-    -- ) = 1
+    QUALIFY ROW_NUMBER() OVER (
+      PARTITION BY 
+        ping_instance_wave_sm.ping_created_date_month,
+        sm_subscriptions.dim_subscription_id_original,
+        ping_instance_wave_sm.dim_instance_id,
+        ping_instance_wave_sm.hostname
+        ORDER BY 
+          ping_instance_wave_sm.ping_created_at DESC,
+          instance_type_ordering.ordering_field ASC --prioritizing Production instances
+    ) = 1
 
 )   
 
