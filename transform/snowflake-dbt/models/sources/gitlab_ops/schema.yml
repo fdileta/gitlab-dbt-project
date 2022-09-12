@@ -50,7 +50,7 @@ models:
         tags: ["tdf","gitlab_ops"]
         tests:
           - not_null
-          - dbt_utils.unique_where:
+          - unique:
               where: "valid_to = NULL"
       - name: valid_from
         tags: ["tdf","gitlab_ops"]
@@ -80,7 +80,7 @@ models:
         tags: ["tdf","gitlab_ops"]
         tests:
           - not_null
-          - dbt_utils.unique_where:
+          - unique:
               where: "valid_to = NULL"
       - name: valid_from
         tags: ["tdf","gitlab_ops"]
