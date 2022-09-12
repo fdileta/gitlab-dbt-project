@@ -58,6 +58,14 @@ WITH sfdc_opportunity AS (
 ), sfdc_opportunity_xf AS (
 
    SELECT
+    -- JK 20220912 Pending fields to be added to the edm mart
+    sfdc_opportunity_xf.stage_6_awaiting_signature_date,
+    -- NF 20220727 These next fields are needed for custom logic down the line
+    sfdc_opportunity_xf.incremental_acv,
+    sfdc_opportunity_xf.net_incremental_acv,
+    sfdc_opportunity_xf.is_deleted,
+
+
     edm_opty.dbt_updated_at                   AS _last_dbt_run,
     edm_opty.dim_crm_account_id               AS account_id,
     edm_opty.dim_crm_opportunity_id           AS opportunity_id,
@@ -148,8 +156,6 @@ WITH sfdc_opportunity AS (
     edm_opty.stage_3_technical_evaluation_date,
     edm_opty.stage_4_proposal_date,
     edm_opty.stage_5_negotiating_date,
-    
-    sfdc_opportunity_xf.stage_6_awaiting_signature_date,
     
     edm_opty.stage_6_closed_won_date,
     edm_opty.stage_6_closed_lost_date,
@@ -629,13 +635,8 @@ WITH sfdc_opportunity AS (
     WHEN edm_opty.dim_crm_opportunity_id IN ('0064M00000ZGpfQQAT','0064M00000ZGpfVQAT','0064M00000ZGpfGQAT')
         THEN 1
     ELSE 0
-    END                                                                       AS is_excluded_flag,
-    ----------------------------------------------------------------
-    ----------------------------------------------------------------
-    -- NF 20220727 These next fields are needed for custom logic down the line
-    sfdc_opportunity_xf.incremental_acv,
-    sfdc_opportunity_xf.net_incremental_acv,
-    sfdc_opportunity_xf.is_deleted
+    END                                                                       AS is_excluded_flag
+    
     -----------------------------------------------
 
     FROM legacy_sfdc_opportunity_xf AS sfdc_opportunity_xf
