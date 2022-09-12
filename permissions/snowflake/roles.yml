@@ -3739,6 +3739,38 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - ngalang_prep
+                - ngalang_prod
+            schemas:
+                - ngalang_prep.*
+                - ngalang_prod.*
+            tables:
+                - ngalang_prep.*.*
+                - ngalang_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - ngalang_prep
+                    - ngalang_prod
+                write:
+                    - ngalang_prep
+                    - ngalang_prod
+            schemas:
+                read:
+                    - ngalang_prep.*
+                    - ngalang_prod.*
+                write:
+                    - ngalang_prep.*
+                    - ngalang_prod.*
+            tables:
+                read:
+                    - ngalang_prep.*.*
+                    - ngalang_prod.*.*
+                write:
+                    - ngalang_prep.*.*
+                    - ngalang_prod.*.*
 
     - nkhanna:
         member_of:
