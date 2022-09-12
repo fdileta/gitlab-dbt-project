@@ -1,3 +1,6 @@
 version: 2
 
-#models:
+models:
+  - name: wk_customers_db_license_versions
+    tags: ["exception", "product"]
+    description: Self-managed EE instances will send seat link information to the customers portal on a daily basis. This information includes a license version data. Additional detail can be found in [this doc](https://gitlab.com/gitlab-org/customers-gitlab-com/-/blob/staging/doc/reconciliations.md).
