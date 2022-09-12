@@ -26,6 +26,7 @@
       fct_behavior_structured_event.app_id,
       fct_behavior_structured_event.session_id,
       fct_behavior_structured_event.user_snowplow_domain_id,
+      
       -- Time Attributes
       fct_behavior_structured_event.dvce_created_tstamp,
       fct_behavior_structured_event.behavior_at,
