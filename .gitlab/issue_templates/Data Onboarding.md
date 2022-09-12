@@ -305,7 +305,7 @@ DBT is our data transformation engine that we use to build our dimensional model
 _Ensure you've set up your SSH configuration in the previous step as this is required to connect to one our dbt packages_
 
 - [ ] Follow the [instructions](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#Venv-workflow) found in the handbook for running and configuring dbt.
-- [ ] Run the `run-dbt` command from the analytics repository.  This will load the dbt dependencies and open a shell to virtual environment where dbt is installed allowing you run dbt commands
+- [ ] Run the `make run-dbt` command from the analytics repository.  This will load the dbt dependencies and open a shell to virtual environment where dbt is installed allowing you run dbt commands
 - [ ] Run `dbt seed` to import the CSV's from the analytics/data into your schema. For dbt to compile this needs to be completed as some of the models have dependencies on the tables which are created by the CSV's.
 - [ ] Run `dbt run --models +staging.sfdc` from within the shell to know that your connection has been successful, you are in the correct location, and everything will run smoothly.  For more details on the syntax for how to select and run the models, please refer to this [page](https://docs.getdbt.com/reference/node-selection/syntax#examples).  Afterwards, you can also try running `dbt compile` to ensure that the entire project will compile correctly.
 - [ ] Test the command `make help` and use it to understand how to use various `make *` commands available to you.
