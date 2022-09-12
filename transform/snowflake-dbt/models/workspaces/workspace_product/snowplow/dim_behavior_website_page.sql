@@ -1,6 +1,6 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "dim_website_page_sk"
+        unique_key = "dim_behavior_website_page_sk"
 ) }}
 
 {{ simple_cte([
@@ -36,7 +36,7 @@
 
     SELECT DISTINCT
       -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['app_id','page_url_host','clean_url_path']) }}               AS dim_website_page_sk,
+      {{ dbt_utils.surrogate_key(['app_id','page_url_host','clean_url_path']) }}               AS dim_behavior_website_page_sk,
 
       -- Natural Keys
       app_id,
@@ -59,5 +59,5 @@
     created_by="@chrissharp",
     updated_by="@chrissharp",
     created_date="2022-07-22",
-    updated_date="2022-07-22"
+    updated_date="2022-09-02"
 ) }}
