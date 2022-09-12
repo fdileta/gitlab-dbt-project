@@ -3600,7 +3600,7 @@ roles:
                 - mpetersen_prod
             schemas:
                 - mpetersen_prep.*
-                -mpetersen_prod.*
+                - mpetersen_prod.*
             tables:
                 - mpetersen_prep.*.*
                 - mpetersen_prod.*.*
