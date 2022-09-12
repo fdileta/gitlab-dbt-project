@@ -111,6 +111,44 @@ models:
         tests:
           - not_null
           - unique
+  - name: customers_db_license_versions_source
+    description: '{{ doc("customers_db_orders_source") }}'
+    columns:
+      - name: item_id
+        tags:
+          - customers_db
+        tests:
+          - not_null
+      - name: created_at
+        tags:
+          - customers_db
+        tests:
+          - not_null
+      - name: item_type
+        tags:
+          - customers_db
+        tests:
+          - not_null
+      - name: event
+        tags:
+          - customers_db
+        tests:
+          - not_null
+      - name: whodunnit
+        tags:
+          - customers_db
+        meta:
+          sensitive: true
+      - name: object
+        tags:
+          - customers_db
+        meta:
+          sensitive: true
+      - name: object_changes
+        tags:
+          - customers_db
+        meta:
+          sensitive: true
   - name: customers_db_orders_source
     description: '{{ doc("customers_db_orders_source") }}'  
     columns:

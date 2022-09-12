@@ -26,3 +26,7 @@ This model is the data from tap-postgres for the orders table from customers.git
 {% docs customers_db_trial_histories_source %}
 This model is the data from tap-postgres for the trial_histories table from customers.gitlab.com. The schema of the database is defined in [this ruby code](https://gitlab.com/gitlab-org/customers-gitlab-com/blob/master/db/schema.rb).
 {% enddocs %}
+
+{% customers_db_license_versions_source %}
+This table contains data from licenses versions in customers portal.
+{% enddocs %}
