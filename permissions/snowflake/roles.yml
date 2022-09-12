@@ -3787,6 +3787,38 @@ roles:
             - zuora_query_api
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - nraisinghani_prep
+                - nraisinghani_prod
+            schemas:
+                - nraisinghani_prep.*
+                - nraisinghani_prod.*
+            tables:
+                - nraisinghani_prep.*.*
+                - nraisinghani_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - nraisinghani_prep
+                    - nraisinghani_prod
+                write:
+                    - nraisinghani_prep
+                    - nraisinghani_prod
+            schemas:
+                read:
+                    - nraisinghani_prep.*
+                    - nraisinghani_prod.*
+                write:
+                    - nraisinghani_prep.*
+                    - nraisinghani_prod.*
+            tables:
+                read:
+                    - nraisinghani_prep.*.*
+                    - nraisinghani_prod.*.*
+                write:
+                    - nraisinghani_prep.*.*
+                    - nraisinghani_prod.*.*
 
     - ofalkenhof:
         member_of:
