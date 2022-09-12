@@ -170,6 +170,9 @@ models:
       - name: lead_id
         tests:
           - not_null
+      - name: email
+        meta:
+          sensitive: true
   - name: marketo_activity_email_bounced_source
     columns:
       - name: marketo_activity_email_bounced_id
@@ -179,6 +182,9 @@ models:
       - name: lead_id
         tests:
           - not_null
+      - name: email
+        meta:
+          sensitive: true
   - name: marketo_activity_email_delivered_source
     columns:
       - name: marketo_activity_email_delivered_id

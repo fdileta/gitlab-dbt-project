@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: marketo_activity_email_bounced_soft_source_pii
+    columns:
+      - name: marketo_activity_email_bounced_soft_id
+        tests:
+          - not_null
+          - unique
+      - name: lead_id
+        tests:
+          - not_null
+  - name: marketo_activity_email_bounced_source_pii
+    columns:
+      - name: marketo_activity_email_bounced_id
+        tests:
+          - not_null
+          - unique
+      - name: lead_id
+        tests:
+          - not_null

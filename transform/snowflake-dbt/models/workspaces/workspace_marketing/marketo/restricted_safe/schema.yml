@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: wk_marketo_activity_email_bounced_soft_pii
+    description: Marketo activity email tables
+  - name: wk_marketo_activity_email_bounced_pii
+    description: Marketo activity email tables
