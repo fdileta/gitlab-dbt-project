@@ -67,7 +67,7 @@ clone_data_science_ptp_repo_cmd = f"""
 # Create the DAG
 # Run Every Monday
 dag = DAG(
-    "propensity_to_purchase_trial_ptpt",
+    "ds_propensity_to_purchase_trial",
     default_args=default_args,
     schedule_interval="0 5 * * 1",
 )
