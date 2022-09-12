@@ -107,10 +107,12 @@
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_touchpoint_date_normalized,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_integrated_campaign_grouping,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_marketing_channel_path,
+      rpt_sfdc_bizible_tp_person_lifecycle.bizible_marketing_channel,
+      
       CASE
         WHEN rpt_sfdc_bizible_tp_person_lifecycle.region = 'NORAM' THEN 'AMER'
         ELSE rpt_sfdc_bizible_tp_person_lifecycle.region
-      END AS region_normalized, -- 5
+      END AS region_normalized, -- 7
       IFF(rpt_sfdc_bizible_tp_person_lifecycle.sales_segment_name IS null,'Unknown',rpt_sfdc_bizible_tp_person_lifecycle.sales_segment_name) AS sales_segment_name,
       rpt_sfdc_bizible_tp_person_lifecycle.crm_person_status,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_touchpoint_type,
@@ -120,19 +122,19 @@
       null AS sales_accepted_date,
       null AS close_date,
       null AS stage_name,
-      null AS is_won,-- 15
+      null AS is_won,-- 17
       null AS is_sao,
       null AS deal_path_name,
       null AS order_type,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_landing_page,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_form_url,
-      rpt_sfdc_bizible_tp_person_lifecycle.dim_crm_account_id, --20
+      rpt_sfdc_bizible_tp_person_lifecycle.dim_crm_account_id, --24
       null AS dim_crm_opportunity_id,
       rpt_sfdc_bizible_tp_person_lifecycle.crm_account_name AS crm_account_name,
       rpt_sfdc_bizible_tp_person_lifecycle.crm_account_gtm_strategy,
       UPPER(rpt_sfdc_bizible_tp_person_lifecycle.person_country) AS country,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_medium AS bizible_medium,
-      rpt_sfdc_bizible_tp_person_lifecycle.touchpoint_segment, -- 25
+      rpt_sfdc_bizible_tp_person_lifecycle.touchpoint_segment, -- 30
       rpt_sfdc_bizible_tp_person_lifecycle.gtm_motion,
       rpt_sfdc_bizible_tp_person_lifecycle.last_utm_campaign,
       rpt_sfdc_bizible_tp_person_lifecycle.last_utm_content,
@@ -196,7 +198,7 @@
       0 AS won_custom_net_arr,
       0 AS won_linear_net_arr
     FROM rpt_sfdc_bizible_tp_person_lifecycle
-    {{ dbt_utils.group_by(n=41) }}
+    {{ dbt_utils.group_by(n=42) }}
     UNION ALL
     SELECT
       rpt_sfdc_bizible_linear.dim_crm_touchpoint_id,
@@ -204,6 +206,7 @@
       rpt_sfdc_bizible_linear.bizible_touchpoint_date_normalized AS opp_touchpoint_date_normalized,
       rpt_sfdc_bizible_linear.bizible_integrated_campaign_grouping AS opp_integrated_campaign_grouping,
       rpt_sfdc_bizible_linear.marketing_channel_path,
+      rpt_sfdc_bizible_linear.bizible_marketing_channel,
     CASE
       WHEN rpt_sfdc_bizible_linear.crm_user_region = 'NORAM' THEN 'AMER'
       ELSE rpt_sfdc_bizible_linear.crm_user_region
@@ -365,7 +368,7 @@
         ELSE 0
       END AS won_linear_net_arr
     FROM rpt_sfdc_bizible_linear
-    {{ dbt_utils.group_by(n=41) }}
+    {{ dbt_utils.group_by(n=42) }}
 
 ), final AS (
 
