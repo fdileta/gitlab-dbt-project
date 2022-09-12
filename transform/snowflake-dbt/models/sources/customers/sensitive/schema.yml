@@ -7,5 +7,9 @@ models:
           tests:
               - not_null
               - unique
-
-
+  - name: customers_db_license_versions
+    description: Model for License Versions sensitive data
+    columns:
+        - name: item_id
+          tests:
+              - not_null
