@@ -1,7 +1,7 @@
 WITH source AS (
 
     SELECT *
-    FROM {{ ref('customers_db_license_version') }}
+    FROM {{ source('customers', 'customers_db_license_versions') }}
 
 ), renamed AS (
 
@@ -10,7 +10,7 @@ WITH source AS (
       created_at::TIMESTAMP                               AS created_at,
       item_type::VARCHAR                                  AS item_type,
       event::VARCHAR                                      AS event,
-      whodounnit::VARCHAR                                 AS whodounnit,
+      whodunnit::VARCHAR                                  AS whodunnit,
       object::VARCHAR                                     AS object,
       object_changes::VARCHAR                             AS object_changes,
       DATEADD('s', _uploaded_at, '1970-01-01')::TIMESTAMP AS _uploaded_at
