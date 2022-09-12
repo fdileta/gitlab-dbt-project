@@ -106,6 +106,7 @@ renamed AS (
     sequence_step_type2__c AS sequence_step_type,
     actively_being_sequenced__c::BOOLEAN AS is_actively_being_sequenced,
     gaclientid__c AS ga_client_id,
+    employee_buckets__c AS employee_bucket,
 
 
     {{ sfdc_source_buckets('leadsource') }}
@@ -163,11 +164,13 @@ renamed AS (
     cognism_city__c as cognism_city,
     cognism_state__c as cognism_state,
     cognism_country__c as cognism_country,
+    cognism_number_of_employees__c AS cognism_employee_count,
 
     --LeanData
     leandata__matched_account_billing_state__c as leandata_matched_account_billing_state,
     leandata__matched_account_billing_postal_code__c as leandata_matched_account_billing_postal_code,
     leandata__matched_account_billing_country__c as leandata_matched_account_billing_country,
+    leandata__matched_account_employees__c AS leandata_matched_account_employee_count,
 
 
     --metadata

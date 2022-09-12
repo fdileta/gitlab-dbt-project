@@ -88,6 +88,7 @@
         WHEN bizible_marketing_channel_path IS null AND dim_parent_campaign_id LIKE '%7014M000001dn8M%' THEN 'Paid Social.LinkedIn Lead Gen'
         ELSE mart_crm_touchpoint.bizible_marketing_channel_path
       END AS bizible_marketing_channel_path,
+      mart_crm_touchpoint.bizible_marketing_channel,
       mart_crm_touchpoint.bizible_landing_page,
       mart_crm_touchpoint.bizible_form_url,
       mart_crm_touchpoint.bizible_referrer_page,
@@ -163,5 +164,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-01-25",
-    updated_date="2022-05-25"
+    updated_date="2022-09-06"
 ) }}
