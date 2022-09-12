@@ -56,7 +56,7 @@ sources:
           - name: report_timestamp
             tests:
               - not_null
-      - name: customers_db_license_versions_source
+      - name: customers_db_license_versions
         columns:
         - name: id
           tests:
