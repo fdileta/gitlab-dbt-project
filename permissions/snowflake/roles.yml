@@ -141,7 +141,7 @@ databases:
 
     - mpetersen_prod:
         shared: no
-    - mpetersen_prrep:
+    - mpetersen_prep:
         shared: no
 
     - mramirez_prod:
