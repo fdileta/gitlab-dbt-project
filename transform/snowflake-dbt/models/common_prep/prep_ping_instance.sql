@@ -63,7 +63,7 @@
     FROM usage_data
     LEFT JOIN raw_usage_data
       ON usage_data.raw_usage_data_id = raw_usage_data.raw_usage_data_id
-    WHERE usage_data.ping_created_at <= (select max(created_at) from raw_usage_data)
+    WHERE usage_data.ping_created_at <= (SELECT MAX(created_at) FROM raw_usage_data)
 
 
 )
