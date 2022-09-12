@@ -146,6 +146,7 @@
       dim_crm_person.account_demographics_upa_postal_code,
       dim_crm_person.cognism_employee_count,
       dim_crm_person.leandata_matched_account_employee_count,
+      dim_crm_person.leandata_matched_account_sales_segment,
       dim_crm_person.employee_bucket,
       dim_crm_person.zoominfo_company_employee_count,
       fct_crm_person.is_mql,
@@ -234,5 +235,5 @@
     created_by="@iweeks",
     updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-09-07",
+    updated_date="2022-09-09",
   ) }}  

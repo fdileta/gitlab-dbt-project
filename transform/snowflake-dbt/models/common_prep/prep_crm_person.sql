@@ -132,6 +132,7 @@ WITH biz_person AS (
       NULL                                          AS leandata_matched_account_billing_postal_code,
       NULL                                          AS leandata_matched_account_billing_country,
       NULL                                          AS leandata_matched_account_employee_count,
+      NULL                                          AS leandata_matched_account_sales_segment,
       zoominfo_contact_city,
       zoominfo_contact_state,
       zoominfo_contact_country,
@@ -233,6 +234,7 @@ WITH biz_person AS (
       leandata_matched_account_billing_postal_code,
       leandata_matched_account_billing_country,
       leandata_matched_account_employee_count,
+      leandata_matched_account_sales_segment,
       zoominfo_contact_city,
       zoominfo_contact_state,
       zoominfo_contact_country,
@@ -271,5 +273,5 @@ WITH biz_person AS (
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-09-07"
+    updated_date="2022-09-09"
 ) }}
