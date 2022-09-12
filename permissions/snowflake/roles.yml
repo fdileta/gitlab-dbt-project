@@ -2719,12 +2719,45 @@ roles:
                 write:
                     - dvanrooijen_prep.*.*
                     - dvanrooijen_prod.*.*
+
     - eneuberger:
         member_of:
             - analyst_growth
             - restricted_safe
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - eneuberger_prep
+                - eneuberger_prod
+            schemas:
+                - eneuberger_prep.*
+                -eneuberger_prod.*
+            tables:
+                - eneuberger_prep.*.*
+                - eneuberger_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - eneuberger_prep
+                    - eneuberger_prod
+                write:
+                    - eneuberger_prep
+                    - eneuberger_prod
+            schemas:
+                read:
+                    - eneuberger_prep.*
+                    - eneuberger_prod.*
+                write:
+                    - eneuberger_prep.*
+                    - eneuberger_prod.*
+            tables:
+                read:
+                    - eneuberger_prep.*.*
+                    - eneuberger_prod.*.*
+                write:
+                    - eneuberger_prep.*.*
+                    - eneuberger_prod.*.*
 
     - fivetran_role:
         warehouses:
