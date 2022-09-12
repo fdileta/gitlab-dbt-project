@@ -3,6 +3,12 @@ WITH source AS (
   FROM {{ ref('blended_job_info_source') }}
 ),
 
+employee_name AS (
+  SELECT * 
+  FROM {{ ref('blended_directory_source') }}
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY employee_id ORDER BY uploaded_at DESC) = 1
+),
+
 bamboohr_employment_status AS (
   
     SELECT
@@ -26,8 +32,9 @@ cleaned AS (
     SELECT 
       job_sequence,
       source.employee_id,
-      job_title,
+      source.job_title,
       source.effective_date, --the below case when statement is also used in employee_directory_analysis until we upgrade to 0.14.0 of dbt
+      employee_name.employee_id AS reports_to_id,
       CASE WHEN division = 'Alliances' THEN 'Alliances'
            WHEN division = 'Customer Support' THEN 'Customer Support'
            WHEN division = 'Customer Service' THEN 'Customer Success'
@@ -44,6 +51,8 @@ cleaned AS (
       reports_to,
       (LAG(DATEADD('day',-1,source.effective_date), 1) OVER (PARTITION BY source.employee_id ORDER BY source.effective_date DESC, job_sequence DESC)) AS effective_end_date
     FROM source
+    LEFT JOIN employee_name
+      ON employee_name.full_name = source.reports_to
 
     
 ),
@@ -54,6 +63,7 @@ joined AS (
       cleaned.job_sequence,
       cleaned.employee_id,
       cleaned.job_title,
+      cleaned.reports_to_id,
       cleaned.effective_date,
       COALESCE(bamboohr_employment_status.valid_to_date, cleaned.effective_end_date) as effective_end_date,
       cleaned.department,

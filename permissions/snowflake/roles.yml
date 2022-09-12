@@ -29,6 +29,11 @@ databases:
     - testing_db:
         shared: no
 
+    - cbraza_prod:
+        shared: no
+    - cbraza_prep:
+        shared: no
+
     - csharp_prod:
         shared: no
     - csharp_prep:
@@ -52,6 +57,11 @@ databases:
     - dvanrooijen_prod:
         shared: no
     - dvanrooijen_prep:
+        shared: no
+
+    - eneuberger_prod:
+        shared: no
+    - eneuberger_prep:
         shared: no
 
     - ian_prod:
@@ -129,6 +139,11 @@ databases:
     - mlaanen_prep:
         shared: no
 
+    - mpetersen_prod:
+        shared: no
+    - mpetersen_prep:
+        shared: no
+
     - mramirez_prod:
         shared: no
     - mramirez_prep:
@@ -147,6 +162,16 @@ databases:
     - nfiguera_prod:
         shared: no
     - nfiguera_prep:
+        shared: no
+
+    - ngalang_prod:
+        shared: no
+    - ngalang_prep:
+        shared: no
+
+    - nraisinghani_prod:
+        shared: no
+    - nraisinghani_prep:
         shared: no
 
     - parmstrong_prod:
@@ -2476,6 +2501,16 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - cbraza_prep
+                - cbraza_prod
+            schemas:
+                - cbraza_prep.*
+                - cbraza_prod.*
+            tables:
+                - cbraza_prep.*.*
+                - cbraza_prod.*.*
 
     - cmeddaugh:
         member_of:
@@ -2704,12 +2739,45 @@ roles:
                 write:
                     - dvanrooijen_prep.*.*
                     - dvanrooijen_prod.*.*
+
     - eneuberger:
         member_of:
             - analyst_growth
             - restricted_safe
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - eneuberger_prep
+                - eneuberger_prod
+            schemas:
+                - eneuberger_prep.*
+                - eneuberger_prod.*
+            tables:
+                - eneuberger_prep.*.*
+                - eneuberger_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - eneuberger_prep
+                    - eneuberger_prod
+                write:
+                    - eneuberger_prep
+                    - eneuberger_prod
+            schemas:
+                read:
+                    - eneuberger_prep.*
+                    - eneuberger_prod.*
+                write:
+                    - eneuberger_prep.*
+                    - eneuberger_prod.*
+            tables:
+                read:
+                    - eneuberger_prep.*.*
+                    - eneuberger_prod.*.*
+                write:
+                    - eneuberger_prep.*.*
+                    - eneuberger_prod.*.*
 
     - fivetran_role:
         warehouses:
@@ -3546,6 +3614,38 @@ roles:
             - restricted_safe
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - mpetersen_prep
+                - mpetersen_prod
+            schemas:
+                - mpetersen_prep.*
+                - mpetersen_prod.*
+            tables:
+                - mpetersen_prep.*.*
+                - mpetersen_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - mpetersen_prep
+                    - mpetersen_prod
+                write:
+                    - mpetersen_prep
+                    - mpetersen_prod
+            schemas:
+                read:
+                    - mpetersen_prep.*
+                    - mpetersen_prod.*
+                write:
+                    - mpetersen_prep.*
+                    - mpetersen_prod.*
+            tables:
+                read:
+                    - mpetersen_prep.*.*
+                    - mpetersen_prod.*.*
+                write:
+                    - mpetersen_prep.*.*
+                    - mpetersen_prod.*.*
 
     - mramirez:
         member_of:
@@ -3724,6 +3824,38 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - ngalang_prep
+                - ngalang_prod
+            schemas:
+                - ngalang_prep.*
+                - ngalang_prod.*
+            tables:
+                - ngalang_prep.*.*
+                - ngalang_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - ngalang_prep
+                    - ngalang_prod
+                write:
+                    - ngalang_prep
+                    - ngalang_prod
+            schemas:
+                read:
+                    - ngalang_prep.*
+                    - ngalang_prod.*
+                write:
+                    - ngalang_prep.*
+                    - ngalang_prod.*
+            tables:
+                read:
+                    - ngalang_prep.*.*
+                    - ngalang_prod.*.*
+                write:
+                    - ngalang_prep.*.*
+                    - ngalang_prod.*.*
 
     - nkhanna:
         member_of:
@@ -3740,6 +3872,38 @@ roles:
             - zuora_query_api
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - nraisinghani_prep
+                - nraisinghani_prod
+            schemas:
+                - nraisinghani_prep.*
+                - nraisinghani_prod.*
+            tables:
+                - nraisinghani_prep.*.*
+                - nraisinghani_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - nraisinghani_prep
+                    - nraisinghani_prod
+                write:
+                    - nraisinghani_prep
+                    - nraisinghani_prod
+            schemas:
+                read:
+                    - nraisinghani_prep.*
+                    - nraisinghani_prod.*
+                write:
+                    - nraisinghani_prep.*
+                    - nraisinghani_prod.*
+            tables:
+                read:
+                    - nraisinghani_prep.*.*
+                    - nraisinghani_prod.*.*
+                write:
+                    - nraisinghani_prep.*.*
+                    - nraisinghani_prod.*.*
 
     - ofalkenhof:
         member_of:
