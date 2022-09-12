@@ -61,8 +61,10 @@
         ELSE NULL END                                                                                                                             AS product_tier,
         COALESCE(raw_usage_data.raw_usage_data_payload, usage_data.raw_usage_data_payload_reconstructed)                                          AS raw_usage_data_payload
     FROM usage_data
-    INNER JOIN raw_usage_data
+    LEFT JOIN raw_usage_data
       ON usage_data.raw_usage_data_id = raw_usage_data.raw_usage_data_id
+    WHERE usage_data.ping_created_at <= (select max(created_at) from raw_usage_data)
+
 
 )
 
