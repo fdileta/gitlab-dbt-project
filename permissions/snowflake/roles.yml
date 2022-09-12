@@ -59,6 +59,11 @@ databases:
     - dvanrooijen_prep:
         shared: no
 
+    - eneuberger_prod:
+        shared: no
+    - eneuberger_prep:
+        shared: no
+
     - ian_prod:
         shared: no
     - ian_prep:
@@ -134,6 +139,11 @@ databases:
     - mlaanen_prep:
         shared: no
 
+    - mpetersen_prod:
+        shared: no
+    - mpetersen_prrep:
+        shared: no
+
     - mramirez_prod:
         shared: no
     - mramirez_prep:
@@ -152,6 +162,16 @@ databases:
     - nfiguera_prod:
         shared: no
     - nfiguera_prep:
+        shared: no
+
+    - ngalang_prod:
+        shared: no
+    - ngalang_prep:
+        shared: no
+
+    - nraisinghani_prod:
+        shared: no
+    - nraisinghani_prep:
         shared: no
 
     - parmstrong_prod:
