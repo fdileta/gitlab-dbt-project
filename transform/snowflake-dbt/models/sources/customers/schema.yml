@@ -114,6 +114,12 @@ models:
   - name: customers_db_license_versions_source
     description: '{{ doc("customers_db_orders_source") }}'
     columns:
+      - name: id
+        tags:
+          - customers_db
+        tests:
+          - not_null
+          - unique
       - name: item_id
         tags:
           - customers_db
