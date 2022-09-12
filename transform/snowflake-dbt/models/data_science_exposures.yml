@@ -9,6 +9,7 @@ exposures:
     depends_on:
       - ref('mart_arr_snapshot_model')
       - ref('mart_arr_snapshot_bottom_up')
+      - ref('wk_sales_sfdc_opportunity_snapshot_history_xf')
       - ref('mart_crm_attribution_touchpoint')
       - ref('mart_product_usage_paid_user_metrics_monthly')
       - ref('monthly_stage_usage_by_account')
@@ -25,6 +26,7 @@ exposures:
     depends_on:
       - ref('mart_arr_snapshot_model')
       - ref('mart_arr_snapshot_bottom_up')
+      - ref('wk_sales_sfdc_opportunity_snapshot_history_xf')
       - ref('mart_crm_attribution_touchpoint')
       - ref('mart_product_usage_paid_user_metrics_monthly')
       - ref('monthly_stage_usage_by_account')
