@@ -2732,7 +2732,7 @@ roles:
                 - eneuberger_prod
             schemas:
                 - eneuberger_prep.*
-                -eneuberger_prod.*
+                - eneuberger_prod.*
             tables:
                 - eneuberger_prep.*.*
                 - eneuberger_prod.*.*
