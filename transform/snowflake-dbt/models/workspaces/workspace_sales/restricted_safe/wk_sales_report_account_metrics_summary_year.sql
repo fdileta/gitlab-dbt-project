@@ -98,7 +98,7 @@ WITH date_details AS (
         SUM(o.arr_basis)    AS nfy_sfdc_atr
     FROM sfdc_opportunity_xf o
     LEFT JOIN date_details d
-      ON o.quote_start_date = d.date_actual
+      ON o.subscription_start_date = d.date_actual    -- to be changed to quote_start_date
     WHERE o.sales_type = 'Renewal'
       AND stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
       AND amount <> 0
@@ -113,7 +113,7 @@ WITH date_details AS (
         SUM(o.arr_basis)    AS fy_sfdc_atr
     FROM sfdc_opportunity_xf o
     LEFT JOIN date_details d
-      ON o.quote_start_date = d.date_actual
+      ON o.subscription_start_date = d.date_actual  -- to be changed to quote_start_date
     WHERE o.sales_type = 'Renewal'
       AND stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
       AND amount <> 0
@@ -129,7 +129,7 @@ WITH date_details AS (
     FROM sfdc_opportunity_xf o
         CROSS JOIN report_dates d 
     WHERE o.sales_type = 'Renewal'
-    AND o.quote_start_date BETWEEN DATEADD(month, -12,DATE_TRUNC('month',d.report_month_date)) 
+    AND o.subscription_start_date BETWEEN DATEADD(month, -12,DATE_TRUNC('month',d.report_month_date))  -- to be changed to quote_start_date
         AND DATE_TRUNC('month',d.report_month_date)
       AND o.stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
       AND o.amount <> 0
