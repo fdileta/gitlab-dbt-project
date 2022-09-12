@@ -1,6 +1,6 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "behavior_unstructured_event_pk"
+        unique_key = "behavior_structured_event_pk"
 ) }}
 
 -- depends_on: {{ ref('snowplow_structured_events') }}

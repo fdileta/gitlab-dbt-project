@@ -12,7 +12,7 @@ models:
   - name: fct_behavior_structured_event
     description: Atomic fact of [Snowplow structured events](https://docs.gitlab.com/ee/development/snowplow/#structured-event-taxonomy).
     columns: 
-      - name: behavior_unstructured_event_pk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -20,7 +20,7 @@ models:
   - name: fct_behavior_structured_event_experiment
     description: Snowplow structured events filtered related to experiments, enriched with attributes of the experiment.
     columns: 
-      - name: behavior_unstructured_event_pk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -28,7 +28,7 @@ models:
   - name: fct_behavior_structured_event_without_assignment
     description: Snowplow structured events filtered to remove assignment events for performance improvements.
     columns: 
-      - name: behavior_unstructured_event_pk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -36,7 +36,7 @@ models:
   - name: fct_behavior_structured_event_redis_hll_counters
     description: Snowplow structured events filtered to Redis metrics.
     columns: 
-      - name: behavior_unstructured_event_pk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
