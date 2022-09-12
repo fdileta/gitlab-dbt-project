@@ -171,6 +171,7 @@ renamed AS (
     leandata__matched_account_billing_postal_code__c as leandata_matched_account_billing_postal_code,
     leandata__matched_account_billing_country__c as leandata_matched_account_billing_country,
     leandata__matched_account_employees__c AS leandata_matched_account_employee_count,
+    lean_data_matched_account_sales_segment__c AS leandata_matched_account_sales_segment,
 
 
     --metadata
