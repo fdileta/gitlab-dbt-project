@@ -2,6 +2,18 @@ WITH source AS (
 
     SELECT *
     FROM {{ source('customers', 'customers_db_license_versions') }}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY item_id,
+                                            created_at,
+                                            item_type,
+                                            event,
+                                            whodunnit,
+                                            object,
+                                            object_changes
+                               ORDER BY _uploaded_at DESC) = 1
+), dedupe AS (
+
+    SELECT *
+      FROM source
 
 ), renamed AS (
 
@@ -17,7 +29,7 @@ WITH source AS (
       object::VARCHAR                                     AS object,
       object_changes::VARCHAR                             AS object_changes,
       DATEADD('s', _uploaded_at, '1970-01-01')::TIMESTAMP AS _uploaded_at
-    FROM source
+    FROM dedupe
 
 )
 
