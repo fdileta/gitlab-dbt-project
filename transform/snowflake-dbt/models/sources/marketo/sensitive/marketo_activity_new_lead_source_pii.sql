@@ -7,5 +7,3 @@ WITH source AS (
 
 SELECT *
 FROM source
-
-_pii.sql
