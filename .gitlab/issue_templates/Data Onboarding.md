@@ -197,13 +197,13 @@ _**THE SCRIPT SHOULD ONLY BE RUN ON YOUR GITLAB-ISSUED LAPTOP.** If you run this
 
 ### Google Cloud
 
-Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credentials are needed if you plan on connecting on your local machine to airflow or any CGP service (storage buckets, etc.) . Follow below steps to get running instance for yourself.
+Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credentials are needed if you plan on connecting on your local machine to airflow or any GCP service (storage buckets, etc.) . Follow below steps to get running instance for yourself.
 
 - [ ] Compete the [Command Line Interface](#command-line-interface) set up before starting this set up.
     - [ ] Download the json file provided by one of the project owners and move to your home directory (e.g. `/Users/yourusername`)
-    - [ ] Open terminal and run the following command, replacing `yourusername` with your actual user name on your computer (type `pwd` into the terminal if you don’t know it — the path should contain your user name) and `filename.json` with you name of the file.
+    - [ ] Open terminal and run the following command, replacing `filename.json` with you name of the file.
         ```zsh
-        echo 'export GOOGLE_APPLICATION_CREDENTIALS=/Users/yourusername/filename.json' >> ./.zshrc
+        echo 'export GOOGLE_APPLICATION_CREDENTIALS=~/filename.json' >> ~/.zshrc
         ```
         - If you already have the variable  `GOOGLE_APPLICATION_CREDENTIALS`  modify its value to the file path and file name instead of adding a new one. 
     - [ ] Refresh this file by sourcing it back, by running command in terminal: `source ~/.zshrc`.
