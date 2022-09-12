@@ -11,5 +11,5 @@ models:
   - name: wk_marketo_activity_sfdc_activity_pii
   - name: wk_marketo_activity_sfdc_activity_updated_pii
   - name: wk_marketo_activity_sync_lead_to_sfdc_pii
-  - name: wk_marketo_activity_update_opportunity_pii
   - name: wk_marketo_activity_visit_webpage_pii
+  - name: wk_marketo_activity_unsubscribe_email_pii
