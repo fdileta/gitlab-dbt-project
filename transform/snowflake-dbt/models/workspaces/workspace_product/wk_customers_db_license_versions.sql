@@ -1,8 +1,8 @@
 
 WITH source AS (
 
-  SELECT {{ hash_sensitive_columns('edcast_glue_groups_g3_group_performance_data_explorer') }}
-  FROM {{ref('edcast_glue_groups_g3_group_performance_data_explorer')}}
+  SELECT {{ hash_sensitive_columns('customers_db_license_versions_source') }}
+  FROM {{ref('customers_db_license_versions_source')}}
 
 )
 
