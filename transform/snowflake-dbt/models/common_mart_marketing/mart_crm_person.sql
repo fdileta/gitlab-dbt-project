@@ -104,6 +104,7 @@
       dim_crm_person.email_hash,
       dim_crm_person.status,
       dim_crm_person.lead_source,
+      dim_crm_person.was_converted_lead,
       dim_crm_person.source_buckets,
       dim_crm_person.crm_partner_id,
       dim_crm_person.prospect_share_status,
@@ -233,7 +234,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@rkohnke",
+    updated_by="@lisvinueza",
     created_date="2020-12-07",
-    updated_date="2022-09-09",
+    updated_date="2022-09-12",
   ) }}  
