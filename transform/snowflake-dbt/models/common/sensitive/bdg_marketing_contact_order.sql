@@ -1,3 +1,7 @@
+{{ config(
+    tags=["product"]
+) }}
+
 {{ simple_cte([
     ('marketing_contact', 'dim_marketing_contact'),
     ('marketing_contact_role', 'bdg_marketing_contact_role'),
@@ -65,7 +69,7 @@
       user_license_management_jobs_28_days_user,
       user_secret_detection_jobs_28_days_user,
       projects_with_packages_all_time_event,
-      projects_with_packages_28_days_user,
+      projects_with_packages_28_days_event,
       deployments_28_days_user,
       releases_28_days_user,
       epics_28_days_user,
@@ -266,7 +270,7 @@
       instance_metric_wave_aggregate.user_license_management_jobs_28_days_user                                                  AS usage_user_license_management_jobs_28_days_user,
       instance_metric_wave_aggregate.user_secret_detection_jobs_28_days_user                                                    AS usage_user_secret_detection_jobs_28_days_user,
       instance_metric_wave_aggregate.projects_with_packages_all_time_event                                                      AS usage_projects_with_packages_all_time_event,
-      instance_metric_wave_aggregate.projects_with_packages_28_days_user                                                        AS usage_projects_with_packages_28_days_user,
+      instance_metric_wave_aggregate.projects_with_packages_28_days_event                                                       AS usage_projects_with_packages_28_days_event,
       instance_metric_wave_aggregate.deployments_28_days_user                                                                   AS usage_deployments_28_days_user,
       instance_metric_wave_aggregate.releases_28_days_user                                                                      AS usage_releases_28_days_user,
       instance_metric_wave_aggregate.epics_28_days_user                                                                         AS usage_epics_28_days_user,
@@ -283,7 +287,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@trevor31",
-    updated_by="@jpeguero",
+    updated_by="@mdrussell",
     created_date="2021-02-04",
-    updated_date="2022-08-18"
+    updated_date="2022-08-26"
 ) }}

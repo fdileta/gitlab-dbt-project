@@ -80,7 +80,7 @@
       monthly_metrics.user_container_scanning_jobs_28_days_user,
       monthly_metrics.object_store_packages_enabled,
       monthly_metrics.projects_with_packages_all_time_event,
-      monthly_metrics.projects_with_packages_28_days_user,
+      monthly_metrics.projects_with_packages_28_days_event,
       monthly_metrics.deployments_28_days_user,
       monthly_metrics.releases_28_days_user,
       monthly_metrics.epics_28_days_user,
@@ -172,5 +172,5 @@
     created_by="@ischweickartDD",
     updated_by="@mdrussell",
     created_date="2021-05-26",
-    updated_date="2021-12-23"
+    updated_date="2022-09-07"
 ) }}
