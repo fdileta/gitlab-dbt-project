@@ -240,6 +240,9 @@ models:
 
       marketo:
         +schema: marketo
+        sensitive:
+          +schema: sensitive
+          secure: true
 
       netsuite:
         +schema: netsuite
@@ -552,6 +555,12 @@ models:
             +schema: restricted_safe_workspace_marketing
             +tags: [ "safe" ]
             secure: true
+        marketo:
+          restricted_safe:
+            +schema: restricted_safe_workspace_marketing
+            +tags: [ "safe" ]
+            secure: true
+
 
       workspace_product:
         +schema: workspace_product
