@@ -3594,6 +3594,38 @@ roles:
             - restricted_safe
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - mpetersen_prep
+                - mpetersen_prod
+            schemas:
+                - mpetersen_prep.*
+                -mpetersen_prod.*
+            tables:
+                - mpetersen_prep.*.*
+                - mpetersen_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - mpetersen_prep
+                    - mpetersen_prod
+                write:
+                    - mpetersen_prep
+                    - mpetersen_prod
+            schemas:
+                read:
+                    - mpetersen_prep.*
+                    - mpetersen_prod.*
+                write:
+                    - mpetersen_prep.*
+                    - mpetersen_prod.*
+            tables:
+                read:
+                    - mpetersen_prep.*.*
+                    - mpetersen_prod.*.*
+                write:
+                    - mpetersen_prep.*.*
+                    - mpetersen_prod.*.*
 
     - mramirez:
         member_of:
