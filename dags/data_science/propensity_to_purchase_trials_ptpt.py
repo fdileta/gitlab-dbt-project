@@ -1,7 +1,6 @@
 """
-Propensity to Contract DAG
+Propensity to Purchase Trials DAG
 """
-
 
 import os
 from datetime import datetime, timedelta
@@ -24,6 +23,7 @@ from kube_secrets import (
     GITLAB_ANALYTICS_PRIVATE_TOKEN,
 )
 
+
 # Load the env vars into a dict and set Secrets
 env = os.environ.copy()
 GIT_BRANCH = env["GIT_BRANCH"]
@@ -37,49 +37,52 @@ default_args = {
     "owner": "airflow",
     "retries": 0,
     "retry_delay": timedelta(minutes=1),
-    "start_date": datetime(2022, 8, 10),
+    "start_date": datetime(2022, 8, 9),
     "dagrun_timeout": timedelta(hours=2),
 }
 
 # Prepare the cmd
-DATA_SCIENCE_PTC_SSH_REPO = "git@gitlab.com:gitlab-data/data-science-projects/propensity-to-contract-and-churn.git"
-DATA_SCIENCE_PTC_HTTP_REPO = "https://gitlab_analytics:$GITLAB_ANALYTICS_PRIVATE_TOKEN@gitlab.com/gitlab-data/data-science-projects/propensity-to-contract-and-churn.git"
+DATA_SCIENCE_PTP_SSH_REPO = (
+    "git@gitlab.com:gitlab-data/data-science-projects/propensity-to-purchase.git"
+)
+DATA_SCIENCE_PTP_HTTP_REPO = "https://gitlab_analytics:$GITLAB_ANALYTICS_PRIVATE_TOKEN@gitlab.com/gitlab-data/data-science-projects/propensity-to-purchase.git"
 
-clone_data_science_ptc_repo_cmd = f"""
+clone_data_science_ptp_repo_cmd = f"""
     {data_test_ssh_key_cmd} &&
     if [[ -z "$GIT_COMMIT" ]]; then
         export GIT_COMMIT="HEAD"
     fi
     if [[ -z "$GIT_DATA_TESTS_PRIVATE_KEY" ]]; then
-        export REPO="{DATA_SCIENCE_PTC_HTTP_REPO}";
+        export REPO="{DATA_SCIENCE_PTP_HTTP_REPO}";
         else
-        export REPO="{DATA_SCIENCE_PTC_SSH_REPO}";
+        export REPO="{DATA_SCIENCE_PTP_SSH_REPO}";
     fi &&
     echo "git clone -b main --single-branch --depth 1 $REPO" &&
     git clone -b main --single-branch --depth 1 $REPO &&
     echo "checking out commit $GIT_COMMIT" &&
-    cd propensity-to-contract-and-churn &&
+    cd propensity-to-purchase &&
     git checkout $GIT_COMMIT &&
-    echo pwd &&
     cd .."""
 
 # Create the DAG
-# Run on the 9th of every month
+# Run Every Monday
 dag = DAG(
-    "propensity_to_contract", default_args=default_args, schedule_interval="0 4 9 * *"
+    "propensity_to_purchase_trial_ptpt",
+    default_args=default_args,
+    schedule_interval="0 5 * * 1",
 )
 
 # Task 1
-ptc_scoring_command = f"""
-    {clone_data_science_ptc_repo_cmd} &&
-    cd propensity-to-contract-and-churn/prod &&
+ptpt_scoring_command = f"""
+    {clone_data_science_ptp_repo_cmd} &&
+    cd propensity-to-purchase/prod &&
     papermill scoring_code.ipynb -p is_local_development False
 """
 KubernetesPodOperator(
     **gitlab_defaults,
     image=ANALYST_IMAGE,
-    task_id="propensity-to-contract",
-    name="propensity-to-contract",
+    task_id="propensity-to-purchase-trial",
+    name="propensity-to-purchase-trial",
     secrets=[
         SNOWFLAKE_ACCOUNT,
         SNOWFLAKE_LOAD_PASSWORD,
@@ -89,6 +92,6 @@ KubernetesPodOperator(
         GITLAB_ANALYTICS_PRIVATE_TOKEN,
     ],
     env_vars=pod_env_vars,
-    arguments=[ptc_scoring_command],
+    arguments=[ptpt_scoring_command],
     dag=dag,
 )
