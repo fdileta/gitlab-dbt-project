@@ -112,7 +112,7 @@ models:
           - not_null
           - unique
   - name: customers_db_license_versions_source
-    description: '{{ doc("customers_db_orders_source") }}'
+    description: '{{ doc("customers_db_license_versions_source") }}'
     columns:
       - name: id
         tags:
