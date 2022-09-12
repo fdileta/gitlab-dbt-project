@@ -750,17 +750,6 @@ WITH date_details AS (
         ELSE 0 
       END                                                         AS created_in_snapshot_quarter_iacv,
      
-      -- temporary, to deal with global reports that use account_owner_team_stamp field
-      CASE 
-        WHEN sfdc_opportunity_xf.account_owner_team_stamped IN ('Commercial - SMB','SMB','SMB - US','SMB - International')
-          THEN 'SMB'
-        WHEN sfdc_opportunity_xf.account_owner_team_stamped IN ('APAC','EMEA','Channel','US West','US East','Public Sector')
-          THEN 'Large'
-        WHEN sfdc_opportunity_xf.account_owner_team_stamped IN ('MM - APAC','MM - East','MM - EMEA','Commercial - MM','MM - West','MM-EMEA')
-          THEN 'Mid-Market'
-        ELSE 'SMB'
-      END                                                         AS account_owner_team_stamped_cro_level,   
-
       -- Team Segment / ASM - RD 
       -- As the snapshot history table is used to compare current perspective with the past, I leverage the most recent version
       -- of the truth ato cut the data, that's why instead of using the stampped version, I take the current fields.
