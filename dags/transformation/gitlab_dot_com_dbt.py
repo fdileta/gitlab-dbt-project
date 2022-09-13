@@ -1,0 +1,162 @@
+import os
+import string
+from tokenize import String
+from datetime import datetime, timedelta
+
+from airflow import DAG
+from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
+
+
+from airflow_utils import (
+    DATA_IMAGE,
+    clone_repo_cmd,
+    gitlab_defaults,
+    slack_failed_task,
+    DBT_IMAGE,
+    dbt_install_deps_nosha_cmd,
+    gitlab_pod_env_vars,
+    run_command_test_exclude,
+)
+from kubernetes_helpers import get_affinity, get_toleration
+from kube_secrets import *
+
+# Load the env vars into a dict and set env vars
+env = os.environ.copy()
+GIT_BRANCH = env["GIT_BRANCH"]
+
+dbt_secrets = [
+    GIT_DATA_TESTS_CONFIG,
+    GIT_DATA_TESTS_PRIVATE_KEY,
+    SALT,
+    SALT_EMAIL,
+    SALT_IP,
+    SALT_NAME,
+    SALT_PASSWORD,
+    SNOWFLAKE_PASSWORD,
+    SNOWFLAKE_TRANSFORM_ROLE,
+    SNOWFLAKE_TRANSFORM_SCHEMA,
+    SNOWFLAKE_TRANSFORM_WAREHOUSE,
+    SNOWFLAKE_USER,
+]
+
+
+# Dictionary containing the configuration values for the various Postgres DBs
+config_dict = {
+    "t_gitlab_customers_db": {
+        "dag_name": "t_gitlab_customers_db_dbt",
+        "dbt_name": "customers",
+        "start_date": datetime(2022, 9, 12),
+        "dbt_schedule_interval": "0 5 * * *",
+        "task_name": "t_customers",
+        "description": "This DAG does incremental refresh of the gitlab customer database",
+    },
+    "t_gitlab_com_db": {
+        "dag_name": "t_gitlab_com_db_dbt",
+        "dbt_name": "gitlab_dotcom",
+        "start_date": datetime(2022, 9, 12),
+        "dbt_schedule_interval": "0 7 * * *",
+        "task_name": "t_gitlab_dotcom",
+        "description": "This DAG does Incremental Refresh gitlab.com source table",
+
+    },
+    "t_gitlab_ops_db": {
+        "dag_name": "t_gitlab_ops_db_dbt",
+        "dbt_name": "gitlab_ops",
+        "start_date": datetime(2022, 9, 12),
+        "dbt_schedule_interval": "30 6 * * *",
+        "task_name": "t_gitlab_ops_db",
+        "description": "This DAG does Incremental Refresh gitlab ops database source table of OPS table",
+    },
+}
+
+dbt_dag_args = {
+    "catchup": False,
+    "depends_on_past": False,
+    "on_failure_callback": slack_failed_task,
+    "owner": "airflow",
+    "retries": 0,
+    "trigger_rule": "all_success",
+}
+
+
+def dbt_tasks(dbt_name, dbt_task_identifier):
+  
+   # Snapshot source data
+    snapshot_cmd = f"""
+        {dbt_install_deps_nosha_cmd} &&
+        export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
+        dbt snapshot --profiles-dir profile --target prod --select path:snapshots/{dbt_name}; ret=$?;
+        python ../../orchestration/upload_dbt_file_to_snowflake.py snapshots; exit $ret
+    """
+    snapshot = KubernetesPodOperator(
+        **gitlab_defaults,
+        image=DBT_IMAGE,
+        task_id=f"{dbt_task_identifier}-source-snapshot",
+        trigger_rule="all_done",
+        name=f"{dbt_task_identifier}-source-snapshot",
+        secrets=dbt_secrets,
+        env_vars=gitlab_pod_env_vars,
+        arguments=[snapshot_cmd],
+        affinity=get_affinity(False),
+        tolerations=get_toleration(False),
+    )
+
+    model_run_cmd = f"""
+        {dbt_install_deps_nosha_cmd} &&
+        export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
+        dbt run --profiles-dir profile --target prod --models +sources.{dbt_name}; ret=$?;
+        python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
+    """
+    model_run = KubernetesPodOperator(
+        **gitlab_defaults,
+        image=DBT_IMAGE,
+        task_id=f"{dbt_task_identifier}-source-model-run",
+        trigger_rule="all_done",
+        name=f"{dbt_task_identifier}-source-model-run",
+        secrets=dbt_secrets,
+        env_vars=gitlab_pod_env_vars,
+        arguments=[model_run_cmd],
+        affinity=get_affinity(False),
+        tolerations=get_toleration(False),
+    )
+
+    # Test all source models
+    model_test_cmd = f"""
+        {dbt_install_deps_nosha_cmd} &&
+        dbt test --profiles-dir profile --target prod --models +sources.{dbt_name} {run_command_test_exclude}; ret=$?;
+        python ../../orchestration/upload_dbt_file_to_snowflake.py test; exit $ret
+    """
+    model_test = KubernetesPodOperator(
+        **gitlab_defaults,
+        image=DBT_IMAGE,
+        task_id=f"{dbt_task_identifier}-model-test",
+        trigger_rule="all_done",
+        name=f"{dbt_task_identifier}-model-test",
+        secrets=dbt_secrets,
+        env_vars=gitlab_pod_env_vars,
+        arguments=[model_test_cmd],
+        affinity=get_affinity(False),
+        tolerations=get_toleration(False),
+    )
+
+    return snapshot, model_run, model_test
+
+# Loop through each config_dict and generate a DAG
+for source_name, config in config_dict.items():
+    dbt_dag_args["start_date"] = config["start_date"]
+    dbt_transform_dag = DAG(
+            f"{config['dag_name']}",
+            default_args=dbt_dag_args,
+            schedule_interval=config["dbt_schedule_interval"],
+            description=config["description"],
+        )
+    with dbt_transform_dag:
+        dbt_name = f"{config['dbt_name']}"
+        dbt_task_identifier = f"{config['task_name']}"
+        snapshot, model_run, model_test = dbt_tasks(
+                dbt_name, dbt_task_identifier
+            )
+    
+    snapshot >> model_run >> model_test
+    
+    globals()[f"{config['dag_name']}"] = dbt_transform_dag
