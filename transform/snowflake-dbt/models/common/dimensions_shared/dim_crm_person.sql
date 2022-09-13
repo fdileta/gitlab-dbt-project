@@ -35,6 +35,7 @@ WITH crm_person AS (
       status,
       lead_source,
       lead_source_type,
+      was_converted_lead,
       source_buckets,
       employee_bucket,
       net_new_source_categories,
@@ -95,7 +96,7 @@ WITH crm_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@jjstark",
-    updated_by="@rkohnke",
+    updated_by="@lisvinueza",
     created_date="2020-09-10",
-    updated_date="2022-09-09"
+    updated_date="2022-09-12"
 ) }}
