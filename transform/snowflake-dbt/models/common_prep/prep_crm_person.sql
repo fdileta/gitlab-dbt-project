@@ -39,8 +39,8 @@ WITH biz_person AS (
 
 ),  was_converted_lead AS (
 
-    SELECT
-      DISTINCT contact_id,
+    SELECT DISTINCT
+      contact_id,
       1 AS was_converted_lead
     FROM {{ ref('sfdc_contact_source') }}
     INNER JOIN {{ ref('sfdc_lead_source') }}
