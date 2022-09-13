@@ -14,12 +14,24 @@
     ('mart_crm_opportunity','mart_crm_opportunity')
 ]) }}
 
-, final AS (
+, linear_base AS ( --the number of touches a given opp has in total
+    --linear attribution Net_Arr of an opp / all touches (count_touches) for each opp - weighted by the number of touches in the given bucket (campaign,channel,etc)
+
+    SELECT
+      dim_crm_opportunity_id,
+      net_arr,
+      COUNT(dim_crm_touchpoint_id) AS touchpoints_per_opportunity,
+      net_arr/touchpoints_per_opportunity AS weighted_linear_net_arr
+    FROM  mart_crm_attribution_touchpoint
+    GROUP BY 1,2
+
+), final AS (
 
     SELECT
       -- touchpoint info
       dim_crm_touchpoint.dim_crm_touchpoint_id,
       dim_crm_touchpoint.bizible_touchpoint_date,
+      dim_crm_touchpoint.bizible_touchpoint_month,
       dim_crm_touchpoint.bizible_touchpoint_position,
       dim_crm_touchpoint.bizible_touchpoint_source,
       dim_crm_touchpoint.bizible_touchpoint_source_type,
@@ -42,12 +54,22 @@
       dim_crm_touchpoint.gtm_motion,
       dim_crm_touchpoint.integrated_campaign_grouping,
       dim_crm_touchpoint.pipe_name,
-      fct_crm_attribution_touchpoint.bizible_count_first_touch,
-      fct_crm_attribution_touchpoint.bizible_count_lead_creation_touch,
-      fct_crm_attribution_touchpoint.bizible_attribution_percent_full_path,
-      fct_crm_attribution_touchpoint.bizible_count_custom_model,
-      fct_crm_attribution_touchpoint.bizible_count_u_shaped,
-      fct_crm_attribution_touchpoint.bizible_count_w_shaped,
+      fct_crm_touchhpoint.touchpoints_per_opportunity,
+      fct_crm_touchhpoint.opps_per_touchpoint,
+      fct_crm_touchhpoint.first_weight,
+      fct_crm_touchhpoint.bizible_count_lead_creation_touch,
+      fct_crm_touchhpoint.full_weight,
+      fct_crm_touchhpoint.u_weight,
+      fct_crm_touchhpoint.w_weight,
+      fct_crm_touchhpoint.custom_weight,
+      (fct_crm_touchpoint.opps_per_touchpoint / linear_base.touchpoints_per_opportunity) AS l_weight,
+      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.first_weight) AS first_net_arr,
+      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.w_weight) AS w_net_arr,
+      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.u_weight) AS u_net_arr,
+      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.full_weight) AS full_net_arr,
+      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.custom_weight) AS custom_net_arr,
+      (mart_crm_opportunity.net_arr * l_weight) AS linear_net_arr,
+      (mart_crm_opportunity.net_arr / fct_crm_attribution_touchpoint.campaigns_per_opp) AS net_arr_per_campaign,
       fct_crm_attribution_touchpoint.bizible_revenue_full_path,
       fct_crm_attribution_touchpoint.bizible_revenue_custom_model,
       fct_crm_attribution_touchpoint.bizible_revenue_first_touch,
@@ -263,12 +285,14 @@
       ON fct_campaign.campaign_owner_id = campaign_owner.dim_crm_user_id
     LEFT JOIN mart_crm_opportunity
       ON fct_crm_attribution_touchpoint.dim_crm_opportunity_id = mart_crm_opportunity.dim_crm_opportunity_id
+    LEFT JOIN linear_base 
+      ON mart_crm_attribution_touchpoint.dim_crm_opportunity_id = linear_base.dim_crm_opportunity_id
 )
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2020-02-18",
-    updated_date="2022-05-06"
+    updated_date="2022-09-12"
 ) }}
