@@ -314,8 +314,6 @@ sources:
           error_after: {count: 15, period: day}
       - name: saml_providers
         identifier: gitlab_db_saml_providers
-      - name: services
-        identifier: gitlab_db_services
       - name: slack_integrations
         identifier: gitlab_db_slack_integrations
       - name: shards

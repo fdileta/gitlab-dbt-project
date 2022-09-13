@@ -5,12 +5,14 @@ models:
     description: '{{ doc("current_arr_segmentation_all_levels") }}'
     columns:
         - name: id
-          description: "Subcription Slug, SFDC Account ID, or SFDC Ultimate Parent Account ID"
+          description: "Subscription Slug, SFDC Account ID, or SFDC Ultimate Parent Account ID"
           tests:
-              - not_null:
-                  severity: warn
+            - not_null:
+                config:
+                  error_if: ">2"
+                  warn_if: ">1"
         - name: level_
-          description: "Subcription, SFDC Account, or SFDC Ultimate Parent Account"
+          description: "Subscription, SFDC Account, or SFDC Ultimate Parent Account"
           tests:
               - not_null
               - accepted_values:
@@ -18,8 +20,10 @@ models:
         - name: arr
           description: "Annual Recurring Revenue (MRR * 12) for most recent month for which this is MRR that is not in the future."
           tests:
-              - not_null:
-                  severity: warn
+            - not_null:
+                config:
+                  error_if: ">2"
+                  warn_if: ">1"
         - name: arr_segmentation
           description: "ARR Segmentation"
           tests:
@@ -196,7 +200,7 @@ models:
           tests:
               - not_null
               - accepted_values:
-                      values: ['Maintained', 'Upgraded', 'Downgraded', 'Cancelled']
+                      values: ['Maintained', 'Upgraded', 'Downgraded', 'Cancelled', 'Other']
         - name: arr_segmentation
           tests:
               - accepted_values:

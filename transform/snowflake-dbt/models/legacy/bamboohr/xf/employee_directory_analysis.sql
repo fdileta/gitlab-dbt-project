@@ -11,16 +11,18 @@ WITH employee_directory_intermediate AS (
 
 ),
 
+
 cleaned AS (
 
   SELECT
     date_actual,
     employee_id,
     reports_to,
+    reports_to_id,
     full_name,
     work_email,
     gitlab_username,
-    region,
+    region_modified AS region,
     sales_geo_differential,
     jobtitle_speciality,
     job_role_modified,

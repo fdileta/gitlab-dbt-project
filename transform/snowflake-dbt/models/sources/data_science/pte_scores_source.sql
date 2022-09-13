@@ -22,10 +22,11 @@ WITH source AS (
       data_by_row['importance']::INT                        AS importance,
       data_by_row['grouping']::INT                          AS score_group,
       data_by_row['insights']::VARCHAR                      AS insights,
-      uploaded_at::TIMESTAMP                                AS uploaded_at
+      uploaded_at::TIMESTAMP                                AS uploaded_at,
+      data_by_row['uptier_likely']::BOOLEAN                 AS uptier_likely
 
     FROM intermediate
 
 )
-SELECT * 
+SELECT *
 FROM parsed
