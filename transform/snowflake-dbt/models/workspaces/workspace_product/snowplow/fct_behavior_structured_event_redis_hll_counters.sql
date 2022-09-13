@@ -78,6 +78,7 @@
     'ci_templates_unique',
     'p_terraform_state_api_unique_users',
     'i_search_paid'
+    )
    
     {% if is_incremental() %}
 
