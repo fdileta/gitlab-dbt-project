@@ -38,13 +38,13 @@ WITH biz_person AS (
     WHERE is_deleted = 'FALSE'
 
 ),  was_converted_lead AS (
-    SELECT 
-      DISTINCT contact_id,
-      1 AS was_converted_lead     
-    FROM {{ ref('sfdc_contact_source') }}     
-    INNER JOIN {{ ref('sfdc_lead_source') }}
-    ON sfdc_contact_source.contact_id = sfdc_lead_source.converted_contact_id
 
+    SELECT
+      DISTINCT contact_id,
+      1 AS was_converted_lead
+    FROM {{ ref('sfdc_contact_source') }}
+    INNER JOIN {{ ref('sfdc_lead_source') }}
+      ON sfdc_contact_source.contact_id = sfdc_lead_source.converted_contact_id
 
 ),  crm_person_final AS (
 
@@ -250,7 +250,7 @@ WITH biz_person AS (
 
 ), duplicates AS (
 
-    SELECT 
+    SELECT
       dim_crm_person_id
     FROM crm_person_final
     GROUP BY 1
