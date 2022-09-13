@@ -49,7 +49,7 @@ user_namespaces AS (
     NULL AS invite_token,
     valid_from,
     valid_to,
-    IFF(valid_to IS NULL, TRUE, FALSE) AS is_currently_valid,  -- add is_current flag to source
+    IFF(valid_to IS NULL, TRUE, FALSE) AS is_currently_valid,
     namespace_id
   FROM namespace
   WHERE namespace_type = 'User'
@@ -70,7 +70,7 @@ fct AS (
 
   SELECT
     -- Primary Key
-    {{ dbt_utils.surrogate_key(['combine.member_id']) }} AS direct_member_pk,
+    {{ dbt_utils.surrogate_key(['combine.member_id','combine.valid_from']) }} AS direct_member_pk,
 
     -- Foreign Keys
     {{ get_keyed_nulls(dbt_utils.surrogate_key(['combine.user_id'])) }} AS dim_user_sk,
@@ -85,7 +85,7 @@ fct AS (
     combine.access_level,
     access_levels.access_level_name,
     combine.member_type,
-    combine.created_at AS membership_created_at, -- change to created_at
+    combine.created_at AS membership_created_at,
     combine.invite_accepted_at,
     combine.requested_at,
     combine.expires_at,
