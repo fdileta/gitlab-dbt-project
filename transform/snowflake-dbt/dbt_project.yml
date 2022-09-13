@@ -540,8 +540,6 @@ models:
 
       workspace_data_science:
         +schema: workspace_data_science
-        pte:
-          +materialized: table
 
       workspace_marketing:
         +schema: workspace_marketing
