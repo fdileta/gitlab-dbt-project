@@ -26,6 +26,18 @@ WITH source AS (
       item_type::VARCHAR                                  AS item_type,
       event::VARCHAR                                      AS event,
       whodunnit::VARCHAR                                  AS whodunnit,
+      CASE
+      WHEN whodunnit ILIKE '%@gitlab.com' THEN
+        TRIM(REPLACE(whodunnit,'Admin: ',''))
+      ELSE
+        NULL
+      END                                                 AS whodunnit_gitlab,
+      CASE
+      WHEN whodunnit ILIKE '%@gitlab.com' THEN
+        whodunnit
+      ELSE
+        NULL
+      END                                                 AS whodunnit_gitlab_desc,
       object::VARCHAR                                     AS object,
       object_changes::VARCHAR                             AS object_changes,
       DATEADD('s', _uploaded_at, '1970-01-01')::TIMESTAMP AS _uploaded_at
