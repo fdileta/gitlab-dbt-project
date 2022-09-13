@@ -85,6 +85,15 @@
     - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
+➕specify_dbt_parameters:
+  <<: *snowflake_dbt_jobs
+  script:
+    - *deps_and_seed
+    - echo $DBT_PARAMETERS
+    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} $DBT_PARAMETERS || FAILED=true
+    - dbt --partial-parse test $CI_PROFILE_TARGET $DBT_PARAMETERS || FAILED=true
+    - if [ $FAILED ]; then exit 1; fi
+
 ➕🐘specify_xl_model:
   <<: *snowflake_dbt_jobs
   script:
