@@ -29,19 +29,6 @@ sources:
           - name: updated_at
             tests:
               - not_null
-      - name: customers_db_eula_requests
-        columns:
-          - name: id
-            tests:
-              - not_null
-          - name: eula_id
-            tests:
-              - not_null
-      - name: customers_db_eulas
-        columns:
-          - name: id
-            tests:
-              - not_null
       - name: customers_db_leads
         columns:
           - name: id
