@@ -30,6 +30,13 @@ analytics_pipelines_dag = [
 ]
 
 
+data_science_pipelines_dag = [
+    "ds_propensity_to_expand",
+    "ds_propensity_to_contract",
+    "ds_propensity_to_purchase_trial",
+]
+
+
 def split_date_parts(day: date, partition: str) -> Dict:
 
     if partition == "month":
@@ -129,6 +136,8 @@ def slack_defaults(context, task_type):
     if task_type == "failure":
         if dag_id in analytics_pipelines_dag:
             slack_channel = "#analytics-pipelines"
+        elif dag_id in data_science_pipelines_dag:
+            slack_channel = "#data-science-pipelines"
         else:
             slack_channel = dag_context.params.get(
                 "slack_channel_override", "#data-pipelines"
