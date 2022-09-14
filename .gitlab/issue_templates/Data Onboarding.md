@@ -213,7 +213,7 @@ Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credential
 
 - [ ] Run `gcloud container clusters get-credentials data-ops --zone us-west1-a --project gitlab-analysis` to connect to the Airflow kubernetes cluster, and configure your `./.kube/config` file
 - [ ] Navigate to `./.kube/config`. 
-- [ ] Copy and paste the file, rename the copied file to ./kube/config_docker
+- [ ] Copy and paste the file, rename the copied file to `./.kube/config_docker`
 - [ ] Open the copied file in a text editor. 
 - [ ] Find the line with `cmd-path: /Users/{your username}/google-cloud-sdk/bin/gcloud`
 - [ ] Replace this line with `cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud`
