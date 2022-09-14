@@ -26,6 +26,7 @@ WITH crm_person AS (
 
       --info
       person_score,
+      behavior_score,
       title,
       country,
       state,
@@ -96,7 +97,7 @@ WITH crm_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@jjstark",
-    updated_by="@lisvinueza",
+    updated_by="@rkohnke",
     created_date="2020-09-10",
-    updated_date="2022-09-12"
+    updated_date="2022-09-14"
 ) }}

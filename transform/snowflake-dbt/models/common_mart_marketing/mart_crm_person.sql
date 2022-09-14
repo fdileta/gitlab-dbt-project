@@ -123,6 +123,8 @@
       dim_bizible_marketing_channel_path.bizible_marketing_channel_path_name,
       dim_sales_segment.sales_segment_name,
       dim_sales_segment.sales_segment_grouped,
+      dim_crm_person.person_score,
+      dim_crm_person.behavior_score,
       dim_crm_person.marketo_last_interesting_moment,
       dim_crm_person.marketo_last_interesting_moment_date,
       dim_crm_person.outreach_step_number,
@@ -234,7 +236,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@lisvinueza",
+    updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-09-12",
+    updated_date="2022-09-14",
   ) }}  

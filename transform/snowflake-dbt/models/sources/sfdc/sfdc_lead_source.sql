@@ -37,6 +37,7 @@ renamed AS (
     hasoptedoutofemail AS has_opted_out_email,
     emailbounceddate AS email_bounced_date,
     emailbouncedreason AS email_bounced_reason,
+    behavior_score__c AS behavior_score,
     leadsource AS lead_source,
     lead_from__c AS lead_from,
     lead_source_type__c AS lead_source_type,
