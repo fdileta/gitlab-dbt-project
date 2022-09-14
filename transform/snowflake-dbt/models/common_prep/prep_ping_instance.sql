@@ -5,11 +5,15 @@
 ) }}
 
 
-{{ simple_cte([
-    ('raw_usage_data', 'version_raw_usage_data_source')
-    ])
+WITH raw_usage_data AS (
 
-}}
+    SELECT
+      raw_usage_data_id,
+      raw_usage_data_payload,
+      MAX(created_at) OVER () AS max_created_at
+    FROM {{ ref('version_raw_usage_data_source') }}
+
+)
 
 , source AS (
 
@@ -63,7 +67,7 @@
     FROM usage_data
     LEFT JOIN raw_usage_data
       ON usage_data.raw_usage_data_id = raw_usage_data.raw_usage_data_id
-    WHERE usage_data.ping_created_at <= (SELECT MAX(created_at) FROM raw_usage_data)
+    WHERE usage_data.ping_created_at <= raw_usage_data.max_created_at
 
 
 )
@@ -73,5 +77,5 @@
     created_by="@icooper-acp",
     updated_by="@chrissharp",
     created_date="2022-03-17",
-    updated_date="2022-09-06"
+    updated_date="2022-09-14"
 ) }}
