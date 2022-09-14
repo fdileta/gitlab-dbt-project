@@ -1,15 +1,11 @@
 import os
-import string
-from tokenize import String
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 
 
 from airflow_utils import (
-    DATA_IMAGE,
-    clone_repo_cmd,
     gitlab_defaults,
     slack_failed_task,
     DBT_IMAGE,
@@ -40,7 +36,7 @@ dbt_secrets = [
 ]
 
 
-# Dictionary containing the configuration values for the various Postgres DBs
+# Dictionary containing the configuration values for the various Postgres DBs for which we need to run DBT snapshots, De dupe model and DBT test on source and model. 
 config_dict = {
     "t_gitlab_customers_db": {
         "dag_name": "t_gitlab_customers_db_dbt",
@@ -48,7 +44,7 @@ config_dict = {
         "start_date": datetime(2022, 9, 12),
         "dbt_schedule_interval": "0 5 * * *",
         "task_name": "t_customers",
-        "description": "This DAG does incremental refresh of the gitlab customer database",
+        "description": "This DAG does incremental refresh of the gitlab customer database,run snapshot on source table and DBT test",
     },
     "t_gitlab_com_db": {
         "dag_name": "t_gitlab_com_db_dbt",
@@ -56,7 +52,7 @@ config_dict = {
         "start_date": datetime(2022, 9, 12),
         "dbt_schedule_interval": "0 7 * * *",
         "task_name": "t_gitlab_dotcom",
-        "description": "This DAG does Incremental Refresh gitlab.com source table",
+        "description": "This DAG does Incremental Refresh gitlab.com source table,run snapshot on source table and DBT test ",
 
     },
     "t_gitlab_ops_db": {
@@ -65,10 +61,11 @@ config_dict = {
         "start_date": datetime(2022, 9, 12),
         "dbt_schedule_interval": "30 6 * * *",
         "task_name": "t_gitlab_ops_db",
-        "description": "This DAG does Incremental Refresh gitlab ops database source table of OPS table",
+        "description": "This DAG does Incremental Refresh gitlab ops database source table ,run snapshot on source table and DBT test",
     },
 }
 
+# DAG argument for scheduling the DAG
 dbt_dag_args = {
     "catchup": False,
     "depends_on_past": False,
@@ -101,6 +98,7 @@ def dbt_tasks(dbt_name, dbt_task_identifier):
         tolerations=get_toleration(False),
     )
 
+    # Run de dupe / rename /scd model    
     model_run_cmd = f"""
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
@@ -144,19 +142,21 @@ def dbt_tasks(dbt_name, dbt_task_identifier):
 # Loop through each config_dict and generate a DAG
 for source_name, config in config_dict.items():
     dbt_dag_args["start_date"] = config["start_date"]
+
     dbt_transform_dag = DAG(
             f"{config['dag_name']}",
             default_args=dbt_dag_args,
             schedule_interval=config["dbt_schedule_interval"],
             description=config["description"],
         )
+
     with dbt_transform_dag:
         dbt_name = f"{config['dbt_name']}"
         dbt_task_identifier = f"{config['task_name']}"
         snapshot, model_run, model_test = dbt_tasks(
                 dbt_name, dbt_task_identifier
             )
-    
+    # DAG flow
     snapshot >> model_run >> model_test
     
     globals()[f"{config['dag_name']}"] = dbt_transform_dag
