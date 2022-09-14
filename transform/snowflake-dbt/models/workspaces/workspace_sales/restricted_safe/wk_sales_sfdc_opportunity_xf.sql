@@ -156,8 +156,8 @@ we can delete this connection and use the mart table directly.
       -----------------------------------------------------------
       -- New fields for FY22 - including user segment / region fields
 
-      sfdc_opportunity_xf.order_type_live,
-      sfdc_opportunity_xf.order_type_stamped,
+      COALESCE(sfdc_opportunity_xf.order_type_live, 'NA') AS order_type_live,
+      COALESCE(sfdc_opportunity_xf.order_type_stamped, 'NA') AS order_type_stamped,
 
       COALESCE(sfdc_opportunity_xf.net_arr,0)                 AS raw_net_arr,
       sfdc_opportunity_xf.recurring_amount,

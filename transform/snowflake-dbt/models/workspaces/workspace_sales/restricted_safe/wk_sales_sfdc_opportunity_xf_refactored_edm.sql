@@ -98,7 +98,11 @@ WITH sfdc_opportunity AS (
     edm_opty.sales_path                            AS sales_path,
     edm_opty.sales_type                            AS sales_type,
     edm_opty.stage_name                            AS stage_name,
-    edm_opty.order_type                            AS order_type_stamped,
+
+    CASE edm_opty.order_type
+      WHEN 'Missing order_type_name' THEN 'NA'
+      ELSE edm_opty.order_type
+    END                                            AS order_type_stamped,
 
     ----------------------------------------------------------
     ----------------------------------------------------------
@@ -240,9 +244,11 @@ WITH sfdc_opportunity AS (
     ----------------------------------------------------------
 
     CASE
-    WHEN edm_opty.sales_qualified_source_name = 'BDR Generated'
+    WHEN sales_qualified_source_name = 'BDR Generated'
         THEN 'SDR Generated'
-    ELSE COALESCE(edm_opty.sales_qualified_source_name,'NA')
+    WHEN sales_qualified_source_name = 'Missing sales_qualified_source_name'
+        THEN 'NA'
+    ELSE sales_qualified_source_name
     END                                                           AS sales_qualified_source,
 
     CASE
