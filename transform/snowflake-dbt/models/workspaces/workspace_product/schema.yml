@@ -30,11 +30,11 @@ models:
         tags:
           - customers_db
       - name: whodunnit_gitlab
-        description: Email for licensing, contains either @gitlab.com email or NULL. Can contain `Admin` string
+        description: Email for licensing, contains either @gitlab.com email (value from whodunnit)  or NULL
         tags:
           - customers_db
       - name: whodunnit_gitlab_desc
-        description: Email for licensing, contains either @gitlab.com email (value from whodunnit)  or NULL
+        description: Email for licensing, contains either @gitlab.com email or NULL. Can contain `Admin` string
         tags:
           - customers_db
       - name: object
