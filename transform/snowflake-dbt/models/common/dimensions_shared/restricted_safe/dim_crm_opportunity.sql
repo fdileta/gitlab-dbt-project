@@ -95,6 +95,14 @@ WITH prep_crm_opportunity AS (
       prep_crm_opportunity.quote_start_date,
       prep_crm_opportunity.subscription_start_date,
       prep_crm_opportunity.subscription_end_date,
+      prep_crm_opportunity.resale_partner_name,
+
+      --account people attributes
+      prep_crm_opportunity.crm_account_owner_sales_segment,
+      prep_crm_opportunity.crm_account_owner_geo,
+      prep_crm_opportunity.crm_account_owner_region,
+      prep_crm_opportunity.crm_account_owner_area,
+      prep_crm_opportunity.crm_account_owner_sales_segment_geo_region_area,
 
       -- Competitors
       prep_crm_opportunity.competitors,
