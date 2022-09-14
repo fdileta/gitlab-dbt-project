@@ -13,9 +13,7 @@ WITH raw_usage_data AS (
       MAX(created_at) OVER () AS max_created_at
     FROM {{ ref('version_raw_usage_data_source') }}
 
-)
-
-, source AS (
+), source AS (
 
     SELECT
       id                                                                        AS dim_ping_instance_id,
