@@ -29,7 +29,7 @@ def get_billing_data_query(start_time: str, end_time: str) -> str:
           overwrite=true) AS
         SELECT * 
           , DATE(_PARTITIONTIME) as _partition_date 
-        FROM `billing-tools-277316.gitlab_com_detailed_billing.gcp_billing_export_resource_v1_017B02_778F9C_493B83` 
+        FROM `billing-tools-277316.gitlap_com_detailed_billing.gcp_billing_export_resource_v1_017B02_778F9C_493B83` 
         WHERE DATE(_PARTITIONTIME) = "{date_partition_date}"
     """
 
