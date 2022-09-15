@@ -24,7 +24,7 @@ SELECT
     mart.dim_crm_account_id                                  AS account_id,
     mart.crm_account_name                                    AS account_name,
     mart.master_record_id,
-    mart.crm_account_owner_id                                AS owner_id,
+    mart.dim_crm_user_id                                     AS owner_id,
     -- parent_id,
     mart.dim_crm_person_primary_contact_id                   AS primary_contact_id,
     mart.record_type_id,
@@ -37,7 +37,7 @@ SELECT
     mart.crm_account_owner_team                              AS account_owner_team,
     mart.business_development_rep,
     mart.dedicated_service_engineer,
-    mart.business_development_rep                            AS sales_development_rep,    --- double check
+    --sales_development_rep,  --missing
     mart.technical_account_manager_id,
     mart.dim_parent_crm_account_id                           AS ultimate_parent_account_id,
     mart.crm_account_type                                    AS account_type,
