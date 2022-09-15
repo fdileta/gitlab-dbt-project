@@ -55,6 +55,7 @@ renamed AS (
     dozisf__zoominfo_company_id__c AS zoominfo_company_id,
     zi_company_revenue__c AS zoominfo_company_revenue,
     zi_employee_count__c AS zoominfo_company_employee_count,
+    cognism_number_of_employees__c AS cognism_employee_count,
     zi_contact_city__c AS zoominfo_contact_city,
     zi_company_city__c AS zoominfo_company_city,
     zi_industry__c AS zoominfo_company_industry,

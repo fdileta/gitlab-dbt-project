@@ -15,11 +15,6 @@ WITH first_contact  AS (
     FROM {{ ref('sfdc_bizible_attribution_touchpoint_source') }}
     WHERE is_deleted = 'FALSE'
 
-), dim_date AS (
-
-    SELECT *
-    FROM {{ ref('dim_date') }}
-
 ), linear_attribution_base AS ( --the number of attribution touches a given opp has in total
     --linear attribution IACV of an opp / all touches (count_touches) for each opp - weighted by the number of touches in the given bucket (campaign,channel,etc)
     SELECT
@@ -170,8 +165,8 @@ WITH first_contact  AS (
           THEN prep_crm_user.crm_user_area
         ELSE sfdc_opportunity_source.user_area_stamped
       END                                                                   AS opportunity_owner_user_area,
-      prep_crm_user.user_role_name                                      AS opportunity_owner_role,
-      prep_crm_user.title                                               AS opportunity_owner_title
+      prep_crm_user.user_role_name                                          AS opportunity_owner_role,
+      prep_crm_user.title                                                   AS opportunity_owner_title
   FROM {{ ref('sfdc_opportunity_source') }}
   INNER JOIN {{ ref('prep_crm_user') }}
     ON sfdc_opportunity_source.owner_id = prep_crm_user.dim_crm_user_id
@@ -195,7 +190,7 @@ WITH first_contact  AS (
       close_date::DATE                                                   AS close_date,
       net_arr                                                            AS raw_net_arr,
     {%- if model_type == 'live' %}
-        {{ dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR"])}}
+        {{ dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"])}}
     {%- elif model_type == 'snapshot' %}
         {{ dbt_utils.surrogate_key(['sfdc_opportunity_snapshots_source.opportunity_id','snapshot_dates.date_id'])}}   AS crm_opportunity_snapshot_id,
         snapshot_dates.date_id                                                                                        AS snapshot_id,
@@ -206,7 +201,7 @@ WITH first_contact  AS (
         snapshot_dates.first_day_of_fiscal_quarter                                                                    AS snapshot_fiscal_quarter_date,
         snapshot_dates.day_of_fiscal_quarter_normalised                                                               AS snapshot_day_of_fiscal_quarter_normalised,
         snapshot_dates.day_of_fiscal_year_normalised                                                                  AS snapshot_day_of_fiscal_year_normalised,
-        {{ dbt_utils.star(from=ref('sfdc_opportunity_snapshots_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM", "SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR"])}}
+        {{ dbt_utils.star(from=ref('sfdc_opportunity_snapshots_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM", "SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"])}}
      {%- endif %}
     FROM 
     {%- if model_type == 'live' %}
@@ -283,6 +278,11 @@ WITH first_contact  AS (
     {%- endif %}
     WHERE user_id IS NOT NULL
 
+), dim_date AS (
+
+    SELECT *
+    FROM {{ ref('dim_date') }}
+
 ), final AS (
 
     SELECT
@@ -299,6 +299,7 @@ WITH first_contact  AS (
       {{ get_date_id('sfdc_opportunity.stage_3_technical_evaluation_date') }}                     AS stage_3_technical_evaluation_date_id,
       {{ get_date_id('sfdc_opportunity.stage_4_proposal_date') }}                                 AS stage_4_proposal_date_id,
       {{ get_date_id('sfdc_opportunity.stage_5_negotiating_date') }}                              AS stage_5_negotiating_date_id,
+      {{ get_date_id('sfdc_opportunity.stage_6_awaiting_signature_date') }}                       AS stage_6_awaiting_signature_date_id,
       {{ get_date_id('sfdc_opportunity.stage_6_closed_won_date') }}                               AS stage_6_closed_won_date_id,
       {{ get_date_id('sfdc_opportunity.stage_6_closed_lost_date') }}                              AS stage_6_closed_lost_date_id,
       {{ get_date_id('sfdc_opportunity.technical_evaluation_date') }}                             AS technical_evaluation_date_id,
@@ -306,6 +307,13 @@ WITH first_contact  AS (
       {{ get_date_id('sfdc_opportunity.subscription_start_date') }}                               AS subscription_start_date_id,
       {{ get_date_id('sfdc_opportunity.subscription_end_date') }}                                 AS subscription_end_date_id,
       {{ get_date_id('sfdc_opportunity.sales_qualified_date') }}                                  AS sales_qualified_date_id,
+
+      -- account owner information
+      account_owner.user_segment AS crm_account_owner_sales_segment,
+      account_owner.user_geo AS crm_account_owner_geo,
+      account_owner.user_region AS crm_account_owner_region,
+      account_owner.user_area AS crm_account_owner_area,
+      account_owner.user_segment_geo_region_area AS crm_account_owner_sales_segment_geo_region_area,
 
 
       close_date.first_day_of_fiscal_quarter                                                      AS close_fiscal_quarter_date,
@@ -529,17 +537,19 @@ WITH first_contact  AS (
             THEN 1
         ELSE 0
       END                                                                                         AS is_eligible_sao,
-      CASE 
+      CASE
         WHEN sfdc_opportunity.is_edu_oss = 0
           AND sfdc_opportunity.is_deleted = 0
+          -- For ASP we care mainly about add on, new business, excluding contraction / churn
           AND sfdc_opportunity.order_type IN ('1. New - First Order','2. New - Connected','3. Growth')
+          -- Exclude Decomissioned as they are not aligned to the real owner
+          -- Contract Reset, Decomission
           AND sfdc_opportunity.opportunity_category IN ('Standard','Ramp Deal','Internal Correction')
-          AND ((sfdc_opportunity.is_web_portal_purchase = 1 
-                AND net_arr > 0)
-                OR sfdc_opportunity.is_web_portal_purchase = 0)
+          -- Exclude Deals with nARR < 0
+          AND net_arr > 0
             THEN 1
           ELSE 0
-      END                                                                                         AS is_eligible_asp_analysis,
+      END                                                           AS is_eligible_asp_analysis,
       CASE 
         WHEN sfdc_opportunity.is_edu_oss = 0
           AND sfdc_opportunity.is_deleted = 0
@@ -589,6 +599,8 @@ WITH first_contact  AS (
 
       {{ alliance_partner('fulfillment_partner.account_name', 'partner_account.account_name', 'sfdc_opportunity.close_date', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type,
       {{ alliance_partner_short('fulfillment_partner.account_name', 'partner_account.account_name', 'sfdc_opportunity.close_date', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type_short,
+
+      fulfillment_partner.account_name AS resale_partner_name,
 
       --  quote information
       quote.dim_quote_id,
@@ -655,24 +667,24 @@ WITH first_contact  AS (
           THEN '0. Open' 
         ELSE 'N/A'
       END                                                                                         AS stage_category,
-      CASE 
-            WHEN sfdc_opportunity.order_type = '3. Growth' 
-                THEN '2. Growth'
-            WHEN sfdc_opportunity.order_type = '1. New - First Order' 
-                THEN '1. New'
-              ELSE '3. Other'
-          END                                                                                    AS deal_group,
-       CASE 
-          WHEN sfdc_opportunity.order_type = '1. New - First Order' 
-            THEN '1. New'
-          WHEN sfdc_opportunity.order_type IN ('2. New - Connected', '3. Growth') 
-            THEN '2. Growth' 
-          WHEN sfdc_opportunity.order_type IN ('4. Contraction')
-            THEN '3. Contraction'
-          WHEN sfdc_opportunity.order_type IN ('5. Churn - Partial','6. Churn - Final')
-            THEN '4. Churn'
-          ELSE '5. Other' 
-        END                                                                                       AS deal_category,
+      CASE
+       WHEN sfdc_opportunity.order_type = '1. New - First Order'
+         THEN '1. New'
+       WHEN sfdc_opportunity.order_type IN ('2. New - Connected', '3. Growth', '5. Churn - Partial','6. Churn - Final','4. Contraction')
+         THEN '2. Growth'
+       ELSE '3. Other'
+     END                                                                   AS deal_group,
+     CASE 
+       WHEN sfdc_opportunity.order_type = '1. New - First Order' 
+         THEN '1. New'
+       WHEN sfdc_opportunity.order_type IN ('2. New - Connected', '3. Growth') 
+         THEN '2. Growth' 
+       WHEN sfdc_opportunity.order_type IN ('4. Contraction')
+         THEN '3. Contraction'
+       WHEN sfdc_opportunity.order_type IN ('5. Churn - Partial','6. Churn - Final')
+         THEN '4. Churn'
+       ELSE '5. Other' 
+      END                                                                                       AS deal_category,
       COALESCE(sfdc_opportunity.reason_for_loss, sfdc_opportunity.downgrade_reason)               AS reason_for_loss_staged,
       CASE 
         WHEN reason_for_loss_staged IN ('Do Nothing','Other','Competitive Loss','Operational Silos') 
@@ -730,6 +742,17 @@ WITH first_contact  AS (
             AND sfdc_opportunity.sales_qualified_source != 'Channel Generated' 
           THEN 'Partner Co-Sell'
       END                                                                                       AS deal_path_engagement,
+      CASE
+        WHEN net_arr > 0 AND net_arr < 5000
+          THEN '1 - Small (<5k)'
+        WHEN net_arr >=5000 AND net_arr < 25000
+          THEN '2 - Medium (5k - 25k)'
+        WHEN net_arr >=25000 AND net_arr < 100000
+          THEN '3 - Big (25k - 100k)'
+        WHEN net_arr >= 100000
+          THEN '4 - Jumbo (>100k)'
+        ELSE 'Other'
+      END                                                          AS deal_size,
       CASE 
         WHEN net_arr > 0 AND net_arr < 1000 
           THEN '1. (0k -1k)'
@@ -808,42 +831,35 @@ WITH first_contact  AS (
         WHEN is_credit = 1
           THEN 0
         ELSE 1
-      END                                               AS pipeline_calculated_deal_count,
+      END                                               AS calculated_deal_count,
       CASE 
         WHEN is_eligible_open_pipeline = 1
           AND is_stage_1_plus = 1
-            THEN pipeline_calculated_deal_count  
+            THEN calculated_deal_count  
         ELSE 0
       END                                               AS open_1plus_deal_count,
 
       CASE 
         WHEN is_eligible_open_pipeline = 1
           AND is_stage_3_plus = 1
-            THEN pipeline_calculated_deal_count
+            THEN calculated_deal_count
         ELSE 0
       END                                               AS open_3plus_deal_count,
 
       CASE 
         WHEN is_eligible_open_pipeline = 1
           AND is_stage_4_plus = 1
-            THEN pipeline_calculated_deal_count
+            THEN calculated_deal_count
         ELSE 0
       END                                               AS open_4plus_deal_count,
       CASE 
         WHEN sfdc_opportunity_stage.is_won = 1
-          THEN pipeline_calculated_deal_count
+          THEN calculated_deal_count
         ELSE 0
       END                                               AS booked_deal_count,
       CASE
-        WHEN (
-               (
-                is_renewal = 1
-                 AND is_lost = 1
-               )
-                OR sfdc_opportunity_stage.is_won = 1 
-             )
-            AND sfdc_opportunity.order_type IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
-        THEN pipeline_calculated_deal_count
+        WHEN is_eligible_churn_contraction = 1
+          THEN calculated_deal_count
         ELSE 0
       END                                               AS churned_contraction_deal_count,
       CASE
@@ -855,7 +871,7 @@ WITH first_contact  AS (
                 OR sfdc_opportunity_stage.is_won = 1 
               )
               AND is_eligible_churn_contraction = 1
-          THEN pipeline_calculated_deal_count
+          THEN calculated_deal_count
         ELSE 0
       END                                                 AS booked_churned_contraction_deal_count,
       CASE
@@ -868,10 +884,15 @@ WITH first_contact  AS (
             OR sfdc_opportunity_stage.is_won = 1 
             )
             AND is_eligible_churn_contraction = 1
-        THEN net_arr
+          THEN net_arr
         ELSE 0
       END                                                 AS booked_churned_contraction_net_arr,
 
+      CASE
+        WHEN is_eligible_churn_contraction = 1
+          THEN net_arr
+        ELSE 0
+      END                                                 AS churned_contraction_net_arr,
       CASE 
         WHEN is_eligible_open_pipeline = 1
           THEN net_arr
@@ -915,18 +936,6 @@ WITH first_contact  AS (
             THEN 1
           ELSE 0
       END                                                           AS is_booked_net_arr,
-      CASE
-        WHEN (
-               (
-                 is_renewal = 1
-                   AND is_lost = 1
-                )
-               OR sfdc_opportunity_stage.is_won = 1 
-              )
-            AND sfdc_opportunity.order_type IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
-        THEN net_arr
-        ELSE 0
-      END                                                 AS churned_contraction_net_arr,
       CASE
         WHEN sfdc_opportunity.deal_path = 'Channel' 
           THEN REPLACE(COALESCE(sfdc_opportunity.partner_track, partner_account.partner_track, fulfillment_partner.partner_track,'Open'),'select','Select')
@@ -1034,7 +1043,7 @@ WITH first_contact  AS (
     CASE
       WHEN arr_created_date.fiscal_quarter_name_fy = sfdc_opportunity.snapshot_fiscal_quarter_name
         AND is_net_arr_pipeline_created = 1
-        THEN pipeline_calculated_deal_count
+        THEN calculated_deal_count
       ELSE 0
     END AS created_in_snapshot_quarter_deal_count,
     {%- endif %}
@@ -1138,45 +1147,63 @@ WITH first_contact  AS (
         THEN 1
       ELSE 0
     END AS competitors_aws_flag,
+   LOWER( 
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_segment
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_segment
+      END  
+    )                                                     AS report_opportunity_user_segment,
     LOWER(
-      sfdc_opportunity.user_segment_stamped
-    ) AS report_opportunity_user_segment,
-    LOWER(
-      sfdc_opportunity.user_geo_stamped
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_geo
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_geo
+      END  
     ) AS report_opportunity_user_geo,
     LOWER(
-      sfdc_opportunity.user_region_stamped
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_region
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_region
+      END  
     ) AS report_opportunity_user_region,
     LOWER(
-      sfdc_opportunity.user_area_stamped
+      CASE 
+        WHEN sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year
+          THEN account_owner.user_area
+        ELSE live_opportunity_owner_fields.opportunity_owner_user_area
+      END  
     ) AS report_opportunity_user_area,
     LOWER(
-      sfdc_opportunity.crm_opp_owner_sales_segment_geo_region_area_stamped
+      CONCAT(
+        report_opportunity_user_segment,'-',report_opportunity_user_geo,'-',report_opportunity_user_region,'-',report_opportunity_user_area
+      ) 
     ) AS report_user_segment_geo_region_area,
+    COALESCE(sfdc_opportunity.sales_qualified_source, 'NA') AS key_sqs,
     LOWER(
       CONCAT(
         report_user_segment_geo_region_area,
         '-',
-        sfdc_opportunity.sales_qualified_source,
+        key_sqs,
         '-',
         sfdc_opportunity.order_type
       )
     ) AS report_user_segment_geo_region_area_sqs_ot,
-    report_opportunity_user_segment AS key_segment,
-    sfdc_opportunity.sales_qualified_source AS key_sqs,
-    deal_group AS key_ot,
-    report_opportunity_user_segment || '_' || sfdc_opportunity.sales_qualified_source AS key_segment_sqs,
-    report_opportunity_user_segment || '_' || deal_group AS key_segment_ot,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo AS key_segment_geo,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || sfdc_opportunity.sales_qualified_source AS key_segment_geo_sqs,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || deal_group AS key_segment_geo_ot,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region AS key_segment_geo_region,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || sfdc_opportunity.sales_qualified_source AS key_segment_geo_region_sqs,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || deal_group AS key_segment_geo_region_ot,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area AS key_segment_geo_region_area,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || sfdc_opportunity.sales_qualified_source AS key_segment_geo_region_area_sqs,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || deal_group AS key_segment_geo_region_area_ot,
-    report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_area AS key_segment_geo_area,
+    COALESCE(report_opportunity_user_segment, 'other') AS key_segment,
+    COALESCE(deal_group, 'other') AS key_ot,
+    COALESCE(report_opportunity_user_segment || '_' || key_sqs, 'other') AS key_segment_sqs,
+    COALESCE(report_opportunity_user_segment || '_' || deal_group, 'other') AS key_segment_ot,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo, 'other') AS key_segment_geo,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || key_sqs, 'other') AS key_segment_geo_sqs,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || deal_group, 'other') AS key_segment_geo_ot,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region, 'other') AS key_segment_geo_region,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || key_sqs, 'other') AS key_segment_geo_region_sqs,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || deal_group, 'other') AS key_segment_geo_region_ot,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area, 'other') AS key_segment_geo_region_area,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || key_sqs, 'other') AS key_segment_geo_region_area_sqs,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || deal_group, 'other') AS key_segment_geo_region_area_ot,
+    COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_area, 'other') AS key_segment_geo_area,
     COALESCE(
       report_opportunity_user_segment, 'other'
     ) AS sales_team_cro_level,
@@ -1292,6 +1319,11 @@ WITH first_contact  AS (
       ON sfdc_opportunity.dim_crm_user_id= sfdc_user.user_id
     {%- if model_type == 'snapshot' %}
         AND sfdc_opportunity.snapshot_id = sfdc_user.snapshot_id
+    {%- endif %}
+    LEFT JOIN sfdc_user AS account_owner
+      ON sfdc_account.owner_id = account_owner.user_id
+    {%- if model_type == 'snapshot' %}
+        AND sfdc_opportunity.snapshot_id = account_owner.snapshot_id
     {%- endif %}
     LEFT JOIN live_opportunity_owner_fields
       ON sfdc_opportunity.dim_crm_opportunity_id = live_opportunity_owner_fields.dim_crm_opportunity_id

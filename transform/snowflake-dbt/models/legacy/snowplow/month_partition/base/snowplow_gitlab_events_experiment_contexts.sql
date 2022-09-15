@@ -1,5 +1,5 @@
-{% set year_value = var('year', run_started_at.strftime('%Y')) %}
-{% set month_value = var('month', run_started_at.strftime('%m')) %}
+{% set year_value = var('year', (run_started_at - modules.datetime.timedelta(1)).strftime('%Y')) %}
+{% set month_value = var('month', (run_started_at - modules.datetime.timedelta(1)).strftime('%m')) %}
 
 WITH base AS (
 

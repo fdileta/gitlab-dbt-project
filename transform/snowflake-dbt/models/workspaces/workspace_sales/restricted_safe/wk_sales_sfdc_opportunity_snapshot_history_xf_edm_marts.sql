@@ -274,7 +274,7 @@ WITH date_details AS (
       edm_snapshot_opty.competitors_aws_flag,
 
       edm_snapshot_opty.stage_category,
-      edm_snapshot_opty.pipeline_calculated_deal_count          AS calculated_deal_count,
+      edm_snapshot_opty.calculated_deal_count          AS calculated_deal_count,
       -- calculated age field
       -- if open, use the diff between created date and snapshot date
       -- if closed, a) the close date is later than snapshot date, use snapshot date

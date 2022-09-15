@@ -134,6 +134,7 @@
       {{ usage_ping_month_range('audit_screen_view_28_days_user') }},
       {{ usage_ping_month_range('instance_audit_screen_view_28_days_user') }},
       {{ usage_ping_month_range('credential_inventory_view_28_days_user') }},
+      {{ usage_ping_month_range('compliance_frameworks_pipeline_all_time_event') }},
       {{ usage_ping_month_range('compliance_frameworks_pipeline_28_days_event') }},
       {{ usage_ping_month_range('groups_streaming_destinations_all_time_event') }},
       {{ usage_ping_month_range('groups_streaming_destinations_28_days_event') }},
@@ -141,7 +142,8 @@
       {{ usage_ping_month_range('audit_event_destinations_28_days_event') }},
       {{ usage_ping_month_range('projects_status_checks_all_time_event') }},
       {{ usage_ping_month_range('external_status_checks_all_time_event') }},
-      {{ usage_ping_month_range('paid_license_search_28_days_user') }}
+      {{ usage_ping_month_range('paid_license_search_28_days_user') }},
+      {{ usage_ping_month_range('last_activity_28_days_user') }}
     FROM monthly_metrics
 
 ), diffs AS (
@@ -259,6 +261,7 @@
       {{ usage_ping_over_ping_difference('audit_screen_view_28_days_user') }},
       {{ usage_ping_over_ping_difference('instance_audit_screen_view_28_days_user') }},
       {{ usage_ping_over_ping_difference('credential_inventory_view_28_days_user') }},
+      {{ usage_ping_over_ping_difference('compliance_frameworks_pipeline_all_time_event') }},
       {{ usage_ping_over_ping_difference('compliance_frameworks_pipeline_28_days_event') }},
       {{ usage_ping_over_ping_difference('groups_streaming_destinations_all_time_event') }},
       {{ usage_ping_over_ping_difference('groups_streaming_destinations_28_days_event') }},
@@ -266,7 +269,8 @@
       {{ usage_ping_over_ping_difference('audit_event_destinations_28_days_event') }},
       {{ usage_ping_over_ping_difference('projects_status_checks_all_time_event') }},
       {{ usage_ping_over_ping_difference('external_status_checks_all_time_event') }},
-      {{ usage_ping_over_ping_difference('paid_license_search_28_days_user') }}
+      {{ usage_ping_over_ping_difference('paid_license_search_28_days_user') }},
+      {{ usage_ping_over_ping_difference('last_activity_28_days_user') }}
     FROM monthly_metrics
 
 ), smoothed_diffs AS (
@@ -378,6 +382,7 @@
       {{ usage_ping_over_ping_smoothed('audit_screen_view_28_days_user') }},
       {{ usage_ping_over_ping_smoothed('instance_audit_screen_view_28_days_user') }},
       {{ usage_ping_over_ping_smoothed('credential_inventory_view_28_days_user') }},
+      {{ usage_ping_over_ping_smoothed('compliance_frameworks_pipeline_all_time_event') }},
       {{ usage_ping_over_ping_smoothed('compliance_frameworks_pipeline_28_days_event') }},
       {{ usage_ping_over_ping_smoothed('groups_streaming_destinations_all_time_event') }},
       {{ usage_ping_over_ping_smoothed('groups_streaming_destinations_28_days_event') }},
@@ -385,7 +390,8 @@
       {{ usage_ping_over_ping_smoothed('audit_event_destinations_28_days_event') }},
       {{ usage_ping_over_ping_smoothed('projects_status_checks_all_time_event') }},
       {{ usage_ping_over_ping_smoothed('external_status_checks_all_time_event') }},
-      {{ usage_ping_over_ping_smoothed('paid_license_search_28_days_user') }}
+      {{ usage_ping_over_ping_smoothed('paid_license_search_28_days_user') }},
+      {{ usage_ping_over_ping_smoothed('last_activity_28_days_user') }}
     FROM diffs
     INNER JOIN months
       ON diffs.snapshot_month = months.first_day_of_month
@@ -502,6 +508,7 @@
       {{ usage_ping_over_ping_estimated('audit_screen_view_28_days_user') }},
       {{ usage_ping_over_ping_estimated('instance_audit_screen_view_28_days_user') }},
       {{ usage_ping_over_ping_estimated('credential_inventory_view_28_days_user') }},
+      {{ usage_ping_over_ping_estimated('compliance_frameworks_pipeline_all_time_event') }},
       {{ usage_ping_over_ping_estimated('compliance_frameworks_pipeline_28_days_event') }},
       {{ usage_ping_over_ping_estimated('groups_streaming_destinations_all_time_event') }},
       {{ usage_ping_over_ping_estimated('groups_streaming_destinations_28_days_event') }},
@@ -509,7 +516,8 @@
       {{ usage_ping_over_ping_estimated('audit_event_destinations_28_days_event') }},
       {{ usage_ping_over_ping_estimated('projects_status_checks_all_time_event') }},
       {{ usage_ping_over_ping_estimated('external_status_checks_all_time_event') }},
-      {{ usage_ping_over_ping_estimated('paid_license_search_28_days_user') }}
+      {{ usage_ping_over_ping_estimated('paid_license_search_28_days_user') }},
+      {{ usage_ping_over_ping_estimated('last_activity_28_days_user') }}
     FROM smoothed_diffs
     LEFT JOIN ping_ranges
       ON smoothed_diffs.dim_subscription_id = ping_ranges.dim_subscription_id
@@ -533,5 +541,5 @@
     created_by="@ischweickartDD",
     updated_by="@mdrussell",
     created_date="2021-03-04",
-    updated_date="2022-08-18"
+    updated_date="2022-08-26"
 ) }}

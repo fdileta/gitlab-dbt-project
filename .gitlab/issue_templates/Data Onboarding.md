@@ -74,6 +74,7 @@ You will need access to several groups, applications, tools, and data sources fo
 |  Google Drive folder: SheetLoad | No |Yes | Yes | Yes | Yes |  ? |
 |  Google Drive folder: Boneyard | No |Yes | Yes | Yes | Yes |  ? |
 |  Service Account Credentials: Google Cloud | No | No | ? | No | Yes | ? |
+|  Monte Carlo Data | No | No | Editor | Editor | Editor | Access Request | 
 
 - [ ] Manager: Complete access requests for the new team member based on there assigned responsibilities following the provided method.
     - [ ] Snowflake - Access Request, [Example](https://gitlab.com/gitlab-com/team-member-epics/access-requests/-/issues/10857)
@@ -123,6 +124,7 @@ There are many slack channels for communication of data team needs and informati
 | `analytics-pipelines` | No | No | Yes | No | No |
 | `data-prom-alerts` | No | No | No | No | Yes |
 | `bt-data-science` | No | No | No | Yes | No |
+| `data-pipelines` | No | No | No | No | Yes |
 
 </details>
 
