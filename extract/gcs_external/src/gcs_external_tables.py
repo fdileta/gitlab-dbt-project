@@ -19,11 +19,11 @@ def get_billing_data_query(start_time: str, end_time: str) -> str:
     """
     sql to run in bigquery for daily partition
     """
-		date_partition_name = '2022_07_07'
+    date_partition_name = '2022_07_07'
     date_partition_date = '2022-07-07'
 
     return f"""
-				EXPORT DATA OPTIONS(
+        EXPORT DATA OPTIONS(
           uri='gs://gl_gcp_billing_export/test_detail/{date_partition_name}/*.parquet',
           format='PARQUET',
           overwrite=true) AS
