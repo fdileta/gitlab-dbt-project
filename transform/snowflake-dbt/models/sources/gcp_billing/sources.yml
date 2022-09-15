@@ -23,10 +23,14 @@ sources:
         description: "GCP Billing detail table exported from bigQuery"
         external:
           location: "@raw.gcp_billing.GCP_BILLING_GCS_EXPORT/test_detail"
-          file_format: "( type = parquet )"      # fully specified here, or reference an existing file format
-          auto_refresh: false                  # requires configuring an event notification from Amazon S3 or Azure
+          file_format: "( type = parquet )"
+          auto_refresh: false
           partitions:
             - name: date_part
               data_type: date
               expression: to_date(split_part(metadata$filename, '/', 2),'YYYY_MM_DD')
-        
+        columns:
+          - name: _partition_date
+            data_type: date
+          - name: adjustment_info
+            data_type: varchar
