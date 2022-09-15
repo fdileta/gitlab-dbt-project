@@ -1,81 +1,57 @@
-"""
-The main module for gcs
-"""
+import json
 import logging
 from os import environ as env
+from typing import List
+from google.cloud import bigquery
 
-from fire import Fire
-from gitlabdata.orchestration_utils import snowflake_engine_factory
+from pandas import DataFrame
+from big_query_client import BigQueryClient
+
+from gitlabdata.orchestration_utils import (
+    snowflake_engine_factory,
+    snowflake_stage_load_copy_remove,
+)
+
+config_dict = env.copy()
 
 
-def get_load_command(path_date: str) -> str:
+def get_billing_data_query(start_time: str, end_time: str) -> str:
     """
-    Generate a load command based on date
+    sql to run in bigquery for daily partition
     """
+		date_partition_name = '2022_07_07'
+    date_partition_date = '2022-07-07'
+
     return f"""
-
-        CREATE OR REPLACE TABLE "CONTAINER_REGISTRY"."JOINED_{path_date.replace('-','_')}" AS (
-
-          WITH blob_downloaded AS (
-          SELECT
-            $1:correlation_id::VARCHAR     AS correlation_id,
-            $1:time::TIMESTAMP             AS timestamp,
-            $1:root_repo::VARCHAR          AS root_repo,
-            $1:vars_name::VARCHAR          AS vars_name,
-            $1:digest::VARCHAR             AS digest,
-            $1:size_bytes::INT             AS size_bytes
-          FROM @container_registry.container_registry/dt={path_date}
-            (file_format=>json_generic)
-            WHERE $1:msg='blob downloaded'
-            ), access AS (
-          SELECT
-            $1:correlation_id::VARCHAR     AS correlation_id,
-            $1:time::TIMESTAMP             AS timestamp,
-            $1:remote_ip::VARCHAR          AS remote_ip
-          FROM @container_registry.container_registry/dt={path_date}
-            (file_format=>json_generic)
-          WHERE $1:msg='access'
-          )
-          SELECT
-            blob_downloaded.correlation_id,
-            blob_downloaded.timestamp,
-            blob_downloaded.root_repo,
-            blob_downloaded.vars_name,
-            blob_downloaded.digest,
-            blob_downloaded.size_bytes,
-            access.remote_ip
-          FROM access
-          INNER JOIN blob_downloaded ON blob_downloaded.correlation_id = access.correlation_id
-
-        );
+				EXPORT DATA OPTIONS(
+          uri='gs://gl_gcp_billing_export/test_detail/{date_partition_name}/*.parquet',
+          format='PARQUET',
+          overwrite=true) AS
+        SELECT * 
+          , DATE(_PARTITIONTIME) as _partition_date 
+        FROM `billing-tools-277316.gitlab_com_detailed_billing.gcp_billing_export_resource_v1_017B02_778F9C_493B83` 
+        WHERE DATE(_PARTITIONTIME) = "{date_partition_date}"
     """
-
-
-def load_data():
-    """
-    run copy command to copy data from snowflake
-    """
-    logging.info("Preparing to load data...")
-    config_dict = env.copy()
-    path_date = config_dict["PATH_DATE"]
-    engine = snowflake_engine_factory(config_dict, "LOADER")
-    logging.info(f"Engine Created: {engine}")
-
-    try:
-        connection = engine.connect()
-        load_command = get_load_command(path_date)
-        logging.info(f"running copy command {load_command}")
-        results = connection.execute(load_command).fetchone()
-        logging.info(results)
-    except:
-        logging.error("Failed to load")
-        raise
-    finally:
-        connection.close()
-        engine.dispose()
-
 
 if __name__ == "__main__":
+
     logging.basicConfig(level=20)
-    Fire(load_data)
+
+    credentials = json.loads(config_dict["GCP_BILLING_ACCOUNT_CREDENTIALS"])
+
+    bq = BigQueryClient(credentials)
+
+    start_time = config_dict["START_TIME"]
+    end_time = config_dict["END_TIME"]
+
+    sql_statement = get_billing_data_query(start_time, end_time)
+
+    logging.info(sql_statement)
+
+    df_result = bq.get_result_from_sql(
+        sql_statement,
+        project="billing-tools-277316",
+        job_config=bigquery.QueryJobConfig(use_legacy_sql=False),
+    )
+
     logging.info("Complete.")
