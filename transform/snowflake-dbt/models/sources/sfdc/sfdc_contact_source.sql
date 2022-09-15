@@ -72,6 +72,7 @@ renamed AS (
     core_check_in_notes__c AS core_check_in_notes,
     leadsource AS lead_source,
     lead_source_type__c AS lead_source_type,
+    behavior_score__c AS behavior_score,
     outreach_stage__c AS outreach_stage,
     sequence_step_number__c AS outreach_step_number,
     account_type__c AS account_type,
