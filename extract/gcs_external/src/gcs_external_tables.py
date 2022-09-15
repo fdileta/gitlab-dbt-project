@@ -48,10 +48,10 @@ if __name__ == "__main__":
 
     logging.info(sql_statement)
 
-    df_result = bq.get_result_from_sql(
+    result = bq.get_result_from_sql(
         sql_statement,
         project="billing-tools-277316",
         job_config=bigquery.QueryJobConfig(use_legacy_sql=False),
     )
-
+    logging.info(result)
     logging.info("Complete.")
