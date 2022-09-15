@@ -44,7 +44,7 @@ default_args = {
 }
 
 dag = DAG(
-    "gcp_billing_extract_partition",
+    "gcs_external",
     default_args=default_args,
     schedule_interval="0 0/8 * * *",
     concurrency=1,
