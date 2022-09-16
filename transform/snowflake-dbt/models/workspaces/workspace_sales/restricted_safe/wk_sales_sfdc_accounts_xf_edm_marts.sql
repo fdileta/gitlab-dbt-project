@@ -53,7 +53,7 @@ SELECT
     mart.support_level,
     mart.named_account,
     mart.crm_account_billing_country                         AS billing_country,
-    mart.crm_account_billing_country_code                    AS billing_country_code,
+    -- mart.crm_account_billing_country_code                    AS billing_country_code, --to be added
     mart.billing_postal_code,
     mart.is_sdr_target_account,
     --lam
