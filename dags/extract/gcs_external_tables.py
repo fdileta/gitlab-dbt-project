@@ -21,6 +21,7 @@ from kube_secrets import (
 )
 
 from kubernetes_helpers import get_affinity, get_toleration
+from yaml import load, safe_load, YAMLError
 
 env = os.environ.copy()
 
@@ -46,37 +47,48 @@ default_args = {
 dag = DAG(
     "gcs_external",
     default_args=default_args,
-    schedule_interval="0 0/8 * * *",
+    schedule_interval="0 12 * * *",
     concurrency=1,
 )
 
 
 # don't add a newline at the end of this because it gets added to in the K8sPodOperator arguments
-billing_extract_command = (
-    f"{clone_and_setup_extraction_cmd} && python gcs_external/src/gcs_external_tables.py"
-)
 
-billing_operator = KubernetesPodOperator(
-    **gitlab_defaults,
-    image=DATA_IMAGE,
-    task_id="gcp-billing-extract-partition",
-    name="gcp-billing-extract-partition",
-    secrets=[
-        GCP_BILLING_ACCOUNT_CREDENTIALS,
-        SNOWFLAKE_ACCOUNT,
-        SNOWFLAKE_LOAD_DATABASE,
-        SNOWFLAKE_LOAD_ROLE,
-        SNOWFLAKE_LOAD_USER,
-        SNOWFLAKE_LOAD_WAREHOUSE,
-        SNOWFLAKE_LOAD_PASSWORD,
-    ],
-    env_vars={
-        **pod_env_vars,
-        "START_TIME": "{{ prev_execution_date }}",
-        "END_TIME": "{{ execution_date }}",
-    },
-    affinity=get_affinity(False),
-    tolerations=get_toleration(False),
-    arguments=[billing_extract_command],
-    dag=dag,
-)
+airflow_home = env["AIRFLOW_HOME"]
+
+with open(f"{airflow_home}/analytics/extract/gcs_external/src/gcp_billing/gcs_external.yml", "r") as file:
+    try:
+        stream = safe_load(file)
+    except YAMLError as exc:
+        print(exc)
+
+for export in stream['exports']:
+
+  billing_extract_command = (
+      f"{clone_and_setup_extraction_cmd} && python gcs_external/src/gcs_external.py"
+  )
+  
+  billing_operator = KubernetesPodOperator(
+      **gitlab_defaults,
+      image=DATA_IMAGE,
+      task_id=export['name'],
+      name=export['name'],
+      secrets=[
+          GCP_BILLING_ACCOUNT_CREDENTIALS,
+          SNOWFLAKE_ACCOUNT,
+          SNOWFLAKE_LOAD_DATABASE,
+          SNOWFLAKE_LOAD_ROLE,
+          SNOWFLAKE_LOAD_USER,
+          SNOWFLAKE_LOAD_WAREHOUSE,
+          SNOWFLAKE_LOAD_PASSWORD,
+      ],
+      env_vars={
+          **pod_env_vars,
+					**export,
+          "EXPORT_DATE": "{{ execution_date }}",
+      },
+      affinity=get_affinity(False),
+      tolerations=get_toleration(False),
+      arguments=[billing_extract_command],
+      dag=dag,
+  )
