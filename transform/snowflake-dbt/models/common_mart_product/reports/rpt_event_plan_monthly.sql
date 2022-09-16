@@ -12,7 +12,18 @@
 mart_with_date_range AS (
 
   SELECT
-    mart_event_valid.*,
+    mart_event_valid.dim_ultimate_parent_namespace_id,
+    mart_event_valid.event_calendar_month,
+    mart_event_valid.event_calendar_quarter,
+    mart_event_valid.event_calendar_year,
+    mart_event_valid.event_name,
+    mart_event_valid.stage_name,
+    mart_event_valid.section_name,
+    mart_event_valid.group_name,
+    mart_event_valid.is_smau,
+    mart_event_valid.is_gmau,
+    mart_event_valid.is_umau,
+    mart_event_valid.dim_user_id,
     dim_date.last_day_of_month AS last_day_of_month,
     dim_date.last_day_of_quarter AS last_day_of_quarter,
     dim_date.last_day_of_fiscal_year AS last_day_of_fiscal_year
