@@ -65,14 +65,16 @@ with open(f"{airflow_home}/analytics/extract/gcs_external/src/gcp_billing/gcs_ex
 for export in stream['exports']:
 
   billing_extract_command = (
-      f"{clone_and_setup_extraction_cmd} && python gcs_external/src/gcs_external.py"
+      f"{clone_and_setup_extraction_cmd} && python gcs_external/src/gcp_billing/gcs_external.py"
   )
   
+  task_name = export['name']
+
   billing_operator = KubernetesPodOperator(
       **gitlab_defaults,
       image=DATA_IMAGE,
-      task_id=export['name'],
-      name=export['name'],
+      task_id=task_name,
+      name=task_name,
       secrets=[
           GCP_BILLING_ACCOUNT_CREDENTIALS,
           SNOWFLAKE_ACCOUNT,
@@ -84,7 +86,7 @@ for export in stream['exports']:
       ],
       env_vars={
           **pod_env_vars,
-          **export,
+          # **export,
           "EXPORT_DATE": "{{ execution_date }}",
       },
       affinity=get_affinity(False),
@@ -92,4 +94,3 @@ for export in stream['exports']:
       arguments=[billing_extract_command],
       dag=dag,
   )
-  
