@@ -56,11 +56,10 @@
 **Business Logic in this Model:** 
 - Valid events where the Event Create DateTime is >= User Create DateTime
 - Events from blocked users are excluded
-- Aggregated Event Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
+- Aggregated Event, Namespace and User Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
   - Events that are 29,30 or 31 days prior to the Last Day of the Month will Not be included in these totals
   - This is intended to match the instance-level month over month service ping metrics by getting a 28-day count
-- Latest Plan ID is the last plan ID in the Month for a Namespace.  This value is retrieved from events in the entire month, not just 28 days.  This is to prevent missing last events for the Namespaces that may occur the 1st or 2nd day of the month for months with 30 and 31 days.
-  - Ultimate Parent Namespace Count is totalled from the entire Month as well.  This is a Distinct Count of Namespace by Month, Latest Plan ID, Event .     
+- Latest Plan ID is the last plan ID in the Month for a Namespace.  This value is derived from the 28-day events dataset as well.  
 
 **Other Comments:**
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
