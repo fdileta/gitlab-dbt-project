@@ -141,7 +141,7 @@ Your computer set up is critical to working efficiently.  This section will help
 | [Command Line Interface](#command-line-interface) | No | No | No | No | Yes |
 | [Google Cloud](#google-cloud) | No | No | No | Yes | Yes |
 | [Jupyter](#jupyter) | No | No | No | Yes | No |
-| [Airflow](#airflow) | No | No | Yes | No | Yes |
+| [Airflow local development environment](#airflow) | No | No | Yes | No | Yes |
 | [Optional Steps](#optional-steps) | No | Yes | Yes | Yes | Yes |
 
 
