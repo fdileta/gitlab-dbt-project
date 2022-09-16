@@ -14,7 +14,6 @@
   ('services', 'gitlab_dotcom_integrations_source'),
   ('project', 'prep_project')
 ]) }}
-
 -------------------------- Start of PQL logic: --------------------------
 
 , namespaces AS (
@@ -614,6 +613,20 @@
           THEN TRUE
         ELSE FALSE
       END                                                                                        AS has_free_namespace_with_public_project,
+      CASE
+        WHEN MAX(marketing_contact_order.is_ultimate_parent_namespace_public) = TRUE
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                        AS is_member_of_public_ultimate_parent_namespace,
+      CASE
+        WHEN MAX(marketing_contact_order.is_ultimate_parent_namespace_private) = TRUE
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                        AS is_member_of_private_ultimate_parent_namespace,
+      ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_public = TRUE, marketing_contact_order.dim_namespace_id, NULL))
+                                                                                                 AS public_ultimate_parent_namespaces,
+      ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_private = TRUE, marketing_contact_order.dim_namespace_id, NULL))
+                                                                                                 AS private_ultimate_parent_namespaces,
       ARRAY_AGG(
                 DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
                   IFNULL(marketing_contact_order.saas_product_tier, '') || IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Role') 
@@ -677,6 +690,9 @@
       IFF(is_saas_delivery
         OR is_self_managed_delivery,
         TRUE, FALSE)                                        AS is_paid_tier,
+      marketing_contact.is_paid_tier_marketo,
+      IFF(is_paid_tier = TRUE OR (is_paid_tier = FALSE AND marketing_contact.is_paid_tier_marketo = TRUE), TRUE, FALSE)
+                                                            AS is_paid_tier_change,
       subscription_aggregate.min_subscription_start_date,
       subscription_aggregate.max_subscription_end_date,
       paid_subscription_aggregate.nbr_of_paid_subscriptions,
@@ -734,6 +750,9 @@
       marketing_contact.customer_db_created_date,
       marketing_contact.customer_db_confirmed_date,
       IFF(latest_pql.email IS NOT NULL, TRUE, FALSE) AS is_pql,
+      marketing_contact.is_pql_marketo,
+      IFF(is_pql = TRUE OR (is_pql = FALSE AND marketing_contact.is_pql_marketo = TRUE), TRUE, FALSE)
+                                            AS is_pql_change,
       latest_pql.pql_namespace_id,
       latest_pql.pql_namespace_name,
       latest_pql.pql_namespace_name_masked,
@@ -905,16 +924,19 @@
       'pql_nbr_integrations_installed',
       'pql_integrations_installed',
       'pql_namespace_creator_job_description',
-      'is_pql'
+      'is_pql',
+      'is_paid_tier',
+      'is_pql_change',
+      'is_paid_tier_change'
       ]
 ) }}
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@trevor31",
-    updated_by="@mdrussell",
+    updated_by="@jpeguero",
     created_date="2021-02-09",
-    updated_date="2022-08-26"
+    updated_date="2022-08-31"
 ) }}
 
 

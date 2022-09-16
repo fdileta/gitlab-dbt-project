@@ -68,6 +68,7 @@ WITH biz_person AS (
 
       --info
       person_score,
+      behavior_score,
       contact_title                                 AS title,
       it_job_title_hierarchy,
       has_opted_out_email,
@@ -170,6 +171,7 @@ WITH biz_person AS (
 
       --info
       person_score,
+      behavior_score,
       title,
       it_job_title_hierarchy,
       has_opted_out_email,
@@ -271,7 +273,7 @@ WITH biz_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@lisvinueza",
+    updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-09-12"
+    updated_date="2022-09-14"
 ) }}

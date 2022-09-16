@@ -665,6 +665,9 @@ snapshots:
     target_schema: "snapshots"
     transient: false
 
+    bizible:
+      +tags: ["daily"]
+
     common:
       +tags: ["edm_snapshot"]
 
