@@ -92,3 +92,4 @@ for export in stream['exports']:
       arguments=[billing_extract_command],
       dag=dag,
   )
+  
