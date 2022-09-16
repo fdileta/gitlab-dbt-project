@@ -100,7 +100,7 @@ WITH sfdc_opportunity AS (
       sfdc_opportunity_xf.sales_path,
       sfdc_opportunity_xf.sales_type,
       sfdc_opportunity_xf.stage_name,
-      COALESCE(sfdc_opportunity_xf.order_type_stamped, 'NA')  AS order_type_stamped,
+      COALESCE(sfdc_opportunity_xf.order_type_stamped, 'Missing order_type_name')  AS order_type_stamped,
 
 
       ----------------------------------------------------------
@@ -245,7 +245,7 @@ WITH sfdc_opportunity AS (
       CASE
         WHEN sfdc_opportunity_xf.sales_qualified_source = 'BDR Generated'
             THEN 'SDR Generated'
-        ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source,'NA')
+        ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source, 'Missing sales_qualified_source_name')
       END                                                           AS sales_qualified_source,
 
       CASE
