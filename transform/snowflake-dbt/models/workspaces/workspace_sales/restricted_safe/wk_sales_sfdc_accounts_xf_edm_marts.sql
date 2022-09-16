@@ -53,8 +53,7 @@ SELECT
     mart.support_level,
     mart.named_account,
     mart.crm_account_billing_country                         AS billing_country,
-
-    --billing_country_code -- to be added in https://gitlab.com/gitlab-data/analytics/-/merge_requests/7175
+    mart.crm_account_billing_country_code                    AS billing_country_code,
     mart.billing_postal_code,
     mart.is_sdr_target_account,
     --lam
