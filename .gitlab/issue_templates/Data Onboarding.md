@@ -144,7 +144,7 @@ Your computer set up is critical to working efficiently.  This section will help
 | [Command Line Interface](#command-line-interface) | No | No | No | No | Yes |
 | [Google Cloud](#google-cloud) | No | No | No | Yes | Yes |
 | [Jupyter](#jupyter) | No | No | No | Yes | No |
-| [Airflow](#airflow) | No | No | Yes | No | Yes |
+| [Airflow local development environment](#airflow) | No | No | Yes | No | Yes |
 | [Optional Steps](#optional-steps) | No | Yes | Yes | Yes | Yes |
 
 
@@ -209,6 +209,19 @@ Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credential
     - [ ] Refresh this file by sourcing it back, by running command in terminal: `source ~/.zshrc`.
 
 ### Airflow
+
+#### Setting up ./kube/config 
+
+**Ensure you have your service credentials configured, and the ${GOOGLE_APPLICATION_CREDENTIALS} variable is set locally as instructed above**
+
+- [ ] Run `gcloud container clusters get-credentials data-ops --zone us-west1-a --project gitlab-analysis` to connect to the Airflow kubernetes cluster, and configure your `./.kube/config` file
+- [ ] Navigate to `./.kube/config`. 
+- [ ] Copy and paste the file, rename the copied file to `./.kube/config_docker`
+- [ ] Open the copied file in a text editor. 
+- [ ] Find the line with `cmd-path: /Users/{your username}/google-cloud-sdk/bin/gcloud`
+- [ ] Replace this line with `cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud`
+
+This file will then be used each time you test locally via Airflow, and is passed to the containers in the ./analytics/docker-compose.yml file.
 
 - [ ] Install [Rancher Desktop](https://rancherdesktop.io/) using the UI install specified for your system
   - [ ] Make sure to download Rancher Desktop version `1.4.1` - you can find the correct version for your system here https://github.com/rancher-sandbox/rancher-desktop/releases/tag/v1.4.1
