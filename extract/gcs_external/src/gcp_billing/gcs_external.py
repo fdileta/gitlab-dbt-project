@@ -49,6 +49,8 @@ if __name__ == "__main__":
 
     export_date = config_dict["EXPORT_DATE"]
 
+		export = config_dict["export"]
+
     sql_statement = get_billing_data_query(export, export_date)
 
     logging.info(sql_statement)

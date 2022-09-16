@@ -86,7 +86,7 @@ for export in stream['exports']:
       ],
       env_vars={
           **pod_env_vars,
-          # **export,
+          **export,
           "EXPORT_DATE": "{{ execution_date }}",
       },
       affinity=get_affinity(False),
