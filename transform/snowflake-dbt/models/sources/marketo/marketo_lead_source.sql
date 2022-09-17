@@ -26,6 +26,8 @@ WITH source AS (
       email_bounced_date::DATE                  AS email_bounced_date,
       unsubscribed::BOOLEAN                     AS is_unsubscribed,
       compliance_segment_value::VARCHAR         AS compliance_segment_value,
+      pql_product_qualified_lead_c::BOOLEAN     AS is_pql_marketo,
+      cdbispaidtier_c::BOOLEAN                  AS is_paid_tier_marketo,
       updated_at::TIMESTAMP                     AS updated_at
 
     FROM source
