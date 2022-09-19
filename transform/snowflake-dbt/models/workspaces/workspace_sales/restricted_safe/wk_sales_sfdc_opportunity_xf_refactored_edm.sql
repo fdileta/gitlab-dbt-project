@@ -242,7 +242,7 @@ WITH sfdc_opportunity AS (
     CASE
     WHEN edm_opty.sales_qualified_source_name = 'BDR Generated'
         THEN 'SDR Generated'
-    ELSE COALESCE(edm_opty.sales_qualified_source_name,'NA')
+    ELSE edm_opty.sales_qualified_source_name
     END                                                           AS sales_qualified_source,
 
     CASE
