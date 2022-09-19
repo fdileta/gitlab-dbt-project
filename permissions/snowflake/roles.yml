@@ -3025,6 +3025,7 @@ roles:
         member_of:
             - analyst_marketing
             - analyst_sales
+            - bamboohr
             - customers_db
             - netsuite
             - static_admin
@@ -3034,6 +3035,7 @@ roles:
             - restricted_safe
             - dbt_data_science
             - snowplow
+            - workday
         warehouses:
             - dev_xs
             - dev_l
@@ -3475,9 +3477,11 @@ roles:
     - mcooper:
         member_of:
             - analyst_finance
+            - bamboohr
             - customers_db
             - data_team_analyst
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
         owns:
