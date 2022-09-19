@@ -104,6 +104,7 @@
       dim_crm_person.email_hash,
       dim_crm_person.status,
       dim_crm_person.lead_source,
+      dim_crm_person.was_converted_lead,
       dim_crm_person.source_buckets,
       dim_crm_person.crm_partner_id,
       dim_crm_person.prospect_share_status,
@@ -122,6 +123,8 @@
       dim_bizible_marketing_channel_path.bizible_marketing_channel_path_name,
       dim_sales_segment.sales_segment_name,
       dim_sales_segment.sales_segment_grouped,
+      dim_crm_person.person_score,
+      dim_crm_person.behavior_score,
       dim_crm_person.marketo_last_interesting_moment,
       dim_crm_person.marketo_last_interesting_moment_date,
       dim_crm_person.outreach_step_number,
@@ -144,6 +147,11 @@
       dim_crm_person.account_demographics_upa_city,
       dim_crm_person.account_demographics_upa_street,
       dim_crm_person.account_demographics_upa_postal_code,
+      dim_crm_person.cognism_employee_count,
+      dim_crm_person.leandata_matched_account_employee_count,
+      dim_crm_person.leandata_matched_account_sales_segment,
+      dim_crm_person.employee_bucket,
+      dim_crm_person.zoominfo_company_employee_count,
       fct_crm_person.is_mql,
       fct_crm_person.is_inquiry,
       CASE
@@ -228,7 +236,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@lisvinueza",
+    updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-08-26",
+    updated_date="2022-09-14",
   ) }}  

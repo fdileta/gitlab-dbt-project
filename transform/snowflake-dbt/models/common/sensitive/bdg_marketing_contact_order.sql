@@ -1,3 +1,7 @@
+{{ config(
+    tags=["product"]
+) }}
+
 {{ simple_cte([
     ('marketing_contact', 'dim_marketing_contact'),
     ('marketing_contact_role', 'bdg_marketing_contact_role'),
@@ -65,7 +69,7 @@
       user_license_management_jobs_28_days_user,
       user_secret_detection_jobs_28_days_user,
       projects_with_packages_all_time_event,
-      projects_with_packages_28_days_user,
+      projects_with_packages_28_days_event,
       deployments_28_days_user,
       releases_28_days_user,
       epics_28_days_user,
@@ -99,6 +103,10 @@
       namespace_lineage.is_setup_for_company                                                  AS is_setup_for_company,
       namespace_project_visibility.does_namespace_have_public_project                         AS does_namespace_have_public_project,
       free_namespace_project_visibility.does_free_namespace_have_public_project               AS does_free_namespace_have_public_project,
+      IFF(namespace_lineage.namespace_is_ultimate_parent AND namespace_lineage.visibility_level = 'public', TRUE, FALSE)
+                                                                                              AS is_ultimate_parent_namespace_public,
+      IFF(namespace_lineage.namespace_is_ultimate_parent AND namespace_lineage.visibility_level = 'private', TRUE, FALSE)
+                                                                                              AS is_ultimate_parent_namespace_private,
       marketing_contact_role.customer_db_customer_id                                          AS customer_id,
       marketing_contact_role.zuora_billing_account_id                                         AS dim_billing_account_id,
       CASE
@@ -266,7 +274,7 @@
       instance_metric_wave_aggregate.user_license_management_jobs_28_days_user                                                  AS usage_user_license_management_jobs_28_days_user,
       instance_metric_wave_aggregate.user_secret_detection_jobs_28_days_user                                                    AS usage_user_secret_detection_jobs_28_days_user,
       instance_metric_wave_aggregate.projects_with_packages_all_time_event                                                      AS usage_projects_with_packages_all_time_event,
-      instance_metric_wave_aggregate.projects_with_packages_28_days_user                                                        AS usage_projects_with_packages_28_days_user,
+      instance_metric_wave_aggregate.projects_with_packages_28_days_event                                                       AS usage_projects_with_packages_28_days_event,
       instance_metric_wave_aggregate.deployments_28_days_user                                                                   AS usage_deployments_28_days_user,
       instance_metric_wave_aggregate.releases_28_days_user                                                                      AS usage_releases_28_days_user,
       instance_metric_wave_aggregate.epics_28_days_user                                                                         AS usage_epics_28_days_user,
@@ -285,5 +293,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-04",
-    updated_date="2022-08-18"
+    updated_date="2022-08-31"
 ) }}

@@ -29,6 +29,11 @@ databases:
     - testing_db:
         shared: no
 
+    - cbraza_prod:
+        shared: no
+    - cbraza_prep:
+        shared: no
+
     - csharp_prod:
         shared: no
     - csharp_prep:
@@ -52,6 +57,11 @@ databases:
     - dvanrooijen_prod:
         shared: no
     - dvanrooijen_prep:
+        shared: no
+
+    - eneuberger_prod:
+        shared: no
+    - eneuberger_prep:
         shared: no
 
     - ian_prod:
@@ -89,6 +99,11 @@ databases:
     - judume_prep:
         shared: no
 
+    - juwong_prod:
+        shared: no
+    - juwong_prep:
+        shared: no  
+
     - kaguilar_prod:
         shared: no
     - kaguilar_prep:
@@ -124,6 +139,11 @@ databases:
     - mlaanen_prep:
         shared: no
 
+    - mpetersen_prod:
+        shared: no
+    - mpetersen_prep:
+        shared: no
+
     - mramirez_prod:
         shared: no
     - mramirez_prep:
@@ -142,6 +162,16 @@ databases:
     - nfiguera_prod:
         shared: no
     - nfiguera_prep:
+        shared: no
+
+    - ngalang_prod:
+        shared: no
+    - ngalang_prep:
+        shared: no
+
+    - nraisinghani_prod:
+        shared: no
+    - nraisinghani_prep:
         shared: no
 
     - parmstrong_prod:
@@ -534,7 +564,9 @@ roles:
             - analytics_engineer_core
             - analyst_people
             - analyst_engineering
+            - bamboohr
             - prometheus
+            - workday
 
     - analytics_engineer_gtm:
         member_of:
@@ -1451,9 +1483,7 @@ roles:
                 read:
                     - prod.common_prep.prep_usage_ping_no_license_key
                     - prod.common_mart_product.mart_product_usage_wave_1_3_metrics_latest
-                    - prod.common_mart_product.mart_product_usage_wave_1_3_metrics_monthly
                     - prod.common_mart_product.mart_product_usage_wave_1_3_metrics_monthly_diff
-                    - prod.common_mart_product.mart_saas_product_usage_metrics_monthly
                     - prod.common_mart_product.mart_product_usage_paid_user_metrics_monthly
                     - prod.common_mart_product.mart_product_usage_free_user_metrics_monthly
                     - prod.restricted_safe_common_mart_sales.mart_arr
@@ -2450,6 +2480,7 @@ roles:
             - bamboohr
             - bi_tool_eval_read
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
 
@@ -2469,6 +2500,16 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - cbraza_prep
+                - cbraza_prod
+            schemas:
+                - cbraza_prep.*
+                - cbraza_prod.*
+            tables:
+                - cbraza_prep.*.*
+                - cbraza_prod.*.*
 
     - cmeddaugh:
         member_of:
@@ -2697,12 +2738,45 @@ roles:
                 write:
                     - dvanrooijen_prep.*.*
                     - dvanrooijen_prod.*.*
+
     - eneuberger:
         member_of:
             - analyst_growth
             - restricted_safe
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - eneuberger_prep
+                - eneuberger_prod
+            schemas:
+                - eneuberger_prep.*
+                - eneuberger_prod.*
+            tables:
+                - eneuberger_prep.*.*
+                - eneuberger_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - eneuberger_prep
+                    - eneuberger_prod
+                write:
+                    - eneuberger_prep
+                    - eneuberger_prod
+            schemas:
+                read:
+                    - eneuberger_prep.*
+                    - eneuberger_prod.*
+                write:
+                    - eneuberger_prep.*
+                    - eneuberger_prod.*
+            tables:
+                read:
+                    - eneuberger_prep.*.*
+                    - eneuberger_prod.*.*
+                write:
+                    - eneuberger_prep.*.*
+                    - eneuberger_prod.*.*
 
     - fivetran_role:
         warehouses:
@@ -2951,6 +3025,7 @@ roles:
         member_of:
             - analyst_marketing
             - analyst_sales
+            - bamboohr
             - customers_db
             - netsuite
             - static_admin
@@ -2960,6 +3035,7 @@ roles:
             - restricted_safe
             - dbt_data_science
             - snowplow
+            - workday
         warehouses:
             - dev_xs
             - dev_l
@@ -3100,6 +3176,48 @@ roles:
                 write:
                     - judume_prep.*.*
                     - judume_prod.*.*
+
+    - juwong:
+        member_of:
+            - engineer
+            - restricted_safe
+        warehouses:
+            - dev_xs
+            - dev_m
+            - loading
+            - reporting
+        owns:
+            databases:
+                - juwong_prep
+                - juwong_prod
+            schemas:
+                - juwong_prep.*
+                - juwong_prod.*
+            tables:
+                - juwong_prep.*.*
+                - juwong_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - juwong_prep
+                    - juwong_prod
+                write:
+                    - juwong_prep
+                    - juwong_prod
+            schemas:
+                read:
+                    - juwong_prep.*
+                    - juwong_prod.*
+                write:
+                    - juwong_prep.*
+                    - juwong_prod.*
+            tables:
+                read:
+                    - juwong_prep.*.*
+                    - juwong_prod.*.*
+                write:
+                    - juwong_prep.*.*
+                    - juwong_prod.*.*
 
     - kaguilar:
         member_of:
@@ -3297,6 +3415,7 @@ roles:
         member_of:
             - analyst_finance
             - analyst_people
+            - analytics_engineer_ga
             - bamboohr
             - bamboohr_analytics
             - customers_db
@@ -3358,9 +3477,11 @@ roles:
     - mcooper:
         member_of:
             - analyst_finance
+            - bamboohr
             - customers_db
             - data_team_analyst
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
         owns:
@@ -3496,6 +3617,38 @@ roles:
             - restricted_safe
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - mpetersen_prep
+                - mpetersen_prod
+            schemas:
+                - mpetersen_prep.*
+                - mpetersen_prod.*
+            tables:
+                - mpetersen_prep.*.*
+                - mpetersen_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - mpetersen_prep
+                    - mpetersen_prod
+                write:
+                    - mpetersen_prep
+                    - mpetersen_prod
+            schemas:
+                read:
+                    - mpetersen_prep.*
+                    - mpetersen_prod.*
+                write:
+                    - mpetersen_prep.*
+                    - mpetersen_prod.*
+            tables:
+                read:
+                    - mpetersen_prep.*.*
+                    - mpetersen_prod.*.*
+                write:
+                    - mpetersen_prep.*.*
+                    - mpetersen_prod.*.*
 
     - mramirez:
         member_of:
@@ -3674,6 +3827,38 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - ngalang_prep
+                - ngalang_prod
+            schemas:
+                - ngalang_prep.*
+                - ngalang_prod.*
+            tables:
+                - ngalang_prep.*.*
+                - ngalang_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - ngalang_prep
+                    - ngalang_prod
+                write:
+                    - ngalang_prep
+                    - ngalang_prod
+            schemas:
+                read:
+                    - ngalang_prep.*
+                    - ngalang_prod.*
+                write:
+                    - ngalang_prep.*
+                    - ngalang_prod.*
+            tables:
+                read:
+                    - ngalang_prep.*.*
+                    - ngalang_prod.*.*
+                write:
+                    - ngalang_prep.*.*
+                    - ngalang_prod.*.*
 
     - nkhanna:
         member_of:
@@ -3690,6 +3875,38 @@ roles:
             - zuora_query_api
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - nraisinghani_prep
+                - nraisinghani_prod
+            schemas:
+                - nraisinghani_prep.*
+                - nraisinghani_prod.*
+            tables:
+                - nraisinghani_prep.*.*
+                - nraisinghani_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - nraisinghani_prep
+                    - nraisinghani_prod
+                write:
+                    - nraisinghani_prep
+                    - nraisinghani_prod
+            schemas:
+                read:
+                    - nraisinghani_prep.*
+                    - nraisinghani_prod.*
+                write:
+                    - nraisinghani_prep.*
+                    - nraisinghani_prod.*
+            tables:
+                read:
+                    - nraisinghani_prep.*.*
+                    - nraisinghani_prod.*.*
+                write:
+                    - nraisinghani_prep.*.*
+                    - nraisinghani_prod.*.*
 
     - ofalkenhof:
         member_of:
@@ -3743,6 +3960,7 @@ roles:
     - pempey:
         member_of:
             - engineer
+            - analytics_engineer_ga
             - bi_tool_eval_db
         warehouses:
             - dev_xs
@@ -4005,6 +4223,7 @@ roles:
                 write:
                     - schaturvedi_prep.*.*
                     - schaturvedi_prod.*.*
+
     - sgladchun:
         member_of:
             - analyst_finance
@@ -4029,6 +4248,7 @@ roles:
             - bamboohr
             - reporter
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
 
@@ -4491,6 +4711,11 @@ users:
         can_login: yes
         member_of:
             - judume
+
+    - juwong:
+        can_login: yes
+        member_of:
+            - juwong
 
     - kaguilar:
         can_login: yes

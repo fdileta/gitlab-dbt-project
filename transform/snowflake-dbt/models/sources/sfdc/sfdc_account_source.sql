@@ -84,6 +84,7 @@ renamed AS (
     potential_users__c AS potential_users,
     number_of_licenses_this_account__c AS number_of_licenses_this_account,
     decision_maker_count_linkedin__c AS decision_maker_count_linkedin,
+    numberofemployees                AS number_of_employees,
 
     -- territory success planning fields
     atam_approved_next_owner__c AS tsp_approved_next_owner,
