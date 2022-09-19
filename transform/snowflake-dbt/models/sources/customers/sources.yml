@@ -45,16 +45,8 @@ sources:
               - not_null
       - name: customers_db_license_versions
         columns:
-        - name: id
-          tests:
-            - not_null
-            - unique
-        - name: item_type
-          tests:
-            - not_null
-        - name: event
-          tests:
-            - not_null
+          - name: item_type
+          - name: event
       - name: customers_db_licenses
         columns:
           - name: id
