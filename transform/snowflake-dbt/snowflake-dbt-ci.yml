@@ -385,6 +385,8 @@ clone_dbt_select:
     - ls
     - cd ..
     - ls
-    - cd ~
+    - cd ..
+    - ls
+    - cd ./
     - ls
     - orchestration/manage_snowflake.py manage_clones --database prod --empty
