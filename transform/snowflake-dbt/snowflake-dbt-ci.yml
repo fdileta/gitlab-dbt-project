@@ -1,5 +1,5 @@
 .snowflake_dbt_jobs: &snowflake_dbt_jobs
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.2
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:update_dbt_image_requirements
   stage: ⚙️ dbt Run
   before_script:
     - cd transform/snowflake-dbt/
@@ -381,7 +381,5 @@ clone_dbt_select:
     - dbt deps $CI_PROFILE_TARGET
     - OUTPUT=$(dbt ls --models +dim_subscription --output json --output-keys "database schema name"  --profiles-dir profile --target prod | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
     - echo $OUTPUT
-    - cd ..
-    - cd ..
-    - pip install fire
+    - cd ~
     - orchestration/manage_snowflake.py manage_clones --database prod --empty
