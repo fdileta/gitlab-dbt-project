@@ -382,4 +382,5 @@ clone_dbt_select:
     - OUTPUT=$(dbt ls --models +dim_subscription --output json --output-keys "database schema name"  --profiles-dir profile --target prod | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
     - echo $OUTPUT
     - cd ~
+    - ls
     - orchestration/manage_snowflake.py manage_clones --database prod --empty
