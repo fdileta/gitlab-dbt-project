@@ -383,4 +383,5 @@ clone_dbt_select:
     - echo $OUTPUT
     - cd ..
     - cd ..
+    - pip install fire
     - orchestration/manage_snowflake.py manage_clones --database prod --empty
