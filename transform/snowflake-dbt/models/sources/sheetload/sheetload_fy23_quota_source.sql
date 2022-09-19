@@ -14,7 +14,7 @@ WITH source AS (
     quota_type::VARCHAR AS quota_type,
     participant_id::VARCHAR AS participant_id,
     employee_id::VARCHAR AS employee_id,
-    quota_amnt::VARCHAR AS quota_amnt,
+    quota_amnt::NUMBER AS quota_amnt,
     hc_type::VARCHAR AS hc_type,
     region::VARCHAR AS region,
     role::VARCHAR AS role
