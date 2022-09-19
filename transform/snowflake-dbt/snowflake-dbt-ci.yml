@@ -386,6 +386,7 @@ clone_dbt_select:
     - cd ..
     - ls
     - cd ..
+    - pwd
     - ls
     - cd ./
     - ls
