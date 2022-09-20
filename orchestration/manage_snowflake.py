@@ -30,9 +30,11 @@ class SnowflakeManager:
 
         # Snowflake database name should be in CAPS
         # see https://gitlab.com/meltano/analytics/issues/491
-        self.prep_database = "{}_PREP".format(config_vars["BRANCH_NAME"].upper())
-        self.prod_database = "{}_PROD".format(config_vars["BRANCH_NAME"].upper())
-        self.raw_database = "{}_RAW".format(config_vars["BRANCH_NAME"].upper())
+        self.branch_name = config_vars["BRANCH_NAME"].upper()
+        self.prep_database = "{}_PREP".format(self.branch_name)
+        self.prod_database = "{}_PROD".format(self.branch_name)
+        self.raw_database = "{}_RAW".format(self.branch_name)
+
 
     def generate_db_queries(
         self,
@@ -288,6 +290,17 @@ class SnowflakeManager:
                 # Catches permissions errors
                 logging.error(prg._sql_message(as_unicode=False))
 
+    def create_schemas(self, input):
+        # distinct and convert string into list based on lines
+        input_set = set([i for i in input.split('\n')])
+        input_list = list(input_set)
+
+        for i in input_list:
+            i = i.replace('"', "")
+            output_schema = f"{self.branch_name}_{i}"
+            clone_statement = f'CREATE OR REPLACE SCHEMA {output_schema} CLONE {i};'
+            print(clone_statement)
+            # stages = query_executor(self.engine, stages_query)
 
 if __name__ == "__main__":
     snowflake_manager = SnowflakeManager(env.copy())
