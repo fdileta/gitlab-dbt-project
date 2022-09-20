@@ -2650,6 +2650,12 @@ roles:
                     - degan_prep.*.*
                     - degan_prod.*.*
 
+    - dfelton:
+        member_of:
+            - securityadmin
+        warehouses:
+            - dev_xs
+
     - dmicovic:
         member_of:
             - reporter
@@ -4602,6 +4608,11 @@ users:
         can_login: yes
         member_of:
             - degan
+
+    - dfelton:
+        can_login: yes
+        member_of:
+            - dfelton
 
     - dmicovic:
         can_login: yes
