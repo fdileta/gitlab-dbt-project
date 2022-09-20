@@ -125,7 +125,7 @@ The DRI for this incident is `@username`.
 
 The link to the Data Team Incident issue is <link>
 
-`CC @Justin Farris @meks, @leif, @Wayne,  @Steve Loyd, @lily, @kwiebers, @Sam Awezec, @product-analysts @datateam `
+`CC @Justin Farris , @meks, @leif, @Wayne,  @Steve Loyd, @lily, @kwiebers, @Sam Awezec, @product-analysts @datateam `
 
 
 #### Salesforce
