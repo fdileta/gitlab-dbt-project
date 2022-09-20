@@ -292,6 +292,11 @@ class SnowflakeManager:
 
     def create_schemas(self, *input):
         # distinct and convert string into list based on lines
+        print(input)
+
+        for i in input:
+            print(i)
+
         input_set = set([i for i in input.split('\n')])
         input_list = list(input_set)
 
