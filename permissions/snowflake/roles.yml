@@ -3617,6 +3617,7 @@ roles:
             - analyst_growth
             - customers_db
             - restricted_safe
+            - mailgun
         warehouses:
             - dev_xs
         owns:
