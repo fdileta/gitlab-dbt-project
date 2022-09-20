@@ -290,7 +290,7 @@ class SnowflakeManager:
                 # Catches permissions errors
                 logging.error(prg._sql_message(as_unicode=False))
 
-    def create_schemas(self, input):
+    def create_schemas(self, *input):
         # distinct and convert string into list based on lines
         input_set = set([i for i in input.split('\n')])
         input_list = list(input_set)
