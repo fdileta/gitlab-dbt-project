@@ -56,15 +56,15 @@ WITH date_details AS (
       
   ), sfdc_accounts_xf AS (
     
-    SELECT *
-    FROM prod.restricted_safe_legacy.sfdc_accounts_xf
-    --FROM {{ref('sfdc_accounts_xf')}} 
+    SELECT * 
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
 
   ), stitch_account  AS (
 
     SELECT *
-    FROM raw.salesforce_stitch.account
-    --FROM {{ source('salesforce', 'account') }}
+    --FROM raw.salesforce_stitch.account
+    FROM {{ source('salesforce', 'account') }}
 
   ), sfdc_users_xf AS (
 

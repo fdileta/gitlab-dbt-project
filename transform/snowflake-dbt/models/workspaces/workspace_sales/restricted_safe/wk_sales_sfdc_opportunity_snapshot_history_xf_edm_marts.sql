@@ -11,7 +11,8 @@ WITH date_details AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}} 
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
 
 ), sfdc_opportunity_snapshot_history_legacy AS (
 
