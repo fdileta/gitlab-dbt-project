@@ -128,7 +128,6 @@ clone_stop:
     - analytics/orchestration/manage_snowflake.py delete_clones
 
 
-
 # ======
 # Python Code Checks
 # ======
