@@ -228,7 +228,7 @@ WITH date_details AS (
       edm_snapshot_opty.stage_3_technical_evaluation_date,
       edm_snapshot_opty.stage_4_proposal_date,
       edm_snapshot_opty.stage_5_negotiating_date,
-      sfdc_opportunity_snapshot_history.stage_6_awaiting_signature_date,
+      edm_snapshot_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
       edm_snapshot_opty.stage_6_closed_won_date,
       edm_snapshot_opty.stage_6_closed_lost_date,
       

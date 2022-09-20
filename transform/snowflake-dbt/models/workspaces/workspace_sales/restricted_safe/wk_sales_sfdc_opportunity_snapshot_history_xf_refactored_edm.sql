@@ -115,7 +115,6 @@ WITH date_details AS (
       sfdc_opportunity_snapshot_history.incremental_acv,
       sfdc_opportunity_snapshot_history.net_incremental_acv,
       sfdc_opportunity_snapshot_history.order_type_stamped          AS snapshot_order_type_stamped,
-      sfdc_opportunity_snapshot_history.stage_6_awaiting_signature_date,
 
       edm_snapshot_opty.crm_opportunity_snapshot_id AS opportunity_snapshot_id,
       edm_snapshot_opty.dim_crm_opportunity_id AS opportunity_id,
@@ -220,7 +219,7 @@ WITH date_details AS (
       edm_snapshot_opty.stage_3_technical_evaluation_date,
       edm_snapshot_opty.stage_4_proposal_date,
       edm_snapshot_opty.stage_5_negotiating_date,
- 
+      edm_snapshot_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
       edm_snapshot_opty.stage_6_closed_won_date,
       edm_snapshot_opty.stage_6_closed_lost_date,
 
