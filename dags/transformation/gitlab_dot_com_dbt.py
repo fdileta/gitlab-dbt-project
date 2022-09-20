@@ -39,7 +39,7 @@ dbt_secrets = [
 ]
 
 
-# Dictionary containing the configuration values for the various Postgres DBs for which we need to run DBT snapshots, De dupe model and DBT test on source and model. 
+# Dictionary containing the configuration values for the various Postgres DBs for which we need to run DBT snapshots, De dupe model and DBT test on source and model.
 config_dict = {
     "t_gitlab_customers_db": {
         "dag_name": "t_gitlab_customers_db_dbt",
@@ -56,7 +56,6 @@ config_dict = {
         "dbt_schedule_interval": "0 7 * * *",
         "task_name": "t_gitlab_dotcom",
         "description": "This DAG does Incremental Refresh gitlab.com source table,run snapshot on source table and DBT test ",
-
     },
     "t_gitlab_ops_db": {
         "dag_name": "t_gitlab_ops_db_dbt",
@@ -80,8 +79,8 @@ dbt_dag_args = {
 
 
 def dbt_tasks(dbt_name, dbt_task_identifier):
-  
-   # Snapshot source data
+
+    # Snapshot source data
     snapshot_cmd = f"""
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
@@ -101,7 +100,7 @@ def dbt_tasks(dbt_name, dbt_task_identifier):
         tolerations=get_toleration(False),
     )
 
-    # Run de dupe / rename /scd model    
+    # Run de dupe / rename /scd model
     model_run_cmd = f"""
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
@@ -142,24 +141,23 @@ def dbt_tasks(dbt_name, dbt_task_identifier):
 
     return snapshot, model_run, model_test
 
+
 # Loop through each config_dict and generate a DAG
 for source_name, config in config_dict.items():
     dbt_dag_args["start_date"] = config["start_date"]
 
     dbt_transform_dag = DAG(
-            f"{config['dag_name']}",
-            default_args=dbt_dag_args,
-            schedule_interval=config["dbt_schedule_interval"],
-            description=config["description"],
-        )
+        f"{config['dag_name']}",
+        default_args=dbt_dag_args,
+        schedule_interval=config["dbt_schedule_interval"],
+        description=config["description"],
+    )
 
     with dbt_transform_dag:
         dbt_name = f"{config['dbt_name']}"
         dbt_task_identifier = f"{config['task_name']}"
-        snapshot, model_run, model_test = dbt_tasks(
-                dbt_name, dbt_task_identifier
-            )
+        snapshot, model_run, model_test = dbt_tasks(dbt_name, dbt_task_identifier)
     # DAG flow
     snapshot >> model_run >> model_test
-    
+
     globals()[f"{config['dag_name']}"] = dbt_transform_dag
