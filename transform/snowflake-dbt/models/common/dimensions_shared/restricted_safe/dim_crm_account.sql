@@ -23,10 +23,16 @@ WITH final AS (
 
       ----ultimate parent crm account info
       prep_crm_account.parent_crm_account_name,
+      prep_crm_account.parent_crm_account_sales_segment,
+      prep_crm_account.parent_crm_account_billing_country,
       prep_crm_account.parent_crm_account_billing_country_code,
       prep_crm_account.parent_crm_account_industry_hierarchy,
+      prep_crm_account.parent_crm_account_sales_territory,
+      prep_crm_account.parent_crm_account_tsp_region,
+      prep_crm_account.parent_crm_account_tsp_area,
       prep_crm_account.parent_crm_account_gtm_strategy,
       prep_crm_account.parent_crm_account_focus_account,
+      prep_crm_account.parent_crm_account_tsp_max_family_employees,
       prep_crm_account.parent_crm_account_employee_count_band,
       prep_crm_account.parent_crm_account_created_date,
       prep_crm_account.parent_crm_account_zi_technologies,

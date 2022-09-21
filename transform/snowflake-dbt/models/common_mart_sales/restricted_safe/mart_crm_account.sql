@@ -34,6 +34,12 @@
 
       ----ultimate parent crm account info
       dim_crm_account.parent_crm_account_name,
+      dim_crm_account.parent_crm_account_billing_country,
+      dim_crm_account.parent_crm_account_sales_segment,
+      dim_crm_account.parent_crm_account_sales_territory,
+      dim_crm_account.parent_crm_account_tsp_region,
+      dim_crm_account.parent_crm_account_tsp_area,
+      dim_crm_account.parent_crm_account_tsp_max_family_employees,
       dim_crm_account.parent_crm_account_billing_country_code,
       dim_crm_account.parent_crm_account_industry_hierarchy,
       dim_crm_account.parent_crm_account_gtm_strategy,
