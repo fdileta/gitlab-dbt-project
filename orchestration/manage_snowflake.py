@@ -307,6 +307,13 @@ class SnowflakeManager:
             print(f"Running {clone_statement}")
             query_executor(self.engine, clone_statement)
             print(f"Run {clone_statement}")
+
+            logging.info("Granting rights on stage to GITLAB_CI")
+            grants_query = f"""GRANT READ, WRITE ON SCHEMA {output_schema} TO GITLAB_CI"""
+            res = query_executor(self.engine, grants_query)
+            logging.info(res[0])
+
+
 if __name__ == "__main__":
     snowflake_manager = SnowflakeManager(env.copy())
     Fire(snowflake_manager)
