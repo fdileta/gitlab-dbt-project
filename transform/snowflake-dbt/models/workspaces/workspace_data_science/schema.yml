@@ -52,3 +52,11 @@ models:
         description: 0-1 value representing the likelihood to purchase. For example. a value of 0.61 would mean a 61% likelihood to purchase in the next 40 days
       - name: decile
         description: 1-10 value representing the scoring decile the record falls into. 1 = Top 10% of scores; 10 = Bottom 10% of scores
+  - name: ptpt_scores_by_user
+    description: This model takes the scores from ptpt_scores, transforms it to user / email address grain and uses the latest score date available. This model is then further used in mart_marketing_contact and the marketing pump.
+    columns:
+      - name: email_address_hash
+        description: Hash of the email address for privacy reasons.
+        tests:
+          - not_null
+          - unique
