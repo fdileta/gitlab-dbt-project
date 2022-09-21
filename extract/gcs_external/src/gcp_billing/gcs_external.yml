@@ -13,7 +13,7 @@ exports:
   - name: summary-gcp-billing
     table: billing-tools-277316.gitlab_com_billing.gcp_billing_export_v1_017B02_778F9C_493B83
     bucket_path: gs://gl_gcp_billing_export/summary
-    partition_column: DATE(_PARTITIONTIME)
+    partition_column: CAST(DATE(_partitiontime) AS STRING FORMAT 'YYYY-MM')
     partition_date_part: m
     selected_columns:
       - "*"
