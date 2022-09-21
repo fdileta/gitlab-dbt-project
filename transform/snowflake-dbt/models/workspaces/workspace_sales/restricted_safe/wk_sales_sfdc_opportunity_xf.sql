@@ -29,7 +29,8 @@ we can delete this connection and use the mart table directly.
 ), sfdc_accounts_xf AS (
 
     SELECT * 
-    FROM {{ref('sfdc_accounts_xf')}}
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 
 ), date_details AS (

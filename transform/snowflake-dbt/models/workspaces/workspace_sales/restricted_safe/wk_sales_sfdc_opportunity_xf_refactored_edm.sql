@@ -30,8 +30,8 @@ WITH sfdc_opportunity AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}}
-    --FROM prod.restricted_safe_legacy.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 ), date_details AS (
 
@@ -59,7 +59,6 @@ WITH sfdc_opportunity AS (
 
    SELECT
     -- JK 20220912 Pending fields to be added to the edm mart
-    sfdc_opportunity_xf.stage_6_awaiting_signature_date,
     -- NF 20220727 These next fields are needed for custom logic down the line
     sfdc_opportunity_xf.incremental_acv,
     sfdc_opportunity_xf.net_incremental_acv,
@@ -156,7 +155,7 @@ WITH sfdc_opportunity AS (
     edm_opty.stage_3_technical_evaluation_date,
     edm_opty.stage_4_proposal_date,
     edm_opty.stage_5_negotiating_date,
-    
+    edm_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
     edm_opty.stage_6_closed_won_date,
     edm_opty.stage_6_closed_lost_date,
     edm_opty.cp_champion,
