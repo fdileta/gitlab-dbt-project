@@ -313,6 +313,11 @@ class SnowflakeManager:
             res = query_executor(self.engine, grants_query)
             logging.info(res[0])
 
+            logging.info("Granting rights on stage to LOADER")
+            grants_query = f"""GRANT USAGE ON SCHEMA {output_schema} TO LOADER"""
+            res = query_executor(self.engine, grants_query)
+            logging.info(res[0])
+
 
 if __name__ == "__main__":
     snowflake_manager = SnowflakeManager(env.copy())
