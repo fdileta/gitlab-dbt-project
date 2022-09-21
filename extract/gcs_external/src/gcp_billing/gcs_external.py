@@ -15,11 +15,12 @@ from gitlabdata.orchestration_utils import (
 
 config_dict = env.copy()
 
+
 def get_export(export_name: str) -> dict:
     """
     retrieve export record attributes from gcs_external.yml
     """
-    
+
     with open("gcs_external/src/gcp_billing/gcs_external.yml", "r") as yaml_file:
         try:
             stream = safe_load(yaml_file)
@@ -33,18 +34,18 @@ def get_export(export_name: str) -> dict:
     ][0]
 
     return export
-  
+
 
 def get_billing_data_query(export: dict, export_date: str) -> str:
     """
     sql to run in bigquery for daily partition
-    """  
-    if export['partition_date_part'] == 'd':
-       partition = export_date[0:10]
-    elif export['partition_date_part'] == 'm':
-       partition = export_date[0:7]
+    """
+    if export["partition_date_part"] == "d":
+        partition = export_date[0:10]
+    elif export["partition_date_part"] == "m":
+        partition = export_date[0:7]
 
-    select_string = ', '.join(export['selected_columns'])
+    select_string = ", ".join(export["selected_columns"])
 
     return f"""
         EXPORT DATA OPTIONS(
@@ -57,6 +58,7 @@ def get_billing_data_query(export: dict, export_date: str) -> str:
             WHERE {export['partition_column']} = '{partition}'
     """
 
+
 def run_export(export_name: str):
     """
     run sql command in bigquery
@@ -66,7 +68,7 @@ def run_export(export_name: str):
     sql_statement = get_billing_data_query(export, export_date)
 
     logging.info(sql_statement)
-    
+
     credentials = json.loads(config_dict["GCP_BILLING_ACCOUNT_CREDENTIALS"])
     bq = BigQueryClient(credentials)
     # result = bq.get_result_from_sql(
@@ -74,6 +76,7 @@ def run_export(export_name: str):
     #     project="billing-tools-277316",
     #     job_config=bigquery.QueryJobConfig(use_legacy_sql=False),
     # )
+
 
 if __name__ == "__main__":
 

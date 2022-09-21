@@ -40,7 +40,11 @@ default_args = {
 }
 
 # Create the DAG
-dag = DAG("el_gcs_container_registry", default_args=default_args, schedule_interval="0 3 * * *")
+dag = DAG(
+    "el_gcs_container_registry",
+    default_args=default_args,
+    schedule_interval="0 3 * * *",
+)
 
 airflow_home = env["AIRFLOW_HOME"]
 
