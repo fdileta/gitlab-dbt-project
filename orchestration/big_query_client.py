@@ -71,7 +71,6 @@ class BigQueryClient:
     ) -> pd.DataFrame:
         """
             Uses BigQuery client to query data and return result,
-            Result is then converted to a dataframe and returned see documentation
             https://googleapis.dev/python/bigquery/latest/generated/google.cloud.bigquery.job.QueryJob.html
             Under the hood the client library is actually creating a job in bigquery which is used to
             query and return the results.

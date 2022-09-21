@@ -9,7 +9,8 @@ exports:
     partition_date_part: d
     selected_columns:
       - "*"
-      - DATE(_PARTITIONTIME) as _partition_date 
+      - DATE(_PARTITIONTIME) as _partition_date
+      - current_timestamp() as gcs_export_time
   - name: summary-gcp-billing
     table: billing-tools-277316.gitlab_com_billing.gcp_billing_export_v1_017B02_778F9C_493B83
     bucket_path: gs://gl_gcp_billing_export/summary
@@ -18,3 +19,4 @@ exports:
     selected_columns:
       - "*"
       - DATE(_PARTITIONTIME) as _partition_date
+      - current_timestamp() as gcs_export_time
