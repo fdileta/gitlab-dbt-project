@@ -1180,14 +1180,14 @@ WITH first_contact  AS (
         report_opportunity_user_segment,'-',report_opportunity_user_geo,'-',report_opportunity_user_region,'-',report_opportunity_user_area
       ) 
     ) AS report_user_segment_geo_region_area,
-    COALESCE(sfdc_opportunity.sales_qualified_source, 'NA') AS key_sqs,
+    COALESCE(sfdc_opportunity.sales_qualified_source, 'Missing sales_qualified_source_name') AS key_sqs,
     LOWER(
       CONCAT(
         report_user_segment_geo_region_area,
         '-',
         key_sqs,
         '-',
-        sfdc_opportunity.order_type
+        COALESCE(sfdc_opportunity.order_type, 'Missing order_type_name')
       )
     ) AS report_user_segment_geo_region_area_sqs_ot,
     COALESCE(report_opportunity_user_segment, 'other') AS key_segment,
