@@ -2022,6 +2022,7 @@ roles:
                     - prod.restricted_safe_legacy
                     - prod.restricted_safe_common_prep
                     - prod.restricted_safe_workspace_finance
+                    - prod.restricted_safe_workspace_marketing
                     - prod.restricted_safe_workspace_sales
                     - prod.restricted_safe_common_mart_product
                     - prod.workspace_data_science
@@ -2035,6 +2036,7 @@ roles:
                     - prod.restricted_safe_legacy.*
                     - prod.restricted_safe_common_prep.*
                     - prod.restricted_safe_workspace_finance.*
+                    - prod.restricted_safe_workspace_marketing.*
                     - prod.restricted_safe_workspace_sales.*
                     - prod.restricted_safe_common_mart_product.*
                     - prod.workspace_data_science.*
@@ -3621,6 +3623,7 @@ roles:
             - analyst_growth
             - customers_db
             - restricted_safe
+            - mailgun
         warehouses:
             - dev_xs
         owns:
