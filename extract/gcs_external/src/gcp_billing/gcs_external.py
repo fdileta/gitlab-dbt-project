@@ -20,7 +20,7 @@ def get_export(export_name: str) -> dict:
     retrieve export record attributes from gcs_external.yml
     """
     
-    with open("extract/gcs_external/src/gcp_billing/gcs_external.yml", "r") as yaml_file:
+    with open("gcs_external/src/gcp_billing/gcs_external.yml", "r") as yaml_file:
         try:
             stream = safe_load(yaml_file)
         except YAMLError as exc:
@@ -75,11 +75,8 @@ def run_export(export_name: str):
     #     job_config=bigquery.QueryJobConfig(use_legacy_sql=False),
     # )
 
-import os
-
 if __name__ == "__main__":
 
     logging.basicConfig(level=20)
-    logging.info(os.getcwd())
     fire.Fire(run_export)
     logging.info("Complete.")
