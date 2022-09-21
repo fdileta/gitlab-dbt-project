@@ -309,7 +309,7 @@ class SnowflakeManager:
             print(f"Run {clone_statement}")
 
             logging.info("Granting rights on stage to GITLAB_CI")
-            grants_query = f"""GRANT READ, WRITE ON SCHEMA {output_schema} TO GITLAB_CI"""
+            grants_query = f"""GRANT USAGE SCHEMA {output_schema} TO GITLAB_CI"""
             res = query_executor(self.engine, grants_query)
             logging.info(res[0])
 
