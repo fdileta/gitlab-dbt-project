@@ -166,6 +166,12 @@ models:
         description: Flags if customer db owner
       - name: is_zuora_billing_contact
         description: Flags if zuora billing contact
+      - name: is_marketo_lead
+        description: Flags if marketo lead
+      - name: is_marketo_email_hard_bounced
+        description: Flags if marketing contact email has hard bounced
+      - name: marketo_email_hard_bounced_date
+        description: Date when the marketing contact email hard bounced
       - name: days_since_saas_trial_ended
         description: Number of days since saas trial ended
       - name: days_until_saas_trial_ends
@@ -350,4 +356,3 @@ models:
         description: Past ptpt_score_date givene to the ptpt_namespace_id
       - name: is_ptpt_contact
         description: Flag if marketing contact has a ptpt score
-        
