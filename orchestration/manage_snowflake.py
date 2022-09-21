@@ -304,9 +304,9 @@ class SnowflakeManager:
             i = i.replace('"', "")
             output_schema = f"{self.branch_name}_{i}"
             clone_statement = f'CREATE OR REPLACE SCHEMA {output_schema} CLONE {i};'
-            print(clone_statement)
-            # stages = query_executor(self.engine, stages_query)
-
+            print(f"Running {clone_statement}")
+            query_executor(self.engine, clone_statement)
+            print(f"Run {clone_statement}")
 if __name__ == "__main__":
     snowflake_manager = SnowflakeManager(env.copy())
     Fire(snowflake_manager)
