@@ -58,7 +58,7 @@ def get_billing_data_query(export: dict, export_date: str) -> str:
             WHERE {export['partition_column']} = '{partition}'
     """
 
-def run_export(export_name: str, export_date: str):
+def run_export(export_name: str):
     """
     run sql command in bigquery
     """
