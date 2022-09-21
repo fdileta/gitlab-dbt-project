@@ -1,11 +1,12 @@
 import json
 import logging
-from os import environ as env
+import fire
+import os
 from typing import List
 from google.cloud import bigquery
 
-from pandas import DataFrame
 from big_query_client import BigQueryClient
+from yaml import load, safe_load, YAMLError
 
 from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
@@ -14,17 +15,35 @@ from gitlabdata.orchestration_utils import (
 
 config_dict = env.copy()
 
+def get_export(export_name: str) -> dict:
+    """
+    retrieve export record attributes from gcs_external.yml
+    """
+    
+
+    with open("extract/gcs_external/src/gcp_billing/gcs_external.yml", "r") as yaml_file:
+        try:
+            stream = safe_load(yaml_file)
+        except YAMLError as exc:
+            print(exc)
+
+    export = [
+        export
+        for export in stream["exports"]
+        if (export_name is None or export.get("name") == export_name)
+    ][0]
+
+    return export
+  
 
 def get_billing_data_query(export: dict, export_date: str) -> str:
     """
     sql to run in bigquery for daily partition
-    """
-    
-
+    """  
     if export['partition_date_part'] == 'd':
        partition = export_date
     elif export['partition_date_part'] == 'm':
-       partition = export_date
+       partition = export_date[0:7]
 
     select_string = ', '.join(export['selected_columns'])
 
@@ -39,25 +58,28 @@ def get_billing_data_query(export: dict, export_date: str) -> str:
             WHERE {export['partition_column']} = '{partition}'
     """
 
-if __name__ == "__main__":
-
-    logging.basicConfig(level=20)
-
-    credentials = json.loads(config_dict["GCP_BILLING_ACCOUNT_CREDENTIALS"])
-
-    bq = BigQueryClient(credentials)
-
+def run_export(export_name: str, export_date: str):
+    """
+    run sql command in bigquery
+    """
+    export = get_export(export_name)
     export_date = config_dict["EXPORT_DATE"]
-
-		export = config_dict["export"]
-
     sql_statement = get_billing_data_query(export, export_date)
 
     logging.info(sql_statement)
+    
+    credentials = json.loads(config_dict["GCP_BILLING_ACCOUNT_CREDENTIALS"])
 
     # result = bq.get_result_from_sql(
     #     sql_statement,
     #     project="billing-tools-277316",
     #     job_config=bigquery.QueryJobConfig(use_legacy_sql=False),
     # )
+
+if __name__ == "__main__":
+
+    logging.basicConfig(level=20)
+
+    bq = BigQueryClient(credentials)
+    fire.Fire(run_export)
     logging.info("Complete.")

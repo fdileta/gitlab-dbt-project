@@ -56,25 +56,28 @@ dag = DAG(
 
 airflow_home = env["AIRFLOW_HOME"]
 
-with open(f"{airflow_home}/analytics/extract/gcs_external/src/gcp_billing/gcs_external.yml", "r") as file:
+with open(f"{airflow_home}/analytics/extract/gcs_external/src/gcp_billing/gcs_external.yml", "r") as yaml_file:
     try:
-        stream = safe_load(file)
+        stream = safe_load(yaml_file)
     except YAMLError as exc:
         print(exc)
 
 for export in stream['exports']:
 
-  billing_extract_command = (
-      f"{clone_and_setup_extraction_cmd} && python gcs_external/src/gcp_billing/gcs_external.py"
-  )
+  export_name = export['name']
+
+  billing_extract_command = f"""
+    {clone_and_setup_extraction_cmd} && 
+    python gcs_external/src/gcp_billing/gcs_external.py --export_name={export_name}
+    """
   
   task_name = export['name']
 
   billing_operator = KubernetesPodOperator(
       **gitlab_defaults,
       image=DATA_IMAGE,
-      task_id=task_name,
-      name=task_name,
+      task_id=export_name,
+      name=export_name,
       secrets=[
           GCP_BILLING_ACCOUNT_CREDENTIALS,
           SNOWFLAKE_ACCOUNT,
@@ -86,7 +89,6 @@ for export in stream['exports']:
       ],
       env_vars={
           **pod_env_vars,
-          **export,
           "EXPORT_DATE": "{{ execution_date }}",
       },
       affinity=get_affinity(False),
