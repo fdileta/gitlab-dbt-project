@@ -340,3 +340,5 @@ models:
         description: Past ptpt_score_group given to the ptpt_namespace_id
       - name: ptpt_past_score_date
         description: Past ptpt_score_date givene to the ptpt_namespace_id
+      - name: is_ptpt_contact
+        description: Flag if marketing contact has a ptpt score

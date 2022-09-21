@@ -788,6 +788,8 @@
       marketing_contact.wip_invalid_email_address_reason,
 
       -- Propensity to purchase trials fields
+      IFF(ptpt_scores_by_user.namespace_id IS NOT NULL, TRUE, FALSE)
+                                                  AS is_ptpt_contact,
       ptpt_scores_by_user.namespace_id            AS ptpt_namespace_id,
       ptpt_scores_by_user.score_group             AS ptpt_score_group,
       ptpt_scores_by_user.insights                AS ptpt_insights,
