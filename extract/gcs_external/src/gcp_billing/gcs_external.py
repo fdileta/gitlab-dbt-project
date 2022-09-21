@@ -71,11 +71,11 @@ def run_export(export_name: str):
 
     credentials = json.loads(config_dict["GCP_BILLING_ACCOUNT_CREDENTIALS"])
     bq = BigQueryClient(credentials)
-    # result = bq.get_result_from_sql(
-    #     sql_statement,
-    #     project="billing-tools-277316",
-    #     job_config=bigquery.QueryJobConfig(use_legacy_sql=False),
-    # )
+    result = bq.get_result_from_sql(
+        sql_statement,
+        project="billing-tools-277316",
+        job_config=bigquery.QueryJobConfig(use_legacy_sql=False),
+    )
 
 
 if __name__ == "__main__":
