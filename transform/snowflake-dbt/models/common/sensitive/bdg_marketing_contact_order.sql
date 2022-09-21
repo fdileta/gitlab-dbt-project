@@ -81,7 +81,7 @@
 
 ), prep AS (
 
-     SELECT   
+     SELECT DISTINCT
       marketing_contact.dim_marketing_contact_id,
       marketing_contact_role.marketing_contact_role,
       marketing_contact.email_address, 
@@ -293,5 +293,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-04",
-    updated_date="2022-08-31"
+    updated_date="2022-09-21"
 ) }}
