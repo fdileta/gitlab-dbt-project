@@ -8,13 +8,16 @@ models:
     description: Workspace model of the source data (deduplicated).
 
   - name: gitlab_dotcom_approval_project_rules_users
-    description: Workspace model of the source data (deduplicated).  
+    description: Workspace model of the source data (deduplicated).
 
   - name: gitlab_dotcom_project_settings
-    description: Workspace model of the source data (deduplicated).  
+    description: Workspace model of the source data (deduplicated).
 
   - name: gitlab_dotcom_resource_iteration_events
-    description: Workspace model of the source data (deduplicated).  
+    description: Workspace model of the source data (deduplicated).
 
   - name: version_usage_ping_errors
-    description: Workspace model of the source data. 
+    description: Workspace model of the source data (one to one copy).
+
+  - name: version_usage_ping_metadata
+    description: Workspace model of the source data (one to one copy).

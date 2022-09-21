@@ -37,30 +37,6 @@ models:
       - name: zuora_account_id
       - name: salesforce_account_id
       - name: billable
-  - name: customers_db_eula_requests_source
-    description: '{{ doc("customers_db_eula_requests_source") }}' 
-    columns:
-      - name: eula_request_id
-        tags:
-          - tdf
-          - customers_db
-        tests:
-          - not_null
-      - name: eula_id
-        tags:
-          - tdf
-          - customers_db
-        tests:
-          - not_null
-  - name: customers_db_eulas_source
-    description: '{{ doc("customers_db_eulas_source") }}'  
-    columns:
-      - name: eula_id
-        tags:
-          - tdf
-          - customers_db
-        tests:
-          - not_null
   - name: customers_db_leads_source
     description: '{{ doc("customers_db_leads_source") }}'  
     columns:
@@ -111,6 +87,68 @@ models:
         tests:
           - not_null
           - unique
+  - name: customers_db_license_versions_source
+    description: '{{ doc("customers_db_license_versions_source") }}'
+    columns:
+      - name: id
+        description: Pseudo ID generated to simulate Primary Key
+        tags:
+          - customers_db
+        tests:
+          - not_null
+          - unique
+      - name: item_id
+        description: Line if for item
+        tags:
+          - customers_db
+        tests:
+          - not_null
+      - name: created_at
+        description: Timestamp when the record was created
+        tags:
+          - customers_db
+        tests:
+          - not_null
+      - name: item_type
+        description: Item type, for example - License
+        tags:
+          - customers_db
+        tests:
+          - not_null
+      - name: event
+        description: Name of the event, for example - create, update
+        tags:
+          - customers_db
+        tests:
+          - not_null
+      - name: whodunnit
+        description: Email for licensing
+        tags:
+          - customers_db
+        meta:
+          sensitive: true
+      - name: whodunnit_gitlab
+        description: Email for licensing, contains either @gitlab.com email (value from whodunnit)  or NULL
+        tags:
+          - customers_db
+      - name: whodunnit_gitlab_desc
+        description: Email for licensing, contains either @gitlab.com email or NULL. Can contain `Admin` string
+        tags:
+          - customers_db
+      - name: object
+        description: Details about license
+        tags:
+          - customers_db
+        meta:
+          sensitive: true
+      - name: object_changes
+        description: Details about license changes
+        tags:
+          - customers_db
+        meta:
+          sensitive: true
+      - name: _uploaded_at
+        description: Timestamp when record is inserted in the RAW layer
   - name: customers_db_orders_source
     description: '{{ doc("customers_db_orders_source") }}'  
     columns:

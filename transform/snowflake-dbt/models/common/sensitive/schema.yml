@@ -308,3 +308,15 @@ models:
         description: If True, the marketing contact is a member of a namespace that has at least one public project
       - name: has_free_namespace_with_public_project
         description: If True, the marketing contact is a member of a Free namespace that has at least one public project
+      - name: is_member_of_public_ultimate_parent_namespace
+        description: If True, the marketing contact is a member of an ultimate parent namespace that is public.
+      - name: is_member_of_private_ultimate_parent_namespace
+        description: If True, the marketing contact is a member of an ultimate parent namespace that is private.
+      - name: public_ultimate_parent_namespaces
+        description: Array containing all the public ultimate parent namespaces the marketing contact is a member of.
+      - name: private_ultimate_parent_namespaces
+        description: Array containing all the private ultimate parent namespaces the marketing contact is a member of.
+      - name: is_paid_tier_change
+        description: This is a flag designed to keep Marketo in sync with the marketin database. If True, the marketing contact is_paid_tier flag is set to True OR the is_paid_tier flag is set to False and the is_paid_tier_marketo set to True (which means that it needs to be updated in Marketo)
+      - name: is_pql_change
+        description: This is a flag designed to keep Marketo in sync with the marketin database. If True, the marketing contact is_pql flag is set to True OR the is_pql flag is set to False and the is_pql_marketo flag set to True (which means that it needs to be updated in Marketo)

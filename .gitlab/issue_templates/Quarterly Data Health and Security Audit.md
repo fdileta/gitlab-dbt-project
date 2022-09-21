@@ -335,9 +335,9 @@ Below checklist of activities would be run once for quarter to validate security
             MIN(date_day) AS first_day_fq,
             MAX(date_day) AS last_day_fq
           FROM "PROD"."COMMON"."DIM_DATE"
-          --set the year and quarter you want to audit
-          WHERE fiscal_year = <--fiscal year-->
-          AND fiscal_quarter = <--fiscal quarter-->
+          --Check the year and quarter you want to audit
+          WHERE fiscal_year = (CASE WHEN MONTH(CURRENT_DATE()) IN ('2','3','4') THEN year(CURRENT_DATE()) ELSE year(CURRENT_DATE())+1 END)
+          AND fiscal_quarter = (CASE WHEN MONTH(CURRENT_DATE()) IN ('2','3','4') THEN '4' WHEN MONTH(CURRENT_DATE()) IN ('5','6','7') THEN '1' WHEN MONTH(CURRENT_DATE()) IN ('8','9','10') THEN '2' WHEN MONTH(CURRENT_DATE()) IN ('11','12','1') THEN '3' END)
         )
 
         , DISTINCT_SELECT AS
@@ -353,6 +353,7 @@ Below checklist of activities would be run once for quarter to validate security
         --AND model_name = 'bamboohr_budget_vs_actual'
         AND compilation_started_at >= first_day_fq
         AND compilation_started_at <= last_day_fq
+        AND model_name in ( SELECT DISTINCT model_name FROM  "PROD"."WORKSPACE_DATA"."DBT_RUN_RESULTS" WHERE compilation_started_at BETWEEN dateadd('day', -7, CURRENT_DATE()) AND CURRENT_DATE AND RUN_STATUS = 'success' )
         )
 
         --select * from DISTINCT_SELECT

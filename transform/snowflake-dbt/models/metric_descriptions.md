@@ -330,3 +330,15 @@ by a guest. [link](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/met
 Calculated unique users to perform a search with a paid license enabled
 by month. [link](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216184035_i_search_paid_monthly.yml)
 {% enddocs %}
+
+{% docs compliance_frameworks_pipeline_all_time_event_desc %}
+Count of compliance frameworks that have a pipeline configuration. [link](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210622123800_compliance_frameworks_with_pipeline.yml)
+{% enddocs %}
+
+{% docs last_activity_28_days_user_desc %}
+Users that have a last_activity_on date within the past 28 days. [link](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20220621085114_unique_active_users_monthly.yml)
+{% enddocs %}
+
+{% docs projects_with_packages_28_days_event_desc %}
+Projects with package registry enabled. [link](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216181055_projects_with_packages.yml)
+{% enddocs %}
