@@ -19,10 +19,10 @@ Downstream Airflow tasks or dbt models that were skipped: <!-- None -->
 <details>
 <summary><b>Source freshness failures</b></summary>
 
-1. [ ] Confirm that there are no errors in our process which could be a cause. If there are no errors it is likely an external failure. 
-2. [ ] Check the [source contact spreadsheet](https://docs.google.com/spreadsheets/d/1VKvqyn7wy6HqpWS9T3MdPnE6qbfH2kGPQDFg2qPcp6U/edit#gid=0) for details on who to contact to assist 
+1. [ ] Confirm that there are no errors in our process which could be a cause. If there are no errors it is likely an external failure.
+2. [ ] Check the [source contact spreadsheet](https://docs.google.com/spreadsheets/d/1VKvqyn7wy6HqpWS9T3MdPnE6qbfH2kGPQDFg2qPcp6U/edit#gid=0) for details on who to contact to assist
 3. [ ] Add the label with the source to this issue.
- 
+
 </details>
 
 
