@@ -1,7 +1,7 @@
 import json
 import logging
 import fire
-import os
+from os import environ as env
 from typing import List
 from google.cloud import bigquery
 
