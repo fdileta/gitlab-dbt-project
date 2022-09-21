@@ -788,12 +788,12 @@
       marketing_contact.wip_invalid_email_address_reason,
 
       -- Propensity to purchase trials fields
-      ptpt_scores_by_user.ptpt_namespace_id,
-      ptpt_scores_by_user.score_group,
-      ptpt_scores_by_user.insights,
-      ptpt_scores_by_user.score_date,
-      ptpt_scores_by_user.past_score_group,
-      ptpt_scores_by_user.past_score_date,
+      ptpt_scores_by_user.namespace_id            AS ptpt_namespace_id,
+      ptpt_scores_by_user.score_group             AS ptpt_score_group,
+      ptpt_scores_by_user.insights                AS ptpt_insights,
+      ptpt_scores_by_user.score_date              AS ptpt_score_date,
+      ptpt_scores_by_user.past_score_group        AS ptpt_past_score_group,
+      ptpt_scores_by_user.past_score_date         AS ptpt_past_score_date,
 
       usage_metrics.usage_umau_28_days_user,
       usage_metrics.usage_action_monthly_active_users_project_repo_28_days_user,
