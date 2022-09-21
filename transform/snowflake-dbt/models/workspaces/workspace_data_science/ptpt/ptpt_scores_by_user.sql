@@ -39,7 +39,7 @@
     SELECT
       COALESCE(users.notification_email, users.email) AS email_address,
       {{ hash_of_column('email_address') }}
-      ptpt_scores.namespace_id                        AS ptpt_namespace_id,
+      ptpt_scores.namespace_id,
       ptpt_scores.score,
       ptpt_scores.score_group,
       ptpt_scores.insights,
@@ -69,7 +69,7 @@
 
 SELECT
   namespace_creator_ptpt_score.email_address_hash,
-  namespace_creator_ptpt_score.ptpt_namespace_id,
+  namespace_creator_ptpt_score.namespace_id,
   namespace_creator_ptpt_score.score,
   namespace_creator_ptpt_score.score_group,
   namespace_creator_ptpt_score.insights,
