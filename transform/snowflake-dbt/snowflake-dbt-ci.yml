@@ -379,17 +379,7 @@ clone_schema_dbt_select:
     - export SNOWFLAKE_PREP_DATABASE="PREP"
     - export SNOWFLAKE_PROD_DATABASE="PROD"
     - dbt deps $CI_PROFILE_TARGET
-    - SCHEMA_OUTPUT=$(dbt ls --models +dim_subscription --output json --output-keys "database schema"  | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
-    - echo $SCHEMA_OUTPUT
-    - cd /builds/gitlab-data/analytics
-    - orchestration/manage_snowflake.py create_schemas $SCHEMA_OUTPUT
-
-clone_model_dbt_select:
-  <<: *snowflake_dbt_jobs
-  script:
-    - export SNOWFLAKE_PREP_DATABASE="PREP"
-    - export SNOWFLAKE_PROD_DATABASE="PROD"
-    - dbt deps $CI_PROFILE_TARGET
-    - INPUT=$(dbt ls --models +dim_subscription --output json --output-keys "database schema name"  | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
+    - INPUT=$(dbt ls --models +dim_subscription --output json --output-keys "database schema"  --profiles-dir profile --target prod | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
+    - echo $INPUT
     - cd /builds/gitlab-data/analytics
     - orchestration/manage_snowflake.py create_schemas $INPUT
