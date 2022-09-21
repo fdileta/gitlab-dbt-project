@@ -290,23 +290,23 @@ class SnowflakeManager:
                 # Catches permissions errors
                 logging.error(prg._sql_message(as_unicode=False))
 
-    def create_schemas(self, *input):
-        # distinct and convert string into list based on lines
-        # print(input)
-#
-        # for i in input:
-        #     print(i)
-
-        input_set = set([i for i in input])
+    def create_schemas(self, *schema_input):
+        """
+            Runs through a list of schemas, creating each in the CI DB provided.
+        :param schema_input:
+        :return: None
+        """
+        # Distinct values of input
+        input_set = set([i for i in schema_input])
         input_list = list(input_set)
 
         for i in input_list:
             i = i.replace('"', "")
             output_schema = f"{self.branch_name}_{i}"
             clone_statement = f'CREATE OR REPLACE SCHEMA {output_schema} CLONE {i};'
-            print(f"Running {clone_statement}")
+            logging.info(f"Running {clone_statement}")
             query_executor(self.engine, clone_statement)
-            print(f"Run {clone_statement}")
+            logging.info(f"{clone_statement} run")
 
             logging.info("Granting rights on stage to GITLAB_CI")
             grants_query = f"""GRANT ALL ON SCHEMA {output_schema} TO GITLAB_CI"""
