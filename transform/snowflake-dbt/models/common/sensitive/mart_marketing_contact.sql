@@ -1,5 +1,5 @@
 {{ simple_cte ([
-  ('marketing_contact', 'dim_marketing_contact'),
+  ('dim_marketing_contact', 'dim_marketing_contact'),
   ('marketing_contact_order', 'bdg_marketing_contact_order'),
   ('dim_namespace', 'dim_namespace'),
   ('gitlab_dotcom_namespaces_source', 'gitlab_dotcom_namespaces_source'),
@@ -12,11 +12,20 @@
   ('fct_event_user_daily', 'fct_event_user_daily'),
   ('map_gitlab_dotcom_xmau_metrics', 'map_gitlab_dotcom_xmau_metrics'),
   ('services', 'gitlab_dotcom_integrations_source'),
-  ('project', 'prep_project')
+  ('project', 'prep_project'),
+  ('ptpt_scores_by_user', 'ptpt_scores_by_user')
 ]) }}
+
+, marketing_contact AS (
+
+    SELECT
+      {{ hash_of_column('email_address') }}
+      *
+    FROM dim_marketing_contact
+
 -------------------------- Start of PQL logic: --------------------------
 
-, namespaces AS (
+), namespaces AS (
   
     SELECT
       gitlab_dotcom_users_source.email,
@@ -773,6 +782,15 @@
       marketing_contact.zuora_active_state,
       marketing_contact.wip_is_valid_email_address,
       marketing_contact.wip_invalid_email_address_reason,
+
+      -- Propensity to purchase trials fields
+      ptpt_scores_by_user.ptpt_namespace_id,
+      ptpt_scores_by_user.score_group,
+      ptpt_scores_by_user.insights,
+      ptpt_scores_by_user.score_date,
+      ptpt_scores_by_user.past_score_group,
+      ptpt_scores_by_user.past_score_date,
+
       usage_metrics.usage_umau_28_days_user,
       usage_metrics.usage_action_monthly_active_users_project_repo_28_days_user,
       usage_metrics.usage_merge_requests_28_days_user,
@@ -819,6 +837,8 @@
       ON services_by_email.email = marketing_contact.email_address
     LEFT JOIN users_role_by_email
       ON users_role_by_email.email = marketing_contact.email_address
+    LEFT JOIN ptpt_scores_by_user
+      ON ptpt_scores_by_user.email_address_hash = marketing_contact.email_address_hash
 )
 
 {{ hash_diff(
