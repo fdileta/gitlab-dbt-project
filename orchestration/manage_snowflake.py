@@ -345,17 +345,13 @@ class SnowflakeManager:
                 AND TABLE_NAME = UPPER('{table_name}') 
             """
 
-            print(query)
             res = query_executor(self.engine, query)
-            print(res)
             table_or_view = res[0][0]
-            print(table_or_view)
             if table_or_view == 'VIEW':
                 logging.info("Not cloning view")
                 continue
 
             transient_table = res[0][1]
-            print(transient_table)
             ### TODO: This can be a one-liner
             if transient_table == 'YES':
                 clone_statement = f'CREATE OR REPLACE TRANSIENT TABLE {output_schema} CLONE {i} COPY GRANTS'
@@ -363,6 +359,7 @@ class SnowflakeManager:
                 clone_statement = f'CREATE OR REPLACE {output_schema} CLONE {i} COPY GRANTS'
 
             query_executor(self.engine, clone_statement)
+            logging.info(f"{clone_statement} successfully run. ")
 
 
 
