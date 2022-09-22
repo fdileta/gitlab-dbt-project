@@ -415,7 +415,7 @@ WITH edm_opty AS (
     INNER JOIN sfdc_accounts_xf AS account
       ON account.account_id = edm_opty.dim_crm_account_id
     INNER JOIN sfdc_accounts_xf AS upa
-      ON upa.account_id = edm_opty.dim_crm_account_id
+      ON upa.account_id = edm_opty.dim_parent_crm_account_id
     INNER JOIN date_details AS created_date_detail
       ON created_date_detail.date_actual = edm_opty.created_date::DATE
     INNER JOIN sfdc_users_xf AS opportunity_owner
