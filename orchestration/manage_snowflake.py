@@ -393,7 +393,7 @@ class SnowflakeManager:
                 query_executor(self.engine, grants_query)
 
                 logging.info("Granting rights on stage to GITLAB_CI")
-                grants_query = f"""GRANT ALL ON VIEW {output_schema_name} TO GITLAB_CI"""
+                grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO GITLAB_CI"""
                 query_executor(self.engine, grants_query)
 
                 continue
@@ -413,7 +413,7 @@ class SnowflakeManager:
             query_executor(self.engine, grants_query)
 
             logging.info("Granting rights on stage to GITLAB_CI")
-            grants_query = f"""GRANT ALL ON TABLE {output_schema_name} TO GITLAB_CI"""
+            grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO GITLAB_CI"""
             query_executor(self.engine, grants_query)
 
 
