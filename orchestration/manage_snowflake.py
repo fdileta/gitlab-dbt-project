@@ -355,7 +355,12 @@ class SnowflakeManager:
                 """
                 print(query)
                 res = query_executor(self.engine, query)
-                print(res)
+                print(res[0][0])
+                output_query = res[0][0].replace('PREP', self.prep_database).replace('PROD', self.prod_database)
+                print(output_query)
+                query_executor(self.engine, output_query)
+                logging.info(f"{output_query} successfully run. ")
+                continue
 
             transient_table = res[0][1]
             ### TODO: This can be a one-liner
