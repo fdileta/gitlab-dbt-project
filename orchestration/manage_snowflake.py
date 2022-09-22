@@ -348,8 +348,14 @@ class SnowflakeManager:
             res = query_executor(self.engine, query)
             table_or_view = res[0][0]
             if table_or_view == 'VIEW':
-                logging.info("Not cloning view")
-                continue
+                logging.info("Cloning view")
+
+                query = f"""
+                    SELECT GET_DDL('view', {i}) 
+                """
+                print(query)
+                res = query_executor(self.engine, query)
+                print(res)
 
             transient_table = res[0][1]
             ### TODO: This can be a one-liner
