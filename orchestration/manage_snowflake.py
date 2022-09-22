@@ -358,14 +358,25 @@ class SnowflakeManager:
                 """
                 query_executor(self.engine, query)
 
-
                 query = f"""
                     SELECT GET_DDL('VIEW', '{i}', TRUE) 
                 """
                 print(query)
                 res = query_executor(self.engine, query)
-                print(res[0][0])
-                output_query = res[0][0].replace('PREP', self.prep_database).replace('PROD', self.prod_database)
+
+                base_dll = res[0][0]
+
+                split_file = base_dll.splitlines()
+
+                first_line = base_dll.splitlines()[0]
+                find_db_name = first_line[base_dll.find('view'):].split('.')[0].replace('PREP', self.prep_database).replace('PROD', self.prod_database)
+                new_first_line = f"{first_line[:base_dll.find('view')]}{find_db_name}{first_line[base_dll.find('.'):]}"
+
+                replaced_file = [f.replace('PREP', self.prep_database).replace('PROD', self.prod_database) for f in
+                                 split_file]
+                joined_lines = '\n'.join(replaced_file[1:])
+
+                output_query = new_first_line + "\n" + joined_lines
                 print(output_query)
                 query_executor(self.engine, output_query)
                 logging.info(f"View {i} successfully created. ")
