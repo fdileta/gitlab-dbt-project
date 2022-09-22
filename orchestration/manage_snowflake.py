@@ -331,8 +331,6 @@ class SnowflakeManager:
         for i in input_list:
             i = i.replace('"', "")
             output_schema = f"{self.branch_name}_{i}"
-            clone_statement = f'CREATE OR REPLACE SCHEMA {output_schema} CLONE {i};'
-            print(f"Running {clone_statement}")
 
             database_name = i.split('.')[0]
             schema_name = i.split('.')[1]
@@ -350,7 +348,22 @@ class SnowflakeManager:
             print(query)
             res = query_executor(self.engine, query)
             print(res)
-            logging.info(res[0])
+            table_or_view = res[0][0]
+            print(table_or_view)
+            if table_or_view == 'VIEW':
+                logging.info("Not cloning view")
+                continue
+
+            transient_table = res[0][1]
+            print(transient_table)
+            ### TODO: This can be a one-liner
+            if transient_table == 'YES':
+                clone_statement = f'CREATE OR REPLACE TRANSIENT TABLE {output_schema} CLONE {i} COPY GRANTS'
+                print(clone_statement)
+            else:
+                clone_statement = f'CREATE OR REPLACE {output_schema} CLONE {i} COPY GRANTS'
+                print(clone_statement)
+
 
 
 
