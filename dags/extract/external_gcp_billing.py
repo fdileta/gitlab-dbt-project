@@ -83,7 +83,7 @@ default_args = {
 dag = DAG(
     "external_gcs_gcp_billing",
     default_args=default_args,
-    schedule_interval="0 12 * * *",
+    schedule_interval="0 10 * * *",
     concurrency=1,
 )
 
@@ -136,7 +136,7 @@ for export in stream["exports"]:
         secrets=[GCP_BILLING_ACCOUNT_CREDENTIALS],
         env_vars={
             **pod_env_vars,
-            "EXPORT_DATE": "{{ execution_date }}",
+            "EXPORT_DATE": "{{ yesterday_ds }}",
         },
         affinity=get_affinity(False),
         tolerations=get_toleration(False),
