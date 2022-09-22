@@ -1,8 +1,9 @@
 import os
-from datetime import datetime, timedelta
-
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
+from datetime import datetime, timedelta
+from kubernetes_helpers import get_affinity, get_toleration
+from yaml import safe_load, YAMLError
 from airflow_utils import (
     clone_and_setup_extraction_cmd,
     DATA_IMAGE,
@@ -57,9 +58,6 @@ dbt_secrets = [
     SNOWFLAKE_TRANSFORM_WAREHOUSE,
     SNOWFLAKE_USER,
 ]
-
-from kubernetes_helpers import get_affinity, get_toleration
-from yaml import load, safe_load, YAMLError
 
 env = os.environ.copy()
 
@@ -145,5 +143,5 @@ for export in stream["exports"]:
         arguments=[billing_extract_command],
         dag=dag,
     )
-    
+
     billing_operator >> dbt_external_table_run

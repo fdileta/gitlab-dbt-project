@@ -1,20 +1,13 @@
 import json
 import logging
-import fire
 from os import environ as env
-from typing import List
+import fire
 from google.cloud import bigquery
 
 from big_query_client import BigQueryClient
-from yaml import load, safe_load, YAMLError
-
-from gitlabdata.orchestration_utils import (
-    snowflake_engine_factory,
-    snowflake_stage_load_copy_remove,
-)
+from yaml import safe_load, YAMLError
 
 config_dict = env.copy()
-
 
 def get_export(export_name: str) -> dict:
     """
