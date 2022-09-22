@@ -95,7 +95,7 @@ airflow_home = env["AIRFLOW_HOME"]
 external_table_run_cmd = f"""
     {dbt_install_deps_nosha_cmd} &&
     dbt run-operation stage_external_sources \
-        --args "select: source gcp_billing" --profiles-dir profile --target load; ret=$?;
+        --args "select: source gcp_billing" --profiles-dir profile; ret=$?;
 """
 dbt_task_name = "dbt-gcp-billing-external-table-refresh"
 dbt_external_table_run = KubernetesPodOperator(
