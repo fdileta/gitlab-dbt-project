@@ -360,8 +360,8 @@ class SnowflakeManager:
 
                 logging.info("Granting rights on stage to LOADER")
                 grants_query = f"""GRANT ALL ON SCHEMA {output_schema_name} TO TRANSFORMER"""
-                res = query_executor(self.engine, grants_query)
-                logging.info(res[0])
+
+                query_executor(self.engine, grants_query)
 
                 query = f"""
                     SELECT GET_DDL('VIEW', '{i}', TRUE) 
@@ -382,7 +382,6 @@ class SnowflakeManager:
                 joined_lines = '\n'.join(replaced_file[1:])
 
                 output_query = new_first_line + "\n" + joined_lines
-                print(output_query)
                 query_executor(self.engine, output_query)
                 logging.info(f"View {i} successfully created. ")
 
