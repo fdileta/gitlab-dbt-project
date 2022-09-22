@@ -55,7 +55,7 @@ mart_usage_event_plan_monthly AS (
     mart_with_date_range.event_calendar_month,
     mart_with_date_range.event_calendar_quarter,
     mart_with_date_range.event_calendar_year,
-    plan_id_by_month.plan_id_at_event_date  plan_id_at_event_month,
+    plan_id_by_month.plan_id_at_event_date  AS plan_id_at_event_month,
     mart_with_date_range.event_name,
     mart_with_date_range.stage_name,
     mart_with_date_range.section_name,
