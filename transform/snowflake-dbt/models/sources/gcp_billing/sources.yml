@@ -32,50 +32,7 @@ sources:
             - name: date_part
               data_type: date
               expression: to_date(split_part(metadata$filename, '/', 2),'YYYY-MM-DD')
-        columns:
-          - name: _partition_date
-            data_type: date
-          - name: gcs_export_time
-            data_type: number
-          - name: adjustment_info
-            data_type: varchar
-          - name: billing_account_id
-            data_type: varchar
-          - name: cost
-            data_type: float
-          - name: cost_type
-            data_type: varchar
-          - name: credits
-            data_type: array
-          - name: currency
-            data_type: varchar
-          - name: currency_conversion_rate
-            data_type: float
-          - name: export_time
-            data_type: number
-          - name: invoice
-            data_type: object
-          - name: labels
-            data_type: array
-          - name: location
-            data_type: object
-          - name: project
-            data_type: object
-          - name: resource
-            data_type: varchar
-          - name: service
-            data_type: object
-          - name: sku
-            data_type: object
-          - name: system_labels
-            data_type: array
-          - name: usage
-            data_type: object
-          - name: usage_end_time
-            data_type: number
-          - name: usage_start_time
-            data_type: number
-            
+       
       - name: summary_gcp_billing
         description: "GCP Billing detail table exported from bigQuery"
         external:
@@ -86,44 +43,4 @@ sources:
             - name: date_part
               data_type: varchar
               expression: split_part(metadata$filename, '/', 2)
-        columns:
-          - name: _partition_date
-            data_type: date
-          - name: gcs_export_time
-            data_type: timestamp
-          - name: adjustment_info
-            data_type: varchar
-          - name: billing_account_id
-            data_type: varchar
-          - name: cost
-            data_type: float
-          - name: cost_type
-            data_type: varchar
-          - name: credits
-            data_type: array
-          - name: currency
-            data_type: varchar
-          - name: currency_conversion_rate
-            data_type: float
-          - name: export_time
-            data_type: number
-          - name: invoice
-            data_type: object
-          - name: labels
-            data_type: array
-          - name: location
-            data_type: object
-          - name: project
-            data_type: object
-          - name: service
-            data_type: object
-          - name: sku
-            data_type: object
-          - name: system_labels
-            data_type: array
-          - name: usage
-            data_type: object
-          - name: usage_end_time
-            data_type: number
-          - name: usage_start_time
-            data_type: number
+  
