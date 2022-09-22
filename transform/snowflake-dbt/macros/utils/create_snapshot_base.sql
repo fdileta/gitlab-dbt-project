@@ -28,8 +28,7 @@ WITH date_spine AS (
     FROM base
     INNER JOIN date_spine
       ON base.dbt_valid_from::DATE <= date_spine.date_actual
-      AND (base.dbt_valid_to::DATE > date_spine.date_actual OR base.dbt_valid_to IS NULL)
-    ORDER BY 2,3      
+      AND (base.dbt_valid_to::DATE > date_spine.date_actual OR base.dbt_valid_to IS NULL)     
       
 
 )
