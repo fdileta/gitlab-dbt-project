@@ -90,9 +90,24 @@ dag = DAG(
 )
 
 
-# don't add a newline at the end of this because it gets added to in the K8sPodOperator arguments
-
 airflow_home = env["AIRFLOW_HOME"]
+
+external_table_run_cmd = f"""
+    {dbt_install_deps_nosha_cmd} &&
+    dbt run-operation stage_external_sources --args "select: source gcp_billing" --profiles-dir profile; ret=$?;
+"""
+dbt_task_name = "dbt-gcp-billing-external-table-refresh"
+dbt_external_table_run = KubernetesPodOperator(
+    **gitlab_defaults,
+    image=DBT_IMAGE,
+    task_id=dbt_task_name,
+    trigger_rule="all_done",
+    name=dbt_task_name,
+    secrets=dbt_secrets,
+    env_vars=gitlab_pod_env_vars,
+    arguments=[external_table_run_cmd],
+    dag=dag,
+)
 
 with open(
     f"{airflow_home}/analytics/extract/gcs_external/src/gcp_billing/gcs_external.yml",
@@ -129,23 +144,5 @@ for export in stream["exports"]:
         arguments=[billing_extract_command],
         dag=dag,
     )
-
-external_table_run_cmd = f"""
-    {dbt_install_deps_nosha_cmd} &&
-    dbt run-operation stage_external_sources --args "select: source gcp_billing" --profiles-dir profile; ret=$?;
-"""
-dbt_task_name = "dbt-gcp-billing-external-table-refresh"
-
-dbt_external_table_run = KubernetesPodOperator(
-    **gitlab_defaults,
-    image=DBT_IMAGE,
-    task_id=dbt_task_name,
-    trigger_rule="all_done",
-    name=dbt_task_name,
-    secrets=dbt_secrets,
-    env_vars=gitlab_pod_env_vars,
-    arguments=[external_table_run_cmd],
-    dag=dag,
-)
-
-billing_operator >> dbt_external_table_run
+    
+    billing_operator >> dbt_external_table_run
