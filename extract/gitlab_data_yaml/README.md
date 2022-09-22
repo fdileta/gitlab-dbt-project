@@ -12,6 +12,9 @@ Current files are:
 ### API Access
 
 We are using a `project level token` created in the `compensation calculator` project to access the API.
-In order to create one if the existing token has expired, you need to login as the `Analytics API` user into GitLab.com and create a new token for the `compensation calculator` project [here](https://gitlab.com/gitlab-com/people-group/peopleops-eng/compensation-calculator/-/settings/access_tokens).
+
+In order to create one if the existing token has expired, you need to login as the `Analytics API` user into GitLab.com and create a new token for the `compensation calculator` project [here](https://gitlab.com/gitlab-com/people-group/peopleops-eng/compensation-calculator/-/settings/access_tokens). 
+
 The token is stored in our vault as part of the `Analytics API GitLab Login`.
+
 The environment variable called `GITLAB_API_PRIVATE_TOKEN` needed by the upload script is stored as part of the `airflow` k8s secret and needs to be updated accordingly.
