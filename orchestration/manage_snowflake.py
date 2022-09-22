@@ -354,7 +354,7 @@ class SnowflakeManager:
                 logging.info("Creating schema if it does not exist")
 
                 query = f"""
-                CREATE SCHEMA IF NOT EXISTS {table_or_view} 
+                CREATE SCHEMA IF NOT EXISTS {output_schema_name} 
                 """
                 query_executor(self.engine, query)
 
