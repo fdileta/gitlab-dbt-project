@@ -405,11 +405,6 @@ models:
       - name: merge_request_iid
         tests: 
           - not_null
-      - name: merge_request_title
-        tests: 
-          - not_null:
-              config:
-                severity: warn
       - name: merge_request_id
         tests: 
           - not_null

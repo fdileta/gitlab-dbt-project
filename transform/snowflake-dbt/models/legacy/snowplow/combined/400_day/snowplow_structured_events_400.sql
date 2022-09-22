@@ -1,8 +1,32 @@
 {{config({
-    "materialized":"table"
+    "materialized":"incremental",
+    "unique_key":"event_id",
+    "post-hook": ["DELETE FROM {{ this }} WHERE derived_tstamp::DATE < DATEADD('DAY', -400, CURRENT_DATE())"]
   })
 }}
 
--- depends_on: {{ ref('snowplow_structured_events') }}
+{% if is_incremental() %}
 
-{{ schema_union_limit('snowplow_', 'snowplow_structured_events', 'derived_tstamp', 400, database_name=env_var('SNOWFLAKE_PREP_DATABASE')) }}
+{% set days_to_look_back = 30 %}
+
+WITH filtered_table AS (
+
+  SELECT *
+  FROM {{ this }}
+  WHERE derived_tstamp::DATE >= DATEADD(DAY, -{{days_to_look_back}}, CURRENT_DATE::DATE) 
+
+)
+
+{% endif %}
+
+SELECT *
+FROM {{ ref('snowplow_structured_events_all') }}
+
+{% if is_incremental() %}
+WHERE derived_tstamp::DATE >= DATEADD(DAY, -{{days_to_look_back}}, CURRENT_DATE::DATE)
+  AND event_id NOT IN (SELECT event_id FROM filtered_table)
+
+{% else %}
+
+WHERE derived_tstamp::DATE >= DATEADD(DAY, -400, CURRENT_DATE::DATE)
+{% endif %}

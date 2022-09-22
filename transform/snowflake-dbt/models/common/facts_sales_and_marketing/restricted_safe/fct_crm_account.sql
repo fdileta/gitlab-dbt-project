@@ -47,6 +47,10 @@ WITH final AS (
       prep_crm_account.parent_crm_account_lam_dev_count,
       prep_crm_account.carr_this_account,
       prep_crm_account.carr_account_family,
+      prep_crm_account.potential_users,
+      prep_crm_account.number_of_licenses_this_account,
+      prep_crm_account.crm_account_zoom_info_number_of_developers,
+      prep_crm_account.decision_maker_count_linkedin,
 
       --metadata
       prep_crm_account.created_by_id,
@@ -61,7 +65,7 @@ WITH final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@j_kim",
     created_date="2022-08-10",
-    updated_date="2022-08-10"
+    updated_date="2022-08-31"
 ) }}

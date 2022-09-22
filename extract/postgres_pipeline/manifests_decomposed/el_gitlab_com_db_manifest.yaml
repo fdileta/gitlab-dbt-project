@@ -1949,7 +1949,7 @@ tables:
       , setup_for_company
       , render_whitespace_in_code
       , tab_width
-      , experience_level
+      , NULL as experience_level
       , view_diffs_file_by_file
       , id
       , gitpod_enabled

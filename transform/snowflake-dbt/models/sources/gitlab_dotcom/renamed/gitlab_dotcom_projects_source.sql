@@ -75,7 +75,8 @@ WITH source AS (
       only_mirror_protected_branches::BOOLEAN                                     AS only_mirror_protected_branches,
       pull_mirror_available_overridden::BOOLEAN                                   AS pull_mirror_available_overridden,
       mirror_overwrites_diverged_branches::BOOLEAN                                AS mirror_overwrites_diverged_branches,
-      external_authorization_classification_label
+      external_authorization_classification_label,
+      project_namespace_id::NUMBER AS project_namespace_id
     FROM source
 
 )

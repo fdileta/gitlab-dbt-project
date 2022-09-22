@@ -31,7 +31,7 @@
     mart_crm_opportunity_daily_snapshot.dim_crm_account_id AS dim_crm_account_id_snapshot,
     mart_crm_opportunity.dim_crm_account_id AS dim_crm_account_id_live,
     mart_crm_opportunity_daily_snapshot.dim_crm_user_id AS dim_crm_user_id_snapshot,
-    mart_crm_opportunity.dim_crm_sales_rep_id AS dim_crm_user_id_live,
+    mart_crm_opportunity.dim_crm_user_id AS dim_crm_user_id_live,
     mart_crm_opportunity_daily_snapshot.duplicate_opportunity_id AS duplicate_opportunity_id_snapshot,
     mart_crm_opportunity.duplicate_opportunity_id AS duplicate_opportunity_id_live,
     mart_crm_opportunity_daily_snapshot.merged_opportunity_id AS merged_opportunity_id_snapshot,
@@ -176,6 +176,8 @@
     mart_crm_opportunity.ga_client_id AS ga_client_id_live,
     mart_crm_opportunity_daily_snapshot.resale_partner_track AS resale_partner_track_snapshot,
     mart_crm_opportunity.resale_partner_track AS resale_partner_track_live,
+    mart_crm_opportunity_daily_snapshot.resale_partner_name AS resale_partner_name_snapshot,
+    mart_crm_opportunity.resale_partner_name AS resale_partner_name_live,
 
     -- flags
     mart_crm_opportunity_daily_snapshot.is_won AS is_won_snapshot,
@@ -676,6 +678,16 @@
     mart_crm_opportunity.stage_5_negotiating_fiscal_quarter_name AS stage_5_negotiating_fiscal_quarter_name_live,
     mart_crm_opportunity_daily_snapshot.stage_5_negotiating_fiscal_year AS stage_5_negotiating_fiscal_year_snapshot,
     mart_crm_opportunity.stage_5_negotiating_fiscal_year AS stage_5_negotiating_fiscal_year_live,
+    mart_crm_opportunity_daily_snapshot.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date_date_snapshot,
+    mart_crm_opportunity.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date_date_live,
+    mart_crm_opportunity_daily_snapshot.stage_6_awaiting_signature_date_month AS stage_6_awaiting_signature_date_month_snapshot,
+    mart_crm_opportunity.stage_6_awaiting_signature_date_month AS stage_6_awaiting_signature_date_month_live,
+    mart_crm_opportunity_daily_snapshot.stage_6_awaiting_signature_date_fiscal_quarter_date AS stage_6_awaiting_signature_date_fiscal_quarter_date_snapshot,
+    mart_crm_opportunity.stage_6_awaiting_signature_date_fiscal_quarter_date AS stage_6_awaiting_signature_date_fiscal_quarter_date_live,
+    mart_crm_opportunity_daily_snapshot.stage_6_awaiting_signature_date_fiscal_quarter_name AS stage_6_awaiting_signature_date_fiscal_quarter_name_snapshot,
+    mart_crm_opportunity.stage_6_awaiting_signature_date_fiscal_quarter_name AS stage_6_awaiting_signature_date_fiscal_quarter_name_live,
+    mart_crm_opportunity_daily_snapshot.stage_6_awaiting_signature_date_fiscal_year AS stage_6_awaiting_signature_date_fiscal_year_snapshot,
+    mart_crm_opportunity.stage_6_awaiting_signature_date_fiscal_year AS stage_6_awaiting_signature_date_fiscal_year_live,
     mart_crm_opportunity_daily_snapshot.stage_6_closed_won_date AS stage_6_closed_won_date_snapshot,
     mart_crm_opportunity.stage_6_closed_won_date AS stage_6_closed_won_date_live,
     mart_crm_opportunity_daily_snapshot.stage_6_closed_won_month AS stage_6_closed_won_month_snapshot,
@@ -831,8 +843,8 @@
     mart_crm_opportunity.booked_net_arr AS booked_net_arr_live,
     mart_crm_opportunity_daily_snapshot.churned_contraction_net_arr AS churned_contraction_net_arr_snapshot,
     mart_crm_opportunity.churned_contraction_net_arr AS churned_contraction_net_arr_live,
-    mart_crm_opportunity_daily_snapshot.pipeline_calculated_deal_count AS pipeline_calculated_deal_count_snapshot,
-    mart_crm_opportunity.pipeline_calculated_deal_count AS pipeline_calculated_deal_count_live,
+    mart_crm_opportunity_daily_snapshot.calculated_deal_count AS calculated_deal_count_snapshot,
+    mart_crm_opportunity.calculated_deal_count AS calculated_deal_count_live,
     mart_crm_opportunity_daily_snapshot.booked_churned_contraction_deal_count AS booked_churned_contraction_deal_count_snapshot,
     mart_crm_opportunity.booked_churned_contraction_deal_count AS booked_churned_contraction_deal_count_live,
     mart_crm_opportunity_daily_snapshot.booked_churned_contraction_net_arr AS booked_churned_contraction_net_arr_snapshot,
@@ -870,5 +882,5 @@
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-08-08",
-    updated_date="2022-08-08"
+    updated_date="2022-09-06"
 ) }}

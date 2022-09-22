@@ -63,13 +63,15 @@
     FROM usage_data
     LEFT JOIN raw_usage_data
       ON usage_data.raw_usage_data_id = raw_usage_data.raw_usage_data_id
+    WHERE usage_data.ping_created_at <= (SELECT MAX(created_at) FROM raw_usage_data)
+
 
 )
 
 {{ dbt_audit(
     cte_ref="joined_ping",
     created_by="@icooper-acp",
-    updated_by="@snalamaru",
+    updated_by="@chrissharp",
     created_date="2022-03-17",
-    updated_date="2022-05-05"
+    updated_date="2022-09-16"
 ) }}

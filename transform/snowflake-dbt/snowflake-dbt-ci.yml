@@ -65,40 +65,6 @@
   - export SNOWFLAKE_TRANSFORM_WAREHOUSE=$SNOWFLAKE_MR_XS_WAREHOUSE
   - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
 
-# MR Jobs
-➖🐭specify_exclude:
-  <<: *snowflake_dbt_jobs
-  script:
-    - *deps_and_seed
-    - echo $DBT_MODELS
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --exclude $DBT_MODELS || FAILED=true
-    - dbt --partial-parse test $CI_PROFILE_TARGET --exclude $DBT_MODELS || FAILED=true
-    - dbt --partial-parse run $CI_PROFILE_TARGET --exclude $DBT_MODELS || FAILED=true
-    - dbt --partial-parse test $CI_PROFILE_TARGET --exclude $DBT_MODELS || FAILED=true
-    - if [ $FAILED ]; then exit 1; fi
-
-➖🦖specify_l_exclude:
-  <<: *snowflake_dbt_jobs
-  script:
-    - *l_warehouse
-    - *deps_and_seed
-    - echo $DBT_MODELS
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --exclude $DBT_MODELS || FAILED=true
-    - *xs_warehouse
-    - dbt --partial-parse test $CI_PROFILE_TARGET --exclude $DBT_MODELS || FAILED=true
-    - if [ $FAILED ]; then exit 1; fi
-
-➖🐘specify_xl_exclude:
-  <<: *snowflake_dbt_jobs
-  script:
-    - *xl_warehouse
-    - *deps_and_seed
-    - echo $DBT_MODELS
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --exclude $DBT_MODELS || FAILED=true
-    - *xs_warehouse
-    - dbt --partial-parse test $CI_PROFILE_TARGET --exclude $DBT_MODELS || FAILED=true
-    - if [ $FAILED ]; then exit 1; fi
-
 ➕🐭specify_model:
   <<: *snowflake_dbt_jobs
   script:
@@ -117,6 +83,15 @@
     - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
     - *xs_warehouse
     - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
+    - if [ $FAILED ]; then exit 1; fi
+
+➕specify_dbt_parameters:
+  <<: *snowflake_dbt_jobs
+  script:
+    - *deps_and_seed
+    - echo $DBT_PARAMETERS
+    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} $DBT_PARAMETERS || FAILED=true
+    - dbt --partial-parse test $CI_PROFILE_TARGET $DBT_PARAMETERS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 ➕🐘specify_xl_model:
