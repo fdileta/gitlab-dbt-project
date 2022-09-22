@@ -358,9 +358,12 @@ class SnowflakeManager:
                 """
                 query_executor(self.engine, query)
 
-                logging.info("Granting rights on stage to LOADER")
+                logging.info("Granting rights on stage to TRANSFORMER")
                 grants_query = f"""GRANT ALL ON SCHEMA {output_schema_name} TO TRANSFORMER"""
+                query_executor(self.engine, grants_query)
 
+                logging.info("Granting rights on stage to GITLAB_CI")
+                grants_query = f"""GRANT ALL ON SCHEMA {output_schema_name} TO GITLAB_CI"""
                 query_executor(self.engine, grants_query)
 
                 query = f"""
@@ -389,6 +392,10 @@ class SnowflakeManager:
                 grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO TRANSFORMER"""
                 query_executor(self.engine, grants_query)
 
+                logging.info("Granting rights on stage to GITLAB_CI")
+                grants_query = f"""GRANT ALL ON VIEW {output_schema_name} TO GITLAB_CI"""
+                query_executor(self.engine, grants_query)
+
                 continue
 
             transient_table = res[0][1]
@@ -402,7 +409,11 @@ class SnowflakeManager:
             logging.info(f"{clone_statement} successfully run. ")
 
             logging.info("Granting rights on stage to TRANSFORMER")
-            grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO TRANSFORMER"""
+            grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO TRANSFORMER"""
+            query_executor(self.engine, grants_query)
+
+            logging.info("Granting rights on stage to GITLAB_CI")
+            grants_query = f"""GRANT ALL ON TABLE {output_schema_name} TO GITLAB_CI"""
             query_executor(self.engine, grants_query)
 
 
