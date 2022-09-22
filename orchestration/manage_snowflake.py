@@ -358,6 +358,11 @@ class SnowflakeManager:
                 """
                 query_executor(self.engine, query)
 
+                logging.info("Granting rights on stage to LOADER")
+                grants_query = f"""GRANT ALL ON SCHEMA {output_schema_name} TO TRANSFORMER"""
+                res = query_executor(self.engine, grants_query)
+                logging.info(res[0])
+
                 query = f"""
                     SELECT GET_DDL('VIEW', '{i}', TRUE) 
                 """
@@ -380,6 +385,11 @@ class SnowflakeManager:
                 print(output_query)
                 query_executor(self.engine, output_query)
                 logging.info(f"View {i} successfully created. ")
+
+                logging.info("Granting rights on stage to TRANSFORMER")
+                grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO TRANSFORMER"""
+                query_executor(self.engine, grants_query)
+
                 continue
 
             transient_table = res[0][1]
@@ -391,6 +401,10 @@ class SnowflakeManager:
 
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
+
+            logging.info("Granting rights on stage to TRANSFORMER")
+            grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO TRANSFORMER"""
+            query_executor(self.engine, grants_query)
 
 
 
