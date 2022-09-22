@@ -342,9 +342,9 @@ class SnowflakeManager:
                 SELECT 
                     TABLE_TYPE,
                     IS_TRANSIENT
-                FROM {database_name}.information_schema.tables 
-                WHERE SCHEMA_NAME = UPPER({schema_name}) 
-                AND TABLE_NAME = UPPER({table_name}) 
+                FROM {database_name}.INFORMATION_SCHEMA.TABLES 
+                WHERE TABLE_SCHEMA = UPPER('{schema_name}') 
+                AND TABLE_NAME = UPPER('{table_name}') 
             """
 
             print(query)
