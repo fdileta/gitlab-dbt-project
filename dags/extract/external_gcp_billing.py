@@ -4,21 +4,59 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 from airflow_utils import (
-    DATA_IMAGE,
     clone_and_setup_extraction_cmd,
+    DATA_IMAGE,
+    DBT_IMAGE,
+    dbt_install_deps_nosha_cmd,
     gitlab_defaults,
+    gitlab_pod_env_vars,
     slack_failed_task,
 )
 
 from kube_secrets import (
     GCP_BILLING_ACCOUNT_CREDENTIALS,
+    GIT_DATA_TESTS_CONFIG,
+    GIT_DATA_TESTS_PRIVATE_KEY,
+    MCD_DEFAULT_API_ID,
+    MCD_DEFAULT_API_TOKEN,
+    SALT_EMAIL,
+    SALT_IP,
+    SALT_NAME,
+    SALT_PASSWORD,
+    SALT,
     SNOWFLAKE_ACCOUNT,
-    SNOWFLAKE_LOAD_DATABASE,
     SNOWFLAKE_LOAD_PASSWORD,
     SNOWFLAKE_LOAD_ROLE,
     SNOWFLAKE_LOAD_USER,
     SNOWFLAKE_LOAD_WAREHOUSE,
+    SNOWFLAKE_PASSWORD,
+    SNOWFLAKE_TRANSFORM_ROLE,
+    SNOWFLAKE_TRANSFORM_SCHEMA,
+    SNOWFLAKE_TRANSFORM_WAREHOUSE,
+    SNOWFLAKE_USER,
 )
+
+dbt_secrets = [
+    GIT_DATA_TESTS_CONFIG,
+    GIT_DATA_TESTS_PRIVATE_KEY,
+    MCD_DEFAULT_API_ID,
+    MCD_DEFAULT_API_TOKEN,
+    SALT_EMAIL,
+    SALT_IP,
+    SALT_NAME,
+    SALT_PASSWORD,
+    SALT,
+    SNOWFLAKE_ACCOUNT,
+    SNOWFLAKE_LOAD_PASSWORD,
+    SNOWFLAKE_LOAD_ROLE,
+    SNOWFLAKE_LOAD_USER,
+    SNOWFLAKE_LOAD_WAREHOUSE,
+    SNOWFLAKE_PASSWORD,
+    SNOWFLAKE_TRANSFORM_ROLE,
+    SNOWFLAKE_TRANSFORM_SCHEMA,
+    SNOWFLAKE_TRANSFORM_WAREHOUSE,
+    SNOWFLAKE_USER,
+]
 
 from kubernetes_helpers import get_affinity, get_toleration
 from yaml import load, safe_load, YAMLError
@@ -81,15 +119,7 @@ for export in stream["exports"]:
         image=DATA_IMAGE,
         task_id=export_name,
         name=export_name,
-        secrets=[
-            GCP_BILLING_ACCOUNT_CREDENTIALS,
-            SNOWFLAKE_ACCOUNT,
-            SNOWFLAKE_LOAD_DATABASE,
-            SNOWFLAKE_LOAD_ROLE,
-            SNOWFLAKE_LOAD_USER,
-            SNOWFLAKE_LOAD_WAREHOUSE,
-            SNOWFLAKE_LOAD_PASSWORD,
-        ],
+        secrets=[GCP_BILLING_ACCOUNT_CREDENTIALS],
         env_vars={
             **pod_env_vars,
             "EXPORT_DATE": "{{ execution_date }}",
@@ -99,3 +129,23 @@ for export in stream["exports"]:
         arguments=[billing_extract_command],
         dag=dag,
     )
+
+external_table_run_cmd = f"""
+    {dbt_install_deps_nosha_cmd} &&
+    dbt run-operation stage_external_sources --args "select: source gcp_billing" --profiles-dir profile; ret=$?;
+"""
+dbt_task_name = "dbt-gcp-billing-external-table-refresh"
+
+dbt_external_table_run = KubernetesPodOperator(
+    **gitlab_defaults,
+    image=DBT_IMAGE,
+    task_id=dbt_task_name,
+    trigger_rule="all_done",
+    name=dbt_task_name,
+    secrets=dbt_secrets,
+    env_vars=gitlab_pod_env_vars,
+    arguments=[external_table_run_cmd],
+    dag=dag,
+)
+
+billing_operator >> dbt_external_table_run
