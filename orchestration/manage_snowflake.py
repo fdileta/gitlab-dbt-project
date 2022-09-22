@@ -351,7 +351,7 @@ class SnowflakeManager:
                 logging.info("Cloning view")
 
                 query = f"""
-                    SELECT GET_DDL('view', {i}) 
+                    SELECT GET_DDL('VIEW', '{i}') 
                 """
                 print(query)
                 res = query_executor(self.engine, query)
