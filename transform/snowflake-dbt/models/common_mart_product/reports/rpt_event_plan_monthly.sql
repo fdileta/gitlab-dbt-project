@@ -68,7 +68,7 @@ mart_usage_event_plan_monthly AS (
     COUNT(DISTINCT( mart_with_date_range.dim_user_id)) AS user_count
   FROM mart_with_date_range
   LEFT JOIN plan_id_by_month
-    ON COALESCE(mart_with_date_range.dim_ultimate_parent_namespace_id,-5) = COALESCE(plan_id_by_month.dim_ultimate_parent_namespace_id,-5)     -- -1 is already in the table
+    ON mart_with_date_range.dim_ultimate_parent_namespace_id IS NOT DISTINCT FROM plan_id_by_month.dim_ultimate_parent_namespace_id     -- treats NULLs as Values 
     AND mart_with_date_range.event_calendar_month = plan_id_by_month.event_calendar_month
   WHERE mart_with_date_range.event_calendar_month < DATE_TRUNC('month', CURRENT_DATE)
   {{ dbt_utils.group_by(n=12) }}
