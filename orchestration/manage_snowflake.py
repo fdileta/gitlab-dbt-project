@@ -290,10 +290,10 @@ class SnowflakeManager:
                 # Catches permissions errors
                 logging.error(prg._sql_message(as_unicode=False))
 
-    def create_schemas(self, *schema_input):
+    def clone_schemas(self, *schema_input):
         """
             Runs through a list of schemas, creating each in the CI DB provided.
-        :param schema_input:
+        :param: schema_input:
         :return: None
         """
         # Distinct values of input
@@ -317,6 +317,41 @@ class SnowflakeManager:
             grants_query = f"""GRANT ALL ON SCHEMA {output_schema} TO TRANSFORMER"""
             res = query_executor(self.engine, grants_query)
             logging.info(res[0])
+
+    def clone_models(self, *model_input):
+        """
+            Runs through a list of schemas, creating each in the CI DB provided.
+        :param: schema_input:
+        :return: None
+        """
+        # Distinct values of input
+        input_set = set([i for i in model_input])
+        input_list = list(input_set)
+
+        for i in input_list:
+            i = i.replace('"', "")
+            output_schema = f"{self.branch_name}_{i}"
+            clone_statement = f'CREATE OR REPLACE SCHEMA {output_schema} CLONE {i};'
+            print(f"Running {clone_statement}")
+
+            database_name = i.split('.')[0]
+            schema_name = i.split('.')[1]
+            table_name = i.split('.')[-1]
+
+            query = f"""
+                SELECT 
+                    TABLE_TYPE,
+                    IS_TRANSIENT
+                FROM {database_name}.information_schema.tables 
+                WHERE SCHEMA_NAME = UPPER({schema_name}) 
+                AND TABLE_NAME = UPPER({table_name}) 
+            """
+
+            print(query)
+            res = query_executor(self.engine, query)
+            print(res)
+            logging.info(res[0])
+
 
 
 if __name__ == "__main__":
