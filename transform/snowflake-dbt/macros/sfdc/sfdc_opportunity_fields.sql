@@ -165,6 +165,8 @@ WITH first_contact  AS (
           THEN prep_crm_user.crm_user_area
         ELSE sfdc_opportunity_source.user_area_stamped
       END                                                                   AS opportunity_owner_user_area,
+      sfdc_opportunity_source.is_edu_oss,
+      sfdc_opportunity_source.order_type_grouped,
       prep_crm_user.user_role_name                                          AS opportunity_owner_role,
       prep_crm_user.title                                                   AS opportunity_owner_title
   FROM {{ ref('sfdc_opportunity_source') }}
@@ -522,8 +524,8 @@ WITH first_contact  AS (
         ELSE FALSE
       END                                                                                         AS is_closed_won,
       CASE
-        WHEN lower(sfdc_opportunity.order_type_grouped) LIKE ANY ('%growth%', '%new%')
-          AND sfdc_opportunity.is_edu_oss = 0
+        WHEN lower(live_opportunity_owner_fields.order_type_grouped) LIKE ANY ('%growth%', '%new%')
+          AND live_opportunity_owner_fields.is_edu_oss = 0
           AND sfdc_opportunity.is_stage_1_plus = 1
           AND sfdc_opportunity.forecast_category_name != 'Omitted'
           AND sfdc_opportunity.is_open = 1
