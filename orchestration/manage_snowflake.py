@@ -359,11 +359,10 @@ class SnowflakeManager:
             ### TODO: This can be a one-liner
             if transient_table == 'YES':
                 clone_statement = f'CREATE OR REPLACE TRANSIENT TABLE {output_schema} CLONE {i} COPY GRANTS'
-                print(clone_statement)
             else:
                 clone_statement = f'CREATE OR REPLACE {output_schema} CLONE {i} COPY GRANTS'
-                print(clone_statement)
 
+            query_executor(self.engine, clone_statement)
 
 
 
