@@ -330,12 +330,13 @@ class SnowflakeManager:
 
         for i in input_list:
             i = i.replace('"', "")
-            output_schema = f"{self.branch_name}_{i}"
 
             database_name = i.split('.')[0]
             schema_name = i.split('.')[1]
             table_name = i.split('.')[-1]
 
+            output_table_name = f"{self.branch_name}_{i}"
+            output_schema_name = output_table_name.replace(f'.{table_name}', '')
             query = f"""
                 SELECT 
                     TABLE_TYPE,
@@ -350,6 +351,14 @@ class SnowflakeManager:
             if table_or_view == 'VIEW':
                 logging.info("Cloning view")
 
+                logging.info("Creating schema if it does not exist")
+
+                query = f"""
+                CREATE SCHEMA IF NOT EXISTS {table_or_view} 
+                """
+                query_executor(self.engine, query)
+
+
                 query = f"""
                     SELECT GET_DDL('VIEW', '{i}', TRUE) 
                 """
@@ -359,15 +368,15 @@ class SnowflakeManager:
                 output_query = res[0][0].replace('PREP', self.prep_database).replace('PROD', self.prod_database)
                 print(output_query)
                 query_executor(self.engine, output_query)
-                logging.info(f"{output_query} successfully run. ")
+                logging.info(f"View {i} successfully created. ")
                 continue
 
             transient_table = res[0][1]
             ### TODO: This can be a one-liner
             if transient_table == 'YES':
-                clone_statement = f'CREATE OR REPLACE TRANSIENT TABLE {output_schema} CLONE {i} COPY GRANTS'
+                clone_statement = f'CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {i} COPY GRANTS'
             else:
-                clone_statement = f'CREATE OR REPLACE {output_schema} CLONE {i} COPY GRANTS'
+                clone_statement = f'CREATE OR REPLACE {output_table_name} CLONE {i} COPY GRANTS'
 
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
