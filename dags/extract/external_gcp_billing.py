@@ -1,7 +1,7 @@
 import os
+from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
-from datetime import datetime, timedelta
 from kubernetes_helpers import get_affinity, get_toleration
 from yaml import safe_load, YAMLError
 from airflow_utils import (
