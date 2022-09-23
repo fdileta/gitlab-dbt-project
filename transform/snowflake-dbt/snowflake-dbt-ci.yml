@@ -348,7 +348,7 @@
     - sqlfluff lint $LINT_LIST --config .sqlfluff-ci
 
 
-clone_schema_dbt_select:
+🔆clone_schema_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
     - export SNOWFLAKE_PREP_DATABASE="PREP"
@@ -359,7 +359,7 @@ clone_schema_dbt_select:
     - orchestration/manage_snowflake.py clone_schemas $INPUT
 
 
-clone_model_dbt_select:
+🔆⚡️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
     - export SNOWFLAKE_PREP_DATABASE="PREP"
