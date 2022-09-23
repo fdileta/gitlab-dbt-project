@@ -131,7 +131,7 @@ class SnowflakeManager:
                 connection.execute(queries[0])
                 logging.info("DBs exist...")
                 db_exists = True
-            except:
+            except Exception:
                 logging.info("DB does not exist...")
                 db_exists = False
             finally:
@@ -289,6 +289,7 @@ class SnowflakeManager:
                 # Catches permissions errors
                 logging.error(prg._sql_message(as_unicode=False))
 
+
     def clone_schemas(self, *schema_input):
         """
             Runs through a list of schemas, creating each in the CI DB provided.
@@ -411,7 +412,7 @@ class SnowflakeManager:
                 continue
 
             transient_table = res[0][1]
-            ### TODO: This can be a one-liner
+            # TODO: This can be a one-liner
             if transient_table == "YES":
                 clone_statement = f"CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {i} COPY GRANTS"
             else:
