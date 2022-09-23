@@ -160,19 +160,20 @@ WITH map_merged_crm_account AS (
 
       ----ultimate parent crm account info
       ultimate_parent_account.account_name                                AS parent_crm_account_name,
-      sfdc_account.account_demographics_sales_segment                     AS parent_crm_account_sales_segment,
-      sfdc_account.account_demographics_upa_country                       AS parent_crm_account_billing_country,
+      {{ sales_segment_cleaning('sfdc_account.ultimate_parent_sales_segment') }}
+                                                                          AS parent_crm_account_sales_segment,
+      ultimate_parent_account.billing_country                             AS parent_crm_account_billing_country,
       ultimate_parent_account.billing_country_code                        AS parent_crm_account_billing_country_code,
       sfdc_account.parent_account_industry_hierarchy                      AS parent_crm_account_industry_hierarchy,
-      sfdc_account.account_demographics_territory                         AS parent_crm_account_sales_territory,
-      sfdc_account.account_demographics_region                            AS parent_crm_account_tsp_region,
-      sfdc_account.account_demographics_area                              AS parent_crm_account_tsp_area,
+      ultimate_parent_account.tsp_territory                               AS parent_crm_account_sales_territory,
+      ultimate_parent_account.tsp_region                                  AS parent_crm_account_tsp_region,
+      ultimate_parent_account.tsp_area                                    AS parent_crm_account_tsp_area,
       ultimate_parent_account.gtm_strategy                                AS parent_crm_account_gtm_strategy,
       CASE
         WHEN LOWER(ultimate_parent_account.gtm_strategy) IN ('account centric', 'account based - net new', 'account based - expand') THEN 'Focus Account'
         ELSE 'Non - Focus Account'
       END                                                                 AS parent_crm_account_focus_account,
-      sfdc_account.account_demographics_max_family_employee               AS parent_crm_account_tsp_max_family_employees,
+      ultimate_parent_account.tsp_max_family_employees                    AS parent_crm_account_tsp_max_family_employees,
       CASE
          WHEN ultimate_parent_account.tsp_max_family_employees > 2000 THEN 'Employees > 2K'
          WHEN ultimate_parent_account.tsp_max_family_employees <= 2000 AND ultimate_parent_account.tsp_max_family_employees > 1500 THEN 'Employees > 1.5K'
@@ -191,7 +192,13 @@ WITH map_merged_crm_account AS (
 
       --descriptive attributes
       sfdc_account.account_name                                           AS crm_account_name,
+      sfdc_account.account_demographics_sales_segment                     AS parent_crm_account_demographics_sales_segment,
       sfdc_account.account_demographics_geo                               AS parent_crm_account_demographics_geo,
+      sfdc_account.account_demographics_region                            AS parent_crm_account_demographics_region,
+      sfdc_account.account_demographics_area                              AS parent_crm_account_demographics_area,
+      sfdc_account.account_demographics_territory                         AS parent_crm_account_demographics_territory,
+      sfdc_account.account_demographics_max_family_employee               AS parent_crm_account_demographics_max_family_employee,
+      sfdc_account.account_demographics_upa_country                       AS parent_crm_account_demographics_upa_country,
       sfdc_account.account_demographics_upa_state                         AS parent_crm_account_demographics_upa_state,
       sfdc_account.account_demographics_upa_city                          AS parent_crm_account_demographics_upa_city,
       sfdc_account.account_demographics_upa_street                        AS parent_crm_account_demographics_upa_street,
@@ -203,19 +210,21 @@ WITH map_merged_crm_account AS (
         ELSE 'Non - Focus Account'
       END                                                                 AS crm_account_focus_account,
       sfdc_account.account_owner_user_segment                             AS crm_account_owner_user_segment,
+      sfdc_account.tsp_max_family_employees                               AS crm_account_tsp_max_family_employees,
       sfdc_account.billing_country                                        AS crm_account_billing_country,
       sfdc_account.billing_country_code                                   AS crm_account_billing_country_code,
       sfdc_account.account_type                                           AS crm_account_type,
-      sfdc_account.industry                                               AS crm_account_industry,
-      sfdc_account.sub_industry                                           AS crm_account_sub_industry,
       sfdc_account.account_owner                                          AS crm_account_owner,
       sfdc_account.tsp_territory                                          AS crm_account_sales_territory,
+      sfdc_account.tsp_region                                             AS crm_account_tsp_region,
+      sfdc_account.tsp_area                                               AS crm_account_tsp_area,
       CASE
          WHEN sfdc_account.tsp_max_family_employees > 2000 THEN 'Employees > 2K'
          WHEN sfdc_account.tsp_max_family_employees <= 2000 AND sfdc_account.tsp_max_family_employees > 1500 THEN 'Employees > 1.5K'
          WHEN sfdc_account.tsp_max_family_employees <= 1500 AND sfdc_account.tsp_max_family_employees > 1000  THEN 'Employees > 1K'
          ELSE 'Employees < 1K'
       END                                                                 AS crm_account_employee_count_band,
+      sfdc_account.tsp_max_family_employees,
       sfdc_account.partner_vat_tax_id,
       sfdc_account.account_manager,
       sfdc_account.business_development_rep,
