@@ -43,4 +43,3 @@ sources:
             - name: date_part
               data_type: varchar
               expression: split_part(metadata$filename, '/', 2)
-  
