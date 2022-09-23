@@ -21,8 +21,7 @@
 
     {% if is_incremental() %}
     
-    AND collector_tstamp > DATEADD('days', -1 * {{ var('snowplow:page_view_lookback_days') }}
-         , (SELECT MAX(max_collector_timestamp) FROM {{this}}))
+    AND collector_tstamp > (SELECT MAX(max_collector_timestamp) FROM {{this}}))
     
     {% endif %}
 
