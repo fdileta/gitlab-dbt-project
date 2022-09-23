@@ -45,7 +45,7 @@
       platform,
       environment,
 
-      -- Attributes
+      --Time Attributes for Incremental Load
       max_collector_timestamp
     FROM event_source
 )
