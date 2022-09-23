@@ -35,7 +35,6 @@ class SnowflakeManager:
         self.prod_database = "{}_PROD".format(self.branch_name)
         self.raw_database = "{}_RAW".format(self.branch_name)
 
-
     def generate_db_queries(
         self,
         database_name: str,
@@ -303,7 +302,7 @@ class SnowflakeManager:
         for i in input_list:
             i = i.replace('"', "")
             output_schema = f"{self.branch_name}_{i}"
-            clone_statement = f'CREATE OR REPLACE SCHEMA {output_schema} CLONE {i};'
+            clone_statement = f"CREATE OR REPLACE SCHEMA {output_schema} CLONE {i};"
             logging.info(f"Running {clone_statement}")
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} run")
@@ -331,12 +330,12 @@ class SnowflakeManager:
         for i in input_list:
             i = i.replace('"', "")
 
-            database_name = i.split('.')[0]
-            schema_name = i.split('.')[1]
-            table_name = i.split('.')[-1]
+            database_name = i.split(".")[0]
+            schema_name = i.split(".")[1]
+            table_name = i.split(".")[-1]
 
             output_table_name = f"{self.branch_name}_{i}"
-            output_schema_name = output_table_name.replace(f'.{table_name}', '')
+            output_schema_name = output_table_name.replace(f".{table_name}", "")
             query = f"""
                 SELECT 
                     TABLE_TYPE,
@@ -348,7 +347,7 @@ class SnowflakeManager:
 
             res = query_executor(self.engine, query)
             table_or_view = res[0][0]
-            if table_or_view == 'VIEW':
+            if table_or_view == "VIEW":
                 logging.info("Cloning view")
 
                 logging.info("Creating schema if it does not exist")
@@ -359,11 +358,15 @@ class SnowflakeManager:
                 query_executor(self.engine, query)
 
                 logging.info("Granting rights on stage to TRANSFORMER")
-                grants_query = f"""GRANT ALL ON SCHEMA {output_schema_name} TO TRANSFORMER"""
+                grants_query = (
+                    f"""GRANT ALL ON SCHEMA {output_schema_name} TO TRANSFORMER"""
+                )
                 query_executor(self.engine, grants_query)
 
                 logging.info("Granting rights on stage to GITLAB_CI")
-                grants_query = f"""GRANT ALL ON SCHEMA {output_schema_name} TO GITLAB_CI"""
+                grants_query = (
+                    f"""GRANT ALL ON SCHEMA {output_schema_name} TO GITLAB_CI"""
+                )
                 query_executor(self.engine, grants_query)
 
                 query = f"""
@@ -377,12 +380,21 @@ class SnowflakeManager:
                 split_file = base_dll.splitlines()
 
                 first_line = base_dll.splitlines()[0]
-                find_db_name = first_line[base_dll.find('view'):].split('.')[0].replace('PREP', self.prep_database).replace('PROD', self.prod_database)
+                find_db_name = (
+                    first_line[base_dll.find("view") :]
+                    .split(".")[0]
+                    .replace("PREP", self.prep_database)
+                    .replace("PROD", self.prod_database)
+                )
                 new_first_line = f"{first_line[:base_dll.find('view')]}{find_db_name}{first_line[base_dll.find('.'):]}"
 
-                replaced_file = [f.replace('PREP', self.prep_database).replace('PROD', self.prod_database) for f in
-                                 split_file]
-                joined_lines = '\n'.join(replaced_file[1:])
+                replaced_file = [
+                    f.replace("PREP", self.prep_database).replace(
+                        "PROD", self.prod_database
+                    )
+                    for f in split_file
+                ]
+                joined_lines = "\n".join(replaced_file[1:])
 
                 output_query = new_first_line + "\n" + joined_lines
                 query_executor(self.engine, output_query)
@@ -400,10 +412,12 @@ class SnowflakeManager:
 
             transient_table = res[0][1]
             ### TODO: This can be a one-liner
-            if transient_table == 'YES':
-                clone_statement = f'CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {i} COPY GRANTS'
+            if transient_table == "YES":
+                clone_statement = f"CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {i} COPY GRANTS"
             else:
-                clone_statement = f'CREATE OR REPLACE {output_table_name} CLONE {i} COPY GRANTS'
+                clone_statement = (
+                    f"CREATE OR REPLACE {output_table_name} CLONE {i} COPY GRANTS"
+                )
 
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
@@ -415,9 +429,6 @@ class SnowflakeManager:
             logging.info("Granting rights on TABLE to GITLAB_CI")
             grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO GITLAB_CI"""
             query_executor(self.engine, grants_query)
-
-
-
 
 
 if __name__ == "__main__":
