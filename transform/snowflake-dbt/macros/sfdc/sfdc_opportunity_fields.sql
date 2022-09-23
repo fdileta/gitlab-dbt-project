@@ -192,6 +192,17 @@ WITH first_contact  AS (
       close_date::DATE                                                   AS close_date,
       net_arr                                                            AS raw_net_arr,
     {%- if model_type == 'live' %}
+        CASE
+          WHEN sfdc_opportunity_source.stage_name
+            IN ('1-Discovery', '2-Developing', '2-Scoping','3-Technical Evaluation', '4-Proposal', 'Closed Won','5-Negotiating', '6-Awaiting Signature', '7-Closing')
+          THEN 1
+          ELSE 0
+        END                                                                                         AS is_stage_1_plus,
+        CASE
+          WHEN sfdc_opportunity_source.stage_name IN ('8-Closed Lost', 'Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate')
+              THEN 0
+          ELSE 1
+        END                                                                                         AS is_open,
         {{ dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"])}}
     {%- elif model_type == 'snapshot' %}
         {{ dbt_utils.surrogate_key(['sfdc_opportunity_snapshots_source.opportunity_id','snapshot_dates.date_id'])}}   AS crm_opportunity_snapshot_id,
