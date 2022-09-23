@@ -1,10 +1,10 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "dim_behavior_website_event_pk"
+        unique_key = "dim_behavior_website_event_sk"
 ) }}
 
 {{ simple_cte([
-    ('events', 'snowplow_unnested_events_all')
+    ('events', 'prep_snowplow_unstructured_events_all')
     ])
 }}
 
@@ -37,7 +37,7 @@
 
     SELECT
       -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['event','event_name','platform','environment']) }} AS dim_behavior_website_event_pk,
+      {{ dbt_utils.surrogate_key(['event','event_name','platform','environment']) }} AS dim_behavior_website_event_sk,
 
       -- Natural Keys
       event,

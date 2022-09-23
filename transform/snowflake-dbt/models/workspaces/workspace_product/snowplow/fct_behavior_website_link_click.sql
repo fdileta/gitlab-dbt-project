@@ -1,6 +1,6 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "fct_behavior_website_link_click_pk"
+        unique_key = "fct_behavior_website_link_click_sk"
 ) }}
 
 {{ simple_cte([
@@ -39,21 +39,21 @@
     SELECT
 
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['event_id','behavior_at']) }} AS fct_behavior_website_link_click_pk,
+      {{ dbt_utils.surrogate_key(['event_id','behavior_at']) }} AS fct_behavior_website_link_click_sk,
 
       -- Natural Key
       event_id,
 
       -- Surrogate Keys
-      dim_event.dim_behavior_website_event_pk,
-      dim_page.dim_behavior_website_page_pk,
+      dim_event.dim_behavior_website_event_sk,
+      dim_page.dim_behavior_website_page_sk,
 
       --Time Attributes
       behavior_at,
 
       -- Google Key
       gsc_pseudonymized_user_id,
-      
+
       -- Attributes
       session_id,
       link_click_target_url

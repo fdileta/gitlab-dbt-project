@@ -4,7 +4,7 @@ models:
   - name: dim_behavior_website_page
     description: Dimension for the analysis of webpages used according to the page_urlpath in Snowplow. It is unique on `clean_url_path`, `page_url_host` and `app_id`.
     columns:
-      - name: dim_behavior_website_page_pk
+      - name: dim_behavior_website_page_sk
         tests:
           - not_null
           - unique
@@ -44,7 +44,7 @@ models:
   - name: fct_behavior_website_page_view
     description: TBD
     columns:
-      - name: behavior_website_page_view_pk
+      - name: behavior_website_page_view_sk
         tests:
           - not_null
           - unique
@@ -55,7 +55,7 @@ models:
   - name: fct_behavior_website_link_click
     description: Fact table containing details of links clicked.
     columns: 
-      - name: fct_behavior_website_link_click_pk
+      - name: fct_behavior_website_link_click_sk
         tests:
           - not_null
           - unique
@@ -63,7 +63,7 @@ models:
   - name: dim_behavior_website_event
     description: Dimensional model containing distinct events types from Snowplow.
     columns:
-      - name: dim_behavior_website_event_pk
+      - name: dim_behavior_website_event_sk
         tests:
           - not_null
           - unique
