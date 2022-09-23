@@ -1,9 +1,10 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "behavior_structured_event_pk"
+        unique_key = "behavior_structured_event_pk",
+        enabled = false
 ) }}
 
-{{ 
+{{
     simple_cte([
     ('fct_behavior_structured_event', 'fct_behavior_structured_event')
     ])
@@ -11,7 +12,7 @@
 
 , final AS (
 
-    SELECT 
+    SELECT
 
       -- Primary Key
       fct_behavior_structured_event.behavior_structured_event_pk,
@@ -26,7 +27,7 @@
       fct_behavior_structured_event.app_id,
       fct_behavior_structured_event.session_id,
       fct_behavior_structured_event.user_snowplow_domain_id,
-      
+
       -- Time Attributes
       fct_behavior_structured_event.dvce_created_tstamp,
       fct_behavior_structured_event.behavior_at,
@@ -69,7 +70,7 @@
       fct_behavior_structured_event.gsc_plan,
       fct_behavior_structured_event.gsc_project_id,
       fct_behavior_structured_event.gsc_source
-      
+
     FROM fct_behavior_structured_event
     WHERE event_action IN (
     'g_analytics_valuestream',
@@ -79,7 +80,7 @@
     'p_terraform_state_api_unique_users',
     'i_search_paid'
     )
-   
+
     {% if is_incremental() %}
 
     AND behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
@@ -92,7 +93,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@iweeks",
     created_date="2022-09-01",
-    updated_date="2022-09-01"
+    updated_date="2022-09-22"
 ) }}

@@ -1,10 +1,11 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "behavior_structured_event_pk"
+        unique_key = "behavior_structured_event_pk",
+        enabled = false
 ) }}
 
 -- depends_on: {{ ref('snowplow_structured_events') }}
-{{ 
+{{
     simple_cte([
     ('prep_snowplow_structured_event_all_source', 'prep_snowplow_structured_event_all_source'),
     ('dim_behavior_website_page', 'dim_behavior_website_page')
@@ -14,7 +15,7 @@
 , structured_events_w_clean_url AS (
 
     SELECT
-      prep_snowplow_structured_event_all_source.*, 
+      prep_snowplow_structured_event_all_source.*,
       {{ clean_url('page_url_path') }}   AS clean_url_path,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)     AS dim_namespace_id,
       REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1)   AS dim_project_id,
@@ -91,7 +92,7 @@
       structured_events_w_clean_url.gsc_source
 
     FROM structured_events_w_clean_url
-    LEFT JOIN dim_behavior_website_page 
+    LEFT JOIN dim_behavior_website_page
       ON structured_events_w_clean_url.clean_url_path = dim_behavior_website_page.clean_url_path
         AND structured_events_w_clean_url.page_url_host = dim_behavior_website_page.page_url_host
         AND structured_events_w_clean_url.app_id = dim_behavior_website_page.app_id
@@ -101,7 +102,7 @@
 {{ dbt_audit(
     cte_ref="structured_events_w_dim",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@iweeks",
     created_date="2022-09-01",
-    updated_date="2022-09-01"
+    updated_date="2022-09-22"
 ) }}

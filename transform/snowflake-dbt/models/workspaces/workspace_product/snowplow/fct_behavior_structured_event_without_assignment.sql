@@ -1,9 +1,10 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "behavior_structured_event_pk"
+        unique_key = "behavior_structured_event_pk",
+        enabled = false
 ) }}
 
-{{ 
+{{
     simple_cte([
     ('fct_behavior_structured_event', 'fct_behavior_structured_event')
     ])
@@ -11,8 +12,8 @@
 
 , final AS (
 
-    SELECT 
-    
+    SELECT
+
       -- Primary Key
       fct_behavior_structured_event.behavior_structured_event_pk,
 
@@ -85,7 +86,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@iweeks",
     created_date="2022-09-01",
-    updated_date="2022-09-01"
+    updated_date="2022-09-22"
 ) }}
