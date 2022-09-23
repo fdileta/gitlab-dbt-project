@@ -18,7 +18,9 @@
       event_name,
       gsc_environment                                   AS environment,
       gsc_pseudonymized_user_id,
-      {{ clean_url('page_url_path') }}                  AS clean_url_path,      
+      {{ clean_url('page_url_path') }}                  AS clean_url_path,
+      page_url_host,
+      app_id,
       session_id,
       lc_targeturl                                      AS link_click_target_url
     FROM events
@@ -47,6 +49,9 @@
     FROM link_click
     JOIN dim_event ON link_click.event_name = dim_event.event_name
     JOIN dim_page ON link_click.clean_url_path = dim_page.clean_url_path 
+    AND link_click.page_url_host = dim_page.page_url_host
+    AND link_click.app_id = dim_page.app_id
+      
 )
 
 {{ dbt_audit(
