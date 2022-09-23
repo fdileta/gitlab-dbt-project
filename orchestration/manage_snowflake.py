@@ -377,6 +377,9 @@ class SnowflakeManager:
 
                 base_dll = res[0][0]
 
+                # Essentially, this code is finding and replacing the DB name in only the first line for recreating
+                # views. This is because we have a database & schema named PREP, which creates a special case in the
+                # rest of the views they are replaced completely.
                 split_file = base_dll.splitlines()
 
                 first_line = base_dll.splitlines()[0]
