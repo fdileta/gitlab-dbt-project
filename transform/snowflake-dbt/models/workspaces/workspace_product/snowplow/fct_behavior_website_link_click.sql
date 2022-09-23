@@ -1,6 +1,6 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "behavior_website_link_click_sk"
+        unique_key = "fct_behavior_website_link_click_pk"
 ) }}
 
 {{ simple_cte([
@@ -35,10 +35,11 @@
 , link_click_with_dims AS (
 
     SELECT
-      {{ dbt_utils.surrogate_key(['event_id','behavior_at']) }}                AS behavior_website_link_click_sk,
+
+      {{ dbt_utils.surrogate_key(['event_id','behavior_at']) }} AS fct_behavior_website_link_click_pk,
       event_id,
-      dim_event.dim_behavior_website_event_sk,
-      dim_page.dim_behavior_website_page_sk,
+      dim_event.dim_behavior_website_event_pk,
+      dim_page.dim_behavior_website_page_pk,
       behavior_at,
       gsc_pseudonymized_user_id,
       session_id,

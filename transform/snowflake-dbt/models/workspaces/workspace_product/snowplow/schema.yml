@@ -4,7 +4,7 @@ models:
   - name: dim_behavior_website_page
     description: Dimension for the analysis of webpages used according to the page_urlpath in Snowplow.
     columns:
-      - name: dim_behavior_website_page_sk
+      - name: dim_behavior_website_page_pk
         tests:
           - not_null
           - unique
@@ -51,3 +51,19 @@ models:
 
   - name: prep_snowplow_structured_event_all_source
     description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of strutured events if the model is not run incrementally.
+
+  - name: fct_behavior_website_link_click
+    description: Fact table containing details of links clicked.
+    columns: 
+      - name: fct_behavior_website_link_click_pk
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_behavior_website_event
+    description: Dimensional model containing distinct events types from Snowplow.
+    columns:
+      - name: dim_behavior_website_event_pk
+        tests:
+          - not_null
+          - unique
