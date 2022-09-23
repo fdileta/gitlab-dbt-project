@@ -21,6 +21,7 @@
       lc_targeturl                                      AS link_click_target_url
     FROM events
     WHERE event_name = 'link_click'
+    AND derived_tstamp >= DATEADD(MONTH, -25, CURRENT_DATE)
 
     {% if is_incremental() %}
 

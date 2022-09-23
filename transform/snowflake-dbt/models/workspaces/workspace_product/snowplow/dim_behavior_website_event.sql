@@ -26,19 +26,6 @@
     
     {% endif %}
 
-    {% if var('snowplow:app_ids')|length > 0 %}
-
-    AND app_id IN (
-        {% for app_id in var('snowplow:app_ids') %}
-        '{{app_id}}'
-        {% if not loop.last %}
-        ,
-        {% endif %}
-        {% endfor %}
-    )
-
-    {% endif %}
-
     AND domain_sessionid IS NOT NULL
     AND domain_sessionidx IS NOT NULL
     AND domain_userid IS NOT NULL
