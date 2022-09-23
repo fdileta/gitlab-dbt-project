@@ -1,9 +1,10 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "behavior_structured_event_pk"
+        unique_key = "behavior_structured_event_pk",
+        enabled = false
 ) }}
 
-{{ 
+{{
     simple_cte([
     ('fct_behavior_structured_event', 'fct_behavior_structured_event'),
     ('snowplow_gitlab_events_experiment_contexts', 'snowplow_gitlab_events_experiment_contexts')
@@ -76,7 +77,7 @@
       snowplow_gitlab_events_experiment_contexts.experiment_variant,
       snowplow_gitlab_events_experiment_contexts.context_key,
       snowplow_gitlab_events_experiment_contexts.experiment_migration_keys
-      
+
     FROM fct_behavior_structured_event
     INNER JOIN snowplow_gitlab_events_experiment_contexts
       ON fct_behavior_structured_event.event_id = snowplow_gitlab_events_experiment_contexts.event_id
@@ -92,7 +93,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@iweeks",
     created_date="2022-09-01",
-    updated_date="2022-09-01"
+    updated_date="2022-09-22"
 ) }}
