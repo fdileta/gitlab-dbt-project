@@ -16,7 +16,7 @@ tables:
       SELECT id
       , status
       , finished_at
-      , trace
+      , NULL AS trace
       , created_at
       , updated_at
       , started_at
