@@ -1,3 +1,4 @@
+""" Utility class encapsulating SnowFlake operations. Primarily for use with CI jobs. """
 #!/usr/bin/env python3
 import logging
 import sys
