@@ -237,11 +237,12 @@ class SnowflakeManager:
         :param database:
         :param schema:
         """
+
         stages_query = f"""
-             SELECT 
+        SELECT
                  stage_schema,
                  stage_name,
-                 stage_url, 
+                 stage_url,
                  stage_type
              FROM {database}.information_schema.stages
              {f"WHERE stage_schema = '{schema.upper()}'" if schema != "" else ""}
@@ -259,8 +260,7 @@ class SnowflakeManager:
             if stage["stage_type"] == "External Named":
 
                 clone_stage_query = f"""
-                    CREATE OR REPLACE STAGE {output_stage_name} LIKE   
-                    {from_stage_name}
+                    CREATE OR REPLACE STAGE {output_stage_name} LIKE {from_stage_name}
                     """
 
                 grants_query = f"""
@@ -269,7 +269,7 @@ class SnowflakeManager:
 
             else:
                 clone_stage_query = f"""
-                    CREATE OR REPLACE STAGE {output_stage_name}  
+                    CREATE OR REPLACE STAGE {output_stage_name}
                     """
 
                 grants_query = f"""
@@ -288,7 +288,6 @@ class SnowflakeManager:
             except ProgrammingError as prg:
                 # Catches permissions errors
                 logging.error(prg._sql_message(as_unicode=False))
-
 
     def clone_schemas(self, *schema_input):
         """
@@ -338,12 +337,12 @@ class SnowflakeManager:
             output_table_name = f"{self.branch_name}_{i}"
             output_schema_name = output_table_name.replace(f".{table_name}", "")
             query = f"""
-                SELECT 
+                SELECT
                     TABLE_TYPE,
                     IS_TRANSIENT
-                FROM {database_name}.INFORMATION_SCHEMA.TABLES 
-                WHERE TABLE_SCHEMA = UPPER('{schema_name}') 
-                AND TABLE_NAME = UPPER('{table_name}') 
+                FROM {database_name}.INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_SCHEMA = UPPER('{schema_name}')
+                AND TABLE_NAME = UPPER('{table_name}')
             """
 
             res = query_executor(self.engine, query)
@@ -354,7 +353,7 @@ class SnowflakeManager:
                 logging.info("Creating schema if it does not exist")
 
                 query = f"""
-                CREATE SCHEMA IF NOT EXISTS {output_schema_name} 
+                CREATE SCHEMA IF NOT EXISTS {output_schema_name}
                 """
                 query_executor(self.engine, query)
 
@@ -371,7 +370,7 @@ class SnowflakeManager:
                 query_executor(self.engine, grants_query)
 
                 query = f"""
-                    SELECT GET_DDL('VIEW', '{i}', TRUE) 
+                    SELECT GET_DDL('VIEW', '{i}', TRUE)
                 """
                 print(query)
                 res = query_executor(self.engine, query)
