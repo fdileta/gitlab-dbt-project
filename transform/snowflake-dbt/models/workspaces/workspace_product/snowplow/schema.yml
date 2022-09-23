@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: dim_behavior_website_page
-    description: Dimension for the analysis of webpages used according to the page_urlpath in Snowplow.
+    description: Dimension for the analysis of webpages used according to the page_urlpath in Snowplow. It is unique on `clean_url_path`, `page_url_host` and `app_id`.
     columns:
       - name: dim_behavior_website_page_pk
         tests:
