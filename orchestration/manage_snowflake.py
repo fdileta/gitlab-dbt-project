@@ -388,12 +388,12 @@ class SnowflakeManager:
                 query_executor(self.engine, output_query)
                 logging.info(f"View {i} successfully created. ")
 
-                logging.info("Granting rights on VIEW to GITLAB_CI")
-                grants_query = f"""GRANT OWNERSHIP ON VIEW {output_table_name} TO GITLAB_CI REVOKE CURRENT GRANTS"""
+                logging.info("Granting rights on VIEW to TRANSFORMER")
+                grants_query = f"""GRANT OWNERSHIP ON VIEW {output_table_name} TO TRANSFORMER REVOKE CURRENT GRANTS"""
                 query_executor(self.engine, grants_query)
 
-                logging.info("Granting rights on VIEW to TRANSFORMER")
-                grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO TRANSFORMER"""
+                logging.info("Granting rights on VIEW to GITLAB_CI")
+                grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO GITLAB_CI"""
                 query_executor(self.engine, grants_query)
 
                 continue
@@ -408,12 +408,12 @@ class SnowflakeManager:
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
 
-            logging.info("Granting rights on TABLE to GITLAB_CI")
-            grants_query = f"""GRANT OWNERSHIP ON TABLE {output_table_name} TO GITLAB_CI REVOKE CURRENT GRANTS"""
+            logging.info("Granting rights on TABLE to TRANSFORMER")
+            grants_query = f"""GRANT OWNERSHIP ON TABLE {output_table_name} TO TRANSFORMER REVOKE CURRENT GRANTS"""
             query_executor(self.engine, grants_query)
 
-            logging.info("Granting rights on TABLE to TRANSFORMER")
-            grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO TRANSFORMER"""
+            logging.info("Granting rights on TABLE to GITLAB_CI")
+            grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO GITLAB_CI"""
             query_executor(self.engine, grants_query)
 
 
