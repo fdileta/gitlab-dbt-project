@@ -4728,7 +4728,7 @@ models:
         description: Total booked net ARR associated with the opportunity.
       - name: calculated_age_in_days
         description: Age of the opportunity between opportunity created date and opportunity closed date.
-      - name: pipeline_calculated_deal_count
+      - name: calculated_deal_count
         description: Count of deals that are not credits, subtracting out decommissions.
       - name: calculated_from_ratio_net_arr
         description: Net ARR assigned to an opportunity based on its stage, segment, and net incremental annual contract value.

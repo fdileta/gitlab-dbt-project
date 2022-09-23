@@ -80,6 +80,7 @@
       dim_crm_account.crm_account_tsp_account_employees,
       dim_crm_account.crm_account_tsp_max_family_employees,
       dim_crm_account.crm_account_billing_country,
+      dim_crm_account.crm_account_billing_country_code,
       dim_crm_account.crm_account_type,
       dim_crm_account.crm_account_industry,
       dim_crm_account.crm_account_sub_industry,
@@ -226,5 +227,5 @@
     created_by="@michellecooper",
     updated_by="@j_kim",
     created_date="2022-08-10",
-    updated_date="2022-08-31"
+    updated_date="2022-09-14"
 ) }}

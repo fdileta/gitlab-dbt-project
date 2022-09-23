@@ -29,7 +29,8 @@ we can delete this connection and use the mart table directly.
 ), sfdc_accounts_xf AS (
 
     SELECT * 
-    FROM {{ref('sfdc_accounts_xf')}}
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 
 ), date_details AS (
@@ -139,10 +140,11 @@ we can delete this connection and use the mart table directly.
       sfdc_opportunity_xf.downgrade_reason,
       sfdc_opportunity_xf.renewal_acv,
       sfdc_opportunity_xf.renewal_amount,
+      
       CASE
         WHEN sfdc_opportunity_xf.sales_qualified_source = 'BDR Generated'
             THEN 'SDR Generated'
-        ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source,'NA')
+        ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source, 'Missing sales_qualified_source_name')
       END                                                           AS sales_qualified_source,
 
       sfdc_opportunity_xf.solutions_to_be_replaced,
@@ -155,9 +157,8 @@ we can delete this connection and use the mart table directly.
       -----------------------------------------------------------
       -----------------------------------------------------------
       -- New fields for FY22 - including user segment / region fields
-
       sfdc_opportunity_xf.order_type_live,
-      sfdc_opportunity_xf.order_type_stamped,
+      COALESCE(sfdc_opportunity_xf.order_type_stamped, 'Missing order_type_name') AS order_type_stamped,
 
       COALESCE(sfdc_opportunity_xf.net_arr,0)                 AS raw_net_arr,
       sfdc_opportunity_xf.recurring_amount,

@@ -43,8 +43,8 @@ WITH sfdc_opportunity AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}}
-    --FROM prod.restricted_safe_legacy.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 ), date_details AS (
 
@@ -88,7 +88,7 @@ WITH sfdc_opportunity AS (
       ----------------------------------------------------------
       ----------------------------------------------------------
       sfdc_opportunity_xf.owner_id,
-      opportunity_owner.name                            AS opportunity_owner,
+      opportunity_owner.name                                   AS opportunity_owner,
       sfdc_opportunity_xf.opportunity_owner_department,
       sfdc_opportunity_xf.opportunity_owner_manager,
       sfdc_opportunity_xf.opportunity_owner_role,
@@ -100,7 +100,7 @@ WITH sfdc_opportunity AS (
       sfdc_opportunity_xf.sales_path,
       sfdc_opportunity_xf.sales_type,
       sfdc_opportunity_xf.stage_name,
-      sfdc_opportunity_xf.order_type_stamped,
+      COALESCE(sfdc_opportunity_xf.order_type_stamped, 'Missing order_type_name')  AS order_type_stamped,
 
 
       ----------------------------------------------------------
@@ -245,7 +245,7 @@ WITH sfdc_opportunity AS (
       CASE
         WHEN sfdc_opportunity_xf.sales_qualified_source = 'BDR Generated'
             THEN 'SDR Generated'
-        ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source,'NA')
+        ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source, 'Missing sales_qualified_source_name')
       END                                                           AS sales_qualified_source,
 
       CASE

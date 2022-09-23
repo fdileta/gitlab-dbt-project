@@ -91,18 +91,7 @@ models:
         tests:
           - not_null
           - unique
-  - name: sfdc_account_snapshot_history
-    description: This model constrains the scope of sfdc_account_snapshots_base to the columns in sfdc_accounts_xf and their corresponding aliases.
-    columns:
-      - name: account_id
-        tests:
-          - not_null
-      - name: account_name
-        tests:
-          - not_null
-      - name: valid_from
-        tests:
-          - not_null
+
   - name: sfdc_opportunity_snapshot_history
     description: This model constrains the scope of sfdc_opportunity_snapshots_base to the columns in sfdc_opportunity_xf and their corresponding aliases.
     columns:

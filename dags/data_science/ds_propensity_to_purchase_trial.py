@@ -37,7 +37,7 @@ default_args = {
     "owner": "airflow",
     "retries": 0,
     "retry_delay": timedelta(minutes=1),
-    "start_date": datetime(2022, 8, 10),
+    "start_date": datetime(2022, 8, 9),
     "dagrun_timeout": timedelta(hours=2),
 }
 
@@ -67,7 +67,7 @@ clone_data_science_ptp_repo_cmd = f"""
 # Create the DAG
 # Run Every Monday
 dag = DAG(
-    "propensity_to_purchase_trial",
+    "ds_propensity_to_purchase_trial",
     default_args=default_args,
     schedule_interval="0 5 * * 1",
 )

@@ -17,3 +17,5 @@ WITH base_all_time AS (
 SELECT *
 FROM base_all_time
 WHERE subscription_name NOT IN (SELECT subscription_name FROM base_live)
+-- Two subscriptions were incorrectly labeled as true-ups, so these exceptions need to be manually removed from the list of dropped true ups.
+  AND subscription_name NOT IN ('A-S00069616', 'A-S00047777')

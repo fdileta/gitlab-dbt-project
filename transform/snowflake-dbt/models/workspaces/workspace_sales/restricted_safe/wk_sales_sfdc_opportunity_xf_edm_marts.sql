@@ -29,8 +29,8 @@ WITH sfdc_opportunity AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}}
-    --FROM prod.restricted_safe_legacy.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 ), date_details AS (
 
@@ -146,9 +146,7 @@ WITH sfdc_opportunity AS (
     edm_opty.stage_3_technical_evaluation_date,
     edm_opty.stage_4_proposal_date,
     edm_opty.stage_5_negotiating_date,
-    
-    sfdc_opportunity_xf.stage_6_awaiting_signature_date,
-    
+    edm_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
     edm_opty.stage_6_closed_won_date,
     edm_opty.stage_6_closed_lost_date,
     edm_opty.cp_champion,
@@ -340,7 +338,7 @@ WITH sfdc_opportunity AS (
     edm_opty.stage_name_4plus,
     edm_opty.deal_category,
     edm_opty.deal_group,
-    edm_opty.pipeline_calculated_deal_count                                  AS calculated_deal_count,
+    edm_opty.calculated_deal_count                                  AS calculated_deal_count,
 
     ----------------------------------------------------------------
     -- NF 2022-01-28 This is probably TO BE DEPRECATED too, need to align with Channel ops

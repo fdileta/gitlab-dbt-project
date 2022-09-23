@@ -26,6 +26,7 @@ WITH crm_person AS (
 
       --info
       person_score,
+      behavior_score,
       title,
       country,
       state,
@@ -35,6 +36,7 @@ WITH crm_person AS (
       status,
       lead_source,
       lead_source_type,
+      was_converted_lead,
       source_buckets,
       employee_bucket,
       net_new_source_categories,
@@ -66,6 +68,7 @@ WITH crm_person AS (
       leandata_matched_account_billing_postal_code,
       leandata_matched_account_billing_country,
       leandata_matched_account_employee_count,
+      leandata_matched_account_sales_segment,
       zoominfo_contact_city,
       zoominfo_contact_state,
       zoominfo_contact_country,
@@ -96,5 +99,5 @@ WITH crm_person AS (
     created_by="@jjstark",
     updated_by="@rkohnke",
     created_date="2020-09-10",
-    updated_date="2022-09-07"
+    updated_date="2022-09-14"
 ) }}

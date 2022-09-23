@@ -91,6 +91,7 @@ final AS (
     fct_crm_opportunity.forecast_category_name,
     fct_crm_opportunity.opportunity_owner,
     fct_crm_opportunity.dim_crm_user_id AS owner_id,
+    fct_crm_opportunity.resale_partner_name,
 
     -- flags
     fct_crm_opportunity.is_won,
@@ -370,6 +371,11 @@ final AS (
     stage_5_negotiating_date.first_day_of_fiscal_quarter            AS stage_5_negotiating_fiscal_quarter_date,
     stage_5_negotiating_date.fiscal_quarter_name_fy                 AS stage_5_negotiating_fiscal_quarter_name,
     stage_5_negotiating_date.fiscal_year                            AS stage_5_negotiating_fiscal_year,
+    stage_6_awaiting_signature_date.date_actual                     AS stage_6_awaiting_signature_date_date,
+    stage_6_awaiting_signature_date.first_day_of_month              AS stage_6_awaiting_signature_date_month,
+    stage_6_awaiting_signature_date.first_day_of_fiscal_quarter     AS stage_6_awaiting_signature_date_fiscal_quarter_date,
+    stage_6_awaiting_signature_date.fiscal_quarter_name_fy          AS stage_6_awaiting_signature_date_fiscal_quarter_name,
+    stage_6_awaiting_signature_date.fiscal_year                     AS stage_6_awaiting_signature_date_fiscal_year,
     stage_6_closed_won_date.date_actual                             AS stage_6_closed_won_date,
     stage_6_closed_won_date.first_day_of_month                      AS stage_6_closed_won_month,
     stage_6_closed_won_date.first_day_of_fiscal_quarter             AS stage_6_closed_won_fiscal_quarter_date,
@@ -415,11 +421,11 @@ final AS (
     arr_created_date.first_day_of_fiscal_quarter                    AS pipeline_created_fiscal_quarter_date,
     arr_created_date.fiscal_quarter_name_fy                         AS pipeline_created_fiscal_quarter_name,
     arr_created_date.fiscal_year                                    AS pipeline_created_fiscal_year,
-    created_date.date_actual                                        AS net_arr_created_date,
-    created_date.first_day_of_month                                 AS net_arr_created_month,
-    created_date.first_day_of_fiscal_quarter                        AS net_arr_created_fiscal_quarter_date,
-    created_date.fiscal_quarter_name_fy                             AS net_arr_created_fiscal_quarter_name,
-    created_date.fiscal_year                                        AS net_arr_created_fiscal_year,
+    arr_created_date.date_actual                                    AS net_arr_created_date,
+    arr_created_date.first_day_of_month                             AS net_arr_created_month,
+    arr_created_date.first_day_of_fiscal_quarter                    AS net_arr_created_fiscal_quarter_date,
+    arr_created_date.fiscal_quarter_name_fy                         AS net_arr_created_fiscal_quarter_name,
+    arr_created_date.fiscal_year                                    AS net_arr_created_fiscal_year,
     fct_crm_opportunity.snapshot_date,
     fct_crm_opportunity.snapshot_month,
     fct_crm_opportunity.snapshot_fiscal_year,
@@ -456,7 +462,7 @@ final AS (
     fct_crm_opportunity.open_4plus_net_arr,
     fct_crm_opportunity.booked_net_arr,
     fct_crm_opportunity.churned_contraction_net_arr,
-    fct_crm_opportunity.pipeline_calculated_deal_count,
+    fct_crm_opportunity.calculated_deal_count,
     fct_crm_opportunity.booked_churned_contraction_deal_count,
     fct_crm_opportunity.booked_churned_contraction_net_arr,
     fct_crm_opportunity.raw_net_arr,
@@ -499,6 +505,8 @@ final AS (
     ON fct_crm_opportunity.stage_4_proposal_date = stage_4_proposal_date.date_actual
   LEFT JOIN dim_date stage_5_negotiating_date
     ON fct_crm_opportunity.stage_5_negotiating_date = stage_5_negotiating_date.date_actual
+  LEFT JOIN dim_date stage_6_awaiting_signature_date
+      ON fct_crm_opportunity.stage_6_awaiting_signature_date_id = stage_6_awaiting_signature_date.date_id
   LEFT JOIN dim_date stage_6_closed_won_date
     ON fct_crm_opportunity.stage_6_closed_won_date = stage_6_closed_won_date.date_actual
   LEFT JOIN dim_date stage_6_closed_lost_date
@@ -530,5 +538,5 @@ final AS (
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-05-05",
-    updated_date="2022-08-08"
+    updated_date="2022-09-06"
   ) }}

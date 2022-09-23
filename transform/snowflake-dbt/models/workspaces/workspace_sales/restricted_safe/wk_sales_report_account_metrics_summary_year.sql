@@ -56,15 +56,15 @@ WITH date_details AS (
       
   ), sfdc_accounts_xf AS (
     
-    SELECT *
-    FROM prod.restricted_safe_legacy.sfdc_accounts_xf
-    --FROM {{ref('sfdc_accounts_xf')}} 
+    SELECT * 
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
 
   ), stitch_account  AS (
 
     SELECT *
-    FROM raw.salesforce_stitch.account
-    --FROM {{ source('salesforce', 'account') }}
+    --FROM raw.salesforce_stitch.account
+    FROM {{ source('salesforce', 'account') }}
 
   ), sfdc_users_xf AS (
 
@@ -98,7 +98,7 @@ WITH date_details AS (
         SUM(o.arr_basis)    AS nfy_sfdc_atr
     FROM sfdc_opportunity_xf o
     LEFT JOIN date_details d
-      ON o.subscription_start_date = d.date_actual
+      ON o.subscription_start_date = d.date_actual    -- to be changed to quote_start_date
     WHERE o.sales_type = 'Renewal'
       AND stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
       AND amount <> 0
@@ -113,7 +113,7 @@ WITH date_details AS (
         SUM(o.arr_basis)    AS fy_sfdc_atr
     FROM sfdc_opportunity_xf o
     LEFT JOIN date_details d
-      ON o.subscription_start_date = d.date_actual
+      ON o.subscription_start_date = d.date_actual  -- to be changed to quote_start_date
     WHERE o.sales_type = 'Renewal'
       AND stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
       AND amount <> 0
@@ -129,7 +129,7 @@ WITH date_details AS (
     FROM sfdc_opportunity_xf o
         CROSS JOIN report_dates d 
     WHERE o.sales_type = 'Renewal'
-    AND o.subscription_start_date BETWEEN DATEADD(month, -12,DATE_TRUNC('month',d.report_month_date)) 
+    AND o.subscription_start_date BETWEEN DATEADD(month, -12,DATE_TRUNC('month',d.report_month_date))  -- to be changed to quote_start_date
         AND DATE_TRUNC('month',d.report_month_date)
       AND o.stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
       AND o.amount <> 0
@@ -171,19 +171,19 @@ WITH date_details AS (
   
        -- FO year
         SUM(CASE
-            WHEN o.order_type_live = '1. New - First Order'
+            WHEN o.order_type_stamped = '1. New - First Order'
             THEN o.net_arr
             ELSE 0 END) AS ttm_fo_net_arr,
   
         -- New Connected year
         SUM(CASE
-            WHEN o.order_type_live = '2. New - Connected'
+            WHEN o.order_type_stamped = '2. New - Connected'
             THEN o.net_arr
             ELSE 0 END) AS ttm_new_connected_net_arr,
            
         -- Growth year
         SUM(CASE
-            WHEN o.order_type_live NOT IN ('2. New - Connected','1. New - First Order')
+            WHEN o.order_type_stamped NOT IN ('2. New - Connected','1. New - First Order')
             THEN o.net_arr
             ELSE 0 END) AS ttm_growth_net_arr,
   
@@ -304,19 +304,19 @@ WITH date_details AS (
         
         -- First Order year
         SUM(CASE
-            WHEN o.order_type_live = '1. New - First Order'
+            WHEN o.order_type_stamped = '1. New - First Order'
             THEN o.net_arr
             ELSE 0 END) AS fy_fo_net_arr,
         
         -- New Connected year
         SUM(CASE
-            WHEN o.order_type_live = '2. New - Connected'
+            WHEN o.order_type_stamped = '2. New - Connected'
             THEN o.net_arr
             ELSE 0 END) AS fy_new_connected_net_arr,
            
         -- Growth year
         SUM(CASE
-            WHEN o.order_type_live NOT IN ('2. New - Connected','1. New - First Order')
+            WHEN o.order_type_stamped NOT IN ('2. New - Connected','1. New - First Order')
             THEN o.net_arr
             ELSE 0 END) AS fy_growth_net_arr,
         

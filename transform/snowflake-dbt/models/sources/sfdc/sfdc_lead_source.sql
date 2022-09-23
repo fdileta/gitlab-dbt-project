@@ -37,6 +37,7 @@ renamed AS (
     hasoptedoutofemail AS has_opted_out_email,
     emailbounceddate AS email_bounced_date,
     emailbouncedreason AS email_bounced_reason,
+    behavior_score__c AS behavior_score,
     leadsource AS lead_source,
     lead_from__c AS lead_from,
     lead_source_type__c AS lead_source_type,
@@ -171,6 +172,7 @@ renamed AS (
     leandata__matched_account_billing_postal_code__c as leandata_matched_account_billing_postal_code,
     leandata__matched_account_billing_country__c as leandata_matched_account_billing_country,
     leandata__matched_account_employees__c AS leandata_matched_account_employee_count,
+    lean_data_matched_account_sales_segment__c AS leandata_matched_account_sales_segment,
 
 
     --metadata

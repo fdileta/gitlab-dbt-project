@@ -144,7 +144,7 @@ Your computer set up is critical to working efficiently.  This section will help
 | [Command Line Interface](#command-line-interface) | No | No | No | No | Yes |
 | [Google Cloud](#google-cloud) | No | No | No | Yes | Yes |
 | [Jupyter](#jupyter) | No | No | No | Yes | No |
-| [Airflow](#airflow) | No | No | Yes | No | Yes |
+| [Airflow local development environment](#airflow) | No | No | Yes | No | Yes |
 | [Optional Steps](#optional-steps) | No | Yes | Yes | Yes | Yes |
 
 
@@ -197,18 +197,31 @@ _**THE SCRIPT SHOULD ONLY BE RUN ON YOUR GITLAB-ISSUED LAPTOP.** If you run this
 
 ### Google Cloud
 
-Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credentials are needed if you plan on connecting on your local machine to airflow or any CGP service (storage buckets, etc.) . Follow below steps to get running instance for yourself.
+Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credentials are needed if you plan on connecting on your local machine to airflow or any GCP service (storage buckets, etc.) . Follow below steps to get running instance for yourself.
 
 - [ ] Compete the [Command Line Interface](#command-line-interface) set up before starting this set up.
     - [ ] Download the json file provided by one of the project owners and move to your home directory (e.g. `/Users/yourusername`)
-    - [ ] Open terminal and run the following command, replacing `yourusername` with your actual user name on your computer (type `pwd` into the terminal if you don’t know it — the path should contain your user name) and `filename.json` with you name of the file.
+    - [ ] Open terminal and run the following command, replacing `filename.json` with you name of the file.
         ```zsh
-        echo 'export GOOGLE_APPLICATION_CREDENTIALS=/Users/yourusername/filename.json' >> ./.zshrc
+        echo 'export GOOGLE_APPLICATION_CREDENTIALS=~/filename.json' >> ~/.zshrc
         ```
         - If you already have the variable  `GOOGLE_APPLICATION_CREDENTIALS`  modify its value to the file path and file name instead of adding a new one. 
     - [ ] Refresh this file by sourcing it back, by running command in terminal: `source ~/.zshrc`.
 
 ### Airflow
+
+#### Setting up ./kube/config 
+
+**Ensure you have your service credentials configured, and the ${GOOGLE_APPLICATION_CREDENTIALS} variable is set locally as instructed above**
+
+- [ ] Run `gcloud container clusters get-credentials data-ops --zone us-west1-a --project gitlab-analysis` to connect to the Airflow kubernetes cluster, and configure your `./.kube/config` file
+- [ ] Navigate to `./.kube/config`. 
+- [ ] Copy and paste the file, rename the copied file to `./.kube/config_docker`
+- [ ] Open the copied file in a text editor. 
+- [ ] Find the line with `cmd-path: /Users/{your username}/google-cloud-sdk/bin/gcloud`
+- [ ] Replace this line with `cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud`
+
+This file will then be used each time you test locally via Airflow, and is passed to the containers in the ./analytics/docker-compose.yml file.
 
 - [ ] Install [Rancher Desktop](https://rancherdesktop.io/) using the UI install specified for your system
   - [ ] Make sure to download Rancher Desktop version `1.4.1` - you can find the correct version for your system here https://github.com/rancher-sandbox/rancher-desktop/releases/tag/v1.4.1
@@ -305,9 +318,9 @@ DBT is our data transformation engine that we use to build our dimensional model
 _Ensure you've set up your SSH configuration in the previous step as this is required to connect to one our dbt packages_
 
 - [ ] Follow the [instructions](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#Venv-workflow) found in the handbook for running and configuring dbt.
-- [ ] Run the `run-dbt` command from the analytics repository.  This will load the dbt dependencies and open a shell to virtual environment where dbt is installed allowing you run dbt commands
+- [ ] Run the `make run-dbt` command from the analytics repository.  This will load the dbt dependencies and open a shell to virtual environment where dbt is installed allowing you run dbt commands
 - [ ] Run `dbt seed` to import the CSV's from the analytics/data into your schema. For dbt to compile this needs to be completed as some of the models have dependencies on the tables which are created by the CSV's.
-- [ ] Run `dbt run --models +staging.sfdc` from within the shell to know that your connection has been successful, you are in the correct location, and everything will run smoothly.  For more details on the syntax for how to select and run the models, please refer to this [page](https://docs.getdbt.com/reference/node-selection/syntax#examples).  Afterwards, you can also try running `dbt compile` to ensure that the entire project will compile correctly.
+- [ ] Run `dbt run --models +sources.sfdc` from within the shell to know that your connection has been successful, you are in the correct location, and everything will run smoothly.  For more details on the syntax for how to select and run the models, please refer to this [page](https://docs.getdbt.com/reference/node-selection/syntax#examples).  Afterwards, you can also try running `dbt compile` to ensure that the entire project will compile correctly.
 - [ ] Test the command `make help` and use it to understand how to use various `make *` commands available to you.
 
 **Note:** When launching dbt you may see `WARNING: The GOOGLE_APPLICATION_CREDENTIALS variable is not set. Defaulting to a blank string.` Unless you are developing on Airflow this is ok and expected. If you require `GOOGLE_APPLICATION_CREDENTIALS` please follow the steps outlined in the [Google Cloud](#google-cloud) section.

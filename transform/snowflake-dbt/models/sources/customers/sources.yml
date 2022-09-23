@@ -29,19 +29,6 @@ sources:
           - name: updated_at
             tests:
               - not_null
-      - name: customers_db_eula_requests
-        columns:
-          - name: id
-            tests:
-              - not_null
-          - name: eula_id
-            tests:
-              - not_null
-      - name: customers_db_eulas
-        columns:
-          - name: id
-            tests:
-              - not_null
       - name: customers_db_leads
         columns:
           - name: id
@@ -56,6 +43,10 @@ sources:
           - name: report_timestamp
             tests:
               - not_null
+      - name: customers_db_license_versions
+        columns:
+          - name: item_type
+          - name: event
       - name: customers_db_licenses
         columns:
           - name: id
