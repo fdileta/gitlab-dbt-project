@@ -143,9 +143,10 @@ WITH date_details AS (
       edm_snapshot_opty.opportunity_business_development_representative,
       edm_snapshot_opty.opportunity_development_representative,
 
-      sfdc_opportunity_snapshot_history.order_type_stamped          AS snapshot_order_type_stamped,
+      -- sfdc_opportunity_snapshot_history.order_type_stamped          AS snapshot_order_type_stamped,
+      edm_snapshot_opty.order_type                                  AS snapshot_order_type_stamped,
       edm_snapshot_opty.sales_qualified_source_name                 AS snapshot_sales_qualified_source,
-      edm_snapshot_opty.is_edu_oss                                  AS  snapshot_is_edu_oss,
+      edm_snapshot_opty.is_edu_oss                                  AS snapshot_is_edu_oss,
       edm_snapshot_opty.opportunity_category                        AS snapshot_opportunity_category,
 
       -- Accounts might get deleted or merged, I am selecting the latest account id from the opty object
@@ -245,7 +246,10 @@ WITH date_details AS (
       edm_snapshot_opty.is_won,
       edm_snapshot_opty.is_lost,
       edm_snapshot_opty.is_open,
-      edm_snapshot_opty.is_closed,
+      CASE edm_snapshot_opty.is_closed 
+        WHEN TRUE THEN 1 
+        ELSE 0 
+      END                                                        AS is_closed,
       edm_snapshot_opty.is_renewal,
 
       edm_snapshot_opty.is_credit                                AS is_credit_flag,
@@ -376,25 +380,25 @@ WITH date_details AS (
       edm_snapshot_opty.report_opportunity_user_area,
       edm_snapshot_opty.report_user_segment_geo_region_area,
       edm_snapshot_opty.report_user_segment_geo_region_area_sqs_ot,
-      edm_snapshot_opty.key_sqs,
-      edm_snapshot_opty.key_ot,
-      edm_snapshot_opty.key_segment,
-      edm_snapshot_opty.key_segment_sqs,
-      edm_snapshot_opty.key_segment_ot,
-      edm_snapshot_opty.key_segment_geo,
-      edm_snapshot_opty.key_segment_geo_sqs,
-      edm_snapshot_opty.key_segment_geo_ot,
-      edm_snapshot_opty.key_segment_geo_region,
-      edm_snapshot_opty.key_segment_geo_region_sqs,
-      edm_snapshot_opty.key_segment_geo_region_ot,
-      edm_snapshot_opty.key_segment_geo_region_area,
-      edm_snapshot_opty.key_segment_geo_region_area_sqs,
-      edm_snapshot_opty.key_segment_geo_region_area_ot,
-      edm_snapshot_opty.key_segment_geo_area,
+      LOWER(edm_snapshot_opty.key_sqs)                           AS key_sqs,
+      LOWER(edm_snapshot_opty.key_ot)                            AS key_ot,
+      LOWER(edm_snapshot_opty.key_segment)                       AS key_segment,
+      LOWER(edm_snapshot_opty.key_segment_sqs)                   AS key_segment_sqs,
+      LOWER(edm_snapshot_opty.key_segment_ot)                    AS key_segment_ot,
+      LOWER(edm_snapshot_opty.key_segment_geo)                   AS key_segment_geo,
+      LOWER(edm_snapshot_opty.key_segment_geo_sqs)               AS key_segment_geo_sqs,
+      LOWER(edm_snapshot_opty.key_segment_geo_ot)                AS key_segment_geo_ot,
+      LOWER(edm_snapshot_opty.key_segment_geo_region)            AS key_segment_geo_region,
+      LOWER(edm_snapshot_opty.key_segment_geo_region_sqs)        AS key_segment_geo_region_sqs,
+      LOWER(edm_snapshot_opty.key_segment_geo_region_ot)         AS key_segment_geo_region_ot,
+      LOWER(edm_snapshot_opty.key_segment_geo_region_area)       AS key_segment_geo_region_area,
+      LOWER(edm_snapshot_opty.key_segment_geo_region_area_sqs)   AS key_segment_geo_region_area_sqs,
+      LOWER(edm_snapshot_opty.key_segment_geo_region_area_ot)    AS key_segment_geo_region_area_ot,
+      LOWER(edm_snapshot_opty.key_segment_geo_area)              AS key_segment_geo_area,
       edm_snapshot_opty.deal_group,
       edm_snapshot_opty.deal_category,
-      edm_snapshot_opty.opportunity_owner,
-      
+      -- edm_snapshot_opty.opportunity_owner,
+      opportunity_owner.name                                     AS opportunity_owner,
       edm_snapshot_opty.crm_account_name                         AS account_name,
       
       -- double check regarding parent crm account = ultimate parent account?
@@ -411,19 +415,22 @@ WITH date_details AS (
       edm_snapshot_opty.account_demographics_area,
       edm_snapshot_opty.account_demographics_territory,
 
-      edm_snapshot_opty.account_demographics_segment             AS upa_demographics_segment,
-      edm_snapshot_opty.account_demographics_geo                 AS upa_demographics_geo,
-      edm_snapshot_opty.account_demographics_region              AS upa_demographics_region,
-      edm_snapshot_opty.account_demographics_area                AS upa_demographics_area,
-      edm_snapshot_opty.account_demographics_territory           AS upa_demographics_territory,
+      -- edm_snapshot_opty.account_demographics_segment             AS upa_demographics_segment,
+      -- edm_snapshot_opty.account_demographics_geo                 AS upa_demographics_geo,
+      -- edm_snapshot_opty.account_demographics_region              AS upa_demographics_region,
+      -- edm_snapshot_opty.account_demographics_area                AS upa_demographics_area,
+      -- edm_snapshot_opty.account_demographics_territory           AS upa_demographics_territory,
 
       edm_snapshot_opty.stage_1_discovery_date                   AS stage_1_date,
       edm_snapshot_opty.stage_1_discovery_month                  AS stage_1_date_month,
       edm_snapshot_opty.stage_1_discovery_fiscal_year            AS stage_1_fiscal_year,
       edm_snapshot_opty.stage_1_discovery_fiscal_quarter_name    AS stage_1_fiscal_quarter_name,
       edm_snapshot_opty.stage_1_discovery_fiscal_quarter_date    AS stage_1_fiscal_quarter_date,
-
-      edm_snapshot_opty.is_sao                                   AS is_eligible_sao_flag
+      
+      CASE edm_snapshot_opty.is_sao 
+        WHEN TRUE THEN 1 
+        ELSE 0 
+      END                                             AS is_eligible_sao_flag 
 
 
     FROM {{ref('mart_crm_opportunity_daily_snapshot')}} AS edm_snapshot_opty
@@ -455,19 +462,27 @@ WITH date_details AS (
       sfdc_accounts_xf.ultimate_parent_sales_segment,
       sfdc_accounts_xf.tsp_max_hierarchy_sales_segment,
       
-      sfdc_accounts_xf.ultimate_parent_id -- same is ultimate_parent_account_id?
+      sfdc_accounts_xf.ultimate_parent_id, -- same is ultimate_parent_account_id?
+
+      upa.account_demographics_sales_segment                     AS upa_demographics_segment,
+      upa.account_demographics_geo                               AS upa_demographics_geo,
+      upa.account_demographics_region                            AS upa_demographics_region,
+      upa.account_demographics_area                              AS upa_demographics_area,
+      upa.account_demographics_territory                         AS upa_demographics_territory
+
       
-    FROM sfdc_opportunity_snapshot_history opp_snapshot
+    FROM sfdc_opportunity_snapshot_history AS opp_snapshot
     INNER JOIN sfdc_opportunity_xf    
       ON sfdc_opportunity_xf.opportunity_id = opp_snapshot.opportunity_id
     LEFT JOIN sfdc_accounts_xf
       ON sfdc_opportunity_xf.account_id = sfdc_accounts_xf.account_id 
-    LEFT JOIN sfdc_accounts_xf upa
+    LEFT JOIN sfdc_accounts_xf AS upa
       ON upa.account_id = sfdc_accounts_xf.ultimate_parent_account_id
-    LEFT JOIN sfdc_users_xf account_owner
+    LEFT JOIN sfdc_users_xf AS account_owner
       ON account_owner.user_id = sfdc_accounts_xf.owner_id
-    LEFT JOIN sfdc_users_xf opportunity_owner
+    LEFT JOIN sfdc_users_xf AS opportunity_owner
       ON opportunity_owner.user_id = opp_snapshot.owner_id
+    
     WHERE opp_snapshot.raw_account_id NOT IN ('0014M00001kGcORQA0')                           -- remove test account
       AND (sfdc_accounts_xf.ultimate_parent_account_id NOT IN ('0016100001YUkWVAA1')
             OR sfdc_accounts_xf.account_id IS NULL)                                        -- remove test account
