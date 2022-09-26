@@ -70,6 +70,17 @@ SELECT
   pql_namespace_creator_job_description,
   is_pql,
 
+  is_member_of_public_ultimate_parent_namespace,
+  is_member_of_private_ultimate_parent_namespace,
+
+  --Ptpt fields
+  is_ptpt_contact,
+  ptpt_namespace_id,
+  ptpt_score_group,
+  ptpt_insights,
+  ptpt_score_date,
+  ptpt_past_score_group,
+
   -- METADATA COLUMNS FOR USE IN PUMP (NOT INTEGRATION)
   last_changed
 

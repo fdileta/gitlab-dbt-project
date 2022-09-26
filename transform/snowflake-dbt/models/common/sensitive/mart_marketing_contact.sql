@@ -3,7 +3,7 @@
 ) }}
     
 {{ simple_cte ([
-  ('dim_marketing_contact', 'dim_marketing_contact'),
+  ('marketing_contact', 'dim_marketing_contact'),
   ('marketing_contact_order', 'bdg_marketing_contact_order'),
   ('dim_namespace', 'dim_namespace'),
   ('gitlab_dotcom_namespaces_source', 'gitlab_dotcom_namespaces_source'),
@@ -20,16 +20,9 @@
   ('ptpt_scores_by_user', 'prep_ptpt_scores_by_user')
 ]) }}
 
-, marketing_contact AS (
-
-    SELECT
-      {{ hash_of_column('email_address') }}
-      *
-    FROM dim_marketing_contact
-
 -------------------------- Start of PQL logic: --------------------------
 
-), namespaces AS (
+, namespaces AS (
   
     SELECT
       gitlab_dotcom_users_source.email,
@@ -844,7 +837,7 @@
     LEFT JOIN users_role_by_email
       ON users_role_by_email.email = marketing_contact.email_address
     LEFT JOIN ptpt_scores_by_user
-      ON ptpt_scores_by_user.email_address_hash = marketing_contact.email_address_hash
+      ON ptpt_scores_by_user.dim_marketing_contact_id = marketing_contact.dim_marketing_contact_id
 )
 
 {{ hash_diff(
@@ -964,5 +957,3 @@
     created_date="2021-02-09",
     updated_date="2022-09-21"
 ) }}
-
-
