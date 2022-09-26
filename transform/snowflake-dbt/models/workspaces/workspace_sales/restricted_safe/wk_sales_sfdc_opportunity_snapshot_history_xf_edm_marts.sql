@@ -398,7 +398,6 @@ WITH date_details AS (
       edm_snapshot_opty.deal_group,
       edm_snapshot_opty.deal_category,
       -- edm_snapshot_opty.opportunity_owner,
-      opportunity_owner.name                                     AS opportunity_owner,
       edm_snapshot_opty.crm_account_name                         AS account_name,
       
       -- double check regarding parent crm account = ultimate parent account?
@@ -461,6 +460,8 @@ WITH date_details AS (
       sfdc_accounts_xf.tsp_sub_region,
       sfdc_accounts_xf.ultimate_parent_sales_segment,
       sfdc_accounts_xf.tsp_max_hierarchy_sales_segment,
+
+      opportunity_owner.name                                     AS opportunity_owner,
       
       sfdc_accounts_xf.ultimate_parent_id, -- same is ultimate_parent_account_id?
 
