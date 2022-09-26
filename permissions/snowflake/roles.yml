@@ -2499,7 +2499,7 @@ roles:
             - analyst_finance
             - bamboohr_analytics
         warehouses:
-            - analyst_xs
+            - dev_xs
 
     - cbraza:
         member_of:
