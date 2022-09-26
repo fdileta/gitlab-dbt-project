@@ -1,10 +1,6 @@
-{{ config(
-     materialized = "table"
-)}}
-
 {{ simple_cte([
-    ('ptpt_scores', 'ptpt_scores'),
-    ('dim_namespace', 'dim_namespace'),
+    ('ptpt_scores', 'ptpt_scores_source'),
+    ('prep_namespace', 'prep_namespace'),
     ('gitlab_dotcom_users_source', 'gitlab_dotcom_users_source')
     ])
 }}
@@ -43,11 +39,11 @@
       ptpt_scores.score_group,
       ptpt_scores.insights,
       ptpt_scores.score_date::DATE                    AS score_date
-    FROM dim_namespace
+    FROM prep_namespace
     INNER JOIN gitlab_dotcom_users_source users
-      ON dim_namespace.creator_id = users.user_id
+      ON prep_namespace.creator_id = users.user_id
     INNER JOIN ptpt_scores
-      ON dim_namespace.dim_namespace_id = ptpt_scores.namespace_id
+      ON prep_namespace.dim_namespace_id = ptpt_scores.namespace_id
     QUALIFY ROW_NUMBER() OVER(PARTITION BY email_address ORDER BY score DESC) = 1
 
 ), namespace_creator_ptpt_score_last_2 AS (
@@ -56,11 +52,11 @@
       COALESCE(users.notification_email, users.email) AS email_address,
       ptpt_scores_last_2.score_group,
       ptpt_scores_last_2.score_date
-    FROM dim_namespace
+    FROM prep_namespace
     INNER JOIN gitlab_dotcom_users_source users
-      ON dim_namespace.creator_id = users.user_id
+      ON prep_namespace.creator_id = users.user_id
     INNER JOIN ptpt_scores_last_2
-      ON dim_namespace.dim_namespace_id = ptpt_scores_last_2.namespace_id
+      ON prep_namespace.dim_namespace_id = ptpt_scores_last_2.namespace_id
     QUALIFY ROW_NUMBER() OVER(PARTITION BY email_address ORDER BY score DESC) = 1
 
 )
