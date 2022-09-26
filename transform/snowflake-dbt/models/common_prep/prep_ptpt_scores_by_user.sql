@@ -38,7 +38,6 @@
 
     SELECT
       COALESCE(users.notification_email, users.email) AS email_address,
-      {{ hash_of_column('email_address') }}
       ptpt_scores.namespace_id,
       ptpt_scores.score,
       ptpt_scores.score_group,
@@ -55,7 +54,6 @@
 
     SELECT
       COALESCE(users.notification_email, users.email) AS email_address,
-      {{ hash_of_column('email_address') }}
       ptpt_scores_last_2.score_group,
       ptpt_scores_last_2.score_date
     FROM dim_namespace
@@ -68,7 +66,7 @@
 )
 
 SELECT
-  namespace_creator_ptpt_score.email_address_hash,
+  {{ dbt_utils.surrogate_key(['namespace_creator_ptpt_score.email_address']) }} AS dim_marketing_contact_id,
   namespace_creator_ptpt_score.namespace_id,
   namespace_creator_ptpt_score.score,
   namespace_creator_ptpt_score.score_group,
@@ -79,6 +77,3 @@ SELECT
 FROM namespace_creator_ptpt_score
 LEFT JOIN namespace_creator_ptpt_score_last_2
   ON namespace_creator_ptpt_score.email_address = namespace_creator_ptpt_score_last_2.email_address
-QUALIFY ROW_NUMBER() OVER(PARTITION BY namespace_creator_ptpt_score.email_address_hash ORDER BY namespace_creator_ptpt_score.score DESC) = 1 -- Covers the case where the hash is not unique
--- due to the fact that some email addresses have different cases and the hash produced is the same between emails.
--- in case this happens, just only take the record with the highest score

@@ -17,7 +17,7 @@
   ('map_gitlab_dotcom_xmau_metrics', 'map_gitlab_dotcom_xmau_metrics'),
   ('services', 'gitlab_dotcom_integrations_source'),
   ('project', 'prep_project'),
-  ('ptpt_scores_by_user', 'ptpt_scores_by_user')
+  ('ptpt_scores_by_user', 'prep_ptpt_scores_by_user')
 ]) }}
 
 , marketing_contact AS (

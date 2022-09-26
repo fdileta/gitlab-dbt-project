@@ -420,6 +420,15 @@ models:
       - name: is_oss_or_edu_rate_plan
         description: Flag for rate plans containing OSS or EDU
 
+  - name: prep_ptpt_scores_by_user
+    description: '{{ doc("prep_ptpt_scores_by_user") }}'
+    columns:
+      - name: dim_marketing_contact_id
+        description: Unique identifier for the marketing contact.
+        tests:
+          - not_null
+          - unique
+
   - name: prep_sales_segment
     description: '{{ doc("prep_sales_segment") }}'
     columns:
@@ -1015,7 +1024,6 @@ models:
         description: Name of the Model
       - name: row_count
         description: Number of records in the table
-        description: SMAU Metric
 
   - name: prep_saas_usage_ping_free_user_metrics
     description: '{{ doc("prep_saas_usage_ping_free_user_metrics") }}'
