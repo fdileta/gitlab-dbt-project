@@ -184,11 +184,8 @@ config_dict = {
 
 
 def get_task_pool(task_name) -> string:
-    """Select Airflow pool based on type of extraction i.e. if SCD use SCD Pool slot in airflow else use respective task name pool slot"""
-    if task_name == "gitlab-com-scd":
-        return f"{config['task_name']}_scd_pool"
-
-    return f"{config['task_name']}_pool"
+    """Return airflow pool name"""
+    return f"{task_name}-pool"
 
 
 def is_incremental(raw_query):
@@ -293,7 +290,7 @@ for source_name, config in config_dict.items():
 
                 TASK_TYPE = "db-incremental"
                 task_identifier = (
-                    f"{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
+                    f"el_{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                 )
 
                 incremental_cmd = generate_cmd(
@@ -307,7 +304,7 @@ for source_name, config in config_dict.items():
                     image=DATA_IMAGE,
                     task_id=f"{task_identifier}-pgp-extract",
                     name=f"{task_identifier}-pgp-extract",
-                    pool=f"{config['task_name']}_pool",
+                    pool=get_task_pool(config["task_name"]),
                     secrets=standard_secrets + config["secrets"],
                     env_vars={
                         **gitlab_pod_env_vars,
@@ -340,7 +337,7 @@ for source_name, config in config_dict.items():
                     TASK_TYPE = "backfill"
 
                     task_identifier = (
-                        f"{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
+                        f"el_{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                     )
 
                     sync_cmd = generate_cmd(
@@ -353,7 +350,7 @@ for source_name, config in config_dict.items():
                         image=DATA_IMAGE,
                         task_id=task_identifier,
                         name=task_identifier,
-                        pool=f"{config['task_name']}_pool",
+                        pool=get_task_pool(config["task_name"]),
                         secrets=standard_secrets + config["secrets"],
                         env_vars={
                             **gitlab_pod_env_vars,
@@ -389,7 +386,7 @@ for source_name, config in config_dict.items():
                     TASK_TYPE = "db-scd"
 
                     task_identifier = (
-                        f"{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
+                        f"el_{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                     )
 
                     # SCD Task
