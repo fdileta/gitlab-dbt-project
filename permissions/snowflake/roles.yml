@@ -2494,6 +2494,13 @@ roles:
         warehouses:
             - reporting
 
+    - bnguyen:
+        member_of:
+            - analyst_finance
+            - bamboohr_analytics
+        warehouses:
+            - dev_xs
+
     - cbraza:
         member_of:
             - analyst_growth
@@ -4581,6 +4588,11 @@ users:
         can_login: yes
         member_of:
             - bbutterfield
+
+    - bnguyen:
+        can_login: yes
+        member_of:
+            - bnguyen
 
     - cbraza:
         can_login: yes
