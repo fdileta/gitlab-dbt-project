@@ -1,3 +1,4 @@
+"""Gitlab COM DBT DAG """
 import os
 from datetime import datetime
 
@@ -14,7 +15,23 @@ from airflow_utils import (
     run_command_test_exclude,
 )
 from kubernetes_helpers import get_affinity, get_toleration
-from kube_secrets import *
+from kube_secrets import (
+    GIT_DATA_TESTS_CONFIG,
+    GIT_DATA_TESTS_PRIVATE_KEY,
+    SALT,
+    SALT_EMAIL,
+    SALT_IP,
+    SALT_NAME,
+    SALT_PASSWORD,
+    SNOWFLAKE_ACCOUNT,
+    SNOWFLAKE_PASSWORD,
+    SNOWFLAKE_TRANSFORM_ROLE,
+    SNOWFLAKE_TRANSFORM_SCHEMA,
+    SNOWFLAKE_TRANSFORM_WAREHOUSE,
+    SNOWFLAKE_USER,
+    MCD_DEFAULT_API_ID,
+    MCD_DEFAULT_API_TOKEN,
+)
 
 # Load the env vars into a dict and set env vars
 env = os.environ.copy()
@@ -78,21 +95,23 @@ dbt_dag_args = {
 }
 
 
-def dbt_tasks(dbt_name, dbt_task_identifier):
-
+def dbt_tasks(dbt_module_name, dbt_task_name):
+    """Define all the DBT Task"""
     # Snapshot source data
     snapshot_cmd = f"""
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
-        dbt snapshot --profiles-dir profile --target prod --select path:snapshots/{dbt_name}; ret=$?;
+        dbt snapshot --profiles-dir profile --target prod --select path:snapshots/{dbt_module_name}; ret=$?;
+        montecarlo import dbt-run-results \
+        target/run_results.json --project-name gitlab-analysis;
         python ../../orchestration/upload_dbt_file_to_snowflake.py snapshots; exit $ret
     """
-    snapshot = KubernetesPodOperator(
+    snapshot_task = KubernetesPodOperator(
         **gitlab_defaults,
         image=DBT_IMAGE,
-        task_id=f"{dbt_task_identifier}-source-snapshot",
+        task_id=f"{dbt_task_name}-source-snapshot",
         trigger_rule="all_done",
-        name=f"{dbt_task_identifier}-source-snapshot",
+        name=f"{dbt_task_name}-source-snapshot",
         secrets=dbt_secrets,
         env_vars=gitlab_pod_env_vars,
         arguments=[snapshot_cmd],
@@ -104,15 +123,17 @@ def dbt_tasks(dbt_name, dbt_task_identifier):
     model_run_cmd = f"""
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
-        dbt run --profiles-dir profile --target prod --models +sources.{dbt_name}; ret=$?;
+        dbt run --profiles-dir profile --target prod --models +sources.{dbt_module_name}; ret=$?;
+        montecarlo import dbt-run-results \
+        target/run_results.json --project-name gitlab-analysis;
         python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
     """
-    model_run = KubernetesPodOperator(
+    dedupe_dbt_model_task = KubernetesPodOperator(
         **gitlab_defaults,
         image=DBT_IMAGE,
-        task_id=f"{dbt_task_identifier}-source-model-run",
+        task_id=f"{dbt_task_name}-source-model-run",
         trigger_rule="all_done",
-        name=f"{dbt_task_identifier}-source-model-run",
+        name=f"{dbt_task_name}-source-model-run",
         secrets=dbt_secrets,
         env_vars=gitlab_pod_env_vars,
         arguments=[model_run_cmd],
@@ -123,15 +144,17 @@ def dbt_tasks(dbt_name, dbt_task_identifier):
     # Test all source models
     model_test_cmd = f"""
         {dbt_install_deps_nosha_cmd} &&
-        dbt test --profiles-dir profile --target prod --models +sources.{dbt_name} {run_command_test_exclude}; ret=$?;
+        dbt test --profiles-dir profile --target prod --models +sources.{dbt_module_name} {run_command_test_exclude}; ret=$?;
+        montecarlo import dbt-run-results \
+        target/run_results.json --project-name gitlab-analysis;
         python ../../orchestration/upload_dbt_file_to_snowflake.py test; exit $ret
     """
-    model_test = KubernetesPodOperator(
+    source_schema_model_test = KubernetesPodOperator(
         **gitlab_defaults,
         image=DBT_IMAGE,
-        task_id=f"{dbt_task_identifier}-model-test",
+        task_id=f"{dbt_task_name}-model-test",
         trigger_rule="all_done",
-        name=f"{dbt_task_identifier}-model-test",
+        name=f"{dbt_task_name}-model-test",
         secrets=dbt_secrets,
         env_vars=gitlab_pod_env_vars,
         arguments=[model_test_cmd],
@@ -139,7 +162,7 @@ def dbt_tasks(dbt_name, dbt_task_identifier):
         tolerations=get_toleration(False),
     )
 
-    return snapshot, model_run, model_test
+    return snapshot_task, dedupe_dbt_model_task, source_schema_model_test
 
 
 # Loop through each config_dict and generate a DAG
@@ -156,8 +179,13 @@ for source_name, config in config_dict.items():
     with dbt_transform_dag:
         dbt_name = f"{config['dbt_name']}"
         dbt_task_identifier = f"{config['task_name']}"
-        snapshot, model_run, model_test = dbt_tasks(dbt_name, dbt_task_identifier)
-    # DAG flow
-    snapshot >> model_run >> model_test
+        (
+            dbt_snapshot_task,
+            dbt_dedupe_model_run,
+            dbt_source_schema_model_test,
+        ) = dbt_tasks(dbt_name, dbt_task_identifier)
+
+    # DAG flow using 3 DBT steps
+    dbt_snapshot_task >> dbt_dedupe_model_run >> dbt_source_schema_model_test
 
     globals()[f"{config['dag_name']}"] = dbt_transform_dag

@@ -1,8 +1,9 @@
+""" Gitlab.Com Extract and load DAG"""
 import os
 import string
 from tokenize import String
-import yaml
 from datetime import datetime, timedelta
+import yaml
 
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
@@ -125,7 +126,7 @@ config_dict = {
             GITLAB_COM_SCD_PG_PORT,
         ],
         "start_date": datetime(2019, 5, 30),
-        "task_name": "gitlab-com",
+        "task_name": "gitlab-com-scd",
         "description": "This DAG does Full extract & load of gitlab.com database(Postgres) to snowflake",
     },
     "el_gitlab_com_ci_scd": {
@@ -141,7 +142,7 @@ config_dict = {
             GITLAB_COM_CI_DB_USER,
         ],
         "start_date": datetime(2019, 5, 30),
-        "task_name": "gitlab-com",
+        "task_name": "gitlab-com-scd",
         "description": "This DAG does Full extract & load of gitlab.com database CI* (Postgres) to snowflake",
     },
     "el_gitlab_ops": {
@@ -183,17 +184,20 @@ config_dict = {
 
 
 def get_task_pool(task_name) -> string:
-    if task_name == "gitlab-com":
+    """Select Airflow pool based on type of extraction i.e. if SCD use SCD Pool slot in airflow else use respective task name pool slot"""
+    if task_name == "gitlab-com-scd":
         return f"{config['task_name']}_scd_pool"
-    else:
-        return f"{config['task_name']}_pool"
+
+    return f"{config['task_name']}_pool"
 
 
 def is_incremental(raw_query):
+    """Determine if the extraction is incremental or full extract i.e. SCD"""
     return "{EXECUTION_DATE}" in raw_query or "{BEGIN_TIMESTAMP}" in raw_query
 
 
 def use_cloudsql_proxy(dag_name, operation, instance_name):
+    """Use cloudsql proxy for connecting to ops Database"""
     return f"""
         {clone_repo_cmd} &&
         cd analytics/orchestration &&
@@ -205,32 +209,36 @@ def use_cloudsql_proxy(dag_name, operation, instance_name):
 
 
 def get_last_loaded(dag_name: String) -> string:
+    """Pull from xcom value  last loaded timestamp for the table"""
     if dag_name == "el_gitlab_ops":
         return None
-    else:
-        return "{{{{ task_instance.xcom_pull('{}', include_prior_dates=True)['max_data_available'] }}}}".format(
-            task_identifier + "-pgp-extract"
-        )
+
+    return "{{{{ task_instance.xcom_pull('{}', include_prior_dates=True)['max_data_available'] }}}}".format(
+        task_identifier + "-pgp-extract"
+    )
 
 
 def generate_cmd(dag_name, operation, cloudsql_instance_name):
+    """Generate the command"""
     if cloudsql_instance_name is None:
         return f"""
             {clone_repo_cmd} &&
             cd analytics/extract/postgres_pipeline/postgres_pipeline/ &&
             python main.py tap ../manifests_decomposed/{dag_name}_db_manifest.yaml {operation}
         """
-    else:
-        return use_cloudsql_proxy(dag_name, operation, cloudsql_instance_name)
+
+    return use_cloudsql_proxy(dag_name, operation, cloudsql_instance_name)
 
 
-def extract_manifest(file_path):
-    with open(file_path, "r") as file:
+def extract_manifest(manifest_file_path):
+    """Extract postgres pipeline manifest file"""
+    with open(manifest_file_path, "r") as file:
         manifest_dict = yaml.load(file, Loader=yaml.FullLoader)
     return manifest_dict
 
 
 def extract_table_list_from_manifest(manifest_contents):
+    """Extract table from the manifest file for which extraction needs to be done"""
     return manifest_contents["tables"].keys()
 
 
@@ -283,9 +291,9 @@ for source_name, config in config_dict.items():
                 if not is_incremental(manifest["tables"][table]["import_query"]):
                     continue
 
-                task_type = "db-incremental"
+                TASK_TYPE = "db-incremental"
                 task_identifier = (
-                    f"{config['task_name']}-{table.replace('_','-')}-{task_type}"
+                    f"{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                 )
 
                 incremental_cmd = generate_cmd(
@@ -329,10 +337,10 @@ for source_name, config in config_dict.items():
             table_list = extract_table_list_from_manifest(manifest)
             for table in table_list:
                 if is_incremental(manifest["tables"][table]["import_query"]):
-                    task_type = "backfill"
+                    TASK_TYPE = "backfill"
 
                     task_identifier = (
-                        f"{config['task_name']}-{table.replace('_','-')}-{task_type}"
+                        f"{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                     )
 
                     sync_cmd = generate_cmd(
@@ -378,10 +386,10 @@ for source_name, config in config_dict.items():
             table_list = extract_table_list_from_manifest(manifest)
             for table in table_list:
                 if not is_incremental(manifest["tables"][table]["import_query"]):
-                    task_type = "db-scd"
+                    TASK_TYPE = "db-scd"
 
                     task_identifier = (
-                        f"{config['task_name']}-{table.replace('_','-')}-{task_type}"
+                        f"{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                     )
 
                     # SCD Task
