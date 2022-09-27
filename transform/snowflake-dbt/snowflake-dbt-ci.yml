@@ -65,7 +65,7 @@
   - export SNOWFLAKE_TRANSFORM_WAREHOUSE=$SNOWFLAKE_MR_XS_WAREHOUSE
   - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
 
-🐭specify_model:
+➕🐭specify_model:
   <<: *snowflake_dbt_jobs
   script:
     - *deps_and_seed
@@ -74,7 +74,7 @@
     - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-🦖specify_l_model:
+➕🦖specify_l_model:
   <<: *snowflake_dbt_jobs
   script:
     - *l_warehouse
@@ -85,7 +85,7 @@
     - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-specify_dbt_parameters:
+➕specify_dbt_parameters:
   <<: *snowflake_dbt_jobs
   script:
     - *deps_and_seed
@@ -94,7 +94,7 @@ specify_dbt_parameters:
     - dbt --partial-parse test $CI_PROFILE_TARGET $DBT_PARAMETERS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-🐘specify_xl_model:
+➕🐘specify_xl_model:
   <<: *snowflake_dbt_jobs
   script:
     - *xl_warehouse
@@ -105,7 +105,7 @@ specify_dbt_parameters:
     - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-🐭🥩specify_raw_model:
+➕🐭🥩specify_raw_model:
   <<: *snowflake_dbt_jobs
   script:
     - *deps_and_seed
@@ -116,7 +116,7 @@ specify_dbt_parameters:
     - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-🌱specify_csv_seed:
+➕🌱specify_csv_seed:
   <<: *snowflake_dbt_jobs
   script:
     - python3 macro_name_check.py
@@ -124,7 +124,7 @@ specify_dbt_parameters:
     - echo $DBT_MODELS
     - dbt seed --full-refresh $CI_PROFILE_TARGET --select $DBT_MODELS
     
-📸🥩specify_snapshot:
+➕📸🥩specify_snapshot:
   <<: *snowflake_dbt_jobs
   script:
     - echo $DBT_MODELS
@@ -133,7 +133,7 @@ specify_dbt_parameters:
     - *deps_and_seed
     - dbt snapshot $CI_PROFILE_TARGET --select $DBT_MODELS
 
-📸🥩🦖specify_l_snapshot:
+➕📸🥩🦖specify_l_snapshot:
   <<: *snowflake_dbt_jobs
   script:
     - echo $DBT_MODELS
@@ -143,7 +143,7 @@ specify_dbt_parameters:
     - *deps_and_seed
     - dbt snapshot $CI_PROFILE_TARGET --select $DBT_MODELS
 
-🏗️🛺run_changed_models_sql:
+➕🏗️🛺run_changed_models_sql:
   <<: *snowflake_dbt_jobs
   script:
     - *deps_and_seed
@@ -153,7 +153,7 @@ specify_dbt_parameters:
     - dbt --partial-parse test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-🏗️🛺🦖run_changed_models_sql_l:
+➕🏗️🛺🦖run_changed_models_sql_l:
   <<: *snowflake_dbt_jobs
   script:
     - *l_warehouse
@@ -164,7 +164,7 @@ specify_dbt_parameters:
     - dbt --partial-parse test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-🏗️🛺🐘run_changed_models_sql_xl:
+➕🏗️🛺🐘run_changed_models_sql_xl:
   <<: *snowflake_dbt_jobs
   script:
     - *xl_warehouse
@@ -179,7 +179,7 @@ specify_dbt_parameters:
 # DBT cloning
 # ======
 
-🔆clone_schema_dbt_select:
+➕🔆clone_schema_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
     - export SNOWFLAKE_PREP_DATABASE="PREP"
@@ -190,7 +190,7 @@ specify_dbt_parameters:
     - orchestration/manage_snowflake.py clone_schemas $INPUT
 
 
-🔆⚡️clone_model_dbt_select:
+➕🔆⚡️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
     - export SNOWFLAKE_PREP_DATABASE="PREP"
