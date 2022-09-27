@@ -140,6 +140,10 @@ WITH biz_person AS (
       zoominfo_company_city,
       zoominfo_company_state,
       zoominfo_company_country,
+      zoominfo_phone_number, 
+      zoominfo_mobile_phone_number,
+      zoominfo_do_not_call_direct_phone,
+      zoominfo_do_not_call_mobile_phone,
       NULL                                           AS zoominfo_company_employee_count
 
 
@@ -243,6 +247,10 @@ WITH biz_person AS (
       zoominfo_company_city,
       zoominfo_company_state,
       zoominfo_company_country,
+      zoominfo_phone_number, 
+      zoominfo_mobile_phone_number,
+      zoominfo_do_not_call_direct_phone,
+      zoominfo_do_not_call_mobile_phone,
       zoominfo_company_employee_count
 
     FROM sfdc_leads
@@ -275,5 +283,5 @@ WITH biz_person AS (
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-09-14"
+    updated_date="2022-09-27"
 ) }}

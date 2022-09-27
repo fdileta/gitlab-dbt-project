@@ -113,6 +113,8 @@ WITH final AS (
       prep_crm_account.zoom_info_company_city,
       prep_crm_account.zoom_info_company_state_province,
       prep_crm_account.zoom_info_company_country,
+      prep_crm_account.account_phone,
+      prep_crm_account.zoominfo_account_phone,
       prep_crm_account.abm_tier,
       prep_crm_account.health_score,
       prep_crm_account.health_number,
@@ -187,9 +189,9 @@ WITH final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@msendal",
-    updated_by="@j_kim",
+    updated_by="@rkohnke",
     created_date="2020-06-01",
-    updated_date="2022-08-31"
+    updated_date="2022-09-27"
 ) }}
 
 

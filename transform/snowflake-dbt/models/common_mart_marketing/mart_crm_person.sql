@@ -151,6 +151,10 @@
       dim_crm_person.leandata_matched_account_employee_count,
       dim_crm_person.leandata_matched_account_sales_segment,
       dim_crm_person.employee_bucket,
+      dim_crm_person.zoominfo_phone_number, 
+      dim_crm_person.zoominfo_mobile_phone_number,
+      dim_crm_person.zoominfo_do_not_call_direct_phone,
+      dim_crm_person.zoominfo_do_not_call_mobile_phone,
       dim_crm_person.zoominfo_company_employee_count,
       fct_crm_person.is_mql,
       fct_crm_person.is_inquiry,
@@ -238,5 +242,5 @@
     created_by="@iweeks",
     updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-09-14",
+    updated_date="2022-09-27",
   ) }}  
