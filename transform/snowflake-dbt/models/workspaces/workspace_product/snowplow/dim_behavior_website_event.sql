@@ -4,7 +4,7 @@
 ) }}
 
 {{ simple_cte([
-    ('events', 'prep_snowplow_unstructured_events_all')
+    ('events', 'prep_snowplow_unnested_events_all')
     ])
 }}
 
@@ -14,14 +14,14 @@
       event,
       event_name,
       platform,
-      gsc_environment AS environment,
+      gsc_environment       AS environment,
       MAX(collector_tstamp) AS max_collector_timestamp
     FROM events
     WHERE true
 
     {% if is_incremental() %}
     
-    AND collector_tstamp > (SELECT MAX(max_collector_timestamp) FROM {{this}}))
+    AND collector_tstamp > (SELECT MAX(max_collector_timestamp) FROM {{this}})
     
     {% endif %}
 
