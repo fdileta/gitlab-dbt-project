@@ -62,10 +62,7 @@ dbt_secrets = [
 env = os.environ.copy()
 
 GIT_BRANCH = env["GIT_BRANCH"]
-pod_env_vars = {
-    "CI_PROJECT_DIR": "/analytics",
-    "SNOWFLAKE_LOAD_DATABASE": "RAW" if GIT_BRANCH == "master" else f"{GIT_BRANCH}_RAW",
-}
+pod_env_vars = gitlab_pod_env_vars
 
 default_args = {
     "catchup": True,
