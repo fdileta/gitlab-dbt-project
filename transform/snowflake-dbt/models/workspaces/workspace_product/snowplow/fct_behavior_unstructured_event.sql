@@ -16,7 +16,6 @@
       event_id,
       derived_tstamp                                    AS behavior_at,
       event_name,
-      gsc_environment                                   AS environment,
       gsc_pseudonymized_user_id,
       {{ clean_url('page_url_path') }}                  AS clean_url_path,
       page_url_host,

@@ -67,3 +67,11 @@ models:
         tests:
           - not_null
           - unique
+
+  - name: fct_behavior_unstructured_event
+    description: atomic fact table for unstructured events
+    columns:
+      - name: fct_behavior_unstructured_sk
+        tests:
+          - not_null
+          - unique
