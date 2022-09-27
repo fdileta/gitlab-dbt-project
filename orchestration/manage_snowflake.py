@@ -316,6 +316,30 @@ class SnowflakeManager:
             grants_query = f"""GRANT ALL ON SCHEMA {output_schema} TO TRANSFORMER"""
             res = query_executor(self.engine, grants_query)
             logging.info(res[0])
+    def create_schema(self, schema_name):
+        """
+
+        :param schema_name:
+        :return:
+        """
+        logging.info("Creating schema if it does not exist")
+
+        query = f"""CREATE SCHEMA IF NOT EXISTS {schema_name};"""
+        query_executor(self.engine, query)
+
+        logging.info("Granting rights on stage to TRANSFORMER")
+        grants_query = (
+            f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
+        )
+        query_executor(self.engine, grants_query)
+
+        logging.info("Granting rights on stage to GITLAB_CI")
+        grants_query = (
+            f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
+        )
+        query_executor(self.engine, grants_query)
+
+        return True
 
     def clone_models(self, *model_input):
         """
@@ -336,6 +360,7 @@ class SnowflakeManager:
 
             output_table_name = f"{self.branch_name}_{i}"
             output_schema_name = output_table_name.replace(f".{table_name}", "")
+
             query = f"""
                 SELECT
                     TABLE_TYPE,
@@ -346,28 +371,13 @@ class SnowflakeManager:
             """
 
             res = query_executor(self.engine, query)
+
+            self.create_schema(output_schema_name)
+
             table_or_view = res[0][0]
             if table_or_view == "VIEW":
                 logging.info("Cloning view")
 
-                logging.info("Creating schema if it does not exist")
-
-                query = f"""
-                CREATE SCHEMA IF NOT EXISTS {output_schema_name}
-                """
-                query_executor(self.engine, query)
-
-                logging.info("Granting rights on stage to TRANSFORMER")
-                grants_query = (
-                    f"""GRANT ALL ON SCHEMA {output_schema_name} TO TRANSFORMER"""
-                )
-                query_executor(self.engine, grants_query)
-
-                logging.info("Granting rights on stage to GITLAB_CI")
-                grants_query = (
-                    f"""GRANT ALL ON SCHEMA {output_schema_name} TO GITLAB_CI"""
-                )
-                query_executor(self.engine, grants_query)
 
                 query = f"""
                     SELECT GET_DDL('VIEW', '{i}', TRUE)
@@ -416,10 +426,10 @@ class SnowflakeManager:
             transient_table = res[0][1]
             # TODO: This can be a one-liner
             if transient_table == "YES":
-                clone_statement = f"CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {i} COPY GRANTS"
+                clone_statement = f"CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {i} COPY GRANTS;"
             else:
                 clone_statement = (
-                    f"CREATE OR REPLACE {output_table_name} CLONE {i} COPY GRANTS"
+                    f"CREATE OR REPLACE {output_table_name} CLONE {i} COPY GRANTS;"
                 )
 
             query_executor(self.engine, clone_statement)
