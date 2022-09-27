@@ -55,7 +55,7 @@ models:
   - name: fct_behavior_website_link_click
     description: Fact table containing details of links clicked.
     columns: 
-      - name: fct_behavior_website_link_click_sk
+      - name: fct_behavior_unstructured_sk
         tests:
           - not_null
           - unique
