@@ -2486,6 +2486,13 @@ roles:
         warehouses:
             - dev_xs
 
+    - ashaikh:
+        member_of:
+            - data_team_analyst
+            - analyst_core
+        warehouses:
+            - dev_xs
+
     - bbutterfield:
         member_of:
             - reporter
@@ -4579,6 +4586,11 @@ users:
         can_login: yes
         member_of:
             - aperez
+
+    - ashaikh:
+        can_login: yes
+        member_of:
+            - ashaikh
 
     - bi_tool_eval:
         can_login: yes
