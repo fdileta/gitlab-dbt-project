@@ -3486,6 +3486,7 @@ roles:
             - reporter
             - marketo
             - analyst_marketing
+            - customers_db
         warehouses:
             - dev_xs
 
