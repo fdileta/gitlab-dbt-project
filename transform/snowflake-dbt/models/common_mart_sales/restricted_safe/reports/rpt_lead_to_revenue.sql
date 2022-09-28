@@ -225,7 +225,7 @@
       dim_crm_person.leandata_matched_account_sales_segment,
       COALESCE(dim_crm_person.account_demographics_employee_count,dim_crm_person.zoominfo_company_employee_count,dim_crm_person.cognism_employee_count) AS employee_count,
       lower(COALESCE(dim_crm_person.zoominfo_company_country,dim_crm_person.zoominfo_contact_country,dim_crm_person.cognism_company_office_country,dim_crm_person.cognism_country)) 
-                                                                                                                                                        AS first_country,
+                                                                                            AS first_country,
       is_first_order_available,
       order_type_final.person_order_type,
       order_type_final.inquiry_order_type_historical,
@@ -429,55 +429,6 @@
     cohort_base.account_demographics_territory,
     cohort_base.true_inquiry_date,
     cohort_base.mql_date_lastest_pt,
-    cohort_base.dim_crm_user_id,
-    cohort_base.mql_date_first_pt,
-    cohort_base.created_date_pt,
-    cohort_base.created_date,
-    cohort_base.mql_date_first,
-    cohort_base.lead_created_date,
-    cohort_base.lead_created_date_pt,
-    cohort_base.contact_created_date,
-    cohort_base.contact_created_date_pt,
-    cohort_base.inquiry_date,
-    cohort_base.inquiry_date_pt,
-    cohort_base.inquiry_inferred_date,
-    cohort_base.inquiry_inferred_date_pt,
-    cohort_base.accepted_date,
-    cohort_base.accepted_date_pt,
-    cohort_base.qualifying_date,
-    cohort_base.qualifying_date_pt,
-    cohort_base.converted_date,
-    cohort_base.converted_date_pt,
-    cohort_base.worked_date,
-    cohort_base.worked_date_pt,
-    cohort_base.email_domain,
-    cohort_base.was_converted_lead,
-    cohort_base.source_buckets,
-    cohort_base.crm_partner_id,
-    cohort_base.partner_prospect_id,
-    cohort_base.sequence_step_type,
-    cohort_base.name_of_active_sequence,
-    cohort_base.sequence_task_due_date,
-    cohort_base.sequence_status,
-    cohort_base.is_actively_being_sequenced,
-    cohort_base.person_sales_segment_name,
-    cohort_base.person_sales_segment_grouped,
-    cohort_base.person_score,
-    cohort_base.behavior_score,
-    cohort_base.marketo_last_interesting_moment,
-    cohort_base.marketo_last_interesting_moment_date,
-    cohort_base.account_demographics_segment_region_grouped,
-    cohort_base.account_demographics_sales_segment_grouped,
-    cohort_base.account_demographics_upa_country,
-    cohort_base.account_demographics_upa_state,
-    cohort_base.account_demographics_upa_postal_code,
-    cohort_base.zoominfo_phone_number,
-    cohort_base.zoominfo_mobile_phone_number,
-    cohort_base.zoominfo_do_not_call_direct_phone,
-    cohort_base.zoominfo_do_not_call_mobile_phone,
-    cohort_base.zoominfo_company_employee_count,
-    cohort_base.is_lead_source_trial,
-    cohort_base.is_inquiry,
     CASE
     WHEN LOWER(leandata_matched_account_sales_segment) = 'pubsec' THEN 'PubSec'
     WHEN employee_count >=1 AND employee_count < 100 THEN 'SMB'
@@ -544,7 +495,7 @@
     WHEN first_country = 'congo' THEN 'emea'
     WHEN first_country = 'cook islands' THEN 'apac'
     WHEN first_country = 'costa rica' THEN 'amer'
-    WHEN first_country LIKE 'cote' AND first_country LIKE 'ivoire' THEN 'emea'
+    WHEN first_country = "cote d\'ivoire" THEN 'emea'
     WHEN first_country = 'croatia' THEN 'emea'
     WHEN first_country = 'cuba' THEN 'amer'
     WHEN first_country = 'curacao' THEN 'amer'
@@ -599,7 +550,7 @@
     WHEN first_country = 'israel' THEN 'emea'
     WHEN first_country = 'italy' THEN 'emea'
     WHEN first_country = 'ivory coast' THEN 'emea'
-    WHEN first_country LIKE 'côte d' AND first_country LIKE 'ivoire' THEN 'emea'
+    WHEN first_country = "côte d\'ivoire" THEN 'emea'
     WHEN first_country = 'jamaica' THEN 'amer'
     WHEN first_country = 'japan' THEN 'apac'
     WHEN first_country = 'jersey' THEN 'emea'
@@ -609,7 +560,7 @@
     WHEN first_country = 'kosovo' THEN 'emea'
     WHEN first_country = 'kuwait' THEN 'emea'
     WHEN first_country = 'kyrgyzstan' THEN 'emea'
-    WHEN first_country LIKE 'lao people' AND first_country LIKE 'democratic republic' THEN 'apac'
+    WHEN first_country = "lao people\'s democratic republic" THEN 'apac'
     WHEN first_country = 'latvia' THEN 'emea'
     WHEN first_country = 'lebanon' THEN 'emea'
     WHEN first_country = 'lesotho' THEN 'emea'
@@ -731,12 +682,12 @@
     WHEN first_country = 'united states' THEN 'amer'
     WHEN first_country = 'turks and caicos' THEN 'amer'
     WHEN first_country = 'korea, republic of' THEN 'apac'
-    WHEN first_country LIKE 'lao democratic people' AND first_country LIKE 's republic' THEN 'apac'
+    WHEN first_country = "lao democratic people\'s republic" THEN 'apac'
     WHEN first_country = 'macedonia, the former yugoslav republic of' THEN 'emea'
     WHEN first_country = 'moldova, republic of' THEN 'emea'
     WHEN first_country = 'russian federation' THEN 'emea'
     WHEN first_country = 'viet nam' THEN 'apac' 
-  END AS geo,
+  END AS geo
   
     --opportunity data
     cohort_base.opp_created_date,
@@ -956,6 +907,13 @@
     UPPER(geo) AS inferred_geo
     FROM fo_inquiry_with_tp
 
+), final_prep AS (
+
+    SELECT DISTINCT fo_inquiry_with_tp.*,
+    COALESCE(employee_count_segment,employee_bucket_segment) AS inferred_employee_segment,
+    UPPER(geo) AS inferred_geo
+    FROM fo_inquiry_with_tp
+
 ), final AS (
 
   SELECT *
@@ -969,5 +927,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-07-20",
-    updated_date="2022-09-30",
+    updated_date="2022-09-28",
   ) }}
