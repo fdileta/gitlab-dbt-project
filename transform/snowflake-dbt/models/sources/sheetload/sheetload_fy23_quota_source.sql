@@ -17,7 +17,9 @@ WITH source AS (
     quota_amnt::NUMBER AS quota_amnt,
     hc_type::VARCHAR AS hc_type,
     region::VARCHAR AS region,
-    role_type::VARCHAR AS role
+    role_type::VARCHAR AS role,
+    start_date::DATE AS start_date,
+    end_date:: DATE AS end_date
 
   FROM {{ source('sheetload','fy23_quota') }}
 
