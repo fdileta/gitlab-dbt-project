@@ -28,6 +28,7 @@ pod_env_vars = {
     "CI_PROJECT_DIR": "/analytics",
     "SNOWFLAKE_PROD_DATABASE": "PROD",
 }
+
 # Default arguments for the DAG
 default_args = {
     "catchup": False,
@@ -69,8 +70,8 @@ for pump_model in pumps:
       python3 /analytics/pump/pumps.py \
         --model={pump_model["model"]} \
         --sensitive={pump_model["sensitive"]} \
+        --stage={pump_model["stage"]} \ 
         --timestamp={pump_model["timestamp_column"]} \
-        --stage={pump_model["stage"]}
         --inc_start={execution_date} \
         --inc_end={next_execution_date}"""
 
