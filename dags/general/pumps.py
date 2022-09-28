@@ -24,8 +24,10 @@ from kubernetes_helpers import get_affinity, get_toleration
 # Load the env vars into a dict and set Secrets
 env = os.environ.copy()
 GIT_BRANCH = env["GIT_BRANCH"]
-pod_env_vars = gitlab_pod_env_vars
-
+pod_env_vars = {
+    "CI_PROJECT_DIR": "/analytics",
+    "SNOWFLAKE_PROD_DATABASE": "PROD",
+}
 # Default arguments for the DAG
 default_args = {
     "catchup": False,
