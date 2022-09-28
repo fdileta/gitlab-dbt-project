@@ -117,7 +117,7 @@ Post notices to #data and cross-post to #whats-happening-at-gitlab
 
 #### GitLab.com
 
-Follow this runbook for the communication around GitLab.com data incidents.
+Follow the [runbook](https://gitlab.com/gitlab-data/runbooks/-/blob/main/Gitlab_dotcom/Gitlab_DB_recreation_failure.md) for the communication around GitLab.com data incidents.
 
 #### Salesforce
 
