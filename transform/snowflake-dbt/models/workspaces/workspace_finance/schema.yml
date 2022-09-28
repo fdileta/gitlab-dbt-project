@@ -971,7 +971,7 @@ models:
         description: Annual Recurring Revenue value for given month
       - name: quantity
         description: Total quantity
-  - name: rpt_dropped_manual_true_up_charge
+  - name: rpt_dropped_manual_true_up_charges
     description: Report table for tracking true up changes from Zuora Revenue which have been dropped from the data based on historical snapshots. Exceptions have been added due to data quality issues where some subscriptions were mislabled as true ups incorrectly for a period of time, so these should not be considered dropped true ups.
     columns:
       - name: subscription_name
