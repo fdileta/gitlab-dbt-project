@@ -40,7 +40,7 @@ def get_copy_command(model, sensitive, stage, timestamp, inc_start, inc_end):
       """
 
         copy_command = copy_command_tmp.format(
-            stage=stage,
+            stage=stage.upper(),
             model=model,
             query=query,
         )
