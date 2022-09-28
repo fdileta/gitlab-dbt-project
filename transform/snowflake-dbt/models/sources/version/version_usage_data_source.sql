@@ -37,6 +37,7 @@ WITH source AS (
         version::VARCHAR                             AS version,
         active_user_count::NUMBER                    AS instance_user_count, -- See issue #4872.
         license_md5::VARCHAR                         AS license_md5,
+        license_sha256::VARCHAR                      AS license_sha256,
         historical_max_users::NUMBER                 AS historical_max_users,
         --licensee // removed for PII
         license_user_count::NUMBER                   AS license_user_count,
