@@ -70,7 +70,6 @@ for pump_model in pumps:
       python3 /analytics/pump/pumps.py \
         --model={pump_model["model"]} \
         --sensitive={pump_model["sensitive"]} \
-        --stage={pump_model["stage"]} \ 
         --timestamp={pump_model["timestamp_column"]} \
         --inc_start={execution_date} \
         --inc_end={next_execution_date}"""
