@@ -62,7 +62,7 @@ def copy_data(model, sensitive, timestamp, inc_start, inc_end):
     try:
         connection = engine.connect()
         copy_command = get_copy_command(model, sensitive, timestamp, inc_start, inc_end)
-        logging.info("running copy command {copy_command}")
+        logging.info(f"running copy command {copy_command}")
         # connection.execute(copy_command).fetchone()
     except:
         logging.info("Failed to run copy command...")
