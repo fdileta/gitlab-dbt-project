@@ -71,6 +71,7 @@ for pump_model in pumps:
         --model={pump_model["model"]} \
         --sensitive={pump_model["sensitive"]} \
         --timestamp={pump_model["timestamp_column"]} \
+        --stage={pump_model["stage"]}
         --inc_start={execution_date} \
         --inc_end={next_execution_date}"""
 
