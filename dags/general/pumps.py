@@ -72,7 +72,9 @@ for pump_model in pumps:
         --sensitive={pump_model["sensitive"]} \
         --timestamp={pump_model["timestamp_column"]} \
         --inc_start={execution_date} \
-        --inc_end={next_execution_date}"""
+        --inc_end={next_execution_date} \
+        --stage={pump_model["stage"]}
+        """
 
     run_pumps = KubernetesPodOperator(
         **gitlab_defaults,
