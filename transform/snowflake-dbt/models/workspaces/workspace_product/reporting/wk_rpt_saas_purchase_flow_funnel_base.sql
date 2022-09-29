@@ -48,6 +48,6 @@ WITH filtered_snowplow_events AS (
     cte_ref="filtered_snowplow_events",
     created_by="@mdrussell",
     updated_by="@mdrussell",
-    created_date="2022-01-14",
-    updated_date="2022-08-26"
+    created_date="2022-09-29",
+    updated_date="2022-09-29"
 ) }}
