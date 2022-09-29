@@ -13,6 +13,7 @@ intermediate AS (
     first_name,
     last_name,
     hire_date,
+    termination_date,
     first_inactive_date,
     job_role,
     job_grade,
