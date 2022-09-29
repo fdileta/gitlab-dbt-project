@@ -1,8 +1,6 @@
 {{ config(alias='sfdc_opportunity_snapshot_history_xf_refactored_edm') }}
--- TODO
--- Add CS churn fields into model from wk_sales_opportunity object
 
--- USE WAREHOUSE reporting;
+-- NF 20220907 Moved EDM Refactored model as base model, move original model to a deprecated model
 
 WITH date_details AS (
 
@@ -13,8 +11,8 @@ WITH date_details AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}}
-    -- FROM prod.restricted_safe_legacy.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 ), sfdc_opportunity_snapshot_history_legacy AS (
 
@@ -39,7 +37,6 @@ WITH date_details AS (
       deal_group,
       opportunity_owner_manager,
       is_edu_oss,
-      account_owner_team_stamped,
 
       -- Opportunity Owner Stamped fields
       opportunity_owner_user_segment,
@@ -113,6 +110,12 @@ WITH date_details AS (
 ), sfdc_opportunity_snapshot_history AS (
 
      SELECT
+
+      -- NF 20220907 Pending fields to be added to the edm mart
+      sfdc_opportunity_snapshot_history.incremental_acv,
+      sfdc_opportunity_snapshot_history.net_incremental_acv,
+      sfdc_opportunity_snapshot_history.order_type_stamped          AS snapshot_order_type_stamped,
+
       edm_snapshot_opty.crm_opportunity_snapshot_id AS opportunity_snapshot_id,
       edm_snapshot_opty.dim_crm_opportunity_id AS opportunity_id,
       edm_snapshot_opty.opportunity_name,
@@ -134,7 +137,7 @@ WITH date_details AS (
       --------------------------------------------
       --  NF: For reporting we tend to use live values for things like order type
       --      exposing some of those fields here in case they are needed
-      sfdc_opportunity_snapshot_history.order_type_stamped          AS snapshot_order_type_stamped,
+
       edm_snapshot_opty.sales_qualified_source_name                 AS snapshot_sales_qualified_source,
       edm_snapshot_opty.is_edu_oss                                  AS snapshot_is_edu_oss,
       edm_snapshot_opty.opportunity_category                        AS snapshot_opportunity_category,
@@ -144,9 +147,6 @@ WITH date_details AS (
       edm_snapshot_opty.dim_crm_account_id                          AS raw_account_id,
       -- edm_snapshot_opty.net_arr                                     AS raw_net_arr,
       edm_snapshot_opty.raw_net_arr,
-      sfdc_opportunity_snapshot_history.incremental_acv,
-      sfdc_opportunity_snapshot_history.net_incremental_acv,
-
       edm_snapshot_opty.deployment_preference,
       edm_snapshot_opty.merged_opportunity_id,
       edm_snapshot_opty.sales_path,
@@ -219,7 +219,7 @@ WITH date_details AS (
       edm_snapshot_opty.stage_3_technical_evaluation_date,
       edm_snapshot_opty.stage_4_proposal_date,
       edm_snapshot_opty.stage_5_negotiating_date,
-      sfdc_opportunity_snapshot_history.stage_6_awaiting_signature_date,
+      edm_snapshot_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
       edm_snapshot_opty.stage_6_closed_won_date,
       edm_snapshot_opty.stage_6_closed_lost_date,
 

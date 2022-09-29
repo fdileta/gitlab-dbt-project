@@ -1,3 +1,49 @@
 version: 2
 
-#models:
+models:
+  - name: wk_customers_db_license_versions
+    tags: ["exception", "product"]
+    description: Self-managed EE instances will send seat link information to the customers portal on a daily basis. This information includes a license version data. Additional detail can be found in [this doc](https://gitlab.com/gitlab-org/customers-gitlab-com/-/blob/staging/doc/reconciliations.md).
+    columns:
+      - name: id
+        description: Pseudo ID generated to simulate Primary Key
+        tags:
+          - customers_db
+      - name: item_id
+        description: Line if for item
+        tags:
+          - customers_db
+      - name: created_at
+        description: Timestamp when the record was created
+        tags:
+          - customers_db
+      - name: item_type
+        description: Item type, for example - License
+        tags:
+          - customers_db
+      - name: event
+        description: Name of the event, for example - create, update
+        tags:
+          - customers_db
+      - name: whodunnit
+        description: Email for licensing
+        tags:
+          - customers_db
+      - name: whodunnit_gitlab
+        description: Email for licensing, contains either @gitlab.com email (value from whodunnit)  or NULL
+        tags:
+          - customers_db
+      - name: whodunnit_gitlab_desc
+        description: Email for licensing, contains either @gitlab.com email or NULL. Can contain `Admin` string
+        tags:
+          - customers_db
+      - name: object
+        description: Details about license
+        tags:
+          - customers_db
+      - name: object_changes
+        description: Details about license changes
+        tags:
+          - customers_db
+      - name: _uploaded_at
+        description: Timestamp when record is inserted in the RAW layer

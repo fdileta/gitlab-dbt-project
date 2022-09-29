@@ -80,6 +80,7 @@
       dim_crm_account.crm_account_tsp_account_employees,
       dim_crm_account.crm_account_tsp_max_family_employees,
       dim_crm_account.crm_account_billing_country,
+      dim_crm_account.crm_account_billing_country_code,
       dim_crm_account.crm_account_type,
       dim_crm_account.crm_account_industry,
       dim_crm_account.crm_account_sub_industry,
@@ -123,6 +124,8 @@
       dim_crm_account.zoom_info_company_city,
       dim_crm_account.zoom_info_company_state_province,
       dim_crm_account.zoom_info_company_country,
+      dim_crm_account.zoominfo_account_phone,
+      dim_crm_account.account_phone,
       dim_crm_account.abm_tier,
       dim_crm_account.health_score,
       dim_crm_account.health_number,
@@ -224,7 +227,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@j_kim",
+    updated_by="@rkohnke",
     created_date="2022-08-10",
-    updated_date="2022-08-31"
+    updated_date="2022-09-27"
 ) }}

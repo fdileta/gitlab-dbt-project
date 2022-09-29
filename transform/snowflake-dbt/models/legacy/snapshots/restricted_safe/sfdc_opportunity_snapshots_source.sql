@@ -73,7 +73,7 @@ SELECT
         IFF(acv_2__c >= 0, 1, 0)                        AS closed_deals, -- so that you can exclude closed deals that had negative impact
         competitors__c                                  AS competitors,
         critical_deal_flag__c                           AS critical_deal_flag,
-        {{sfdc_deal_size('incremental_acv_2__c', 'deal_size')}},
+        {{sfdc_deal_size('arr_net__c', 'deal_size')}},
         forecastcategoryname                            AS forecast_category_name,
         incremental_acv_2__c                            AS forecasted_iacv,
         iacv_created_date__c                            AS iacv_created_date,

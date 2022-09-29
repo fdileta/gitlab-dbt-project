@@ -16,3 +16,6 @@ models:
         tests:
           - not_null
           - unique
+
+  - name: prep_snowplow_structured_event_all_source
+    description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of strutured events if the model is not run incrementally.

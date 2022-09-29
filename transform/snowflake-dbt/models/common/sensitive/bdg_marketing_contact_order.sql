@@ -81,7 +81,7 @@
 
 ), prep AS (
 
-     SELECT   
+     SELECT DISTINCT
       marketing_contact.dim_marketing_contact_id,
       marketing_contact_role.marketing_contact_role,
       marketing_contact.email_address, 
@@ -90,6 +90,7 @@
                saas_customer.dim_namespace_id, 
                saas_billing_account.dim_namespace_id)                                         AS dim_namespace_id,
       gitlab_namespaces.namespace_path,
+      namespace_lineage.namespace_is_ultimate_parent                                          AS is_ultimate_parent_namespace,
       CASE 
         WHEN namespace_lineage.namespace_type = 'User' 
           THEN 1 
@@ -103,6 +104,10 @@
       namespace_lineage.is_setup_for_company                                                  AS is_setup_for_company,
       namespace_project_visibility.does_namespace_have_public_project                         AS does_namespace_have_public_project,
       free_namespace_project_visibility.does_free_namespace_have_public_project               AS does_free_namespace_have_public_project,
+      IFF(namespace_lineage.namespace_is_ultimate_parent AND namespace_lineage.visibility_level = 'public', TRUE, FALSE)
+                                                                                              AS is_ultimate_parent_namespace_public,
+      IFF(namespace_lineage.namespace_is_ultimate_parent AND namespace_lineage.visibility_level = 'private', TRUE, FALSE)
+                                                                                              AS is_ultimate_parent_namespace_private,
       marketing_contact_role.customer_db_customer_id                                          AS customer_id,
       marketing_contact_role.zuora_billing_account_id                                         AS dim_billing_account_id,
       CASE
@@ -287,7 +292,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@trevor31",
-    updated_by="@mdrussell",
+    updated_by="@jpeguero",
     created_date="2021-02-04",
-    updated_date="2022-08-26"
+    updated_date="2022-09-29"
 ) }}

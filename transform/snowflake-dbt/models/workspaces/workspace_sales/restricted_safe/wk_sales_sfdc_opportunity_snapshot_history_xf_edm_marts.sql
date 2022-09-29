@@ -11,7 +11,8 @@ WITH date_details AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}} 
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
 
 ), sfdc_opportunity_snapshot_history_legacy AS (
 
@@ -227,7 +228,7 @@ WITH date_details AS (
       edm_snapshot_opty.stage_3_technical_evaluation_date,
       edm_snapshot_opty.stage_4_proposal_date,
       edm_snapshot_opty.stage_5_negotiating_date,
-      sfdc_opportunity_snapshot_history.stage_6_awaiting_signature_date,
+      edm_snapshot_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
       edm_snapshot_opty.stage_6_closed_won_date,
       edm_snapshot_opty.stage_6_closed_lost_date,
       
@@ -274,7 +275,7 @@ WITH date_details AS (
       edm_snapshot_opty.competitors_aws_flag,
 
       edm_snapshot_opty.stage_category,
-      edm_snapshot_opty.pipeline_calculated_deal_count          AS calculated_deal_count,
+      edm_snapshot_opty.calculated_deal_count          AS calculated_deal_count,
       -- calculated age field
       -- if open, use the diff between created date and snapshot date
       -- if closed, a) the close date is later than snapshot date, use snapshot date

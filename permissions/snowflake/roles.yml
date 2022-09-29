@@ -763,7 +763,6 @@ roles:
                 - raw.bamboohr.*
                 - raw.demandbase.*
                 - raw.engineering_extracts.*
-                - raw.gcp_billing.*
                 - raw.gitlab_data_yaml.*
                 - raw.gitter.*
                 - raw.keyhole_twitter.*
@@ -1063,6 +1062,7 @@ roles:
                     - prep.*
                     - prod.*
                     - raw.snapshots
+                    - raw.gcp_billing
             tables:
                 read:
                     - raw.*.*
@@ -1071,6 +1071,8 @@ roles:
                     - prep.*.*
                     - prod.*.*
                     - raw.snapshots.*
+                    - raw.gcp_billing.*
+
 
 # ==========================================
 # Object Roles
@@ -2022,6 +2024,7 @@ roles:
                     - prod.restricted_safe_legacy
                     - prod.restricted_safe_common_prep
                     - prod.restricted_safe_workspace_finance
+                    - prod.restricted_safe_workspace_marketing
                     - prod.restricted_safe_workspace_sales
                     - prod.restricted_safe_common_mart_product
                     - prod.workspace_data_science
@@ -2035,6 +2038,7 @@ roles:
                     - prod.restricted_safe_legacy.*
                     - prod.restricted_safe_common_prep.*
                     - prod.restricted_safe_workspace_finance.*
+                    - prod.restricted_safe_workspace_marketing.*
                     - prod.restricted_safe_workspace_sales.*
                     - prod.restricted_safe_common_mart_product.*
                     - prod.workspace_data_science.*
@@ -2484,6 +2488,13 @@ roles:
         warehouses:
             - dev_xs
 
+    - ashaikh:
+        member_of:
+            - data_team_analyst
+            - analyst_core
+        warehouses:
+            - dev_xs
+
     - bbutterfield:
         member_of:
             - reporter
@@ -2491,6 +2502,13 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - reporting
+
+    - bnguyen:
+        member_of:
+            - analyst_finance
+            - bamboohr_analytics
+        warehouses:
+            - dev_xs
 
     - cbraza:
         member_of:
@@ -2649,6 +2667,12 @@ roles:
                 write:
                     - degan_prep.*.*
                     - degan_prod.*.*
+
+    - dfelton:
+        member_of:
+            - securityadmin
+        warehouses:
+            - dev_xs
 
     - dmicovic:
         member_of:
@@ -3025,6 +3049,7 @@ roles:
         member_of:
             - analyst_marketing
             - analyst_sales
+            - bamboohr
             - customers_db
             - netsuite
             - static_admin
@@ -3034,6 +3059,7 @@ roles:
             - restricted_safe
             - dbt_data_science
             - snowplow
+            - workday
         warehouses:
             - dev_xs
             - dev_l
@@ -3469,15 +3495,18 @@ roles:
             - reporter
             - marketo
             - analyst_marketing
+            - customers_db
         warehouses:
             - dev_xs
 
     - mcooper:
         member_of:
             - analyst_finance
+            - bamboohr
             - customers_db
             - data_team_analyst
             - restricted_safe
+            - workday
         warehouses:
             - dev_xs
         owns:
@@ -3611,6 +3640,7 @@ roles:
             - analyst_growth
             - customers_db
             - restricted_safe
+            - mailgun
         warehouses:
             - dev_xs
         owns:
@@ -4559,6 +4589,11 @@ users:
         member_of:
             - aperez
 
+    - ashaikh:
+        can_login: yes
+        member_of:
+            - ashaikh
+
     - bi_tool_eval:
         can_login: yes
         member_of:
@@ -4568,6 +4603,11 @@ users:
         can_login: yes
         member_of:
             - bbutterfield
+
+    - bnguyen:
+        can_login: yes
+        member_of:
+            - bnguyen
 
     - cbraza:
         can_login: yes
@@ -4598,6 +4638,11 @@ users:
         can_login: yes
         member_of:
             - degan
+
+    - dfelton:
+        can_login: yes
+        member_of:
+            - dfelton
 
     - dmicovic:
         can_login: yes

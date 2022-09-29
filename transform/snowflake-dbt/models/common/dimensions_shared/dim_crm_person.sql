@@ -26,6 +26,7 @@ WITH crm_person AS (
 
       --info
       person_score,
+      behavior_score,
       title,
       country,
       state,
@@ -35,6 +36,7 @@ WITH crm_person AS (
       status,
       lead_source,
       lead_source_type,
+      was_converted_lead,
       source_buckets,
       employee_bucket,
       net_new_source_categories,
@@ -73,6 +75,10 @@ WITH crm_person AS (
       zoominfo_company_city,
       zoominfo_company_state,
       zoominfo_company_country,
+      zoominfo_phone_number, 
+      zoominfo_mobile_phone_number,
+      zoominfo_do_not_call_direct_phone,
+      zoominfo_do_not_call_mobile_phone,
       zoominfo_company_employee_count,
       account_demographics_sales_segment,
       account_demographics_sales_segment_grouped,
@@ -97,5 +103,5 @@ WITH crm_person AS (
     created_by="@jjstark",
     updated_by="@rkohnke",
     created_date="2020-09-10",
-    updated_date="2022-09-09"
+    updated_date="2022-09-14"
 ) }}

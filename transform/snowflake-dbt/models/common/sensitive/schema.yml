@@ -166,6 +166,12 @@ models:
         description: Flags if customer db owner
       - name: is_zuora_billing_contact
         description: Flags if zuora billing contact
+      - name: is_marketo_lead
+        description: Flags if marketo lead
+      - name: is_marketo_email_hard_bounced
+        description: Flags if marketing contact email has hard bounced
+      - name: marketo_email_hard_bounced_date
+        description: Date when the marketing contact email hard bounced
       - name: days_since_saas_trial_ended
         description: Number of days since saas trial ended
       - name: days_until_saas_trial_ends
@@ -240,6 +246,8 @@ models:
         description: Company of the marketing contact
       - name: job_title
         description: Job title of the marketing contact
+      - name: it_job_title_hierarchy
+        description: '{{ doc("it_job_title_hierarchy") }}'
       - name: country
         description: Country where marketing contacted is located
       - name: marketo_compliance_segment_value
@@ -296,6 +304,20 @@ models:
         description: Namespace id of the latest PQL namespace of the marketing contact.
       - name: pql_namespace_name
         description: Namespace name of the latest PQL namespace of the marketing contact.
+      - name: pql_namespace_name_masked
+        description: Masked version of pql_namespace_name. Field created to be used in mart_marketing_contact_no_pii.
+      - name: pql_product_interaction
+        description: Type of product interaction that the PQL had. As of now, it can either be SaaS Trial or Hand Raise PQL.
+      - name: pql_list_stages
+        description: List of product stages adopted by the PQL namespace. It only counts the events done before any conversion was done (if any), SMAU events and events done in the first year of the creation of the namespace. 
+      - name: pql_nbr_stages
+        description: Number of product stages adopted by the PQL namespace.
+      - name: pql_nbr_namespace_users
+        description: Current member count of the PQL namespace. This is calculated using the data in the Gitlab.com members table based on the number of accepted invites. If this number is zero, this is replaced to be 1 as all namespaces have at least one member, the creator.
+      - name: pql_trial_start_date
+        description: Trial start date of the PQL pql_namespace. 
+      - name: pql_event_created_at
+        description: Date that the PQL lead was created.
       - name: pql_nbr_integrations_installed
         description: Number of integrations services installed in the latest PQL namespace of the marketing contact.
       - name: pql_integrations_installed
@@ -308,3 +330,29 @@ models:
         description: If True, the marketing contact is a member of a namespace that has at least one public project
       - name: has_free_namespace_with_public_project
         description: If True, the marketing contact is a member of a Free namespace that has at least one public project
+      - name: is_member_of_public_ultimate_parent_namespace
+        description: If True, the marketing contact is a member of an ultimate parent namespace that is public.
+      - name: is_member_of_private_ultimate_parent_namespace
+        description: If True, the marketing contact is a member of an ultimate parent namespace that is private.
+      - name: public_ultimate_parent_namespaces
+        description: Array containing all the public ultimate parent namespaces the marketing contact is a member of.
+      - name: private_ultimate_parent_namespaces
+        description: Array containing all the private ultimate parent namespaces the marketing contact is a member of.
+      - name: is_paid_tier_change
+        description: This is a flag designed to keep Marketo in sync with the marketin database. If True, the marketing contact is_paid_tier flag is set to True OR the is_paid_tier flag is set to False and the is_paid_tier_marketo set to True (which means that it needs to be updated in Marketo)
+      - name: is_pql_change
+        description: This is a flag designed to keep Marketo in sync with the marketin database. If True, the marketing contact is_pql flag is set to True OR the is_pql flag is set to False and the is_pql_marketo flag set to True (which means that it needs to be updated in Marketo)
+      - name: ptpt_namespace_id
+        description: Namespace id which corresponds to the propensity to purchase score. More information on the propensity to purchase project can be seen [HERE](https://docs.google.com/presentation/d/1EyS9Wq6F0qlQwt5sj7x8VnSSGD1vIy3AcSpMGddZdbk/edit#slide=id.g13222807856_0_0)
+      - name: ptpt_score_group
+        description: 1-5 value which condenses the likelihood to convert the ptpt_namespace_id to paid. The higher the value the more likely the conversion.
+      - name: ptpt_insights
+        description: Top explanatory insights for the ptpt_namespace_id
+      - name: ptpt_score_date
+        description: Date the ptpt_score_group was last updated
+      - name: ptpt_past_score_group
+        description: Past ptpt_score_group given to the ptpt_namespace_id
+      - name: ptpt_past_score_date
+        description: Past ptpt_score_date givene to the ptpt_namespace_id
+      - name: is_ptpt_contact
+        description: Flag if marketing contact has a ptpt score

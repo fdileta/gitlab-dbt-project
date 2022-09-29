@@ -18,12 +18,14 @@ WITH
       notification_level::NUMBER                    AS notification_level,
       type                                           AS member_type,
       created_at::TIMESTAMP                          AS invite_created_at,
+      created_at::TIMESTAMP                          AS created_at,
       created_by_id::NUMBER                         AS created_by_id,
       invite_accepted_at::TIMESTAMP                  AS invite_accepted_at,
       requested_at::TIMESTAMP                        AS requested_at,
       expires_at::TIMESTAMP                          AS expires_at,
       ldap::BOOLEAN                                  AS has_ldap,
       override::BOOLEAN                              AS has_override,
+      invite_token::VARCHAR AS invite_token,
       valid_from -- Column was added in distinct_source CTE
 
     FROM distinct_source

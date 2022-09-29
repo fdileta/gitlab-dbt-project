@@ -103,7 +103,7 @@ models:
   # ------------------
   snowplow:
     +database: "{{ env_var('SNOWFLAKE_PREP_DATABASE') }}" #PREP
-    +schema: "snowplow_{{ var('year', run_started_at.strftime('%Y')) }}_{{ var('month', run_started_at.strftime('%m')) }}"
+    +schema: "snowplow_{{ var('year', (run_started_at - modules.datetime.timedelta(1)).strftime('%Y')) }}_{{ var('month', (run_started_at - modules.datetime.timedelta(1)).strftime('%m')) }}"
     +tags: ["product"]
     +incremental_strategy: "delete+insert"
     page_views:
@@ -540,8 +540,6 @@ models:
 
       workspace_data_science:
         +schema: workspace_data_science
-        pte:
-          +materialized: table
 
       workspace_marketing:
         +schema: workspace_marketing
@@ -666,6 +664,9 @@ snapshots:
     target_database: "{{ env_var('SNOWFLAKE_SNAPSHOT_DATABASE') }}" #RAW in production
     target_schema: "snapshots"
     transient: false
+
+    bizible:
+      +tags: ["daily"]
 
     common:
       +tags: ["edm_snapshot"]

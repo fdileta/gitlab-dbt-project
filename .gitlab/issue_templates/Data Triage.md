@@ -125,7 +125,7 @@ The DRI for this incident is `@username`.
 
 The link to the Data Team Incident issue is <link>
 
-`CC @justinfarris @Mek Stittri, @Christopher Lefelhocz, @WayneHaber,  @Steve Loyd, @lily, @kwiebers, @s_awezec, @product-analysts @datateam`
+`CC @Justin Farris , @meks, @leif, @Wayne,  @Steve Loyd, @lily, @kwiebers, @Sam Awezec, @product-analysts @datateam `
 
 
 #### Salesforce
@@ -138,7 +138,7 @@ The DRI for this incident is `@username`.
 
 The link to the Data Team Incident issue is <link>
 
-`CC @Jake Bielecki, @Matt Benzaquen, @Jack Brennan, @Craig Mestel`
+`CC @Jake Bielecki, @Jack, @Craig Mestel @product-analysts @datateam`
 
 #### Zuora
 
@@ -150,7 +150,7 @@ The DRI for this incident is `@username`.
 
 The link to the Data Team Incident issue is <link>
 
-`CC @Jake Bielecki, @Matt Benzaquen, @Jack Brennan, @Craig Mestel`
+`CC @Jake Bielecki,  @Jack, @Craig Mestel @product-analysts @datateam`
 
 #### General
 
