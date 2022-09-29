@@ -1,6 +1,7 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "fct_behavior_unstructured_sk"
+        unique_key = "fct_behavior_unstructured_sk",
+        full_refresh = false
 ) }}
 
 {{ simple_cte([
