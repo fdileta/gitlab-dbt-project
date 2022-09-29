@@ -14,13 +14,14 @@ WITH date_details AS (
     -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
     FROM {{ref('wk_sales_sfdc_accounts_xf')}}
 
-), sfdc_opportunity_snapshot_history_legacy AS (
+)
+-- , sfdc_opportunity_snapshot_history_legacy AS (
 
-    SELECT *
-    FROM {{ref('sfdc_opportunity_snapshot_history')}}
-    -- FROM prod.restricted_safe_legacy.sfdc_opportunity_snapshot_history
-
-), sfdc_opportunity_xf AS (
+--     SELECT *
+--     FROM {{ref('sfdc_opportunity_snapshot_history')}}
+--     -- FROM prod.restricted_safe_legacy.sfdc_opportunity_snapshot_history
+-- )
+, sfdc_opportunity_xf AS (
 
     SELECT 
       opportunity_id,
@@ -435,9 +436,9 @@ WITH date_details AS (
     FROM {{ref('mart_crm_opportunity_daily_snapshot')}} AS edm_snapshot_opty
     INNER JOIN date_details AS close_date_detail
       ON edm_snapshot_opty.close_date::DATE = close_date_detail.date_actual
-    LEFT JOIN sfdc_opportunity_snapshot_history_legacy AS sfdc_opportunity_snapshot_history
-      ON edm_snapshot_opty.dim_crm_opportunity_id = sfdc_opportunity_snapshot_history.opportunity_id
-      AND edm_snapshot_opty.snapshot_date = sfdc_opportunity_snapshot_history.date_actual::DATE
+    -- LEFT JOIN sfdc_opportunity_snapshot_history_legacy AS sfdc_opportunity_snapshot_history
+    --   ON edm_snapshot_opty.dim_crm_opportunity_id = sfdc_opportunity_snapshot_history.opportunity_id
+    --   AND edm_snapshot_opty.snapshot_date = sfdc_opportunity_snapshot_history.date_actual::DATE
 
 ), sfdc_opportunity_snapshot_history_xf AS (
 
