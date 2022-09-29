@@ -52,7 +52,8 @@ SELECT
     'COALESCE(current_division_department_mapping.division, job_info.division)')}}             AS division_grouping,      
   COALESCE(department_name_changes.new_department_name, job_info.department)                   AS department_modified,  
   {{bamboohr_department_grouping(department='department_modified')}}                           AS department_grouping,  
-  bamboo_mapping.termination_date   
+  bamboo_mapping.termination_date,
+  bamboo_mapping.first_inactive_date  
 FROM bamboo_mapping
 LEFT JOIN job_info 
   ON job_info.employee_id = bamboo_mapping.employee_id

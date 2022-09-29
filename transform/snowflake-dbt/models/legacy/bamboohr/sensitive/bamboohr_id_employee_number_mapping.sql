@@ -12,6 +12,7 @@ WITH source AS (
       first_name,
       last_name,
       hire_date,
+      termination_date,
       first_inactive_date,
       CASE 
         WHEN age BETWEEN 18 AND 24 THEN '18-24'

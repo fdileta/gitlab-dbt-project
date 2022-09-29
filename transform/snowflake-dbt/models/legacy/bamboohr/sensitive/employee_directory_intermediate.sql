@@ -14,6 +14,7 @@ WITH RECURSIVE employee_directory AS (
     rehire_date,
     region_modified,
     termination_date,
+    first_inactive_date,
     hire_location_factor,
     last_work_email,
     (COALESCE(first_name,'') || ' ' || COALESCE(last_name,'')) AS full_name
@@ -83,7 +84,7 @@ direct_reports AS (
       LEFT JOIN employee_directory
         ON employee_directory.hire_date::DATE <= date_details.date_actual
           AND COALESCE(
-            employee_directory.termination_date::DATE, {{ max_date_in_bamboo_analyses() }}
+            employee_directory.first_inactive_date::DATE, {{ max_date_in_bamboo_analyses() }}
           ) >= date_details.date_actual
       LEFT JOIN department_info
         ON employee_directory.employee_id = department_info.employee_id
@@ -256,13 +257,13 @@ enriched AS (
   LEFT JOIN employee_directory
     ON employee_directory.hire_date::DATE <= date_details.date_actual
       AND COALESCE(
-        employee_directory.termination_date::DATE, {{ max_date_in_bamboo_analyses() }}
+        employee_directory.first_inactive_date::DATE, {{ max_date_in_bamboo_analyses() }}
       ) >= date_details.date_actual
       -- active employees that have been rehired will have a termination date less than 
       -- the rehire date and they need to be included while excluding those terminated after
       -- the rehire date
       OR (employee_directory.rehire_date::DATE <= date_details.date_actual
-      AND IFF(employee_directory.termination_date > employee_directory.rehire_date, employee_directory.termination_date,
+      AND IFF(employee_directory.first_inactive_date > employee_directory.rehire_date, employee_directory.first_inactive_date,
             {{ max_date_in_bamboo_analyses() }}) >= date_details.date_actual)
   LEFT JOIN department_info
     ON employee_directory.employee_id = department_info.employee_id
