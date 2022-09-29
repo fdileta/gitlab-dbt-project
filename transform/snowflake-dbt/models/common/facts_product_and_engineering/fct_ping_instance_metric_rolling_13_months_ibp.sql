@@ -1,10 +1,10 @@
 {{ config(
     tags=["product", "mnpi_exception"],
-    materialized='incremental',
+    materialized='insert_by_period',
     unique_key='ping_instance_metric_id',
-    on_schema_change='sync_all_columns',
-    full_refresh=false,
-    post_hook=["DELETE FROM {{ this }} WHERE DATE_TRUNC(MONTH, ping_created_date) < DATEADD(MONTH, -13, DATE_TRUNC(MONTH,CURRENT_DATE))"]        
+    period='month',
+    timestamp_field = "ping_created_date",
+    start_date = "2021-08-01"   
 ) }}
 
 {{ simple_cte([
@@ -19,9 +19,7 @@
       {{ dbt_utils.star(from=ref('fct_ping_instance_metric'), except=['CREATED_BY', 'UPDATED_BY', 'MODEL_CREATED_DATE', 'MODEL_UPDATED_DATE', 'DBT_CREATED_AT', 'DBT_UPDATED_AT']) }}
     FROM {{ ref('fct_ping_instance_metric') }} 
     WHERE DATE_TRUNC(MONTH, ping_created_date) >= DATEADD(MONTH, -13, DATE_TRUNC(MONTH,CURRENT_DATE))
-    {% if is_incremental() %}
-    AND ping_created_date >= (SELECT MAX(ping_created_date) FROM {{ this }})
-    {% endif %}
+    AND __PERIOD_FILTER__
 
 ),
 
