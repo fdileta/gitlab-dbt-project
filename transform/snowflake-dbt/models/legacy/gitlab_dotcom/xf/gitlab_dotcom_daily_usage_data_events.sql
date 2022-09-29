@@ -10,7 +10,9 @@
 
 WITH usage_data AS (
 
-    SELECT *
+    SELECT 
+        *,
+        LAST_VALUE(is_blocked_namespace) OVER (PARTITION BY namespace_id, user_id, event_name, TO_DATE(event_created_at) ORDER BY TO_DATE(event_created_at) DESC) as is_blocked_namespace_last
     FROM {{ ref('gitlab_dotcom_usage_data_events') }}
     {% if is_incremental() %}
 
@@ -25,7 +27,7 @@ WITH usage_data AS (
     SELECT
       {{ dbt_utils.surrogate_key(['namespace_id', 'user_id', 'event_name', 'TO_DATE(event_created_at)']) }} AS daily_usage_data_event_id,
       namespace_id,
-      is_blocked_namespace,
+      is_blocked_namespace_last,
       namespace_created_at,
       user_id,
       namespace_is_internal,
