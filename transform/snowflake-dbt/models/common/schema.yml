@@ -1019,7 +1019,10 @@ models:
       - name: dim_crm_touchpoint_id
         tests:
           - not_null
-          - unique
+          - unique:
+              config:
+                error_if: ">4"
+                warn_if: ">1"
         tags: ["tdf", "common"]
 
   - name: fct_crm_touchpoint

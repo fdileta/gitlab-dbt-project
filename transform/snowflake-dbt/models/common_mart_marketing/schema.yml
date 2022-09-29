@@ -14,8 +14,11 @@ models:
       columns:
         - name: dim_crm_touchpoint_id
           tests:
-              - not_null
-              - unique
+            - not_null
+            - unique:
+                config:
+                  error_if: ">4"
+                  warn_if: ">1"
 
     - name: mart_crm_person
       description: Model with person and MQL business logic.
