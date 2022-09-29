@@ -1,10 +1,22 @@
 {{config({
     "materialized":"incremental",
-    "unique_key":"behavior_structured_event_pk"
+    "unique_key":"behavior_structured_event_pk",
+    "full_refresh":false,
+    "on_schema_change":"sync_all_columns"
+
   })
 
 }}
-WITH prep_snowplow_structured_event_all_source AS (
+{{ 
+    simple_cte([
+    ('dim_behavior_page_url_path', 'dim_behavior_page_url_path'),
+    ('dim_behavior_website_page', 'dim_behavior_website_page'),
+    ('dim_behavior_browser', 'dim_behavior_browser'),
+    ('dim_behavior_operating_system', 'dim_behavior_operating_system')
+    ])
+}}
+
+, prep_snowplow_structured_event_all_source AS (
 
     SELECT *
     FROM {{ ref('prep_snowplow_structured_event_all_source') }}
@@ -55,18 +67,18 @@ WITH prep_snowplow_structured_event_all_source AS (
       prep_snowplow_structured_event_all_source.gsc_source
 
     FROM prep_snowplow_structured_event_all_source
-    LEFT JOIN {{ ref('dim_behavior_page_url_path') }}
+    LEFT JOIN  dim_behavior_page_url_path
       ON prep_snowplow_structured_event_all_source.page_url_path = dim_behavior_page_url_path.page_url_path
-    LEFT JOIN {{ ref('dim_behavior_website_page') }} 
+    LEFT JOIN dim_behavior_website_page
       ON dim_behavior_page_url_path.clean_url_path = dim_behavior_website_page.clean_url_path
         AND prep_snowplow_structured_event_all_source.page_url_host = dim_behavior_website_page.page_url_host
         AND prep_snowplow_structured_event_all_source.app_id = dim_behavior_website_page.app_id
-    LEFT JOIN {{ ref('dim_behavior_browser') }}
+    LEFT JOIN dim_behavior_browser
       ON prep_snowplow_structured_event_all_source.browser_name = dim_behavior_browser.browser_name
         AND prep_snowplow_structured_event_all_source.browser_major_version = dim_behavior_browser.browser_major_version
         AND prep_snowplow_structured_event_all_source.browser_minor_version = dim_behavior_browser.browser_minor_version
         AND prep_snowplow_structured_event_all_source.browser_language = dim_behavior_browser.browser_language
-    LEFT JOIN {{ ref('dim_behavior_operating_system') }}
+    LEFT JOIN dim_behavior_operating_system
       ON prep_snowplow_structured_event_all_source.os_name = dim_behavior_operating_system.os_name
         AND prep_snowplow_structured_event_all_source.os_timezone = dim_behavior_operating_system.os_timezone
     {% if is_incremental() %}
