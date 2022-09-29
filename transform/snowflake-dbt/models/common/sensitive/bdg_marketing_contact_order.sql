@@ -90,6 +90,7 @@
                saas_customer.dim_namespace_id, 
                saas_billing_account.dim_namespace_id)                                         AS dim_namespace_id,
       gitlab_namespaces.namespace_path,
+      namespace_lineage.namespace_is_ultimate_parent                                          AS is_ultimate_parent_namespace,
       CASE 
         WHEN namespace_lineage.namespace_type = 'User' 
           THEN 1 
@@ -293,5 +294,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-04",
-    updated_date="2022-09-21"
+    updated_date="2022-09-29"
 ) }}

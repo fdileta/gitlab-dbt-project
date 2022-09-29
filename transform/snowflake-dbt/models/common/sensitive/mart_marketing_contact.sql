@@ -634,19 +634,21 @@
       ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_private = TRUE, marketing_contact_order.dim_namespace_id, NULL))
                                                                                                  AS private_ultimate_parent_namespaces,
       ARRAY_AGG(
-                DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
-                  IFNULL(marketing_contact_order.saas_product_tier, '') || IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Role') 
-               )                                                                                 AS role_tier_text,
-      ARRAY_AGG(
-                DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
-                  IFNULL(marketing_contact_order.namespace_path, CASE 
-                                          WHEN marketing_contact_order.self_managed_product_tier IS NOT NULL
-                                            THEN 'Self-Managed' 
-                                          ELSE '' 
-                                        END)  || ' | ' || 
-                  IFNULL(marketing_contact_order.saas_product_tier, '') || 
-                  IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Namespace')
-               )                                                                                 AS role_tier_namespace_text
+                DISTINCT
+                CASE
+                  WHEN marketing_contact_order.is_ultimate_parent_namespace = FALSE
+                    THEN NULL
+                  ELSE IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
+                    IFNULL(marketing_contact_order.namespace_path, CASE 
+                                            WHEN marketing_contact_order.self_managed_product_tier IS NOT NULL
+                                              THEN 'Self-Managed' 
+                                            ELSE '' 
+                                          END)  || ' | ' || 
+                    IFNULL(marketing_contact_order.saas_product_tier, '') || 
+                    IFNULL(marketing_contact_order.self_managed_product_tier, ''),
+                    
+                    'No Namespace') END
+               )                                                                                 AS role_tier_ultimate_namespace_text
 
     FROM marketing_contact
     LEFT JOIN  marketing_contact_order
@@ -955,5 +957,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-09",
-    updated_date="2022-09-21"
+    updated_date="2022-09-29"
 ) }}

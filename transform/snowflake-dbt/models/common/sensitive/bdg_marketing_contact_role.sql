@@ -5,10 +5,11 @@
   ('customer_db_source', 'customers_db_customers_source'),
   ('zuora_account', 'zuora_account_source'),
   ('zuora_contact', 'zuora_contact_source'),
-  ('dim_marketing_contact', 'dim_marketing_contact')
+  ('dim_marketing_contact', 'dim_marketing_contact'),
+  ('prep_namespace', 'prep_namespace')
 ]) }}
 
-, final AS (
+, bdg AS (
 
     SELECT
       dim_marketing_contact_id,
@@ -93,7 +94,15 @@
     LEFT JOIN dim_marketing_contact
       ON dim_marketing_contact.email_address = zuora_contact.work_email
     
+), final AS (
+
+    SELECT bdg.*
+    FROM bdg
+    INNER JOIN prep_namespace
+      ON bdg.namespace_id = prep_namespace.dim_namespace_id
+    WHERE prep_namespace.is_currently_valid = TRUE
 )
+
 
 
 {{ dbt_audit(
@@ -101,5 +110,5 @@
     created_by="@rmistry",
     updated_by="@jpeguero",
     created_date="2021-01-19",
-    updated_date="2022-02-28"
+    updated_date="2022-09-29"
 ) }}
