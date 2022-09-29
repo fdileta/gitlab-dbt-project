@@ -1021,7 +1021,7 @@ models:
           - not_null
           - unique:
               config:
-                error_if: ">3"
+                error_if: ">5"
                 warn_if: ">1"
         tags: ["tdf", "common"]
 
