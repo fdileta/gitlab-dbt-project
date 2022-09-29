@@ -12,7 +12,7 @@ WITH usage_data AS (
 
     SELECT 
         *,
-        LAST_VALUE(is_blocked_namespace) OVER (PARTITION BY namespace_id, user_id, event_name, TO_DATE(event_created_at) ORDER BY TO_DATE(event_created_at) DESC) as is_blocked_namespace_last
+        LAST_VALUE(is_blocked_namespace) OVER (PARTITION BY namespace_id, user_id, event_name, TO_DATE(event_created_at) ORDER BY TO_DATE(event_created_at) DESC) AS is_blocked_namespace_last
     FROM {{ ref('gitlab_dotcom_usage_data_events') }}
     {% if is_incremental() %}
 
