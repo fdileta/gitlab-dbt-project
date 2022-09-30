@@ -220,7 +220,6 @@
       person_base.account_demographics_region,
       person_base.account_demographics_geo,
       person_base.account_demographics_area,
-      person_base.account_demographics_upa_country,
       person_base.account_demographics_territory,
       dim_crm_person.employee_bucket,
       dim_crm_person.leandata_matched_account_sales_segment,
