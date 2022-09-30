@@ -22,9 +22,11 @@ Closes #
 - [ ] Branch set to delete. (Leave commits unsquashed)
 - [ ] Latest CI pipeline passes.
   - [ ] If not, an explanation has been provided.
+- [ ] Functional analyst has reviewed logic for accuracy.
+  - [ ] If not, an explanation has been provided.
 - [ ] This MR is ready for final check and merge.
 - [ ] Remove the `Draft:` prefix in the MR title before assigning to reviewer.
-- [ ] Assigned to reviewer. Highlight when you assign that this is for a team workspace model and requires minimal review.
+- [ ] Assigned to reviewer. Highlight when you assign that this is for a team workspace model and requires minimal review from the Data team.
 
 ## Reviewer Checklist
 - [ ] Check to make sure code runs

@@ -139,22 +139,6 @@ models:
           - not_null
       - name: valid_to
 
-  - name: sfdc_account_snapshots_base_clean
-    description: This is the clean base model for snapshots of the salesforce account table for 2019-10-01 and forward. This exists to make the UDF work.
-  - name: sfdc_account_snapshots_base
-    description: This is a view on the clean base model for snapshots of the salesforce account table for 2019-10-01 and forward.
-    columns:
-      - name: unique_key
-        tests:
-          - not_null
-          - unique
-      - name: account_snapshot_id
-        tests:
-          - not_null
-      - name: id
-          - not_null
-      - name: valid_from
-          - not_null
   - name: sfdc_account_snapshots_source
     description: This is the source model for snapshots of the salesforce account table for cleaning and renaming.
     tests:

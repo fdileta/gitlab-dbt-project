@@ -43,8 +43,8 @@ WITH sfdc_opportunity AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}}
-    --FROM prod.restricted_safe_legacy.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 ), date_details AS (
 

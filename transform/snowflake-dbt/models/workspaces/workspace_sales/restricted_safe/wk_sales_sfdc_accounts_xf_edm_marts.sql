@@ -28,7 +28,6 @@ SELECT
     -- parent_id,
     mart.dim_crm_person_primary_contact_id                   AS primary_contact_id,
     mart.record_type_id,
-    -- ultimate_parent_id,
     mart.partner_vat_tax_id,
     mart.federal_account,
     mart.gitlab_com_user,
@@ -53,7 +52,7 @@ SELECT
     mart.support_level,
     mart.named_account,
     mart.crm_account_billing_country                         AS billing_country,
-    -- mart.crm_account_billing_country_code                    AS billing_country_code, --to be added
+    mart.crm_account_billing_country_code                    AS billing_country_code,
     mart.billing_postal_code,
     mart.is_sdr_target_account,
     --lam
