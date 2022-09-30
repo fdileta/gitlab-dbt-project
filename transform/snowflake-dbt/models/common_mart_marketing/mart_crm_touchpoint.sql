@@ -276,7 +276,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2021-02-18",
-    updated_date="2022-05-06"
+    updated_date="2022-09-30"
 ) }}
