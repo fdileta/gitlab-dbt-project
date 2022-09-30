@@ -27,6 +27,7 @@ WITH account_dims_mapping AS (
       sequence_task_due_date,
       sequence_status,
       last_activity_date
+      
 
     FROM {{ref('prep_crm_person')}}
 
@@ -57,27 +58,13 @@ WITH account_dims_mapping AS (
 
 ), sfdc_contacts AS (
 
-    SELECT *,
-          LEAST(COALESCE(marketo_qualified_lead_date::timestamp,'9999-01-01'),COALESCE(mql_datetime_inferred::timestamp,'9999-01-01'))             
-            AS prep_mql_date,
-
-      CASE 
-        WHEN prep_mql_date != '9999-01-01'
-        THEN prep_mql_date::timestamp
-      END                                                                                                                 AS mql_date
+    SELECT *
     FROM {{ ref('sfdc_contact_source') }}
     WHERE is_deleted = 'FALSE'
 
 ), sfdc_leads AS (
 
-    SELECT *,
-          LEAST(COALESCE(marketo_qualified_lead_date::timestamp,'9999-01-01'),COALESCE(mql_datetime_inferred::timestamp,'9999-01-01'))             
-            AS prep_mql_date,
-
-      CASE 
-        WHEN prep_mql_date != '9999-01-01'
-        THEN prep_mql_date::timestamp
-      END                                                                                                                 AS mql_date
+    SELECT *
     FROM {{ ref('sfdc_lead_source') }}
     WHERE is_deleted = 'FALSE'
 
@@ -92,9 +79,10 @@ WITH account_dims_mapping AS (
 
     SELECT
 
-      {{ dbt_utils.surrogate_key(['COALESCE(converted_contact_id, lead_id)','mql_date::timestamp']) }} AS mql_event_id,
+      {{ dbt_utils.surrogate_key(['COALESCE(converted_contact_id, lead_id)','true_mql_date::timestamp']) }} AS mql_event_id,
 
-      mql_date::timestamp                                                                                                 AS mql_event_timestamp,
+      true_mql_date::timestamp                                                                                            AS mql_event_timestamp,
+      true_initial_mql_date::timestamp                                                                                    AS initial_mql_event_timestamp,
       marketo_qualified_lead_date::timestamp                                                                              AS legacy_mql_event_timestamp,
       lead_id                                                                                                             AS sfdc_record_id,
       'lead'                                                                                                              AS sfdc_record,
@@ -105,15 +93,16 @@ WITH account_dims_mapping AS (
       person_score                                                                                                        AS person_score
 
     FROM sfdc_leads
-    WHERE mql_date IS NOT NULL
+    WHERE true_mql_date IS NOT NULL
 
 ), marketing_qualified_contacts AS(
 
     SELECT
 
-      {{ dbt_utils.surrogate_key(['contact_id','mql_date::timestamp']) }}                                                 AS mql_event_id,
+      {{ dbt_utils.surrogate_key(['contact_id','true_mql_date::timestamp']) }}                                            AS mql_event_id,
       
-      mql_date                                                                                                            AS mql_event_timestamp,
+      true_mql_date                                                                                                       AS mql_event_timestamp,
+      true_initial_mql_date                                                                                               AS initial_mql_event_timestamp,
 
 marketo_qualified_lead_date::timestamp
                    AS legacy_mql_event_timestamp,
@@ -126,7 +115,7 @@ marketo_qualified_lead_date::timestamp
       person_score                                                                                                        AS person_score
 
     FROM sfdc_contacts
-    WHERE mql_date IS NOT NULL
+    WHERE true_mql_date IS NOT NULL
     HAVING mql_event_id NOT IN (
                          SELECT mql_event_id
                          FROM marketing_qualified_leads
@@ -149,6 +138,8 @@ marketo_qualified_lead_date::timestamp
       crm_person_id,
       MIN(mql_event_timestamp)         AS first_mql_date,
       MAX(mql_event_timestamp)         AS last_mql_date,
+      MIN(initial_mql_event_timestamp) AS first_initial_mql_date,
+      MAX(initial_mql_event_timestamp) AS last_initial_mql_date,
       MIN(legacy_mql_event_timestamp)  AS first_legacy_mql_date,
       MAX(legacy_mql_event_timestamp)  AS last_legacy_mql_date,
       COUNT(*)                         AS mql_count
@@ -208,13 +199,23 @@ marketo_qualified_lead_date::timestamp
       mqls.first_mql_date::DATE                                                                                 AS mql_date_first,
       mqls.first_mql_date                                                                                       AS mql_datetime_first,
       CONVERT_TIMEZONE('America/Los_Angeles', mqls.first_mql_date)                                              AS mql_datetime_first_pt,
-      {{ get_date_id('mql_date_first') }}                                                                       AS mql_date_first_id,
-      {{ get_date_pt_id('mql_date_first') }}                                                                    AS mql_date_first_pt_id,
+      {{ get_date_id('first_mql_date') }}                                                                       AS mql_date_first_id,
+      {{ get_date_pt_id('first_mql_date') }}                                                                    AS mql_date_first_pt_id,
       mqls.last_mql_date::DATE                                                                                  AS mql_date_latest,
       mqls.last_mql_date                                                                                        AS mql_datetime_latest,
       CONVERT_TIMEZONE('America/Los_Angeles', mqls.last_mql_date)                                               AS mql_datetime_latest_pt,
       {{ get_date_id('last_mql_date') }}                                                                        AS mql_date_latest_id,
       {{ get_date_pt_id('last_mql_date') }}                                                                     AS mql_date_latest_pt_id,
+      mqls.first_initial_mql_date::DATE                                                                         AS initial_mql_date_first,
+      mqls.first_initial_mql_date                                                                               AS initial_mql_datetime_first,
+      CONVERT_TIMEZONE('America/Los_Angeles', mqls.first_initial_mql_date)                                      AS initial_mql_datetime_first_pt,
+      {{ get_date_id('first_initial_mql_date') }}                                                               AS initial_mql_date_first_id,
+      {{ get_date_pt_id('first_initial_mql_date') }}                                                            AS initial_mql_date_first_pt_id,
+      mqls.last_initial_mql_date::DATE                                                                          AS initial_mql_date_latest,
+      mqls.last_initial_mql_date                                                                                AS initial_mql_datetime_latest,
+      CONVERT_TIMEZONE('America/Los_Angeles', mqls.last_initial_mql_date)                                       AS initial_mql_datetime_latest_pt,
+      {{ get_date_id('last_initial_mql_date') }}                                                                AS initial_mql_date_latest_id,
+      {{ get_date_pt_id('last_initial_mql_date') }}                                                             AS initial_mql_date_latest_pt_id,
 
       mqls.first_legacy_mql_date::DATE                                                                          AS legacy_mql_date_first,
       mqls.first_legacy_mql_date                                                                                AS legacy_mql_datetime_first,
