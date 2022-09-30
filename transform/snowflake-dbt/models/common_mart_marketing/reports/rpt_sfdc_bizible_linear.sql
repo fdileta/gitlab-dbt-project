@@ -50,6 +50,7 @@
       mart_crm_attribution_touchpoint.bizible_touchpoint_source,
       mart_crm_attribution_touchpoint.bizible_touchpoint_type,
       mart_crm_attribution_touchpoint.bizible_ad_campaign_name,
+      mart_crm_attribution_touchpoint.bizible_ad_group_name,
       mart_crm_attribution_touchpoint.bizible_ad_content,
       mart_crm_attribution_touchpoint.bizible_form_url_raw,
       mart_crm_attribution_touchpoint.bizible_landing_page_raw,
@@ -105,7 +106,7 @@
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id = linear_base.dim_crm_opportunity_id
     LEFT JOIN  campaigns_per_opp ON
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id =      campaigns_per_opp.dim_crm_opportunity_id
-    {{ dbt_utils.group_by(n=54) }}
+    {{ dbt_utils.group_by(n=55) }}
 
 )
 
@@ -114,5 +115,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-01-25",
-    updated_date="2022-05-23"
+    updated_date="2022-09-30"
 ) }}
