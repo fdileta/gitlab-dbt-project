@@ -59,6 +59,7 @@ WITH crm_person AS (
       matched_account_gtm_strategy,
       is_first_order_initial_mql,
       is_first_order_mql,
+      is_first_order_person,
       cognism_company_office_city,
       cognism_company_office_state,
       cognism_company_office_country,

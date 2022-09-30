@@ -148,6 +148,7 @@
       dim_crm_person.matched_account_gtm_strategy,
       dim_crm_person.is_first_order_initial_mql,
       dim_crm_person.is_first_order_mql,
+      dim_crm_person.is_first_order_person,
       dim_crm_person.account_demographics_sales_segment,
       dim_crm_person.account_demographics_sales_segment_grouped,
       dim_crm_person.account_demographics_geo,
