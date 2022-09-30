@@ -13,7 +13,7 @@
     ('dim_crm_user','dim_crm_user')
 ]) }}
 
-, final AS (
+, joined AS (
 
     SELECT
       -- touchpoint info
@@ -77,6 +77,7 @@
       fct_crm_person.mql_count,
       fct_crm_person.last_utm_content,
       fct_crm_person.last_utm_campaign,
+      fct_crm_person.true_inquiry_date,
 
       -- campaign info
       dim_campaign.dim_campaign_id,
@@ -133,6 +134,8 @@
       dim_crm_user.crm_user_geo                            AS touchpoint_crm_user_geo_name_live,
       dim_crm_user.crm_user_region                         AS touchpoint_crm_user_region_name_live,
       dim_crm_user.crm_user_area                           AS touchpoint_crm_user_area_name_live,
+      dim_crm_user.sdr_sales_segment,
+      dim_crm_user.sdr_region,
 
       -- campaign owner info
       campaign_owner.user_name                             AS campaign_rep_name,
@@ -210,6 +213,63 @@
     LEFT JOIN dim_crm_user
       ON fct_crm_touchpoint.dim_crm_user_id = dim_crm_user.dim_crm_user_id
 
+), count_of_pre_mql_tps AS (
+
+    SELECT DISTINCT
+      joined.email_hash,
+      COUNT(DISTINCT joined.dim_crm_touchpoint_id) AS pre_mql_touches
+    FROM joined
+    WHERE joined.mql_date_first IS NOT NULL
+      AND joined.bizible_touchpoint_date <= joined.mql_date_first
+    GROUP BY 1
+
+), pre_mql_tps_by_person AS (
+
+    SELECT
+      count_of_pre_mql_tps.email_hash,
+      count_of_pre_mql_tps.pre_mql_touches,
+      1/count_of_pre_mql_tps.pre_mql_touches AS pre_mql_weight
+    FROM count_of_pre_mql_tps
+    GROUP BY 1,2
+
+), pre_mql_tps AS (
+
+    SELECT
+      joined.dim_crm_touchpoint_id,
+      pre_mql_tps_by_person.pre_mql_weight
+    FROM pre_mql_tps_by_person
+    LEFT JOIN joined 
+      ON pre_mql_tps_by_person.email_hash=joined.email_hash
+    WHERE joined.mql_date_first IS NOT NULL
+      AND joined.bizible_touchpoint_date <= joined.mql_date_first
+
+), post_mql_tps AS (
+
+    SELECT
+      joined.dim_crm_touchpoint_id,
+      0 AS pre_mql_weight
+    FROM joined
+    WHERE joined.bizible_touchpoint_date > joined.mql_date_first
+      OR joined.mql_date_first IS null
+
+), mql_weighted_tps AS (
+
+    SELECT *
+    FROM pre_mql_tps
+
+    UNION ALL
+
+    SELECT *
+    FROM post_mql_tps
+
+),final AS (
+
+  SELECT 
+    joined.*,
+    mql_weighted_tps.pre_mql_weight
+  FROM joined
+  LEFT JOIN mql_weighted_tps 
+    ON joined.dim_crm_touchpoint_id=mql_weighted_tps.dim_crm_touchpoint_id
 
 )
 
