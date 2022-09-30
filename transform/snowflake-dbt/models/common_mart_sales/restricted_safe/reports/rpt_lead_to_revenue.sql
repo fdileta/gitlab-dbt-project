@@ -215,7 +215,6 @@
       person_base.is_inquiry,
       person_base.is_mql,
       dim_crm_person.sfdc_record_id,
-      person_base.dim_crm_account_id,
       person_base.account_demographics_sales_segment,
       person_base.account_demographics_sales_segment_grouped,
       person_base.account_demographics_region,
@@ -257,7 +256,7 @@
       opp.merged_crm_opportunity_id,
       opp.record_type_id,
       opp.ssp_id,
-      opp.dim_crm_account_id,
+      opp.dim_crm_account_id AS opp_dim_crm_account_id,
       opp.opportunity_name,
       opp.stage_name,
       opp.reason_for_loss,
@@ -414,6 +413,7 @@
     rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_touchpoint_id,
     cohort_base.sfdc_record_id,
     cohort_base.dim_crm_account_id,
+    cohort_base.opp_dim_crm_account_id,
     cohort.base.opp_dim_parent_crm_account_id,
   
     --person data
