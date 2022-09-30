@@ -1,3 +1,7 @@
+{{ config(
+    tags=["product"]
+) }}
+    
 {{ simple_cte ([
   ('marketing_contact', 'dim_marketing_contact'),
   ('marketing_contact_order', 'bdg_marketing_contact_order'),
@@ -12,8 +16,10 @@
   ('fct_event_user_daily', 'fct_event_user_daily'),
   ('map_gitlab_dotcom_xmau_metrics', 'map_gitlab_dotcom_xmau_metrics'),
   ('services', 'gitlab_dotcom_integrations_source'),
-  ('project', 'prep_project')
+  ('project', 'prep_project'),
+  ('ptpt_scores_by_user', 'prep_ptpt_scores_by_user')
 ]) }}
+
 -------------------------- Start of PQL logic: --------------------------
 
 , namespaces AS (
@@ -628,19 +634,21 @@
       ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_private = TRUE, marketing_contact_order.dim_namespace_id, NULL))
                                                                                                  AS private_ultimate_parent_namespaces,
       ARRAY_AGG(
-                DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
-                  IFNULL(marketing_contact_order.saas_product_tier, '') || IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Role') 
-               )                                                                                 AS role_tier_text,
-      ARRAY_AGG(
-                DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
-                  IFNULL(marketing_contact_order.namespace_path, CASE 
-                                          WHEN marketing_contact_order.self_managed_product_tier IS NOT NULL
-                                            THEN 'Self-Managed' 
-                                          ELSE '' 
-                                        END)  || ' | ' || 
-                  IFNULL(marketing_contact_order.saas_product_tier, '') || 
-                  IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Namespace')
-               )                                                                                 AS role_tier_namespace_text
+                DISTINCT
+                CASE
+                  WHEN marketing_contact_order.is_ultimate_parent_namespace = FALSE
+                    THEN NULL
+                  ELSE IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
+                    IFNULL(marketing_contact_order.namespace_path, CASE 
+                                            WHEN marketing_contact_order.self_managed_product_tier IS NOT NULL
+                                              THEN 'Self-Managed' 
+                                            ELSE '' 
+                                          END)  || ' | ' || 
+                    IFNULL(marketing_contact_order.saas_product_tier, '') || 
+                    IFNULL(marketing_contact_order.self_managed_product_tier, ''),
+                    
+                    'No Namespace') END
+               )                                                                                 AS role_tier_ultimate_namespace_text
 
     FROM marketing_contact
     LEFT JOIN  marketing_contact_order
@@ -773,6 +781,17 @@
       marketing_contact.zuora_active_state,
       marketing_contact.wip_is_valid_email_address,
       marketing_contact.wip_invalid_email_address_reason,
+
+      -- Propensity to purchase trials fields
+      IFF(ptpt_scores_by_user.namespace_id IS NOT NULL, TRUE, FALSE)
+                                                  AS is_ptpt_contact,
+      ptpt_scores_by_user.namespace_id            AS ptpt_namespace_id,
+      ptpt_scores_by_user.score_group             AS ptpt_score_group,
+      ptpt_scores_by_user.insights                AS ptpt_insights,
+      ptpt_scores_by_user.score_date              AS ptpt_score_date,
+      ptpt_scores_by_user.past_score_group        AS ptpt_past_score_group,
+      ptpt_scores_by_user.past_score_date         AS ptpt_past_score_date,
+
       usage_metrics.usage_umau_28_days_user,
       usage_metrics.usage_action_monthly_active_users_project_repo_28_days_user,
       usage_metrics.usage_merge_requests_28_days_user,
@@ -819,6 +838,8 @@
       ON services_by_email.email = marketing_contact.email_address
     LEFT JOIN users_role_by_email
       ON users_role_by_email.email = marketing_contact.email_address
+    LEFT JOIN ptpt_scores_by_user
+      ON ptpt_scores_by_user.dim_marketing_contact_id = marketing_contact.dim_marketing_contact_id
 )
 
 {{ hash_diff(
@@ -936,7 +957,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-09",
-    updated_date="2022-08-31"
+    updated_date="2022-09-29"
 ) }}
-
-

@@ -302,7 +302,7 @@ for source_name, config in config_dict.items():
 
                 TASK_TYPE = "db-incremental"
                 task_identifier = (
-                    f"el_{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
+                    f"el-{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                 )
 
                 incremental_cmd = generate_cmd(
@@ -349,7 +349,7 @@ for source_name, config in config_dict.items():
                     TASK_TYPE = "backfill"
 
                     task_identifier = (
-                        f"el_{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
+                        f"el-{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                     )
 
                     sync_cmd = generate_cmd(
@@ -398,7 +398,7 @@ for source_name, config in config_dict.items():
                     TASK_TYPE = "db-scd"
 
                     task_identifier = (
-                        f"el_{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
+                        f"el-{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                     )
 
                     # SCD Task

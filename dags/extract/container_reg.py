@@ -1,5 +1,5 @@
 """
-DAG for gcs external
+DAG for gcs container registry logs
 """
 import os
 from datetime import datetime, timedelta
@@ -40,16 +40,20 @@ default_args = {
 }
 
 # Create the DAG
-dag = DAG("el_gcs_external", default_args=default_args, schedule_interval="0 3 * * *")
+dag = DAG(
+    "el_gcs_container_registry",
+    default_args=default_args,
+    schedule_interval="0 3 * * *",
+)
 
 airflow_home = env["AIRFLOW_HOME"]
 
-TASK_IDENTIFIER = "gcs-external-load"
+TASK_IDENTIFIER = "gcs-container-registry-load"
 
 run_load_command = f"""
   {clone_and_setup_extraction_cmd} &&
   export SNOWFLAKE_LOAD_WAREHOUSE="LOADING_XL" &&
-  python3 /analytics/extract/gcs_external/src/gcs_external.py
+  python3 /analytics/extract/gcs_external/src/gcs_container_registry.py
   """
 
 run_load = KubernetesPodOperator(

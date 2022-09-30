@@ -273,6 +273,8 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_company_city,
       sfdc_account.zoom_info_company_state_province,
       sfdc_account.zoom_info_company_country,
+      sfdc_account.account_phone,
+      sfdc_account.zoominfo_account_phone,
       sfdc_account.abm_tier,
       sfdc_account.health_score,
       sfdc_account.health_number,
