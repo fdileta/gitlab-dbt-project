@@ -515,7 +515,7 @@
     cohort_base.sequence_task_due_date,
     cohort_base.sequence_status,
     cohort_base.is_actively_being_sequenced,
-    cohort_base.sales_segment_name AS person_sales_segment_name,
+    cohort_base.person_sales_segment_name,
     cohort_base.sales_segment_grouped AS person_sales_segment_grouped,
     cohort_base.person_score,
     cohort_base.behavior_score,
