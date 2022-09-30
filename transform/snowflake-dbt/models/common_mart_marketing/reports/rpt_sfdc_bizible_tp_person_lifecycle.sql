@@ -94,7 +94,7 @@
       mart_crm_touchpoint.bizible_referrer_page,
       mart_crm_touchpoint.bizible_ad_campaign_name,
       mart_crm_touchpoint.bizible_ad_content,
-      mart_crm_touchpoint_bizible_ad_group_name,
+      mart_crm_touchpoint.bizible_ad_group_name,
       mart_crm_touchpoint.bizible_form_url_raw,
       mart_crm_touchpoint.bizible_landing_page_raw,
       mart_crm_touchpoint.bizible_referrer_page_raw,
