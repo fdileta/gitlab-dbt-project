@@ -54,6 +54,14 @@ This model assumes that only one priority is placed in a given description or no
 
 {% enddocs %}
 
+{% docs prep_ptpt_scores_by_user %}
+
+Takes the scores from ptpt_scores, transforms it to user / email address grain and uses the latest score date available.
+
+The scores of this model are then used in mart_marketing_contact and the marketing pump to later be synced with Marketo and SFDC.
+
+{% enddocs %}
+
 {% docs prep_sfdc_account %}
 
 SFDC Account Prep table, used to clean and dedupe fields from a common source for use in further downstream dimensions.
@@ -117,7 +125,7 @@ Creates a base view with generated keys for the geographic region shared dimensi
 
 {% docs prep_namespace_plan_hist %}
 
-dim_plan_id column: 
+dim_plan_id column:
 
 Assumes if dim_plan_id is null that it is a free plan, plan id 34. Also, accounts for gold/ultimate plans in the past that did not have a trial plan id or trial name. The logic checks for plan names that are ultimate/gold AND have trial set to true and conforms them to plan id 102 which is the ultimate trial plan. After a trial expires, it is moved to a free plan, plan id 34. Therefore, after accounting for the gold/ultimate plans that had trial = TRUE, we can rely on the plan id and plan name out of the subscription and plan source tables to identify trials. The ultimate_trial plan name is plan id 102 and the premium_trial plan name is plan id 103. In a future iteration, this plan information should be conformed with the dim_product_tier dimension to have a single source of truth for plan information at GitLab.
 
@@ -200,16 +208,6 @@ The grain of the table is quote_id.
 Creates a License Prep table for representing generated licenses and associated metadata for shared dimension and references in facts.
 
 The grain of the table is license_id.
-
-{% enddocs %}
-
-{% docs prep_usage_ping_subscription_mapped_gmau %}
-
-This data model contains the values of each GMAU metric for **Self-Managed** instances with a non-null `license_md5`. Rows missing a `dim_subscription_id` indicate that either no matching license was found in `map_license_subscription_account`, or no `dim_subscription_id` exists in `map_license_subscription_account` associated with the given `license_md5`.
-
-This data model is used for the Customer Health Dashboards.
-
-Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
 
 {% enddocs %}
 
@@ -371,29 +369,12 @@ This curent version is for Sales team only.
 Ideally, the purpose of this data model is to unpack all the metrics from the `raw_usage_data_payload` column, strips all the sensitive data out, and has one value for each metric in that column.
 {% enddocs %}
 
-
-{% docs prep_usage_ping_saas_dates %}
-This data model is a prep model that contains the dates of the usage pings for the self-managed instances that powers our SaaS GitLab.com data model.
-{% enddocs %}
-
 {% docs prep_usage_ping_subscription_mapped %}
 This data model is a prep model that depends on prep_usage_ping and supports the creation of dim_usage_ping that will replace PROD.legacy.version_usage_data, dim_usage_pings, version_usage_data_source, and version_raw_usage_data_source in the future.
 
 This curent version is for Sales team only.
 
 Ideally, the purpose of this data model is to identify the usage pings that can be mapped to a subscription.
-{% enddocs %}
-
-{% docs prep_usage_ping_subscription_mapped_wave_2_3_metrics %}
-The purpose of this data model is to identify the usage pings that can be mapped to a subscription and to unpack an initial set ([wave 2-3](https://gitlab.com/gitlab-data/analytics/-/blob/master/transform/snowflake-dbt/macros/version/sales_wave_2_3_metrics.sql)) of priority metrics from the `raw_usage_data_payload` column, strip all the sensitive data out, and then report one value for each metric in that column.
-
-This data model is a prep model that depends on prep_usage_ping and supports the creation of dim_usage_ping that will replace `prod.legacy.version_usage_data`, `dim_usage_pings`, `version_usage_data_source`, and `version_raw_usage_data_source` in the future.
-
-This current version is for Sales team only.
-
-Ideally, the purpose of this data model is to identify the usage pings that can be mapped to a subscription and to unpack all the metrics from the `raw_usage_data_payload` column, strips all the sensitive data out, and has one value for each metric in that column.
-
-The metric list identifed can be found in the macro [`sales_wave_2_3_metrics`](https://gitlab.com/gitlab-data/analytics/-/blob/master/transform/snowflake-dbt/macros/version/sales_wave_2_3_metrics.sql).
 {% enddocs %}
 
 {% docs prep_gainsight_source_model_counts %}
@@ -454,6 +435,20 @@ Prep table for the dim table `dim_user`.
 
 This table is currently the first iteration. This is a relatively narrow table. A lot of metadata needs to be added.
 
+Missing Column Values:
+* Unknown - Value is Null in source data
+* Not Found - Row Not found in source data
+The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:      
+* role 
+* last_activity_date             
+* last_sign_in_date 
+* setup_for_company       
+* jobs_to_be_done
+* for_business_use                 
+* employee_count
+* country
+* state              
+
 {% enddocs %}
 
 {% docs prep_issue %}
@@ -497,189 +492,6 @@ Prep table for the dim table `dim_epic`.
 {% docs prep_note %}
 
 Prep table for the dim table `dim_note`.
-
-{% enddocs %}
-
-
-{% docs prep_monthly_usage_data_28_days %}
-
-This model transforms 28_days counters stored in the usage data payload into monthly proxies. To do so the logic is as follows:
-
-* For one specific instance (instance_uid), one specific metric (metrics_name) and one specific month M, take the latest received data
-
-{% enddocs %}
-
-{% docs prep_monthly_usage_data_all_time %}
-
-This model transforms all_time counters stored in the usage data payload into monthly proxies. To do so the logic is as follows:
-
-* For one specific instance (instance_uid), one specific metric (metrics_name) and one specific month M, take the latest received data
-* Compare this data point with the one received one month before, we have 3 scenarios:
-  * data from month M > data from month M-1: the monthly proxied metric is data(M) - data(M-1)
-  * no data for month M-1: then monthly proxied metric is data(M)
-  * data from month M < data from month M-1: abnormal behavior which might be due to an instance reset, then proxied metric is 0
-
-{% enddocs %}
-
-{% docs prep_usage_data_7_days_flattened %}
-
-The granularity of this model is one row per tuple (metric_name, instance_id).
-
-Usage ping's data is stored in several nested jsons as shown in [this page](https://docs.gitlab.com/ee/development/telemetry/usage_ping.html#example-usage-ping-payload).
-
-Those metrics sent could be of various types:
-* all_time counters (for example how many issues a specific instance has created since its inception)
-* 28_days counters (how many users have created at least one issue over the last 4 weeks)
-* 7_days counters (how many users have created at least one issue over the last 7 days)
-* an instance configuration parameter (has this instance enabled saml/sso)
-
-This model extracts the 7-days counters (based on the mapping table in this spreadsheet) and flattens the json.
-
-The models transforms this json:
-
-```
-{
-  "uuid": "0000000-0000-0000-0000-000000000000",
-  "hostname": "example.com",
-  "version": "12.10.0-pre",
-  ...
-  "analytics_unique_visits": {
-    "g_analytics_contribution": 999,
-    ...
-  },
-  "usage_activity_by_stage_monthly": {
-    "configure": {
-      "project_clusters_enabled": 999,
-      ...
-    },
-    "create": {
-      "merge_requests": 999,
-      ...
-    },
-    "manage": {
-      "events": 999,
-      ...
-    }
-  }
-  }
-```
-
-into this table:
-
-| uuid                                | hostname    | version     | full_metric_path                                                   | clean_metric_name                                      | metric_value |
-|-------------------------------------|-------------|-------------|--------------------------------------------------------------------|--------------------------------------------------------|--------------|
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | analytics_unique_visits.g_analytics_contribution                   | g_analytics_contribution_unique_visitors_count_28_days | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.configure.project_clusters_enabled | project_clusters_ebled_users_count_28_days                     | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.create.merge_requests              | merge_requests_creation_users_count_28_days            | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.manage.events                      | events_users_count_28_days                             | 999          |
-
-
-{% enddocs %}
-
-{% docs prep_usage_data_28_days_flattened %}
-
-The granularity of this model is one row per tuple (metric_name, instance_id).
-
-Usage ping's data is stored in several nested jsons as shown in [this page](https://docs.gitlab.com/ee/development/telemetry/usage_ping.html#example-usage-ping-payload).
-
-Those metrics sent could be of various types:
-* all_time counters (for example how many issues a specific instance has created since its inception)
-* 7_days counters (how many users have created at least one issue over the last 4 weeks)
-* an instance configuration parameter (has this instance enabled saml/sso)
-
-This model extracts the 28-days counters (based on the mapping table in this spreadsheet) and flattens the json.
-
-The models transforms this json:
-
-```
-{
-  "uuid": "0000000-0000-0000-0000-000000000000",
-  "hostname": "example.com",
-  "version": "12.10.0-pre",
-  ...
-  "analytics_unique_visits": {
-    "g_analytics_contribution": 999,
-    ...
-  },
-  "usage_activity_by_stage_monthly": {
-    "configure": {
-      "project_clusters_enabled": 999,
-      ...
-    },
-    "create": {
-      "merge_requests": 999,
-      ...
-    },
-    "manage": {
-      "events": 999,
-      ...
-    }
-  }
-  }
-```
-
-into this table:
-
-| uuid                                | hostname    | version     | full_metric_path                                                   | clean_metric_name                                      | metric_value |
-|-------------------------------------|-------------|-------------|--------------------------------------------------------------------|--------------------------------------------------------|--------------|
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | analytics_unique_visits.g_analytics_contribution                   | g_analytics_contribution_unique_visitors_count_28_days | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.configure.project_clusters_enabled | project_clusters_ebled_users_count_28_days                     | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.create.merge_requests              | merge_requests_creation_users_count_28_days            | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.manage.events                      | events_users_count_28_days                             | 999          |
-
-
-{% enddocs %}
-
-{% docs prep_usage_data_all_time_flattened %}
-
-The granularity of this model is one row per tuple (metric_name, instance_id).
-
-Usage ping's data is stored in several nested jsons as shown in [this page](https://docs.gitlab.com/ee/development/telemetry/usage_ping.html#example-usage-ping-payload).
-
-Those metrics sent could be of various types:
-* all_time counters (for example how many issues a specific instance has created since its inception)
-* 28_days counters (how many users have created at least one issue over the last 4 months)
-* an instance configuration parameter (has this instance enabled saml/sso)
-
-This model extracts the all-time counters (based on the mapping table in this spreadsheet) and flattens the json.
-
-The models transforms this json:
-
-```
-{
-  "uuid": "0000000-0000-0000-0000-000000000000",
-  "hostname": "example.com",
-  "version": "12.10.0-pre",
-  ...
-  "analytics_unique_visits": {
-    "g_analytics_contribution": 999,
-    ...
-  },
-  "usage_activity_by_stage_monthly": {
-    "configure": {
-      "project_clusters_enabled": 999,
-      ...
-    },
-    "create": {
-      "merge_requests": 999,
-      ...
-    },
-    "manage": {
-      "events": 999,
-      ...
-    }
-  }
-  }
-```
-
-into this table:
-
-| uuid                                | hostname    | version     | full_metric_path                                                   | clean_metric_name                                      | metric_value |
-|-------------------------------------|-------------|-------------|--------------------------------------------------------------------|--------------------------------------------------------|--------------|
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | analytics_unique_visits.g_analytics_contribution                   | g_analytics_contribution_unique_visitors_count_all_time | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.configure.project_clusters_enabled_all_time | project_clusters_enabled_users_count_all_time                     | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.create.merge_requests              | merge_requests_creation_users_count_all_time            | 999          |
-| 0000000-0000-0000-0000-000000000000 | example.com | 12.10.0-pre | usage_activity_by_stage_monthly.manage.events                      | events_users_count_all_time                            | 999          |
 
 {% enddocs %}
 

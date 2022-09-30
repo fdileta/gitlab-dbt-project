@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: rpt_available_to_renew_8th_calendar_day
+    description: Snapshot of the daily available to renew model taken on the 8th calendar day after month-end close.
+
+  - name: rpt_available_to_renew_45th_calendar_day
+    description: Snapshot of the daily available to renew model taken on the 45th calendar day after month-end close.

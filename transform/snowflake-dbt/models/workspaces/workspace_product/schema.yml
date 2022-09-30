@@ -1,55 +1,49 @@
 version: 2
 
 models:
-  - name: wk_self_managed_spo
-    description: Workspace model that builds a MVC for Self-Managed SPO and SPU KPIs.
+  - name: wk_customers_db_license_versions
+    tags: ["exception", "product"]
+    description: Self-managed EE instances will send seat link information to the customers portal on a daily basis. This information includes a license version data. Additional detail can be found in [this doc](https://gitlab.com/gitlab-org/customers-gitlab-com/-/blob/staging/doc/reconciliations.md).
     columns:
-      - name: organization_id
-        description: A unique id that is a combination of the host_name and dim_instance_id.
-        tests:
-          - not_null
-      - name: delivery
-        description: delivery is based on the product category name and is either SaaS or Self-Managed delivery.
-        tests:
-          - not_null
-      - name: organization_type
-        description: segmentation for organization type. Values - Group, Individual, User
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['Group','Individual']
-      - name: active_stage_count
-        description: number of active stages for a given organization in a given month
-
-
-  - name: wk_saas_spo
-    description: Workspace model that shows monthly Stages per Organization data on a namespace-level for SaaS.
-    columns:
-      - name: reporting_month
-        description: Month in which the product usage was reported.
-        tests:
-          - not_null
-      - name: organization_id
-        description: Top-level namespace id.
-        tests:
-          - not_null
-      - name: delivery
-        description: delivery is based on the product category name and is either SaaS or Self-Managed delivery.
-        tests:
-          - not_null
-      - name: organization_type
-        description: segmentation for organization type. Values - Group, Individual, User
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['Group','Individual','User']
-      - name: product_tier
-        description: segmentation for Product Tier. Values - Core (CE, EE), Starter, Premium, Ultimate, NULL
-        tests:
-          - not_null
-      - name: is_paid_product_tier
-        description: Denotes whether the organization is on a paid product tier at the time of reporting.
-        tests:
-          - not_null
-      - name: active_stage_count
-        description: number of active stages for a given organization in a given month
+      - name: id
+        description: Pseudo ID generated to simulate Primary Key
+        tags:
+          - customers_db
+      - name: item_id
+        description: Line if for item
+        tags:
+          - customers_db
+      - name: created_at
+        description: Timestamp when the record was created
+        tags:
+          - customers_db
+      - name: item_type
+        description: Item type, for example - License
+        tags:
+          - customers_db
+      - name: event
+        description: Name of the event, for example - create, update
+        tags:
+          - customers_db
+      - name: whodunnit
+        description: Email for licensing
+        tags:
+          - customers_db
+      - name: whodunnit_gitlab
+        description: Email for licensing, contains either @gitlab.com email (value from whodunnit)  or NULL
+        tags:
+          - customers_db
+      - name: whodunnit_gitlab_desc
+        description: Email for licensing, contains either @gitlab.com email or NULL. Can contain `Admin` string
+        tags:
+          - customers_db
+      - name: object
+        description: Details about license
+        tags:
+          - customers_db
+      - name: object_changes
+        description: Details about license changes
+        tags:
+          - customers_db
+      - name: _uploaded_at
+        description: Timestamp when record is inserted in the RAW layer

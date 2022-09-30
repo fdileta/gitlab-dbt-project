@@ -91,4 +91,15 @@ models:
             - version_db
           tests:
             - not_null
-            - unique    
+            - unique
+
+    - name: version_usage_ping_metadata_source
+      description: Service ping metadata.
+      columns:
+        - name: id
+          tags:
+            - tdf
+            - version_db
+          tests:
+            - not_null
+            - unique

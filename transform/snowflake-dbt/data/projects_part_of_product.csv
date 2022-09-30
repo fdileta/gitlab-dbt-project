@@ -43,6 +43,7 @@ gitlab-org/gitlab-foss,13083
 gitlab-org/gitlab-gollum-lib,6043225
 gitlab-org/gitlab-markup,1777822
 gitlab-org/gitlab-mattermost,387896
+gitlab-org/gitlab-metrics-exporter,34770409
 gitlab-org/gitlab-omnibus-builder,145205
 gitlab-org/gitlab-pages,734943
 gitlab-org/gitlab-pages-proto,5981322

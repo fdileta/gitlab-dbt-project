@@ -58,6 +58,7 @@ renamed AS (
     support_level__c AS support_level,
     named_account__c AS named_account,
     billingcountry AS billing_country,
+    billingcountrycode AS billing_country_code,
     billingpostalcode AS billing_postal_code,
     sdr_target_account__c::BOOLEAN AS is_sdr_target_account,
     lam_tier__c AS lam,
@@ -77,6 +78,13 @@ renamed AS (
     ) AS zi_technologies,
     technical_account_manager_date__c::DATE AS technical_account_manager_date,
     gitlab_customer_success_project__c::VARCHAR AS gitlab_customer_success_project,
+    forbes_2000_rank__c AS forbes_2000_rank,
+    potential_users__c AS potential_users,
+    number_of_licenses_this_account__c AS number_of_licenses_this_account,
+    decision_maker_count_linkedin__c AS decision_maker_count_linkedin,
+    numberofemployees                AS number_of_employees,
+    phone AS account_phone,
+    zi_phone__c AS zoominfo_account_phone,
 
     -- territory success planning fields
     atam_approved_next_owner__c AS tsp_approved_next_owner,
@@ -196,6 +204,7 @@ renamed AS (
     zi_parent_company_name__c AS zoom_info_parent_company_name,
     zi_ultimate_parent_company_zoominfo_id__c AS zoom_info_ultimate_parent_company_zi_id,
     zi_ultimate_parent_company_name__c AS zoom_info_ultimate_parent_company_name,
+    zi_number_of_developers__c AS zoom_info_number_of_developers,
 
     -- NF: Added on 20220427 to support EMEA reporting
     key_account__c                     AS is_key_account,

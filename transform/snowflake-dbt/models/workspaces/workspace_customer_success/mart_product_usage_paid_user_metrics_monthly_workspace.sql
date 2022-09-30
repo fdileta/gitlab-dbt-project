@@ -144,7 +144,7 @@
       monthly_sm_metrics.user_container_scanning_jobs_28_days_user,
       monthly_sm_metrics.object_store_packages_enabled,
       monthly_sm_metrics.projects_with_packages_all_time_event,
-      monthly_sm_metrics.projects_with_packages_28_days_user,
+      monthly_sm_metrics.projects_with_packages_28_days_event,
       monthly_sm_metrics.deployments_28_days_user,
       monthly_sm_metrics.releases_28_days_user,
       monthly_sm_metrics.epics_28_days_user,
@@ -372,7 +372,7 @@
       monthly_saas_metrics.user_container_scanning_jobs_28_days_user,
       monthly_saas_metrics.object_store_packages_enabled,
       monthly_saas_metrics.projects_with_packages_all_time_event,
-      monthly_saas_metrics.projects_with_packages_28_days_user,
+      monthly_saas_metrics.projects_with_packages_28_days_event,
       monthly_saas_metrics.deployments_28_days_user,
       monthly_saas_metrics.releases_28_days_user,
       monthly_saas_metrics.epics_28_days_user,
@@ -565,7 +565,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mdrussell",
-    updated_by="@snalamaru",
+    updated_by="@mdrussell",
     created_date="2022-01-14",
-    updated_date="2022-07-27"
+    updated_date="2022-08-26"
 ) }}

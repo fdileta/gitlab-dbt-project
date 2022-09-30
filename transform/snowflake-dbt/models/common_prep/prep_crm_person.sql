@@ -37,12 +37,21 @@ WITH biz_person AS (
     FROM {{ref('sfdc_lead_source')}}
     WHERE is_deleted = 'FALSE'
 
-), crm_person_final AS (
+),  was_converted_lead AS (
+
+    SELECT DISTINCT
+      contact_id,
+      1 AS was_converted_lead
+    FROM {{ ref('sfdc_contact_source') }}
+    INNER JOIN {{ ref('sfdc_lead_source') }}
+      ON sfdc_contact_source.contact_id = sfdc_lead_source.converted_contact_id
+
+),  crm_person_final AS (
 
     SELECT
       --id
-      {{ dbt_utils.surrogate_key(['contact_id']) }} AS dim_crm_person_id,
-      contact_id                                    AS sfdc_record_id,
+      {{ dbt_utils.surrogate_key(['sfdc_contacts.contact_id']) }} AS dim_crm_person_id,
+      sfdc_contacts.contact_id                      AS sfdc_record_id,
       bizible_person_id                             AS bizible_person_id,
       'contact'                                     AS sfdc_record_type,
       contact_email_hash                            AS email_hash,
@@ -59,6 +68,7 @@ WITH biz_person AS (
 
       --info
       person_score,
+      behavior_score,
       contact_title                                 AS title,
       it_job_title_hierarchy,
       has_opted_out_email,
@@ -67,6 +77,7 @@ WITH biz_person AS (
       contact_status                                AS status,
       lead_source,
       lead_source_type,
+      was_converted_lead.was_converted_lead         AS was_converted_lead,
       source_buckets,
       net_new_source_categories,
       bizible_touchpoint_position,
@@ -94,6 +105,7 @@ WITH biz_person AS (
       mailing_country                               AS country,
       mailing_state                                 AS state,
       last_activity_date,
+      NULL                                          AS employee_bucket,
       account_demographics_sales_segment,
       account_demographics_sales_segment_grouped,
       account_demographics_geo,
@@ -108,7 +120,6 @@ WITH biz_person AS (
       account_demographics_upa_city,
       account_demographics_upa_street,
       account_demographics_upa_postal_code,
-
       NULL                                          AS crm_partner_id,
       NULL                                          AS ga_client_id,
       NULL                                          AS cognism_company_office_city,
@@ -117,19 +128,30 @@ WITH biz_person AS (
       NULL                                          AS cognism_city,
       NULL                                          AS cognism_state,
       NULL                                          AS cognism_country,
+      cognism_employee_count,
       NULL                                          AS leandata_matched_account_billing_state,
       NULL                                          AS leandata_matched_account_billing_postal_code,
       NULL                                          AS leandata_matched_account_billing_country,
+      NULL                                          AS leandata_matched_account_employee_count,
+      NULL                                          AS leandata_matched_account_sales_segment,
       zoominfo_contact_city,
       zoominfo_contact_state,
       zoominfo_contact_country,
       zoominfo_company_city,
       zoominfo_company_state,
-      zoominfo_company_country
+      zoominfo_company_country,
+      zoominfo_phone_number, 
+      zoominfo_mobile_phone_number,
+      zoominfo_do_not_call_direct_phone,
+      zoominfo_do_not_call_mobile_phone,
+      NULL                                           AS zoominfo_company_employee_count
+
 
     FROM sfdc_contacts
     LEFT JOIN biz_person_with_touchpoints
       ON sfdc_contacts.contact_id = biz_person_with_touchpoints.bizible_contact_id
+    LEFT JOIN was_converted_lead
+      ON was_converted_lead.contact_id = sfdc_contacts.contact_id
 
     UNION
 
@@ -153,6 +175,7 @@ WITH biz_person AS (
 
       --info
       person_score,
+      behavior_score,
       title,
       it_job_title_hierarchy,
       has_opted_out_email,
@@ -161,6 +184,7 @@ WITH biz_person AS (
       lead_status                                AS status,
       lead_source,
       lead_source_type,
+      0                                          AS was_converted_lead,
       source_buckets,
       net_new_source_categories,
       bizible_touchpoint_position,
@@ -188,6 +212,7 @@ WITH biz_person AS (
       country,
       state,
       last_activity_date,
+      employee_bucket,
       account_demographics_sales_segment,
       account_demographics_sales_segment_grouped,
       account_demographics_geo,
@@ -210,15 +235,23 @@ WITH biz_person AS (
       cognism_city,
       cognism_state,
       cognism_country,
+      cognism_employee_count,
       leandata_matched_account_billing_state,
       leandata_matched_account_billing_postal_code,
       leandata_matched_account_billing_country,
+      leandata_matched_account_employee_count,
+      leandata_matched_account_sales_segment,
       zoominfo_contact_city,
       zoominfo_contact_state,
       zoominfo_contact_country,
       zoominfo_company_city,
       zoominfo_company_state,
-      zoominfo_company_country
+      zoominfo_company_country,
+      zoominfo_phone_number, 
+      zoominfo_mobile_phone_number,
+      zoominfo_do_not_call_direct_phone,
+      zoominfo_do_not_call_mobile_phone,
+      zoominfo_company_employee_count
 
     FROM sfdc_leads
     LEFT JOIN biz_person_with_touchpoints
@@ -227,7 +260,7 @@ WITH biz_person AS (
 
 ), duplicates AS (
 
-    SELECT 
+    SELECT
       dim_crm_person_id
     FROM crm_person_final
     GROUP BY 1
@@ -248,7 +281,7 @@ WITH biz_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@degan",
+    updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-08-09"
+    updated_date="2022-09-27"
 ) }}

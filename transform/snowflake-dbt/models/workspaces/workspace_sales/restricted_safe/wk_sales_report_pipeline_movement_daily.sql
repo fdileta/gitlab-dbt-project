@@ -34,7 +34,8 @@ WITH date_details AS (
     date_actual                       AS report_date,
     day_of_fiscal_quarter_normalised  AS report_day_of_fiscal_quarter_normalised,
     fiscal_quarter_name_fy            AS report_fiscal_quarter_name,
-    first_day_of_fiscal_quarter       AS report_fiscal_quarter_date
+    first_day_of_fiscal_quarter       AS report_fiscal_quarter_date,
+    fiscal_year                       AS report_fiscal_year
   FROM date_details
   
 )
@@ -47,6 +48,7 @@ WITH date_details AS (
     report.report_day_of_fiscal_quarter_normalised,
     report.report_fiscal_quarter_name,
     report.report_fiscal_quarter_date,
+    report.report_fiscal_year,
   
     pipe.opportunity_id,
     pipe.min_snapshot_date,

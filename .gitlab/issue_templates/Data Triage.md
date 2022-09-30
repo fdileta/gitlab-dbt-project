@@ -117,16 +117,7 @@ Post notices to #data and cross-post to #whats-happening-at-gitlab
 
 #### GitLab.com
 
-We have identified a delay in the `GitLab.com` data refresh and this problem potentially also delays data for GitLab KPIs (e.g. MR Rate, TMAU) or SiSense dashboards. We are actively working on a resolution and will provide an update once the KPIs and SiSense dashboards have been brought up-to-date.
-
-The `GitLab.com` data in the warehouse and downstream models is accurate as of `YYYY-MM-DD HH:MM UTC (HH:MM PST)`.
-
-The DRI for this incident is `@username`.
-
-The link to the Data Team Incident issue is <link>
-
-`CC @Mek Stittri, @Christopher Lefelhocz, @WayneHaber,  @Steve Loyd, @lily, @kwiebers, @Davis Townsend, @s_awezec, @product-analysts`
-
+Follow the [runbook](https://gitlab.com/gitlab-data/runbooks/-/blob/main/Gitlab_dotcom/Gitlab_DB_recreation_failure.md) for the communication around GitLab.com data incidents.
 
 #### Salesforce
 
@@ -138,7 +129,7 @@ The DRI for this incident is `@username`.
 
 The link to the Data Team Incident issue is <link>
 
-`CC @Jake Bielecki, @Matt Benzaquen, @Jack Brennan, @Craig Mestel`
+`CC @Jake Bielecki, @Jack, @Craig Mestel @product-analysts @datateam`
 
 #### Zuora
 
@@ -150,7 +141,7 @@ The DRI for this incident is `@username`.
 
 The link to the Data Team Incident issue is <link>
 
-`CC @Jake Bielecki, @Matt Benzaquen, @Jack Brennan, @Craig Mestel`
+`CC @Jake Bielecki,  @Jack, @Craig Mestel @product-analysts @datateam`
 
 #### General
 

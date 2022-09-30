@@ -1,0 +1,375 @@
+version: 2
+
+models:
+  - name: mart_arr
+    description: '{{ doc("mart_arr") }}'
+    columns:
+      - name: arr
+        description: "Calculated as 12 * MRR value"
+      - name: primary_key
+        tests:
+          - not_null
+          - unique
+      - name: is_reseller
+        description: Identify whether a crm_account is a reseller.
+      - name: subscription_sales_type
+        description: Identifies whether a subscription is Sales-Assisted or Self-Service / Web Direct.
+      - name: billing_account_number
+        tests:
+          - not_null
+      - name: subscription_name_slugify
+        tests:
+          - not_null
+      - name: subscription_name
+        tests:
+          - not_null
+      - name: oldest_subscription_in_cohort
+      - name: subscription_lineage
+      - name: arr_month
+        tests:
+          - not_null
+      - name: subscription_cohort_month
+      - name: subscription_cohort_quarter
+      - name: mrr
+        tests:
+          - not_null
+      - name: months_since_subscription_cohort_start
+      - name: quarters_since_subscription_cohort_start
+      - name: dim_billing_account_id
+        tests:
+          - not_null
+      - name: billing_account_name
+        tests:
+          - not_null
+      - name: product_tier_name
+        tests:
+          - not_null
+      - name: unit_of_measure
+      - name: quantity
+      - name: dim_crm_account_id
+      - name: crm_account_name
+      - name: ultimate_parent_account_id
+      - name: ultimate_parent_account_name
+      - name: billing_account_cohort_month
+      - name: billing_account_cohort_quarter
+      - name: crm_account_cohort_month
+      - name: crm_account_cohort_quarter
+        description: '{{ doc("mart_arr_col_parent_account_cohort_month") }}'
+      - name: parent_account_cohort_quarter
+        description: '{{ doc("mart_arr_col_parent_account_cohort_quarter") }}'
+      - name: months_since_billing_account_cohort_start
+      - name: quarters_since_billing_account_cohort_start
+      - name: months_since_crm_account_cohort_start
+      - name: quarters_since_crm_account_cohort_start
+      - name: months_since_parent_account_cohort_start
+        description: '{{ doc("mart_arr_col_months_since_parent_cohort_start") }}'
+      - name: quarters_since_parent_account_cohort_start
+        description: '{{ doc("mart_arr_col_quarters_since_parent_cohort_start") }}'
+      - name: dim_subscription_id
+      - name: dim_subscription_id_original
+      - name: was_purchased_through_reseller
+        description: Boolean field that indicates whether the subscription was purchased through a reseller. If TRUE, the `invoice_owner_account` will contain the name of the reseller.
+      - name: is_licensed_user
+        description: Flag to identify licensed users. It works by excluding `Storage` product_tier
+      - name: is_arpu
+        description: Flag to identify what counts towards Annual Revenue Per User (ARPU). It works by excluding `Storage` product_tier and `EDU` product_rate_plan.
+
+  - name: mart_arr_jihu
+    description: '{{ doc("mart_arr_jihu") }}'
+    columns:
+      - name: arr
+        description: "Calculated as 12 * MRR value"
+      - name: primary_key
+        tests:
+          - not_null
+          - unique
+      - name: is_reseller
+        description: Identify whether a crm_account is a reseller.
+      - name: subscription_sales_type
+        description: Identifies whether a subscription is Sales-Assisted or Self-Service / Web Direct.
+      - name: billing_account_number
+        tests:
+          - not_null
+      - name: subscription_name_slugify
+        tests:
+          - not_null
+      - name: subscription_name
+        tests:
+          - not_null
+      - name: oldest_subscription_in_cohort
+      - name: subscription_lineage
+      - name: arr_month
+        tests:
+          - not_null
+      - name: subscription_cohort_month
+      - name: subscription_cohort_quarter
+      - name: mrr
+        tests:
+          - not_null
+      - name: months_since_subscription_cohort_start
+      - name: quarters_since_subscription_cohort_start
+      - name: dim_billing_account_id
+        tests:
+          - not_null
+      - name: billing_account_name
+        tests:
+          - not_null
+      - name: product_tier_name
+        tests:
+          - not_null
+      - name: unit_of_measure
+      - name: quantity
+      - name: dim_crm_account_id
+      - name: crm_account_name
+      - name: ultimate_parent_account_id
+      - name: ultimate_parent_account_name
+      - name: billing_account_cohort_month
+      - name: billing_account_cohort_quarter
+      - name: crm_account_cohort_month
+      - name: crm_account_cohort_quarter
+        description: '{{ doc("mart_arr_col_parent_account_cohort_month") }}'
+      - name: parent_account_cohort_quarter
+        description: '{{ doc("mart_arr_col_parent_account_cohort_quarter") }}'
+      - name: months_since_billing_account_cohort_start
+      - name: quarters_since_billing_account_cohort_start
+      - name: months_since_crm_account_cohort_start
+      - name: quarters_since_crm_account_cohort_start
+      - name: months_since_parent_account_cohort_start
+        description: '{{ doc("mart_arr_col_months_since_parent_cohort_start") }}'
+      - name: quarters_since_parent_account_cohort_start
+        description: '{{ doc("mart_arr_col_quarters_since_parent_cohort_start") }}'
+      - name: dim_subscription_id
+      - name: dim_subscription_id_original
+
+  - name: mart_arr_snapshot_bottom_up
+    description: Daily snapshots of MRR/ARR by month values per customer, subscription and product. Built using the snapshotted source tables.
+    columns:
+      - name: primary_key
+        tests:
+          - unique
+          - not_null
+        tags: ["tdf", "mart", "arr"]
+      - name: was_purchased_through_reseller
+        description: Boolean field that indicates whether the subscription was purchased through a reseller. If TRUE, the `invoice_owner_account` will contain the name of the reseller.
+
+  - name: mart_arr_snapshot_model
+    description: Simpler incremental version of the mart_arr snapshot model
+    columns:
+        - name: primary_key
+          tests:
+            - not_null
+          tags: [ "tdf", "mart", "arr" ]
+
+  - name: mart_charge
+    description: Model combining Subscription related objects such as product details and rate plan charge details into a mart.
+    columns:
+      - name: dim_charge_id
+        description: The unique identifier of a rate plan charge
+        tests:
+          - not_null
+          - unique
+      - name: was_purchased_through_reseller
+        description: Boolean field that indicates whether the subscription was purchased through a reseller. If TRUE, the `invoice_owner_account` will contain the name of the reseller.
+
+  - name: mart_crm_account
+    description: Model containing Salesforce crm accounts details for existing and historical customers.
+    columns:
+      - name: dim_crm_account_id
+        tests:
+            - not_null
+            - unique
+
+  - name: mart_crm_opportunity
+    description: Model with single pane of glass sales and marketing metrics.
+    columns:
+      - name: dim_crm_opportunity_id
+        tests:
+            - not_null
+            - unique
+        tags: ["tdf", "mart", "sales_funnel"]
+
+  - name: mart_crm_opportunity_daily_snapshot
+    description: Model with single pane of glass sales and marketing metrics, snapshotted daily.
+    columns:
+      - name: crm_opportunity_snapshot_id
+        tests:
+            - not_null
+            - unique
+        tags: ["tdf", "mart", "sales_funnel"]
+      - name: dim_crm_opportunity_id
+        tests:
+            - not_null
+      - name: snapshot_date
+        tests:
+          - not_null
+
+  - name: mart_crm_opportunity_stamped_hierarchy_hist
+    description: >-
+      Model with single pane of glass over the sales and marketing metrics.
+      It differs from `mart_crm_opportunity` by using the live sales hierarchy, from the account object, for the stamped fields
+      when the fiscal year is below the current one.
+      Also, for the `alliance_type` field it has the current state of the field instead of the historical version of it. For example,
+      instead of showing the value Non-Alliance it shows Channel Partners.
+    columns:
+      - name: dim_crm_opportunity_id
+        tests:
+            - not_null
+            - unique
+        tags: ["tdf", "mart", "sales_funnel"]
+
+  - name: mart_sales_funnel_target
+    description: Model with Sales targets used for planning the go to market Sales and Marketing motion.
+    columns:
+      - name: sales_funnel_target_id
+        tests:
+            - not_null
+            - unique
+        tags: ["tdf", "mart", "sales_funnel"]
+
+  - name: mart_sales_funnel_target_daily
+    description: Model with Sales targets at a daily level and with QTD (Quater To Date), MTD (Month To Date) and YTD (Year To Date) target calculations.
+    columns:
+      - name: primary_key
+        tests:
+            - not_null
+            - unique
+        tags: ["tdf", "mart", "sales_funnel"]
+      - name: report_target_date
+        description: Target_Date + 1. This is used in Sisense when comparing QTD targets vs actuals for the current date.
+      - name: mtd_allocated_target
+        description: Month To Date allocated target.
+      - name: qtd_allocated_target
+        description: Quarter To Date allocated target.
+      - name: ytd_allocated_target
+        description: Year To Date allocated target.
+
+  - name: mart_sales_funnel_partner_alliance_target
+    description: Model with Sales targets for partner and alliances used for planning the go to market Sales and Marketing motion.
+    columns:
+      - name: sales_funnel_partner_alliance_target_id
+        tests:
+            - not_null
+            - unique
+        tags: ["tdf", "mart", "sales_funnel"]
+
+  - name: mart_sales_funnel_partner_alliance_target_daily
+    description: Model with Sales targets for partner and alliances at a daily level and with QTD (Quater To Date), MTD (Month To Date) and YTD (Year To Date) target calculations.
+    columns:
+      - name: primary_key
+        tests:
+            - not_null
+            - unique
+        tags: ["tdf", "mart", "sales_funnel"]
+      - name: report_target_date
+        description: Target_Date + 1. This is used in Sisense when comparing QTD targets vs actuals for the current date.
+      - name: mtd_allocated_target
+        description: Month To Date allocated target.
+      - name: qtd_allocated_target
+        description: Quarter To Date allocated target.
+      - name: ytd_allocated_target
+        description: Year To Date allocated target.
+
+  - name: mart_discount_arr
+    description: Model with Invoiced ARR used to calculate discounts across various dimensions.
+    columns:
+      - name: primary_key
+        description: Unique identifier of a product charge on the invoice amortized by month.
+        tests:
+            - not_null
+            - unique
+        tags: ["tdf", "mart", "arr"]
+      - name: is_myb
+        description: Identifies if a subscription charge is for a multiple year term.
+      - name: current_term_months
+        description: Term of the subscription in months.
+      - name: current_term_years
+        description: Term of the subscription in years. Rounds to the one decimal point. For examples, an 18 month term subscription will be a 1.5 year term.
+
+  - name: mart_delta_arr_parent_month
+    description: "Mart table by month pursuant to the ARR Analysis Framework at the parent customer level"
+    columns:
+      - name: primary_key
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "mart", "arr"]
+
+  - name: mart_delta_arr_parent_product_month
+    description: "Mart table by month pursuant to the ARR Analysis Framework at the parent customer || product category level"
+    columns:
+      - name: primary_key
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "mart", "arr"]
+      - name: product_tier_name
+        tests:
+          - not_null
+        tags: ["tdf", "mart", "arr"]
+      - name: product_delivery_type
+        tests:
+          - not_null
+        tags: ["tdf", "mart", "arr"]
+      - name: product_ranking
+        tests:
+          - not_null
+        tags: ["tdf", "mart", "arr"]
+
+  - name: mart_delta_arr_subscription_product_month
+    description: "Mart table by month purusant to the ARR Analysis Framework at the subscription || product_category level"
+    columns:
+      - name: primary_key
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "mart", "arr"]
+      - name: product_category
+        tests:
+          - not_null
+        tags: ["tdf", "mart", "arr"]
+      - name: delivery
+        tests:
+          - not_null
+        tags: ["tdf", "mart", "arr"]
+      - name: product_ranking
+        tests:
+          - not_null
+        tags: ["tdf", "mart", "arr"]
+
+  - name: mart_delta_arr_subscription_month
+    description: "Mart table by month purusant to the ARR Analysis Framework at the subscription level"
+    columns:
+      - name: primary_key
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "mart", "arr"]
+
+  - name: mart_retention_parent_account_product
+    description: "Mart table to support retention analysis at the ultimate_parent_account || product level."
+    columns:
+      - name: primary_key
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "mart", "arr"]
+
+  - name: mart_retention_crm_account
+    description: "Mart table to support drillable retention analysis by the CRM account grain."
+    columns:
+    - name: fct_retention_id
+      description: A unique identifier of the retention record.
+      tests:
+        - not_null
+        - unique
+      tags: ["tdf", "mart", "arr", "retention"]
+
+  - name: mart_retention_parent_account
+    description: "Mart table to support drillable retention analysis by the Parent CRM account grain"
+    columns:
+    - name: fct_retention_id
+      description: A unique identifier of the retention record.
+      tests:
+        - not_null
+        - unique
+      tags: ["tdf", "mart", "arr", "retention"]

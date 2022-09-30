@@ -1,6 +1,6 @@
 WITH source AS (
 
-    SELECT *
+    SELECT {{ hash_sensitive_columns('marketo_activity_visit_webpage_source') }}
     FROM {{ ref('marketo_activity_visit_webpage_source') }}
 
 )

@@ -46,7 +46,7 @@ default_args = {
 dag = DAG(
     "gcp_billing_extract_partition",
     default_args=default_args,
-    schedule_interval="20 4 * * *",
+    schedule_interval="0 0/8 * * *",
     concurrency=1,
 )
 
@@ -70,7 +70,11 @@ billing_operator = KubernetesPodOperator(
         SNOWFLAKE_LOAD_WAREHOUSE,
         SNOWFLAKE_LOAD_PASSWORD,
     ],
-    env_vars={**pod_env_vars, "START_TIME": "{{ yesterday_ds }}"},
+    env_vars={
+        **pod_env_vars,
+        "START_TIME": "{{ prev_execution_date }}",
+        "END_TIME": "{{ execution_date }}",
+    },
     affinity=get_affinity(False),
     tolerations=get_toleration(False),
     arguments=[billing_extract_command],

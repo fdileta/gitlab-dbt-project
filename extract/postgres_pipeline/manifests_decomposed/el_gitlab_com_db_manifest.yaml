@@ -792,7 +792,7 @@ tables:
     import_db: GITLAB_DB
     import_query: |-
       SELECT id
-      , service_id
+      , integration_id
       , created_at
       , updated_at
       , jira_issue_transition_id
@@ -947,6 +947,7 @@ tables:
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
   merge_request_metrics:
+    additional_filtering: AND COALESCE(first_comment_at,'3000-01-01 00:00:00.000'::TIMESTAMP) >= '2000-01-01 00:00:00.000'::TIMESTAMP
     dbt_source_model: true
     export_schema: 'gitlab_com'
     export_table: 'merge_request_metrics'
@@ -978,7 +979,6 @@ tables:
       FROM merge_request_metrics
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
-        AND first_comment_at >= '2000-01-01 00:00:00.000'::timestamp
   merge_requests:
     dbt_source_model: true
     export_schema: 'gitlab_com'
@@ -1393,7 +1393,7 @@ tables:
       , mirror
       , mirror_user_id
       , shared_runners_enabled
-      , build_coverage_regex
+      , NULL AS build_coverage_regex
       , build_allow_git_fetch
       , build_timeout
       , mirror_trigger_builds
@@ -1744,7 +1744,7 @@ tables:
     import_db: GITLAB_DB
     import_query: |-
       SELECT id
-      , service_id
+      , integration_id
       , team_id
       , team_name
       , alias
@@ -1949,7 +1949,7 @@ tables:
       , setup_for_company
       , render_whitespace_in_code
       , tab_width
-      , experience_level
+      , NULL as experience_level
       , view_diffs_file_by_file
       , id
       , gitpod_enabled
