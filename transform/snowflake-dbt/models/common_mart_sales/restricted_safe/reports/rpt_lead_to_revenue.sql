@@ -599,7 +599,7 @@
     WHEN first_country = 'congo' THEN 'emea'
     WHEN first_country = 'cook islands' THEN 'apac'
     WHEN first_country = 'costa rica' THEN 'amer'
-    WHEN first_country LIKE 'cote' AND first_county LIKE 'ivoire' THEN 'emea'
+    WHEN first_country LIKE 'cote' AND first_country LIKE 'ivoire' THEN 'emea'
     WHEN first_country = 'croatia' THEN 'emea'
     WHEN first_country = 'cuba' THEN 'amer'
     WHEN first_country = 'curacao' THEN 'amer'
