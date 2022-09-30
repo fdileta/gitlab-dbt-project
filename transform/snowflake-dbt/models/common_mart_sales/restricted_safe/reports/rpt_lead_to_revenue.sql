@@ -791,7 +791,7 @@
     WHEN first_country = 'moldova, republic of' THEN 'emea'
     WHEN first_country = 'russian federation' THEN 'emea'
     WHEN first_country = 'viet nam' THEN 'apac' 
-  END AS geo
+  END AS geo,
   
     --opportunity data
     cohort_base.opp_created_date,
@@ -812,8 +812,7 @@
     cohort_base.crm_opp_owner_area_stamped,
     cohort_base.parent_crm_account_demographics_upa_country,
     cohort_base.parent_crm_account_demographics_territory,
-    cohort_base.parent_crm_account_demographics_territory,
-    cohort_base.dim_crm_user_id AS opp_dim_crm_user_id,
+    cohort_base.opp_dim_crm_user_id,
     cohort_base.duplicate_opportunity_id,
     cohort_base.merged_crm_opportunity_id,
     cohort_base.record_type_id,
