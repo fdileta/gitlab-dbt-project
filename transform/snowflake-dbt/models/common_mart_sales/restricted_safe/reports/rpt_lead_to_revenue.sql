@@ -414,7 +414,7 @@
     cohort_base.sfdc_record_id,
     cohort_base.dim_crm_account_id,
     cohort_base.opp_dim_crm_account_id,
-    cohort.base.opp_dim_parent_crm_account_id,
+    cohort_base.opp_dim_parent_crm_account_id,
   
     --person data
     CASE 
