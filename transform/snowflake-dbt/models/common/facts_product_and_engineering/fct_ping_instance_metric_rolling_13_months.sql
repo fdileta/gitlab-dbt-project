@@ -4,7 +4,7 @@
     unique_key='ping_instance_metric_id',
     on_schema_change='sync_all_columns',
     full_refresh=false,
-    post_hook=["DELETE FROM {{ this }} WHERE DATE_TRUNC(MONTH, ping_created_date) < DATEADD(MONTH, -13, DATE_TRUNC(MONTH,CURRENT_DATE))"]        
+    post_hook=["{{ rolling_window_delete('ping_created_date','month',13) }}"]        
 ) }}
 
 {{ simple_cte([
