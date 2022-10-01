@@ -1,7 +1,6 @@
 {{ simple_cte([
     ('dim_crm_account','dim_crm_account'),
     ('mart_crm_opportunity','mart_crm_opportunity'),
-    ('rpt_sdr_ramp_daily','rpt_sdr_ramp_daily'),
     ('mart_crm_person','mart_crm_person'),
     ('dim_crm_user','dim_crm_user')
     
@@ -159,9 +158,7 @@
       mart_crm_opportunity.is_edu_oss,
       mart_crm_opportunity.stage_name,
       mart_crm_opportunity.is_sao,
-      CASE WHEN dim_crm_user.crm_user_sales_segment = 'Other' THEN rpt_sdr_ramp_daily.sdr_segment
-           ELSE dim_crm_user.crm_user_sales_segment
-      END AS user_sales_segment,
+      dim_crm_user.crm_user_sales_segment
       CASE WHEN is_first_order_available = False THEN mart_crm_opportunity.order_type
            ELSE '1. New - First Order'
       END AS person_order_type,
@@ -173,8 +170,6 @@
       ON mart_crm_person.dim_crm_account_id=mart_crm_opportunity.dim_crm_account_id
     LEFT JOIN dim_crm_user 
       ON mart_crm_person.dim_crm_user_id=dim_crm_user.dim_crm_user_id
-    LEFT JOIN rpt_sdr_ramp_daily 
-      ON mart_crm_person.dim_crm_user_id=rpt_sdr_ramp_daily.dim_crm_user_id
     LEFT JOIN upa_base 
       ON mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps 
@@ -185,8 +180,8 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@rkohnke",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2022-01-20",
-    updated_date="2022-03-30",
+    updated_date="2022-10-01",
   ) }}
 
