@@ -148,7 +148,7 @@ WITH page_url_information AS (
       WHEN prep_snowplow_structured_event_all_source.page_url_path LIKE '%/-/billings' 
         THEN 'Settings - Billings'  
       ELSE 'Other' 
-    END AS url_path_regex,
+    END AS url_path_category,
     CASE 
      WHEN 
      ( 

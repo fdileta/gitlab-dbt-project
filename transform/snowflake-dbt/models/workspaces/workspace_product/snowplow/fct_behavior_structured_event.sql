@@ -1,9 +1,10 @@
 {{config({
-    "materialized":"incremental",
-    "unique_key":"behavior_structured_event_pk",
-    "full_refresh":false,
-    "on_schema_change":"sync_all_columns"
 
+        "unique_key":"behavior_structured_event_pk",
+        "materialized":"vault_insert_by_period",
+        "period":"month",
+        "timestamp_field":"BEHAVIOR_AT",
+        "start_date": "2020-09-01" 
   })
 
 }}
@@ -12,17 +13,12 @@
     ('dim_behavior_page_url_path', 'dim_behavior_page_url_path'),
     ('dim_behavior_website_page', 'dim_behavior_website_page'),
     ('dim_behavior_browser', 'dim_behavior_browser'),
-    ('dim_behavior_operating_system', 'dim_behavior_operating_system')
+    ('dim_behavior_operating_system', 'dim_behavior_operating_system'),
+    ('prep_snowplow_structured_event_all_source', 'prep_snowplow_structured_event_all_source')
     ])
 }}
 
-, prep_snowplow_structured_event_all_source AS (
-
-    SELECT *
-    FROM {{ ref('prep_snowplow_structured_event_all_source') }}
-    WHERE derived_tstamp BETWEEN '2022-08-01' AND '2022-09-30'
-
-), structured_events_w_dim AS (
+, structured_events_w_dim AS (
 
     SELECT
 
@@ -81,12 +77,13 @@
     LEFT JOIN dim_behavior_operating_system
       ON prep_snowplow_structured_event_all_source.os_name = dim_behavior_operating_system.os_name
         AND prep_snowplow_structured_event_all_source.os_timezone = dim_behavior_operating_system.os_timezone
+    WHERE __PERIOD_FILTER__
+    
     {% if is_incremental() %}
 
-    WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
+    AND behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
 
     {% endif %}
-
 )
 
 {{ dbt_audit(
