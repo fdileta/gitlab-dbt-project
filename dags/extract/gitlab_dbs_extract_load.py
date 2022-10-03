@@ -240,7 +240,7 @@ def extract_table_list_from_manifest(manifest_contents):
 
 
 # Sync DAG
-sync_dag_args = {
+incremental_backfill_dag_args = {
     "catchup": False,
     "depends_on_past": False,
     "on_failure_callback": slack_failed_task,
@@ -250,13 +250,25 @@ sync_dag_args = {
     "dagrun_timeout": timedelta(hours=10),
     "trigger_rule": "all_success",
 }
+
+scd_dag_args = {
+    "catchup": False,
+    "depends_on_past": False,
+    "on_failure_callback": slack_failed_task,
+    "owner": "airflow",
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
+    "dagrun_timeout": timedelta(hours=10),
+    "trigger_rule": "all_success",
+}
+
 # Extract DAG
 extract_dag_args = {
     "catchup": True,
     "depends_on_past": False,
     "on_failure_callback": slack_failed_task,
     "owner": "airflow",
-    "retries": 0,
+    "retries": 1,
     "retry_delay": timedelta(minutes=1),
     "sla": timedelta(hours=8),
     "sla_miss_callback": slack_failed_task,
@@ -267,7 +279,7 @@ extract_dag_args = {
 for source_name, config in config_dict.items():
     if "scd" not in source_name:
         extract_dag_args["start_date"] = config["start_date"]
-        sync_dag_args["start_date"] = config["start_date"]
+        incremental_backfill_dag_args["start_date"] = config["start_date"]
 
         extract_dag = DAG(
             f"{config['dag_name']}_db_extract",
@@ -321,7 +333,7 @@ for source_name, config in config_dict.items():
 
         incremental_backfill_dag = DAG(
             f"{config['dag_name']}_db_incremental_backfill",
-            default_args=sync_dag_args,
+            default_args=incremental_backfill_dag_args,
             schedule_interval=config["extract_schedule_interval"],
             concurrency=1,
             description=config["description_incremental"],
@@ -367,12 +379,12 @@ for source_name, config in config_dict.items():
             f"{config['dag_name']}_db_incremental_backfill"
         ] = incremental_backfill_dag
     else:
-        sync_dag_args["start_date"] = config["start_date"]
+        scd_dag_args["start_date"] = config["start_date"]
         sync_dag = DAG(
             f"{config['dag_name']}_db_sync",
-            default_args=sync_dag_args,
+            default_args=scd_dag_args,
             schedule_interval=config["extract_schedule_interval"],
-            concurrency=8,
+            concurrency=6,
             description=config["description"],
         )
 
