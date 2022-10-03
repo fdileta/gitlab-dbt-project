@@ -35,7 +35,3 @@ def test_get_md5():
         assert len(res) == 32  # bytes in hex representation
         # As this is one-way function, can't test it with many things - let see to we have all details with various inputs
         assert res is not None
-
-
-if __name__ == "__main__":
-    test_get_md5()
