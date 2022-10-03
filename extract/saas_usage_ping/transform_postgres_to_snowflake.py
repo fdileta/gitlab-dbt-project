@@ -53,9 +53,10 @@ def get_sql_query_map(private_token: str = None) -> Dict[Any, Any]:
     response = requests.get(
         "https://gitlab.com/api/v4/usage_data/queries", headers=headers
     )
-    source_json_data = json.loads(response.text)
 
-    return source_json_data
+    response.raise_for_status()
+
+    source_json_data = json.loads(response.text)
 
 
 def get_trimmed_token(token: List[str]) -> List[str]:

@@ -6,7 +6,7 @@ import pytest
 
 import sqlparse
 
-from extract.saas_usage_ping.transform_instance_level_queries_to_snowsql import (
+from extract.saas_usage_ping.transform_postgres_to_snowflake import (
     META_API_COLUMNS,
     TRANSFORMED_INSTANCE_QUERIES_FILE,
     META_DATA_INSTANCE_QUERIES_FILE,
