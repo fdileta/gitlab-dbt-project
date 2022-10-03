@@ -1,7 +1,7 @@
 {{
   config(
     materialized='incremental',
-    unique_key='snowflake_query_id',
+    unique_key='query_id',
     on_schema_change='append_new_columns'
   )
 }}
@@ -85,7 +85,7 @@ renamed AS (
   {% if is_incremental() %}
 
   -- this filter will only be applied on an incremental run
-  WHERE query_end_time > (SELECT MAX(query_end_time)  FROM {{ this }})
+  WHERE end_time > (SELECT MAX(end_time)  FROM {{ this }})
 
   {% endif %}
   
