@@ -111,20 +111,6 @@ def test_transform_postgres_snowflake() -> None:
     assert actual == transform(input_query)
 
 
-def test_input_query_class_init() -> None:
-    """
-    Assure InputQuery class working fine
-    :return: None
-    """
-    query = InputQuery(
-        metrics_name="test_metric_input_query", postgres_query="SELECT 1"
-    )
-
-    assert query.metrics_name == "test_metric_input_query"
-
-    assert query.postgres_query == "SELECT 1"
-
-
 def test_transforming_queries():
     """
     Test case: for transforming queries from Postgres to Snowflake
