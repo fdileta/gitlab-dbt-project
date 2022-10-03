@@ -50,13 +50,15 @@ def get_sql_query_map(private_token: str = None) -> Dict[Any, Any]:
         "PRIVATE-TOKEN": private_token,
     }
 
-    response = requests.get(
-        "https://gitlab.com/api/v4/usage_data/queries", headers=headers
-    )
+    url = "https://gitlab.com/api/v4/usage_data/queries"
+
+    response = requests.get(url=url, headers=headers)
 
     response.raise_for_status()
 
     source_json_data = json.loads(response.text)
+
+    return source_json_data
 
 
 def get_trimmed_token(token: List[str]) -> List[str]:
@@ -174,11 +176,11 @@ def get_keyword_index(token_list: list, defined_keyword: str) -> int:
     return 0
 
 
-def get_payload(json: Dict[Any, Any]) -> dict:
+def get_payload(json_payload: Dict[Any, Any]) -> dict:
     """
     Prepare flattened payload for processing
     """
-    return flatten(d=json, reducer=make_reducer(delimiter="."))
+    return flatten(d=json_payload, reducer=make_reducer(delimiter="."))
 
 
 def get_sql_dict(payload: dict) -> dict:
@@ -200,13 +202,13 @@ def get_sql_dict(payload: dict) -> dict:
     return res
 
 
-def get_row_queries(json_data: Dict[Any, Any]) -> Dict[Any, Any]:
+def get_row_queries(json_queries: Dict[Any, Any]) -> Dict[Any, Any]:
     """
     function that transforms the given json file
     into a Python dict with only SQL batch counters
     """
 
-    payload = get_payload(json=json_data)
+    payload = get_payload(json_payload=json_queries)
 
     sql_dict = get_sql_dict(payload=payload)
 
@@ -325,13 +327,17 @@ def get_renamed_table_name(
 ) -> None:
     """
     Replaces the table name in the query -
-    represented as the list of tokens, to make it able to run in Snowflake
+    represented as the list of tokens,
+    to make it able to run in Snowflake
 
     Does this by prepending `prep.gitlab_dotcom.gitlab_dotcom_`
     to the table name in the query and then appending `_dedupe_source`
 
-    Input: SELECT 1 FROM some_table
-    Output: SELECT 1 FROM prep.gitlab_dotcom.gitlab_dotcom_some_table_dedupe_source
+    Input:
+    SELECT 1 FROM some_table
+
+    Output:
+    SELECT 1 FROM prep.gitlab_dotcom.gitlab_dotcom_some_table_dedupe_source
     """
 
     # comprehensive list of all the keywords that are followed by a table name
@@ -474,7 +480,7 @@ def transform(query_dict: Dict[Any, Any]) -> Dict[Any, Any]:
     Main input point to transform queries
     """
 
-    raw = get_row_queries(json_data=query_dict)
+    raw = get_row_queries(json_queries=query_dict)
 
     prepared = get_prepared_queries(raw_queries=raw)
 
@@ -505,8 +511,8 @@ def save_json_file(file_name: str, json_file: dict) -> None:
     param json_file: dict
     rtype: None
     """
-    with open(file=file_name, mode="w", encoding="utf-8") as f:
-        json.dump(json_file, f)
+    with open(file=file_name, mode="w", encoding="utf-8") as wr_file:
+        json.dump(json_file, wr_file)
 
 
 if __name__ == "__main__":
@@ -517,9 +523,11 @@ if __name__ == "__main__":
     )
 
     info("Processed sql queries")
+
     final_sql_query_dict = transform(query_dict=json_data)
 
     final_meta_data = keep_meta_data(json_data)
+
     info("Processed final sql queries")
 
     save_json_file(
