@@ -74,7 +74,7 @@ dag = DAG("saas_usage_ping", default_args=default_args, schedule_interval="0 7 *
 instance_cmd = f"""
     {clone_repo_cmd} &&
     cd analytics/extract/saas_usage_ping/ &&
-    python3 transform_instance_level_queries_to_snowsql.py &&
+    python3 transform_postgres_to_snowflake.py &&
     python3 usage_ping.py saas_instance_ping
 """
 
