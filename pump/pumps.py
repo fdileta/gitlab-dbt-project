@@ -66,7 +66,7 @@ def copy_data(model, sensitive, timestamp, inc_start, inc_end, stage):
             model, sensitive, timestamp, inc_start, inc_end, stage
         )
         logging.info(f"running copy command {copy_command}")
-        connection.execute(copy_command).fetchone()
+        # connection.execute(copy_command).fetchone()
     except:
         logging.info("Failed to run copy command...")
         raise
