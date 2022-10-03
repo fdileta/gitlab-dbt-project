@@ -18,7 +18,6 @@
 
       -- Foreign Keys
       fct_behavior_structured_event.dim_behavior_website_page_sk,
-      fct_behavior_structured_event.dim_behavior_page_url_path_sk,
       fct_behavior_structured_event.dim_behavior_browser_sk,
       fct_behavior_structured_event.dim_behavior_operating_system_sk,
       fct_behavior_structured_event.dim_namespace_id,
@@ -70,5 +69,5 @@
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-09-01",
-    updated_date="2022-09-28"
+    updated_date="2022-10-03"
 ) }}
