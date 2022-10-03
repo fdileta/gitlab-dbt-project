@@ -7,6 +7,8 @@ models:
     description: '{{ doc("gitlab_dotcom_dedupe_source_scd") }}'
   - name: gitlab_dotcom_group_import_states_dedupe_source
     description: '{{ doc("gitlab_dotcom_dedupe_source_scd") }}'
+  - name: gitlab_dotcom_jira_connect_installations_dedupe_source
+    description: '{{ doc("gitlab_dotcom_dedupe_source_scd") }}'
   - name: gitlab_dotcom_lfs_file_locks_dedupe_source
     description: '{{ doc("gitlab_dotcom_dedupe_source_scd") }}'
   - name: gitlab_dotcom_path_locks_dedupe_source
