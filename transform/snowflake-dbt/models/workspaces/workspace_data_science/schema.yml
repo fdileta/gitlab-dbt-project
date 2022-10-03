@@ -56,7 +56,7 @@ models:
     description: >-
       Summarises per account and score date the scores given by the PtE and PtC models.
       It also solves discrepancies when the score of PtC = 1 and the score of PtE = 5 for the same score date, meaning that the account is highly likely to expand and contract at the same time.
-      This is done by lowering or upping the score with the lowest variance over its standard deviation.
+      This is done by lowering or upping the score with the lowest distance to the score mean relative to its standard deviation.
       If the score with the lowest variance is the PtC, then the score will go from 1 to 2.
       If the score with the lowest variance is the PtE, then the score will go from 5 to 4.
  
