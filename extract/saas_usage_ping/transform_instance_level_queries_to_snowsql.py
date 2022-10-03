@@ -58,7 +58,25 @@ def get_sql_query_map(private_token: str = None) -> Dict[Any, Any]:
     return source_json_data
 
 
-def optimize_token_size(input_token: str) -> str:
+def get_trimmed_token(token: List[str]) -> List[str]:
+    """
+    Remove empty spaces from the end
+    """
+    if not token:
+        return []
+
+    res = token
+
+    for char in res[::-1]:
+        if char == " ":
+            res.pop()
+        else:
+            break
+
+    return res
+
+
+def get_optimized_token(token: str) -> str:
     """
     Function reduce and optimize the size of the token length
     Primary goal is to:
@@ -68,112 +86,85 @@ def optimize_token_size(input_token: str) -> str:
     - remove '\n' (new line) characters as
       they have no any value for a query execution
     """
-    if not input_token:
+
+    if not token:
         return ""
 
-    optimized_token = []
     current_pos = 0
-    previous_input = " "
+    previous = " "
+    optimized = []
 
-    for current_input in input_token:
-        if (
-            current_input != previous_input or previous_input != " "
-        ) and current_input != "\n":
-            optimized_token.append(input_token[current_pos])
-        previous_input = current_input
+    for current in token:
+        if (current != previous or previous != " ") and current != "\n":
+            optimized.append(token[current_pos])
+        previous = current
         current_pos += 1
 
-    # Remove empty spaces from the end
-    for reverse_optimized in optimized_token[::-1]:
-        if reverse_optimized == " ":
-            optimized_token.pop()
-        else:
-            break
-    return "".join(optimized_token)
+    trimmed = get_trimmed_token(token=optimized)
+
+    return "".join(trimmed)
 
 
-def transform_having_clause(postgres_sql: str) -> str:
-    """
-    Algorithm enhancement , need to allow following transformation from:
-    (COUNT(approval_project_rules_users) < approvals_required)
-    to
-    (COUNT(approval_project_rules_users.id) < MAX(approvals_required))
-    """
-
-    snowflake_having_clause = postgres_sql
-
-    if HAVING_CLAUSE_PATTERN.findall(snowflake_having_clause):
-
-        snowflake_having_clause = postgres_sql.replace(
-            "(approval_project_rules_users)", "(approval_project_rules_users.id)"
-        )
-
-        snowflake_having_clause = snowflake_having_clause.replace(
-            "approvals_required)", "MAX(approvals_required))"
-        )
-
-    return snowflake_having_clause
-
-
-def translate_postgres_snowflake_count(input_token_list: list) -> List[str]:
+def get_translated_postgres_count(token_list: list) -> List[str]:
     """
     Function to support translation of COUNT syntax from Postgres to Snowflake.
     Example:
          - translate count(xx.xx.xx) -> COUNT(xx.xx)
          - translate COUNT(DISTINCT xx.xx.xx) -> COUNT(DISTINCT xx.xx)
     """
-    if not input_token_list:
+    if not token_list:
         return []
 
-    for index, token in enumerate(input_token_list):
+    for index, token in enumerate(token_list):
         token = str(token).replace("COUNT( ", "COUNT(")
-        check_postgres_count = str(token).upper()
+        postgres_query = str(token).upper()
         if (
-            check_postgres_count.startswith("COUNT")
-            and check_postgres_count.endswith(")")
-            and check_postgres_count.count("(") > 0
-            and check_postgres_count.count("(") == check_postgres_count.count(")")
-            and check_postgres_count.count(".") == 2
+            postgres_query.startswith("COUNT")
+            and postgres_query.endswith(")")
+            and postgres_query.count("(") > 0
+            and postgres_query.count("(") == postgres_query.count(")")
+            and postgres_query.count(".") == 2
         ):
             # distinguish COUNT(DISTINCT xx.xx.xx) from COUNT(xx.xx.xx)
             if " " in token[6:]:
-                index_from = check_postgres_count.index(" ")
+                index_from = postgres_query.index(" ")
             else:
-                index_from = check_postgres_count.index("(")
+                index_from = postgres_query.index("(")
             fixed_count = (
                 str(token)[: index_from + 1] + str(token)[token.index(".") + 1 :]
             )
 
-            input_token_list[index] = fixed_count
-    return input_token_list
+            token_list[index] = fixed_count
+    return token_list
 
 
-def prepare_sql_statement(input_token_list: list) -> str:
+def get_sql_as_string(token_list: list) -> str:
     """
     Transform token list in a prepared, executable SQL statement
     ready for the execution in Snowflake.
+    tokenized list -> str
     """
-    if not input_token_list:
+    if not token_list:
         return ""
 
     # transform token list in list of strings
-    prepared_list = [str(token) for token in input_token_list]
+    prepared = [str(token) for token in token_list]
 
     # recreate from the list the SQL query
-    prepared_query = "".join(prepared_list)
+    res = "".join(prepared)
 
-    return prepared_query
+    return res
 
 
-def find_keyword_index(input_token_list: list, defined_keyword: str) -> int:
+def get_keyword_index(token_list: list, defined_keyword: str) -> int:
     """
     Find the index, if any exist for keyword defined
     If no index is found, return 0 as a value
     """
-    if not input_token_list:
+    if not token_list:
         return 0
 
-    for index, keyword_token in enumerate(input_token_list):
+    for index, keyword_token in enumerate(token_list):
         if (
             keyword_token.is_keyword
             and str(keyword_token).upper() == defined_keyword.upper()
@@ -182,27 +173,102 @@ def find_keyword_index(input_token_list: list, defined_keyword: str) -> int:
     return 0
 
 
-def sql_queries_dict(input_json_data: Dict[Any, Any]) -> Dict[Any, Any]:
+def get_payload(json: Dict[Any, Any]) -> dict:
     """
-    function that transforms the given json file into a Python dict with only SQL batch counters
+    Prepare flattened payload for processing
+    """
+    return flatten(d=json, reducer=make_reducer(delimiter="."))
+
+
+def get_sql_dict(payload: dict) -> dict:
+    """
+    Filtered out data and keep real SQLs in
+    the result dict
     """
 
-    full_payload_dict = flatten(input_json_data, reducer=make_reducer(delimiter="."))
+    if payload == {}:
+        return {}
 
-    sql_dict = {}
+    res = {}
 
-    for key, value in full_payload_dict.items():
+    for metric_name, metric_sql in payload.items():
         # Check if key is even then add pair to new dictionary
-        if isinstance(value, str) and value.startswith("SELECT"):
-            sql_dict[key] = value
+        if isinstance(metric_sql, str) and metric_sql.startswith("SELECT"):
+            res[metric_name] = metric_sql
+
+    return res
+
+
+def get_row_queries(json_data: Dict[Any, Any]) -> Dict[Any, Any]:
+    """
+    function that transforms the given json file
+    into a Python dict with only SQL batch counters
+    """
+
+    payload = get_payload(json=json_data)
+
+    sql_dict = get_sql_dict(payload=payload)
 
     return sql_dict
 
 
-def add_counter_name_as_column(sql_metrics_name: str, sql_query: str) -> str:
+def get_trimmed_query(query: str) -> str:
+    """
+    removing extra " to have an easier query to parse
+    """
+    return query.replace('"', "")
+
+
+def get_tokenized_query(raw_query: str):
+    """
+    Transform string-based query to
+    tokenized query
+    """
+    trimmed = get_trimmed_query(query=raw_query)
+
+    optimized = get_optimized_token(token=trimmed)
+
+    parsed = sqlparse.parse(sql=optimized)
+
+    # split the query in tokens
+    # get a list of tokens
+    tokenized = parsed[0].tokens
+
+    return tokenized
+
+
+def get_snowflake_query(
+    metrics_name: str, tokenized, select_index: int, from_index: int
+):
+    """
+    Return Snowflake syntax query in the format
+    applicable to clculte the metrics
+    """
+
+    # Determinate if we have subquery (without FROM clause in the main query),
+    # in the format SELECT (SELECT xx FROM);
+    # If yes, fit it as a scalar value in counter_value column
+    if from_index == 0:
+        from_index = len(tokenized) + 1
+
+    # add the counter name column
+    tokenized.insert(
+        from_index - 1, " AS counter_value, TO_DATE(CURRENT_DATE) AS run_day  "
+    )
+
+    tokenized.insert(
+        select_index + 1,
+        " '" + metrics_name + "' AS counter_name, ",
+    )
+
+    return tokenized
+
+
+def get_transformed_metric_query(metrics: str, query: str) -> str:
     """
     Transform query from Postgres to Snowflake syntax.
-    For this purpose using the sqlparse library: https://pypi.org/project/sqlparse/
+    For this purpose using
+    the sqlparse library: https://pypi.org/project/sqlparse/
 
     Example:
     A query like:
@@ -219,119 +285,201 @@ def add_counter_name_as_column(sql_metrics_name: str, sql_query: str) -> str:
         FROM issues
     """
 
-    # removing extra " to have an easier query to parse
-    sql_query = sql_query.replace('"', "")
-    sql_query_optimized = optimize_token_size(input_token=sql_query)
+    tokenized_query = get_tokenized_query(raw_query=query)
 
-    sql_query_parsed = sqlparse.parse(sql_query_optimized)
-
-    # split the query in tokens
-    # get a list of tokens
-    token_list = sql_query_parsed[0].tokens
-
-    # optimize token_list size
-    select_index = find_keyword_index(
-        input_token_list=token_list, defined_keyword="SELECT"
+    select_index = get_keyword_index(
+        token_list=tokenized_query, defined_keyword="SELECT"
     )
-    from_index = find_keyword_index(input_token_list=token_list, defined_keyword="FROM")
+    from_index = get_keyword_index(token_list=tokenized_query, defined_keyword="FROM")
 
-    token_list_with_counter_name = translate_postgres_snowflake_count(
-        input_token_list=token_list
+    translated = get_translated_postgres_count(token_list=tokenized_query)
+
+    snowflake_query = get_snowflake_query(
+        metrics_name=metrics,
+        tokenized=translated,
+        select_index=select_index,
+        from_index=from_index,
     )
 
+    res = get_sql_as_string(token_list=snowflake_query)
+
+    return res
+
+
+def is_for_renaming(current_token: str, next_token: str) -> bool:
     """
-    Determinate if we have subquery (without FROM clause in the main query),
-    in the format SELECT (SELECT xx FROM);
-    If yes, fit it as a scalar value in counter_value column
+    function as a condition will
+    the next position will be renamed or not
     """
-    if from_index == 0:
-        from_index = len(token_list_with_counter_name) + 1
 
-    # add the counter name column
-    token_list_with_counter_name.insert(
-        from_index - 1, " AS counter_value, TO_DATE(CURRENT_DATE) AS run_day  "
+    return (
+        not next_token.startswith("prep")
+        and not next_token.startswith("prod")
+        and not (current_token == "FROM" and next_token.startswith("("))
     )
 
-    token_list_with_counter_name.insert(
-        # select_index + 1, f" '{sql_metrics_name}' AS counter_name, "
-        select_index + 1,
-        " '" + sql_metrics_name + "' AS counter_name, ",
-    )
 
-    return prepare_sql_statement(input_token_list=token_list_with_counter_name)
-
-
-def rename_table_name(
-    keywords_to_look_at: List[str],
-    token: Token,
-    tokens: List[Token],
-    index: int,
-    token_string_list: List[str],
+def get_renamed_table_name(
+    token: str, index: int, tokenized_list: List[Token], token_list: List[str]
 ) -> None:
     """
-    Replaces the table name in the query --
-    represented as the list of tokens -- to make it able to run in Snowflake
+    Replaces the table name in the query -
+    represented as the list of tokens, to make it able to run in Snowflake
 
     Does this by prepending `prep.gitlab_dotcom.gitlab_dotcom_`
     to the table name in the query and then appending `_dedupe_source`
-    """
 
-    if any(token_word in keywords_to_look_at for token_word in str(token).split(" ")):
-        i = 1
-
-        # Whitespaces are considered as tokens and should be skipped
-        while tokens[index + i].ttype is Whitespace:
-            i += 1
-
-        next_token = tokens[index + i]
-        if (
-            not str(next_token).startswith("prep")
-            and not str(next_token).startswith("prod")
-            and not (str(token) == "FROM" and str(next_token).startswith("("))
-        ):
-
-            # insert, token list to string list, create the SQL query, reparse it
-            # there is FOR sure a better way to do that
-            token_string_list[index + i] = (
-                f"prep.gitlab_dotcom.gitlab_dotcom_"
-                f"{str(next_token)}"
-                f"_dedupe_source AS "
-                f"{str(next_token)}"
-            )
-
-
-def rename_query_tables(sql_query: str) -> str:
-    """
-    function to rename the table in the sql query
+    Input: SELECT 1 FROM some_table
+    Output: SELECT 1 FROM prep.gitlab_dotcom.gitlab_dotcom_some_table_dedupe_source
     """
 
     # comprehensive list of all the keywords that are followed by a table name
-    keywords_to_look_at = [
+    keywords = [
         "FROM",
         "JOIN",
     ]
 
-    # start parsing the query and get the token_list
-    parsed = sqlparse.parse(sql_query)
-    tokens = list(TokenList(parsed[0].tokens).flatten())
-    token_string_list = list(map(str, tokens))
+    if any(token_word in keywords for token_word in token.split(" ")):
+        i = 1
 
-    # go through the tokens to find the tables that should be renamed
-    # for index in range(len(tokens)):
-    for index, token in enumerate(tokens, start=0):
-        rename_table_name(
-            keywords_to_look_at=keywords_to_look_at,
-            token=token,
-            tokens=tokens,
-            index=index,
-            token_string_list=token_string_list,
+        # Whitespaces are considered as tokens and should be skipped
+        while tokenized_list[index + i].ttype is Whitespace:
+            i += 1
+
+        next_token = str(tokenized_list[index + i])
+
+        if is_for_renaming(current_token=token, next_token=next_token):
+            token_list[index + i] = (
+                f"prep.gitlab_dotcom.gitlab_dotcom_"
+                f"{next_token}"
+                f"_dedupe_source AS "
+                f"{next_token}"
+            )
+
+
+def get_tokenized_query_list(sql_query: str) -> list:
+    """
+    Transform string into tokenized list
+    """
+
+    parsed = sqlparse.parse(sql_query)
+
+    return list(TokenList(parsed[0].tokens).flatten())
+
+
+def get_token_list(tokenized_list: list) -> list:
+    """
+    Return string list from a tokenized list
+    """
+    return list(map(str, tokenized_list))
+
+
+def get_prepared_list(token_list: list) -> str:
+    """
+    Get prepared list as a string,
+    transformed from the list.
+    """
+    raw = "".join(token_list)
+
+    prepared = get_transformed_having_clause(postgres_sql=raw)
+
+    return prepared
+
+
+def get_transformed_token_list(sql_query: str) -> List[str]:
+    """
+    Transforming token list
+    """
+
+    # start parsing the query and get the token_list
+    tokenized = get_tokenized_query_list(sql_query=sql_query)
+
+    res = get_token_list(tokenized_list=tokenized)
+
+    # go through the tokenized to find the tables that should be renamed
+    for current_index, current_token in enumerate(tokenized, start=0):
+        get_renamed_table_name(
+            token=str(current_token),
+            index=current_index,
+            tokenized_list=tokenized,
+            token_list=res,
+        )
+    return res
+
+
+def get_renamed_query_tables(sql_query: str) -> str:
+    """
+    function to rename the table in the sql query
+    """
+
+    token_list = get_transformed_token_list(sql_query=sql_query)
+
+    prepared_list = get_prepared_list(token_list=token_list)
+
+    return prepared_list
+
+
+def get_prepared_queries(raw_queries: dict) -> dict:
+    """
+    Transform data to Snowflake syntax
+    """
+    prepared = {
+        metric_name: get_transformed_metric_query(metrics=metric_name, query=metric_sql)
+        for metric_name, metric_sql in raw_queries.items()
+    }
+
+    return prepared
+
+
+def get_transformed_queries(prepared_queries: dict) -> dict:
+    """
+    Transform queries to fully readable Snowflake syntax
+    """
+    transformed_queries = {
+        metric_name: get_renamed_query_tables(sql_query=metric_query)
+        for metric_name, metric_query in prepared_queries.items()
+    }
+
+    return transformed_queries
+
+
+def get_transformed_having_clause(postgres_sql: str) -> str:
+    """
+    Algorithm enhancement , need to allow following transformation from:
+    (COUNT(approval_project_rules_users) < approvals_required)
+    to
+    (COUNT(approval_project_rules_users.id) < MAX(approvals_required))
+    """
+    having_clause_pattern = re.compile(
+        "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
+    )
+    snowflake_having_clause = postgres_sql
+
+    if having_clause_pattern.findall(snowflake_having_clause):
+
+        snowflake_having_clause = postgres_sql.replace(
+            "(approval_project_rules_users)", "(approval_project_rules_users.id)"
         )
 
-    raw_string_list = "".join(token_string_list)
+        snowflake_having_clause = snowflake_having_clause.replace(
+            "approvals_required)", "MAX(approvals_required))"
+        )
 
-    prepared_string_list = transform_having_clause(raw_string_list)
+    return snowflake_having_clause
 
-    return prepared_string_list
+
+def transform(query_dict: Dict[Any, Any]) -> Dict[Any, Any]:
+    """
+    Main input point to transform queries
+    """
+
+    raw = get_row_queries(json_data=query_dict)
+
+    prepared = get_prepared_queries(raw_queries=raw)
+
+    transformed = get_transformed_queries(prepared_queries=prepared)
+
+    return transformed
 
 
 def keep_meta_data(json_file: dict) -> dict:
@@ -360,30 +508,6 @@ def save_json_file(file_name: str, json_file: dict) -> None:
         json.dump(json_file, f)
 
 
-def main(json_query_list: Dict[Any, Any]) -> Dict[Any, Any]:
-    """
-    Main input point to transform queries
-    """
-
-    sql_queries_dictionary = sql_queries_dict(json_query_list)
-
-    sql_queries_dict_with_new_column = {
-        metric_name: add_counter_name_as_column(
-            sql_metrics_name=metric_name, sql_query=sql_queries_dictionary[metric_name]
-        )
-        for metric_name in sql_queries_dictionary
-    }
-
-    transformed_sql_query_dict = {
-        metric_name: rename_query_tables(
-            sql_query=sql_queries_dict_with_new_column[metric_name]
-        )
-        for metric_name in sql_queries_dict_with_new_column
-    }
-
-    return transformed_sql_query_dict
-
-
 if __name__ == "__main__":
     config_dict = env.copy()
 
@@ -392,7 +516,7 @@ if __name__ == "__main__":
     )
 
     info("Processed sql queries")
-    final_sql_query_dict = main(json_query_list=json_data)
+    final_sql_query_dict = transform(query_dict=json_data)
 
     final_meta_data = keep_meta_data(json_data)
     info("Processed final sql queries")

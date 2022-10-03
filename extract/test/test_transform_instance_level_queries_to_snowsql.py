@@ -2,31 +2,134 @@
 Test unit to ensure quality of transformation algorithm
 from Postgres to Snowflake
 """
-from typing import Dict, List, Any
-import re
 import pytest
-import sqlparse.sql
+
+import sqlparse
 
 from extract.saas_usage_ping.transform_instance_level_queries_to_snowsql import (
-    main,
-    optimize_token_size,
-    find_keyword_index,
-    prepare_sql_statement,
-    translate_postgres_snowflake_count,
-    keep_meta_data,
     META_API_COLUMNS,
     TRANSFORMED_INSTANCE_QUERIES_FILE,
     META_DATA_INSTANCE_QUERIES_FILE,
     HAVING_CLAUSE_PATTERN,
     METRICS_EXCEPTION,
+    transform,
+    get_optimized_token,
+    get_translated_postgres_count,
+    get_keyword_index,
+    get_sql_as_string,
+    get_token_list,
+    get_tokenized_query_list,
+    get_transformed_token_list,
+    get_renamed_query_tables,
+    get_renamed_table_name,
+    is_for_renaming,
 )
+
+
+def test_static_variables():
+    """
+    Test case: check static variables
+    """
+    assert META_API_COLUMNS == [
+        "recorded_at",
+        "version",
+        "edition",
+        "recording_ce_finished_at",
+        "recording_ee_finished_at",
+        "uuid",
+    ]
+    assert TRANSFORMED_INSTANCE_QUERIES_FILE == "transformed_instance_queries.json"
+    assert META_DATA_INSTANCE_QUERIES_FILE == "meta_data_instance_queries.json"
+
+
+def test_constants():
+    """
+    Test contants to ensure there are in the proper place
+    with proper values
+    """
+    assert TRANSFORMED_INSTANCE_QUERIES_FILE is not None
+    assert META_DATA_INSTANCE_QUERIES_FILE is not None
+    assert HAVING_CLAUSE_PATTERN is not None
+    assert METRICS_EXCEPTION is not None
+
+
+@pytest.fixture(name="transformed_dict")
+def test_cases_dict_transformed():
+    """
+    Prepare fixture data for testing
+    """
+    test_cases_dict_subquery = {
+        "usage_activity_by_stage_monthly": {
+            "create": {
+                "approval_project_rules_with_more_approvers_than_required": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) > approvals_required)) subquery',
+                "approval_project_rules_with_less_approvers_than_required": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) < approvals_required)) subquery',
+                "approval_project_rules_with_exact_required_approvers": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) = approvals_required)) subquery',
+            }
+        },
+        "usage_activity_by_stage": {
+            "create": {
+                "approval_project_rules_with_more_approvers_than_required": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) > approvals_required)) subquery',
+                "approval_project_rules_with_less_approvers_than_required": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) < approvals_required)) subquery',
+                "approval_project_rules_with_exact_required_approvers": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) = approvals_required)) subquery',
+            }
+        },
+    }
+
+    return transform(test_cases_dict_subquery)
+
+
+@pytest.fixture(name="list_of_metrics")
+def metric_list() -> set:
+    """
+    static list of metrics for testing complex subqueries
+    """
+    return {
+        "usage_activity_by_stage_monthly.create.approval_project_rules_with_more_approvers_than_required",
+        "usage_activity_by_stage_monthly.create.approval_project_rules_with_less_approvers_than_required",
+        "usage_activity_by_stage_monthly.create.approval_project_rules_with_exact_required_approvers",
+        "usage_activity_by_stage.create.approval_project_rules_with_more_approvers_than_required",
+        "usage_activity_by_stage.create.approval_project_rules_with_less_approvers_than_required",
+        "usage_activity_by_stage.create.approval_project_rules_with_exact_required_approvers",
+    }
+
+
+def test_transform_postgres_snowflake() -> None:
+    """
+    Check Postgres -> Snowflake query transformation
+    :return:
+    """
+
+    input_query = {"my_metrics": "SELECT 1 from DUAL"}
+
+    actual = dict(
+        my_metrics="SELECT 'my_metrics' AS counter_name,  "
+        "1 AS counter_value, "
+        "TO_DATE(CURRENT_DATE) AS run_day   "
+        "from DUAL"
+    )
+
+    assert actual == transform(input_query)
+
+
+def test_input_query_class_init() -> None:
+    """
+    Assure InputQuery class working fine
+    :return: None
+    """
+    query = InputQuery(
+        metrics_name="test_metric_input_query", postgres_query="SELECT 1"
+    )
+
+    assert query.metrics_name == "test_metric_input_query"
+
+    assert query.postgres_query == "SELECT 1"
 
 
 def test_transforming_queries():
     """
     Test case: for transforming queries from Postgres to Snowflake
     """
-    test_cases_dict: Dict[Any, Any] = {
+    test_cases_dict = {
         "counts": {
             "boards": 'SELECT COUNT("boards"."id") FROM "boards"',
             "clusters_applications_cert_managers": 'SELECT COUNT(DISTINCT "clusters_applications_cert_managers"."clusters.user_id") '
@@ -66,7 +169,7 @@ def test_transforming_queries():
         }
     }
 
-    results_dict: Dict[Any, Any] = {
+    actuals_dict = {
         "counts.boards": "SELECT 'counts.boards' AS counter_name,  "
         "COUNT(boards.id) AS counter_value, "
         "TO_DATE(CURRENT_DATE) AS run_day   "
@@ -114,7 +217,7 @@ def test_transforming_queries():
         "to IT services and the associated issues require immediate attention'",
     }
 
-    final_sql_query_dict = main(test_cases_dict)
+    final_sql_query_dict = transform(test_cases_dict)
 
     for sql_metric, sql_query in final_sql_query_dict.items():
         #  check did we fix the bug with "JOINprep", should be fixed to "JOIN prep."
@@ -125,7 +228,7 @@ def test_transforming_queries():
             assert "JOIN PREP" in final_sql
 
         # compare translated query with working SQL
-        assert sql_query == results_dict[sql_metric]
+        assert sql_query == actuals_dict[sql_metric]
 
 
 def test_scalar_subquery():
@@ -138,15 +241,15 @@ def test_scalar_subquery():
         }
     }
 
-    results_dict = {
+    actuals_dict = {
         "counts.snippets": "SELECT 'counts.snippets' AS counter_name,  (SELECT COUNT(snippets.id) FROM prep.gitlab_dotcom.gitlab_dotcom_snippets_dedupe_source AS snippets WHERE snippets.type = 'PersonalSnippet') + (SELECT COUNT(snippets.id) FROM prep.gitlab_dotcom.gitlab_dotcom_snippets_dedupe_source AS snippets WHERE snippets.type = 'ProjectSnippet') AS counter_value, TO_DATE(CURRENT_DATE) AS run_day  "
     }
 
-    final_sql_query_dict = main(test_cases_dict)
+    final_sql_query_dict = transform(test_cases_dict)
 
     for sql_metric, sql_query in final_sql_query_dict.items():
         # compare translated query with working SQL
-        assert sql_query == results_dict[sql_metric]
+        assert sql_query == actuals_dict[sql_metric]
 
 
 def test_regular_subquery_transform():
@@ -159,7 +262,7 @@ def test_regular_subquery_transform():
       FROM (SELECT 1 AS a
               FROM b)
     """
-    test_cases_dict_subquery: Dict[Any, Any] = {
+    test_cases_dict_subquery = {
         "usage_activity_by_stage_monthly": {
             "create": {
                 "merge_requests_with_overridden_project_rules": 'SELECT COUNT(DISTINCT "approval_merge_request_rules"."merge_request_id") '
@@ -178,7 +281,7 @@ def test_regular_subquery_transform():
         }
     }
 
-    results_dict_subquery: Dict[Any, Any] = {
+    actuals_dict_subquery = {
         "usage_activity_by_stage_monthly.create.merge_requests_with_overridden_project_rules": "SELECT 'usage_activity_by_stage_monthly.create.merge_requests_with_overridden_project_rules' "
         "AS counter_name,  "
         "COUNT(DISTINCT approval_merge_request_rules.merge_request_id) AS counter_value, "
@@ -190,18 +293,18 @@ def test_regular_subquery_transform():
         "FROM prep.gitlab_dotcom.gitlab_dotcom_approval_merge_request_rule_sources_dedupe_source AS approval_merge_request_rule_sources WHERE approval_merge_request_rule_sources.approval_merge_request_rule_id = approval_merge_request_rules.id AND NOT EXISTS ( SELECT 1 FROM prep.gitlab_dotcom.gitlab_dotcom_approval_project_rules_dedupe_source AS approval_project_rules WHERE approval_project_rules.id = approval_merge_request_rule_sources.approval_project_rule_id AND EXISTS ( SELECT 1 FROM prep.gitlab_dotcom.gitlab_dotcom_projects_dedupe_source AS projects WHERE projects.id = approval_project_rules.project_id AND projects.disable_overriding_approvers_per_merge_request = FALSE)))) OR(approval_merge_request_rules.modified_from_project_rule = TRUE))"
     }
 
-    final_sql_query_dict = main(test_cases_dict_subquery)
+    final_sql_query_dict = transform(test_cases_dict_subquery)
 
     for sql_metric, sql_query in final_sql_query_dict.items():
         # compare translated query with working SQL
-        assert sql_query == results_dict_subquery[sql_metric]
+        assert sql_query == actuals_dict_subquery[sql_metric]
 
 
 def test_optimize_token_size():
     """
     Test case: optimize_token_size
     """
-    test_cases_list: List[Any] = [
+    test_cases_list = [
         "  SELECT  aa.bb  FROM   (SELECT   1 as aa) FROM BB ",
         "   SELECT 1",
         "   SELECT\n a from   bb   ",
@@ -209,7 +312,7 @@ def test_optimize_token_size():
         None,
     ]
 
-    results_list: List[Any] = [
+    actuals_list = [
         "SELECT aa.bb FROM (SELECT 1 as aa) FROM BB",
         "SELECT 1",
         "SELECT a from bb",
@@ -219,7 +322,7 @@ def test_optimize_token_size():
     #
 
     for i, test_case_list in enumerate(test_cases_list):
-        assert optimize_token_size(test_case_list) == results_list[i]
+        assert get_optimized_token(test_case_list) == actuals_list[i]
 
 
 def test_count_pg_snowflake():
@@ -229,7 +332,7 @@ def test_count_pg_snowflake():
     from Postgres to
     Snowflake: translate_postgres_snowflake_count
     """
-    test_cases_list_count: List[Any] = [
+    test_cases_list_count = [
         ["COUNT(DISTINCT aa.bb.cc)"],
         ["COUNT(xx.yy.zz)"],
         ["COUNT( DISTINCT oo.pp.rr)"],
@@ -239,7 +342,7 @@ def test_count_pg_snowflake():
         [],
     ]
 
-    results_list_count: List[Any] = [
+    actuals_list_count = [
         ["COUNT(DISTINCT bb.cc)"],
         ["COUNT(yy.zz)"],
         ["COUNT(DISTINCT pp.rr)"],
@@ -251,8 +354,7 @@ def test_count_pg_snowflake():
 
     for i, test_case_list_count in enumerate(test_cases_list_count):
         assert (
-            translate_postgres_snowflake_count(test_case_list_count)
-            == results_list_count[i]
+            get_translated_postgres_count(test_case_list_count) == actuals_list_count[i]
         )
 
 
@@ -260,23 +362,23 @@ def test_find_keyword_index():
     """
     Test case: find_keyword_index
     """
-    test_cases_parse: List[Any] = [
+    test_cases_parse = [
         sqlparse.parse("SELECT FROM")[0].tokens,
         sqlparse.parse("THERE IS NO MY WORD")[0].tokens,
         sqlparse.parse("THIS IS FROM SELECT")[0].tokens,
         sqlparse.parse("MORE SELECT AND ONE MORE FROM KEYWORD")[0].tokens,
     ]
 
-    results_parse: List[int] = [0, 0, 6, 2]
+    actuals_parse = [0, 0, 6, 2]
 
     # 1. looking for SELECT keyword
     for i, test_case_parse in enumerate(test_cases_parse):
-        assert find_keyword_index(test_case_parse, "SELECT") == results_parse[i]
+        assert get_keyword_index(test_case_parse, "SELECT") == actuals_parse[i]
 
-    results_parse = [2, 0, 4, 10]
+    actuals_parse = [2, 0, 4, 10]
     # 2. looking for FROM keyword
     for i, test_case_parse in enumerate(test_cases_parse):
-        assert find_keyword_index(test_case_parse, "FROM") == results_parse[i]
+        assert get_keyword_index(test_case_parse, "FROM") == actuals_parse[i]
 
 
 def test_prepare_sql_statement():
@@ -289,110 +391,23 @@ def test_prepare_sql_statement():
         sqlparse.parse("SELECT (SELECT 1)")[0].tokens,
     ]
 
-    results_list_prepare = ["SELECT 1", "SELECT abc from def", "SELECT (SELECT 1)"]
+    actuals_list_prepare = ["SELECT 1", "SELECT abc from def", "SELECT (SELECT 1)"]
 
     for i, test_case_prepare in enumerate(test_cases_prepare):
-        assert prepare_sql_statement(test_case_prepare) == results_list_prepare[i]
+        assert get_sql_as_string(test_case_prepare) == actuals_list_prepare[i]
 
 
-def test_static_variables():
-    """
-    Test case: check static variables
-    """
-    assert META_API_COLUMNS == [
-        "recorded_at",
-        "version",
-        "edition",
-        "recording_ce_finished_at",
-        "recording_ee_finished_at",
-        "uuid",
-    ]
-    assert TRANSFORMED_INSTANCE_QUERIES_FILE == "transformed_instance_queries.json"
-    assert META_DATA_INSTANCE_QUERIES_FILE == "meta_data_instance_queries.json"
-
-
-def test_keep_meta_data():
-    """
-    Test case: keep_meta_data
-    """
-    meta_json_result = {
-        "recorded_at": "2022-01-21 09:07:46 UTC",
-        "uuid": "1234",
-        "hostname": "127.0.0.1",
-        "version": "14.7.0-pre",
-        "installation_type": "gitlab-development-kit",
-        "active_user_count": "SELECT 1",
-        "edition": "EE Free",
-        "recording_ce_finished_at": "2022-01-21 09:07:53 UTC",
-        "recording_ee_finished_at": "2022-01-21 09:07:53 UTC",
-    }
-
-    meta_json_raw = meta_json_result.copy()
-    meta_json_raw["fake1"] = "12"
-    meta_json_raw["fake2"] = "13"
-
-    result_json = keep_meta_data(meta_json_raw)
-
-    for result_key, result_value in result_json.items():
-        assert result_value == meta_json_raw.get(result_key)
-
-    assert isinstance(result_json, dict)
-    assert len(result_json.keys()) == len(META_API_COLUMNS)
-    assert result_json.get("fake1", None) is None
-    assert result_json.get("fake2", None) is None
-
-
-@pytest.fixture
-def test_cases_dict_transformed() -> Dict[Any, Any]:
-    """
-    Prepare fixture data for testing
-    """
-    test_cases_dict_subquery: Dict[Any, Any] = {
-        "usage_activity_by_stage_monthly": {
-            "create": {
-                "approval_project_rules_with_more_approvers_than_required": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) > approvals_required)) subquery',
-                "approval_project_rules_with_less_approvers_than_required": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) < approvals_required)) subquery',
-                "approval_project_rules_with_exact_required_approvers": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) = approvals_required)) subquery',
-            }
-        },
-        "usage_activity_by_stage": {
-            "create": {
-                "approval_project_rules_with_more_approvers_than_required": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) > approvals_required)) subquery',
-                "approval_project_rules_with_less_approvers_than_required": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) < approvals_required)) subquery',
-                "approval_project_rules_with_exact_required_approvers": 'SELECT COUNT(*) FROM (SELECT COUNT("approval_project_rules"."id") FROM "approval_project_rules" INNER JOIN approval_project_rules_users ON approval_project_rules_users.approval_project_rule_id = approval_project_rules.id WHERE "approval_project_rules"."rule_type" = 0 GROUP BY "approval_project_rules"."id" HAVING (COUNT(approval_project_rules_users) = approvals_required)) subquery',
-            }
-        },
-    }
-
-    return main(test_cases_dict_subquery)
-
-
-@pytest.fixture
-def metric_list() -> set:
-    """
-    static list of metrics for testing complex subqueries
-    """
-    return {
-        "usage_activity_by_stage_monthly.create.approval_project_rules_with_more_approvers_than_required",
-        "usage_activity_by_stage_monthly.create.approval_project_rules_with_less_approvers_than_required",
-        "usage_activity_by_stage_monthly.create.approval_project_rules_with_exact_required_approvers",
-        "usage_activity_by_stage.create.approval_project_rules_with_more_approvers_than_required",
-        "usage_activity_by_stage.create.approval_project_rules_with_less_approvers_than_required",
-        "usage_activity_by_stage.create.approval_project_rules_with_exact_required_approvers",
-    }
-
-
-def test_subquery_complex(test_cases_dict_transformed, metric_list):
+def test_subquery_complex(transformed_dict, list_of_metrics):
     """
     Test bugs we found for complex subquery with FROM () clause
     """
     expect_value_select, expect_value_from = 2, 2
 
-    final_sql_query_dict = test_cases_dict_transformed
+    final_sql_query_dict = transformed_dict
 
     for metric_name, metric_sql in final_sql_query_dict.items():
         assert "approval" in metric_name
-        assert metric_name in metric_list
+        assert metric_name in list_of_metrics
         assert metric_name in metric_sql
 
         assert (
@@ -401,10 +416,11 @@ def test_subquery_complex(test_cases_dict_transformed, metric_list):
         assert (
             metric_sql.upper().count("FROM") == expect_value_from
         )  # expect 2 FROM statements
+
         assert metric_sql.count("(") == metric_sql.count(")")  # query parsed properly
 
 
-def test_transform_having_clause(test_cases_dict_transformed, metric_list):
+def test_transform_having_clause(transformed_dict, list_of_metrics):
     """
     Test bugs we found for complex subquery - having clause
 
@@ -414,7 +430,7 @@ def test_transform_having_clause(test_cases_dict_transformed, metric_list):
     (COUNT(approval_project_rules_users.id) < MAX(approvals_required))
     """
 
-    final_sql_query_dict = test_cases_dict_transformed
+    final_sql_query_dict = transformed_dict
 
     for metric_name, metric_sql in final_sql_query_dict.items():
         assert ".id" in metric_sql
@@ -423,27 +439,115 @@ def test_transform_having_clause(test_cases_dict_transformed, metric_list):
         assert "MAX(approvals_required)" in metric_sql
         assert "subquery" in metric_sql
         assert metric_sql.count("(") == metric_sql.count(")")
-        assert metric_name in metric_list
+        assert metric_name in list_of_metrics
         assert metric_name in metric_sql
 
 
-def test_constants():
-    assert TRANSFORMED_INSTANCE_QUERIES_FILE is not None
-    assert META_DATA_INSTANCE_QUERIES_FILE is not None
-    assert HAVING_CLAUSE_PATTERN is not None
-    assert METRICS_EXCEPTION is not None
+def test_get_transformed_token_list():
+    """
+    Check transformation from str to list
+    """
+
+    input_value = "SELECT 1 FROM MY_TABLE"
+
+    actual = get_transformed_token_list(sql_query=input_value)
+
+    expected = [
+        "SELECT",
+        " ",
+        "1",
+        " ",
+        "FROM",
+        " ",
+        "prep.gitlab_dotcom.gitlab_dotcom_MY_TABLE_dedupe_source AS MY_TABLE",
+    ]
+
+    assert actual == expected
 
 
-if __name__ == "__main__":
-    test_transforming_queries()
-    test_scalar_subquery()
-    test_regular_subquery_transform()
-    test_optimize_token_size()
-    test_count_pg_snowflake()
-    test_find_keyword_index()
-    test_prepare_sql_statement()
-    test_static_variables()
-    test_keep_meta_data()
-    test_subquery_complex(test_cases_dict_transformed, metric_list)
-    test_transform_having_clause(test_cases_dict_transformed, metric_list)
-    test_constants()
+def test_get_token_list():
+    """
+    Check get_token_list
+    """
+
+    input_value = "SELECT 1"
+
+    tokenized = get_tokenized_query_list(sql_query=input_value)
+
+    actual = get_token_list(tokenized_list=tokenized)
+
+    expected = ["SELECT", " ", "1"]
+
+    assert actual == expected
+
+
+def test_get_renamed_query_tables():
+    """
+    Check get_renamed_query_tables
+    """
+
+    input_value = "SELECT 1 FROM my_table"
+
+    actual = get_renamed_query_tables(sql_query=input_value)
+
+    expected = "SELECT 1 FROM prep.gitlab_dotcom.gitlab_dotcom_my_table_dedupe_source AS my_table"
+
+    assert actual == expected
+
+
+def test_get_renamed_table_name():
+    """
+    Check get_renamed_table_name
+    """
+
+    input_value = "SELECT 1 FROM my_table"
+
+    tokenized = get_tokenized_query_list(sql_query=input_value)
+
+    actual = get_token_list(tokenized_list=tokenized)
+
+    get_renamed_table_name(
+        token="SELECT", index=6, tokenized_list=tokenized, token_list=actual
+    )
+
+    expected = [
+        "SELECT",
+        " ",
+        "1",
+        " ",
+        "FROM",
+        " ",
+        "my_table",
+    ]
+
+    assert actual == expected
+
+
+def test_is_for_renaming_false():
+    """
+    Check is_for_renaming
+
+    """
+
+    current_token = "FROM"
+    next_token = "prod"
+
+    actual = is_for_renaming(current_token=current_token, next_token=next_token)
+    expected = False
+
+    assert actual == expected
+
+
+def test_is_for_renaming_true():
+    """
+    Check is_for_renaming
+
+    """
+
+    current_token = "SELECT"
+    next_token = "1"
+
+    actual = is_for_renaming(current_token=current_token, next_token=next_token)
+    expected = True
+
+    assert actual == expected
