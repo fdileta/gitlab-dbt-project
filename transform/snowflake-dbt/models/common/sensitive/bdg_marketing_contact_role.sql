@@ -100,7 +100,8 @@
     FROM bdg
     LEFT JOIN prep_namespace
       ON bdg.namespace_id = prep_namespace.dim_namespace_id
-    WHERE NOT EQUAL_NULL(prep_namespace.is_currently_valid, FALSE)
+    WHERE bdg.namespace_id IS NULL
+      OR prep_namespace.is_currently_valid = TRUE
 
 )
 
