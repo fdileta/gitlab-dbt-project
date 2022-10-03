@@ -2098,7 +2098,7 @@ tables:
       , created_at
       , updated_at
       , type
-      , service_id
+      , integration_id
       FROM web_hooks
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp

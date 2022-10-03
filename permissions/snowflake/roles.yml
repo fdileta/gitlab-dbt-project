@@ -763,7 +763,6 @@ roles:
                 - raw.bamboohr.*
                 - raw.demandbase.*
                 - raw.engineering_extracts.*
-                - raw.gcp_billing.*
                 - raw.gitlab_data_yaml.*
                 - raw.gitter.*
                 - raw.keyhole_twitter.*

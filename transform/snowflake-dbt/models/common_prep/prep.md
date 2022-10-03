@@ -54,6 +54,14 @@ This model assumes that only one priority is placed in a given description or no
 
 {% enddocs %}
 
+{% docs prep_ptpt_scores_by_user %}
+
+Takes the scores from ptpt_scores, transforms it to user / email address grain and uses the latest score date available.
+
+The scores of this model are then used in mart_marketing_contact and the marketing pump to later be synced with Marketo and SFDC.
+
+{% enddocs %}
+
 {% docs prep_sfdc_account %}
 
 SFDC Account Prep table, used to clean and dedupe fields from a common source for use in further downstream dimensions.
