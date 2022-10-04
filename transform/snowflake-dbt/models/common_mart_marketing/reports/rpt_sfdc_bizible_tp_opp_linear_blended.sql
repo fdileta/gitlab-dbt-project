@@ -64,7 +64,7 @@
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_landing_page_raw,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_referrer_page,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_referrer_page_raw,
-      rpt_sfdc_bizible_tp_person_lifecycle.bizible_salesforce_campaign,
+      rpt_sfdc_bizible_tp_person_lifecycle.campaign_name AS bizible_salesforce_campaign,
       NULL AS pipe_name,
       CASE
         WHEN touchpoint_segment = 'Demand Gen' THEN 1
