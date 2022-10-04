@@ -101,8 +101,8 @@ WITH account_dims_mapping AS (
 
       {{ dbt_utils.surrogate_key(['contact_id','true_mql_date::timestamp']) }}                                            AS mql_event_id,
       
-      true_mql_date                                                                                                       AS mql_event_timestamp,
-      true_initial_mql_date                                                                                               AS initial_mql_event_timestamp,
+      true_mql_date::timestamp                                                                                                        AS mql_event_timestamp,
+      true_initial_mql_date::timestamp                                                                                                AS initial_mql_event_timestamp,
 
 marketo_qualified_lead_date::timestamp
                    AS legacy_mql_event_timestamp,
@@ -308,7 +308,7 @@ marketo_qualified_lead_date::timestamp
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@lisvinueza",
+    updated_by="@rkohnke",
     created_date="2020-12-01",
-    updated_date="2022-08-26"
+    updated_date="2022-10-04"
 ) }}
