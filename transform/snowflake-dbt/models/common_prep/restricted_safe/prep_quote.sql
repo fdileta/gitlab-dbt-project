@@ -7,7 +7,7 @@ WITH sfdc_zqu_quote_source AS (
 ), final AS (
 
     SELECT
-      zqu_quote_id                                  AS dim_quote_id,
+      quote_id                                      AS dim_quote_id,
       zqu__number                                   AS quote_number,
       zqu_quote_name                                AS quote_name,
       zqu__status                                   AS quote_status,
