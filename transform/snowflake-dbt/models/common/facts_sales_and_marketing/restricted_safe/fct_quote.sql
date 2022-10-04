@@ -49,7 +49,6 @@ WITH crm_account AS (
       crm_account.dim_account_location_country_id,
       crm_account.dim_account_location_region_id,
       invoice.invoice_id                                    AS dim_invoice_id,
-      quote.quote_entity,
       quote.zqu__exist_subscription_id                      AS quote_exist_subscription_id,
 
       --dates
