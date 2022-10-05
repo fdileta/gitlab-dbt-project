@@ -22,6 +22,7 @@ Welcome to the GitLab Data Program -- we're excited to have you! The goal of thi
    - [ ] [Data Direction page](https://about.gitlab.com/handbook/business-technology/data-team/direction/) to get a sense of what our short and longer-term roadmap.
    - [ ] [Data Catalog](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/)
 - [ ] Watch @rbacovic [talk at Data Science Conference](https://www.youtube.com/watch?v=x74Koq-cNqM&list=PLQyyxph2CGupNGhGLZ1ofCxqJe_RzM7ME&index=5) that gives a phenomenal overview of how the team works.
+   - Optional: Watch former GitLab Team Member Thomas La Piana [talk at DataEngConf](https://www.youtube.com/watch?v=eu623QBwakc) that gives a phenomenal overview of how the team worked back in 2018.
 - [ ] Watch [this great talk](https://www.youtube.com/watch?v=prcz0ubTAAg) on what Analytics is.
 - [ ] Browse a few of the [Data Team videos in GitLab Unfiltered](https://www.youtube.com/playlist?list=PL05JrBw4t0KrRVTZY33WEHv8SjlA_-keI)
 - [ ] Watch [Data Team quick architecture overview](https://www.youtube.com/watch?v=0vlJdzYShpU)
