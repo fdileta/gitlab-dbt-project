@@ -518,7 +518,6 @@
     cohort_base.marketo_last_interesting_moment_date,
     cohort_base.account_demographics_segment_region_grouped,
     cohort_base.account_demographics_sales_segment_grouped,
-    cohort_base.account_demographics_upa_country,
     cohort_base.account_demographics_upa_state,
     cohort_base.account_demographics_upa_postal_code,
     cohort_base.zoominfo_phone_number,
