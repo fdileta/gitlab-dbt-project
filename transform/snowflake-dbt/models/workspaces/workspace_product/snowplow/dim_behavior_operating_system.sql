@@ -1,3 +1,7 @@
+{{config({
+        "materialized":"table"
+  })
+
 WITH device_information AS (
 
   SELECT DISTINCT

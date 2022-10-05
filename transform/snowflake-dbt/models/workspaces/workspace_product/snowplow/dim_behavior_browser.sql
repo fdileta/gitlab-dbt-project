@@ -1,3 +1,7 @@
+{{config({
+        "materialized":"table"
+  })
+
 WITH browser_information AS (
 
   SELECT DISTINCT
