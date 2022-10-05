@@ -98,9 +98,11 @@
 
     SELECT bdg.*
     FROM bdg
-    INNER JOIN prep_namespace
+    LEFT JOIN prep_namespace
       ON bdg.namespace_id = prep_namespace.dim_namespace_id
-    WHERE prep_namespace.is_currently_valid = TRUE
+    WHERE bdg.namespace_id IS NULL
+      OR prep_namespace.is_currently_valid = TRUE
+
 )
 
 
@@ -110,5 +112,5 @@
     created_by="@rmistry",
     updated_by="@jpeguero",
     created_date="2021-01-19",
-    updated_date="2022-09-29"
+    updated_date="2022-10-03"
 ) }}
