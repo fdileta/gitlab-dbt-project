@@ -69,6 +69,7 @@ WITH mapping as (
       IFF(rehire.is_rehire = 'True', initial_hire.hire_date, mapping.hire_date) AS hire_date,
       rehire.rehire_date,
       mapping.termination_date,
+      mapping.first_inactive_date,
       department_info.last_job_title,
       department_info.last_supervisor,
       department_info.last_department,
