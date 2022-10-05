@@ -25,7 +25,7 @@ WITH crm_account AS (
     SELECT
 
       --ids
-      quote.quote_id                                        AS dim_quote_id,
+      quote.zqu_quote_id                                    AS dim_quote_id,
       quote.zqu__account                                    AS dim_crm_account_id,
       crm_account.dim_parent_crm_account_id,
       quote.zqu__zuora_account_id                           AS dim_billing_account_id,
