@@ -109,36 +109,66 @@ class UsagePing(object):
 
         return meta_data
 
+    def evaluate_saas_queries(self, connection, saas_queries):
+        """
+        For each valid value in the dict,
+        where the value is a sql select statement...
+        It updates the dict value to be
+        the output of the query when run against Snowflake.
+
+        For example {"key": "SELECT 1"} becomes {"key": "1"}
+
+        The dict vals are updated recursively to preserve its nested structure
+
+        """
+        results = {}
+        errors = {}
+
+        for key, query in saas_queries.items():
+            # if the 'query' is a dictionary, then recursively call
+            if isinstance(query, dict):
+                results_returned, errors_returned = self.evaluate_saas_queries(connection, query)
+                results[key] = results_returned
+                #merge error dictionaries in place
+                errors.update(errors_returned)
+            # reached a query, run it in snowflake
+            elif isinstance(query, str) and query.startswith("SELECT")::
+                logging.info(f"Running ping: {key}...")
+
+                try:
+                    data_to_write = error_data_to_write = None
+                    query_output = pd.read_sql(sql=query, con=connection)
+                    #standardize column case across pandas versions
+                    query_output.columns = query_output.columns.str.lower()
+                    info(query_output)
+                    #convert np64 to int to write to .json
+                    data_to_write = int(query_output.loc[0, "counter_value"])
+                except (KeyError, ValueError):
+                    data_to_write = 0
+                except SQLAlchemyError as e:
+                    error_data_to_write = str(e.__dict__["orig"])
+
+                if data_to_write is not None:
+                    results[key] = data_to_write
+
+                if error_data_to_write:
+                    errors[key] = error_data_to_write
+
+            # else keep the dict as is
+            else:
+                results[key] = query
+
+        return results, errors
+
     def saas_instance_ping(self):
         """
         Take a dictionary of {ping_name: sql_query} and run each
         query to then upload to a table in raw.
         """
+        connection = self.loader_engine.connect()
         saas_queries = self._get_instance_queries()
 
-        connection = self.loader_engine.connect()
-
-        results_all = {}
-        errors_data_all = {}
-
-        for key, query in saas_queries.items():
-            logging.info(f"Running ping: {key}...")
-            try:
-                data_to_write = error_data_to_write = None
-                results = pd.read_sql(sql=query, con=connection)
-                info(results)
-                counter_value = results.loc[0, "counter_value"]
-                data_to_write = str(counter_value)
-            except KeyError as k:
-                data_to_write = "0"
-            except SQLAlchemyError as e:
-                error_data_to_write = str(e.__dict__["orig"])
-
-            if data_to_write:
-                results_all[key] = data_to_write
-
-            if error_data_to_write:
-                errors_data_all[key] = error_data_to_write
+        results, errors = self.evaluate_saas_queries(connection, saas_queries)
 
         info("Processed queries")
         connection.close()
@@ -151,7 +181,7 @@ class UsagePing(object):
 
         ping_to_upload.loc[0] = [
             saas_queries,
-            json.dumps(results_all),
+            json.dumps(results),
             self.end_date,
             self._get_md5(datetime.datetime.utcnow().timestamp()),
         ] + self._get_dataframe_api_values(
@@ -168,14 +198,14 @@ class UsagePing(object):
         """
         Handling error data part to load data into table: raw.saas_usage_ping.instance_sql_errors
         """
-        if errors_data_all:
+        if errors:
             error_data_to_upload = pd.DataFrame(
                 columns=["run_id", "sql_errors", "ping_date"]
             )
 
             error_data_to_upload.loc[0] = [
                 self._get_md5(datetime.datetime.utcnow().timestamp()),
-                json.dumps(errors_data_all),
+                json.dumps(errors),
                 self.end_date,
             ]
 

@@ -2,13 +2,12 @@
 Module is used to transform SQL syntax from Postgres to Snowflake style
 """
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Callable
 from logging import info
 
 from os import environ as env
 import re
 from flatten_dict import flatten
-from flatten_dict.reducer import make_reducer
 import sqlparse
 from sqlparse.sql import Token, TokenList
 from sqlparse.tokens import Whitespace
@@ -176,44 +175,26 @@ def get_keyword_index(token_list: list, defined_keyword: str) -> int:
     return 0
 
 
-def get_payload(json_payload: Dict[Any, Any]) -> dict:
-    """
-    Prepare flattened payload for processing
-    """
-    return flatten(d=json_payload, reducer=make_reducer(delimiter="."))
-
-
-def get_sql_dict(payload: dict) -> dict:
+def get_query_dict(payload: dict) -> dict:
     """
     Filtered out data and keep real SQLs in
-    the result dict
+    the sql_dict dict
+
+    The logic:
+    - Only keep any 'valid' key:values that have a select value OR
+    has a descendent k:v with a select value
+    - preserve original JSON structure for 'valid' key:values
     """
 
-    if payload == {}:
-        return {}
-
-    res = {}
-
+    sql_dict = {}
     for metric_name, metric_sql in payload.items():
-        # Check if key is even then add pair to new dictionary
-        if isinstance(metric_sql, str) and metric_sql.startswith("SELECT"):
-            res[metric_name] = metric_sql
-
-    return res
-
-
-def get_row_queries(json_queries: Dict[Any, Any]) -> Dict[Any, Any]:
-    """
-    function that transforms the given json file
-    into a Python dict with only SQL batch counters
-    """
-
-    payload = get_payload(json_payload=json_queries)
-
-    sql_dict = get_sql_dict(payload=payload)
-
+        if isinstance(metric_sql, dict):
+             return_dict = get_query_dict(metric_sql)
+             if return_dict:
+                 sql_dict[metric_name] = return_dict
+        elif isinstance(metric_sql, str) and metric_sql.startswith("SELECT"):
+            sql_dict[metric_name] = metric_sql
     return sql_dict
-
 
 def get_trimmed_query(query: str) -> str:
     """
@@ -267,7 +248,7 @@ def get_snowflake_query(
     return tokenized
 
 
-def get_transformed_metric_query(metrics: str, query: str) -> str:
+def add_counter_name_as_column(metrics: str, query: str) -> str:
     """
     Transform query from Postgres to Snowflake syntax.
     For this purpose using
@@ -426,30 +407,6 @@ def get_renamed_query_tables(sql_query: str) -> str:
     return prepared_list
 
 
-def get_prepared_queries(raw_queries: dict) -> dict:
-    """
-    Transform data to Snowflake syntax
-    """
-    prepared = {
-        metric_name: get_transformed_metric_query(metrics=metric_name, query=metric_sql)
-        for metric_name, metric_sql in raw_queries.items()
-    }
-
-    return prepared
-
-
-def get_transformed_queries(prepared_queries: dict) -> dict:
-    """
-    Transform queries to fully readable Snowflake syntax
-    """
-    transformed_queries = {
-        metric_name: get_renamed_query_tables(sql_query=metric_query)
-        for metric_name, metric_query in prepared_queries.items()
-    }
-
-    return transformed_queries
-
-
 def get_transformed_having_clause(postgres_sql: str) -> str:
     """
     Algorithm enhancement , need to allow following transformation from:
@@ -475,21 +432,51 @@ def get_transformed_having_clause(postgres_sql: str) -> str:
     return snowflake_having_clause
 
 
-def transform(query_dict: Dict[Any, Any]) -> Dict[Any, Any]:
+def perform_action_on_query_str(original_dict: Dict[Any, Any], action: Callable[..., str], action_arg_type: str='both') -> Dict[Any, Any]:
+    """
+    Iterate over a nested dictionary object.
+    If the value is a 'select statement' string...
+    then perform some action on the query string.
+
+    If the value is a dictionary, recursively call this function,
+    so that eventually all 'child' query strings can be actioned.
+    """
+    new_dict = {}
+    for k, v in original_dict.items():
+        # if dict, rerun this function recursively
+        if isinstance(v, dict):
+            return_dict = perform_action_on_query_str(v, action, action_arg_type)
+            new_dict[k] = return_dict
+        # if string and select statement, apply the action
+        elif isinstance(v, str) and v.startswith("SELECT")::
+            if action_arg_type == 'both':
+                new_val = action(k, v)
+            elif action_arg_type == 'value':
+                new_val = action(v)
+            else:
+                raise exception('Invalid action_arg_type for perform_action_on_query_str(), can choose either "both" or "value"')
+            new_dict[k] = new_val
+        # else, keep the dict as is
+        else:
+            new_dict[k] = v
+    return new_dict
+
+
+def transform(json_data: Dict[Any, Any]) -> Dict[Any, Any]:
     """
     Main input point to transform queries
     """
 
-    raw = get_row_queries(json_queries=query_dict)
+    query_dict = get_query_dict(json_data)
 
-    prepared = get_prepared_queries(raw_queries=raw)
+    prepared = perform_action_on_query_str(original_dict=query_dict, action=add_counter_name_as_column, action_arg_type='both')
 
-    transformed = get_transformed_queries(prepared_queries=prepared)
+    transformed = perform_action_on_query_str(original_dict=prepared, action=get_renamed_query_tables, action_arg_type='value')
 
     return transformed
 
 
-def keep_meta_data(json_file: dict) -> dict:
+def keep_meta_data(json_data: dict) -> dict:
     """
     Pick up meta data we want to expose in Snowflake from the original file
 
@@ -498,40 +485,34 @@ def keep_meta_data(json_file: dict) -> dict:
     """
 
     meta_data = {
-        meta_api_column: json_file.get(meta_api_column, "")
+        meta_api_column: json_data.get(meta_api_column, "")
         for meta_api_column in META_API_COLUMNS
     }
 
     return meta_data
 
 
-def save_json_file(file_name: str, json_file: dict) -> None:
+def save_to_json_file(file_name: str, json_data: dict) -> None:
     """
     param file_name: str
-    param json_file: dict
-    rtype: None
+    param json_data: dict
+    return: None
     """
     with open(file=file_name, mode="w", encoding="utf-8") as wr_file:
-        json.dump(json_file, wr_file)
+        json.dump(json_data, wr_file)
 
 
 if __name__ == "__main__":
     config_dict = env.copy()
-
-    json_data = get_sql_query_map(
+    payload = get_sql_query_map(
         private_token=config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"]
     )
 
-    info("Processed sql queries")
-
-    final_sql_query_dict = transform(query_dict=json_data)
-
-    final_meta_data = keep_meta_data(json_data)
-
+    final_sql_query_dict = transform(payload)
+    final_meta_data = keep_meta_data(payload)
     info("Processed final sql queries")
 
-    save_json_file(
-        file_name=TRANSFORMED_INSTANCE_QUERIES_FILE, json_file=final_sql_query_dict
+    save_to_json_file(
+        file_name=TRANSFORMED_INSTANCE_QUERIES_FILE, json_data=final_sql_query_dict
     )
-
-    save_json_file(file_name=META_DATA_INSTANCE_QUERIES_FILE, json_file=final_meta_data)
+    save_to_json_file(file_name=META_DATA_INSTANCE_QUERIES_FILE, json_data=final_meta_data)
