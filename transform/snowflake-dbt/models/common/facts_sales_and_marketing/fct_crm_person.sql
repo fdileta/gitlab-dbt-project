@@ -139,7 +139,6 @@ marketo_qualified_lead_date::timestamp
       MIN(mql_event_timestamp)         AS first_mql_date,
       MAX(mql_event_timestamp)         AS last_mql_date,
       MIN(initial_mql_event_timestamp) AS first_initial_mql_date,
-      MAX(initial_mql_event_timestamp) AS last_initial_mql_date,
       MIN(legacy_mql_event_timestamp)  AS first_legacy_mql_date,
       MAX(legacy_mql_event_timestamp)  AS last_legacy_mql_date,
       COUNT(*)                         AS mql_count
@@ -211,11 +210,6 @@ marketo_qualified_lead_date::timestamp
       CONVERT_TIMEZONE('America/Los_Angeles', mqls.first_initial_mql_date)                                      AS initial_mql_datetime_first_pt,
       {{ get_date_id('first_initial_mql_date') }}                                                               AS initial_mql_date_first_id,
       {{ get_date_pt_id('first_initial_mql_date') }}                                                            AS initial_mql_date_first_pt_id,
-      mqls.last_initial_mql_date::DATE                                                                          AS initial_mql_date_latest,
-      mqls.last_initial_mql_date                                                                                AS initial_mql_datetime_latest,
-      CONVERT_TIMEZONE('America/Los_Angeles', mqls.last_initial_mql_date)                                       AS initial_mql_datetime_latest_pt,
-      {{ get_date_id('last_initial_mql_date') }}                                                                AS initial_mql_date_latest_id,
-      {{ get_date_pt_id('last_initial_mql_date') }}                                                             AS initial_mql_date_latest_pt_id,
 
       mqls.first_legacy_mql_date::DATE                                                                          AS legacy_mql_date_first,
       mqls.first_legacy_mql_date                                                                                AS legacy_mql_datetime_first,
@@ -310,5 +304,5 @@ marketo_qualified_lead_date::timestamp
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-12-01",
-    updated_date="2022-10-04"
+    updated_date="2022-10-05"
 ) }}
