@@ -2,9 +2,10 @@
 
         "unique_key":"behavior_structured_event_pk",
         "materialized":"vault_insert_by_period",
-        "period":"month",
+        "period":"week",
         "timestamp_field":"BEHAVIOR_AT",
-        "start_date": "2020-10-01"
+        "start_date": "2022-08-01",
+        "stop_date": "2022-09-30"
   })
 
 }}
