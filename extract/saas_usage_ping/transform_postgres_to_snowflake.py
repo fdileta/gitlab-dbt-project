@@ -448,7 +448,7 @@ def perform_action_on_query_str(original_dict: Dict[Any, Any], action: Callable[
             return_dict = perform_action_on_query_str(v, action, action_arg_type)
             new_dict[k] = return_dict
         # if string and select statement, apply the action
-        elif isinstance(v, str) and v.startswith("SELECT")::
+        elif isinstance(v, str) and v.startswith("SELECT"):
             if action_arg_type == 'both':
                 new_val = action(k, v)
             elif action_arg_type == 'value':

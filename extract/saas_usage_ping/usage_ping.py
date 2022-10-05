@@ -132,7 +132,7 @@ class UsagePing(object):
                 #merge error dictionaries in place
                 errors.update(errors_returned)
             # reached a query, run it in snowflake
-            elif isinstance(query, str) and query.startswith("SELECT")::
+            elif isinstance(query, str) and query.startswith("SELECT"):
                 logging.info(f"Running ping: {key}...")
 
                 try:
