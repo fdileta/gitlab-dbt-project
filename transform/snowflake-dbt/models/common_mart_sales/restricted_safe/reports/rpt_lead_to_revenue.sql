@@ -933,7 +933,7 @@
     rpt_sfdc_bizible_tp_opp_linear_blended.won_custom_net_arr,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_position,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source_type,
+    --rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source_type,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_type,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_content,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_group_name,
@@ -969,5 +969,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-07-20",
-    updated_date="2022-09-30",
+    updated_date="2022-10-05",
   ) }}
