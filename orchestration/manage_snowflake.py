@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import sys
+import json
 from os import environ as env
 from typing import Dict, List
 
@@ -445,10 +446,20 @@ class SnowflakeManager:
 
     def clone_models_v2_testing(self, *model_input):
 
-        print(model_input)
-        # input_set = set([i for i in model_input])
         input_list = list(model_input)
+
         print(input_list)
+
+        output_list = []
+        for i in input_list:
+            d = json.loads(i)
+            actual_dependencies = [n for n in d.get('depends_on').get('nodes') if 'seed' not in n]
+            d["actual_dependencies"] = actual_dependencies
+            output_list.append(d)
+
+        for s in sorted(output_list, key=lambda i: len(i['actual_dependencies'])):
+            print(len(s.get('actual_dependencies')))
+
 
 if __name__ == "__main__":
     snowflake_manager = SnowflakeManager(env.copy())
