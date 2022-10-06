@@ -1,38 +1,29 @@
 config:
-  partial_parse: true
+    send_anonymous_usage_stats: False
+    use_colors: True
+    partial_parse: true
+
 gitlab-snowflake:
-  target: dev
+  target: prod
   outputs:
-    dev:
+    prod:
       type: snowflake
-      threads: 8
-      account: gitlab
-      user: rkohnke@gitlab.com # <-- This will be your GitLab email
-      role: RKOHNKE # <-- Talk to your manager, usually, it is JSMITH for Jane Smith
-      database: RKOHNKE # <-- JSMITH for Jane Smith
-      warehouse: DEV_XS # <-- [ANALYST_XS, ENGINEER_XS], depends on your role
-      schema: preparation
-      authenticator: externalbrowser # <--- You must be logged in via OKTA
-
-    # You can create targets for any warehouse that you have access to.
-    dev_..:
+      threads: 16
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      database: "{{ env_var('SNOWFLAKE_PREP_DATABASE') }}"
+      role: "{{ env_var('SNOWFLAKE_TRANSFORM_ROLE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_TRANSFORM_WAREHOUSE') }}"
+      schema: "{{ env_var('SNOWFLAKE_PREPARATION_SCHEMA') }}"
+      client_session_keep_alive: True
+    ci:
       type: snowflake
-      threads: 8
-      account: gitlab
-      user: rkohnke@gitlab.com # <-- This will be your GitLab email
-      role: RKOHNKE # <-- Talk to your manager, usually, it is JSMITH for Jane Smith
-      database: RKOHNKE # <-- JSMITH for Jane Smith
-      warehouse: DEV_XS # <-- depends on your role
-      schema: preparation
-      authenticator: externalbrowser # <--- You must be logged in via OKTA
-
-    docs:
-      type: snowflake
-      threads: 8
-      account: gitlab
-      user: rkohnke@gitlab.com # <-- This will be your GitLab email
-      role: RKOHNKE # <-- Talk to your manager, usually, it is JSMITH for Jane Smith
-      database: RKOHNKE # <-- JSMITH for Jane Smith
-      warehouse: DEV_XS # <-- [ANALYST_XS, ENGINEER_XS], depends on your role
-      schema: preparation
-      authenticator: externalbrowser # <--- You must be logged in via OKTA
+      threads: 16
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      database: "{{ env_var('SNOWFLAKE_PREP_DATABASE') }}"
+      role: "{{ env_var('SNOWFLAKE_TRANSFORM_ROLE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_TRANSFORM_WAREHOUSE') }}"
+      schema: "{{ env_var('SNOWFLAKE_PREPARATION_SCHEMA') }}"
