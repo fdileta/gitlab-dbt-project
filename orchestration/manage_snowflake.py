@@ -446,15 +446,14 @@ class SnowflakeManager:
 
     def clone_models_v2_testing(self, *model_input):
 
-        print(type(model_input))
-
-        print(model_input)
-        print(model_input[0])
-
-        print(' '.join(model_input))
-
-        # input_list = list(model_input)
+        # print(type(model_input))
 #
+        # print(model_input)
+        # print(model_input[0])
+        input_list = list(model_input)
+        print(' '.join(input_list))
+
+        #
         # # print(input_list)
         # print(input_list[0])
         # print(type(input_list[0]))
