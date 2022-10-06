@@ -43,8 +43,8 @@
       driveload_financial_metrics_program_phase_1_source.mrr,
       driveload_financial_metrics_program_phase_1_source.arr,
       driveload_financial_metrics_program_phase_1_source.quantity,
-      NULL                                                                                        AS is_arpu,
-      NULL                                                                                        AS is_licensed_user,
+      NULL                                                                                         AS is_arpu,
+      NULL                                                                                         AS is_licensed_user,
       driveload_financial_metrics_program_phase_1_source.parent_account_cohort_month,
       driveload_financial_metrics_program_phase_1_source.months_since_parent_account_cohort_start,
       driveload_financial_metrics_program_phase_1_source.parent_crm_account_employee_count_band
@@ -63,7 +63,7 @@
 
     SELECT
       dim_parent_crm_account_id,
-      MIN(arr_month)                                            AS parent_account_cohort_month
+      MIN(arr_month)                                                                             AS parent_account_cohort_month
     FROM mart_arr_snapshot_model
     {{ dbt_utils.group_by(n=1) }}
 
