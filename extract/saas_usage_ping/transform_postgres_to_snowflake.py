@@ -189,12 +189,13 @@ def get_query_dict(payload: dict) -> dict:
     sql_dict = {}
     for metric_name, metric_sql in payload.items():
         if isinstance(metric_sql, dict):
-             return_dict = get_query_dict(metric_sql)
-             if return_dict:
-                 sql_dict[metric_name] = return_dict
+            return_dict = get_query_dict(metric_sql)
+            if return_dict:
+                sql_dict[metric_name] = return_dict
         elif isinstance(metric_sql, str) and metric_sql.startswith("SELECT"):
             sql_dict[metric_name] = metric_sql
     return sql_dict
+
 
 def get_trimmed_query(query: str) -> str:
     """
@@ -432,7 +433,7 @@ def get_transformed_having_clause(postgres_sql: str) -> str:
     return snowflake_having_clause
 
 
-def perform_action_on_query_str(original_dict: Dict[Any, Any], action: Callable[..., str], action_arg_type: str='both') -> Dict[Any, Any]:
+def perform_action_on_query_str(original_dict: Dict[Any, Any], action: Callable[..., str], action_arg_type: str = 'both') -> Dict[Any, Any]:
     """
     Iterate over a nested dictionary object.
     If the value is a 'select statement' string...
@@ -454,7 +455,7 @@ def perform_action_on_query_str(original_dict: Dict[Any, Any], action: Callable[
             elif action_arg_type == 'value':
                 new_val = action(v)
             else:
-                raise exception('Invalid action_arg_type for perform_action_on_query_str(), can choose either "both" or "value"')
+                raise ValueError('Invalid action_arg_type for perform_action_on_query_str(), can choose either "both" or "value"')
             new_dict[k] = new_val
         # else, keep the dict as is
         else:
