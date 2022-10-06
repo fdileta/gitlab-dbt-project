@@ -111,9 +111,8 @@ class UsagePing(object):
 
     def evaluate_saas_queries(self, connection, saas_queries):
         """
-        For each valid value in the dict,
-        where the value is a sql select statement...
-        It updates the dict value to be
+        For each 'select statement' in the dict,
+        update the dict value to be
         the output of the query when run against Snowflake.
 
         For example {"key": "SELECT 1"} becomes {"key": "1"}
@@ -131,7 +130,7 @@ class UsagePing(object):
                 results[key] = results_returned
                 if errors_returned:
                     errors[key] = errors_returned
-            # reached a query, run it in snowflake
+            # reached a 'select statement' value, run it in snowflake
             elif isinstance(query, str) and query.startswith("SELECT"):
                 logging.info(f"Running ping: {key}...")
 
@@ -141,7 +140,7 @@ class UsagePing(object):
                     #standardize column case across pandas versions
                     query_output.columns = query_output.columns.str.lower()
                     info(query_output)
-                    #convert np64 to int to write to .json
+                    #convert 'numpy int' to 'int' so json can be written
                     data_to_write = int(query_output.loc[0, "counter_value"])
                 except (KeyError, ValueError):
                     data_to_write = 0

@@ -178,7 +178,7 @@ def get_keyword_index(token_list: list, defined_keyword: str) -> int:
 def get_query_dict(payload: dict) -> dict:
     """
     Filtered out data and keep real SQLs in
-    the sql_dict dict
+    the query_dict dict
 
     The logic:
     - Only keep any 'valid' key:values that have a select value OR
@@ -186,15 +186,15 @@ def get_query_dict(payload: dict) -> dict:
     - preserve original JSON structure for 'valid' key:values
     """
 
-    sql_dict = {}
+    query_dict = {}
     for metric_name, metric_sql in payload.items():
         if isinstance(metric_sql, dict):
             return_dict = get_query_dict(metric_sql)
             if return_dict:
-                sql_dict[metric_name] = return_dict
+                query_dict[metric_name] = return_dict
         elif isinstance(metric_sql, str) and metric_sql.startswith("SELECT"):
-            sql_dict[metric_name] = metric_sql
-    return sql_dict
+            query_dict[metric_name] = metric_sql
+    return query_dict
 
 
 def get_trimmed_query(query: str) -> str:
