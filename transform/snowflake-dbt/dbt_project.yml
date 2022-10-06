@@ -53,6 +53,7 @@ seeds:
   +quote_columns: False
   +post-hook:
     - "{{ mask_model() }}"
+  +query_tag: dbt
 
   data_tests:
     +database: "{{ env_var('SNOWFLAKE_PREP_DATABASE') }}" #PREP
@@ -97,6 +98,7 @@ models:
   +copy_grants: true # Maintain any existing Permifrost grants
   +post-hook:
     - "{{ mask_model() }}"
+  +query_tag: dbt
 
   # ------------------
   # Snowplow Package https://hub.getdbt.com/fishtown-analytics/snowplow/latest/
@@ -660,6 +662,7 @@ models:
 snapshots:
   +post-hook:
     - "{{ mask_model() }}"
+  +query_tag: dbt
   gitlab_snowflake:
     target_database: "{{ env_var('SNOWFLAKE_SNAPSHOT_DATABASE') }}" #RAW in production
     target_schema: "snapshots"

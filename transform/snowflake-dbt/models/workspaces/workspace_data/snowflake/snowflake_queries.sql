@@ -10,6 +10,12 @@ WITH source AS (
 
   SELECT *
   FROM {{ ref('snowflake_query_history_source') }}
+  {% if is_incremental() %}
+
+  -- this filter will only be applied on an incremental run
+  WHERE end_time > (SELECT MAX(end_time) FROM {{ this }})
+
+  {% endif %}
 
 ),
 
