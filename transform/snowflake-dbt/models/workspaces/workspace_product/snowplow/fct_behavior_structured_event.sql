@@ -5,7 +5,8 @@
         "period":"week",
         "timestamp_field":"BEHAVIOR_AT",
         "start_date": "2022-08-01",
-        "stop_date": "2022-09-30"
+        "stop_date": "2022-09-30",
+        snowflake_warehouse = generate_warehouse_name('XL')
   })
 
 }}
