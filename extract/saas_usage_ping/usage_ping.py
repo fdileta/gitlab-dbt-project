@@ -129,8 +129,8 @@ class UsagePing(object):
             if isinstance(query, dict):
                 results_returned, errors_returned = self.evaluate_saas_queries(connection, query)
                 results[key] = results_returned
-                #merge error dictionaries in place
-                errors.update(errors_returned)
+                if errors_returned:
+                    errors[key] = errors_returned
             # reached a query, run it in snowflake
             elif isinstance(query, str) and query.startswith("SELECT"):
                 logging.info(f"Running ping: {key}...")
