@@ -33,12 +33,6 @@
                                                AS initial_mql_month_first,
       initial_mql_date_first_pt.first_day_of_month
                                                AS initial_mql_month_first_pt,
-      initial_mql_date_latest.date_day         AS initial_mql_date_lastest,
-      initial_mql_date_latest_pt.date_day      AS initial_mql_date_lastest_pt,
-      initial_mql_date_latest.first_day_of_month
-                                               AS initial_mql_month_latest,
-      initial_mql_date_latest_pt.first_day_of_month
-                                               AS initial_mql_month_latest_pt,
       legacy_mql_date_first_pt.date_day        AS legacy_mql_date_first_pt,
       legacy_mql_date_first.first_day_of_month AS legacy_mql_month_first,
       legacy_mql_date_first_pt.first_day_of_month
@@ -218,10 +212,6 @@
       ON fct_crm_person.initial_mql_date_first_id = initial_mql_date_first.date_id
     LEFT JOIN dim_date AS initial_mql_date_first_pt
       ON fct_crm_person.initial_mql_date_first_pt_id = initial_mql_date_first_pt.date_id
-    LEFT JOIN dim_date AS initial_mql_date_latest
-      ON fct_crm_person.initial_mql_date_latest_id = initial_mql_date_latest.date_id
-    LEFT JOIN dim_date AS initial_mql_date_latest_pt
-      ON fct_crm_person.initial_mql_date_latest_pt_id = initial_mql_date_latest_pt.date_id
     LEFT JOIN dim_date AS legacy_mql_date_first
       ON fct_crm_person.legacy_mql_date_first_id = legacy_mql_date_first.date_id
     LEFT JOIN dim_date AS legacy_mql_date_first_pt
@@ -266,5 +256,5 @@
     created_by="@iweeks",
     updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-09-30",
+    updated_date="2022-10-06",
   ) }}  
