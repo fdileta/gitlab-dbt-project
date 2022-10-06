@@ -9,7 +9,6 @@
     ('prep_license','prep_license'),
     ('prep_charge','prep_charge'),
     ('prep_product_detail','prep_product_detail')
-    ('version_raw_usage_data_source','version_raw_usage_data_source')
     ])
 
 }}
@@ -19,7 +18,7 @@
   SELECT 
     raw_usage_data_id,
     REPLACE(REPLACE(REPLACE(LOWER((raw_usage_data_payload:settings.collected_data_categories::TEXT)),'"',''),'[',''),']','') collected_data_categories 
-  FROM version_raw_usage_data_source,
+  FROM prep_ping_instance,
     LATERAL FLATTEN(input=> raw_usage_data_payload,RECURSIVE => true)
   WHERE key = 'settings'
     AND value LIKE '%collected_data_categories%'
@@ -205,7 +204,7 @@ SELECT DISTINCT
 {{ dbt_audit(
     cte_ref="final",
     created_by="@icooper-acp",
-    updated_by="@iweeks",
+    updated_by="@tpoole1",
     created_date="2022-03-08",
-    updated_date="2022-08-08"
+    updated_date="2022-10-06"
 ) }}
