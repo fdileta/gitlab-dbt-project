@@ -1,6 +1,8 @@
 {{
   config(
-    materialized='table'
+    materialized='incremental',
+    unique_key='query_id',
+    on_schema_change='append_new_columns'
   )
 }}
 
@@ -45,7 +47,7 @@ expanded AS (
     bytes_spilled_to_local_storage,
     credits_used_cloud_services,
     percentage_scanned_from_cache,
-    try_parse_json(regexp_substr(query_text,'\{\"app\".*\}')) AS dbt_metadata,
+    try_parse_json(regexp_substr(query_text, '\{\"app\".*\}')) AS dbt_metadata,
     dbt_metadata['app']::VARCHAR AS app,
     dbt_metadata['dbt_version']::VARCHAR AS dbt_version,
     dbt_metadata['profile_name']::VARCHAR AS profile_name,
@@ -55,17 +57,17 @@ expanded AS (
     dbt_metadata['run_started_at']::VARCHAR AS run_started_at,
     dbt_metadata['full_refresh']::VARCHAR AS full_refresh,
     dbt_metadata['is_full_refresh']::VARCHAR AS is_full_refresh,
-    dbt_metadata['materialized']::VARCHAR AS materialized,
+    dbt_metadata['materialized']::VARCHAR AS model_materialized,
     dbt_metadata['runner']::VARCHAR AS runner,
-    dbt_metadata['file']::VARCHAR AS file,
+    dbt_metadata['file']::VARCHAR AS model_file,
     dbt_metadata['node_id']::VARCHAR AS node_id,
     dbt_metadata['node_name']::VARCHAR AS node_name,
     dbt_metadata['resource_type']::VARCHAR AS resource_type,
     dbt_metadata['package_name']::VARCHAR AS package_name,
     dbt_metadata['relation']::VARCHAR AS relation,
-    dbt_metadata['relation']['database']::VARCHAR AS database,
-    dbt_metadata['relation']['schema']::VARCHAR AS schema,
-    dbt_metadata['relation']['identifier']::VARCHAR AS identifier
+    dbt_metadata['relation']['database']::VARCHAR AS relation_database,
+    dbt_metadata['relation']['schema']::VARCHAR AS relation_schema,
+    dbt_metadata['relation']['identifier']::VARCHAR AS relation_identifier
   FROM source
 
 )

@@ -12,11 +12,11 @@ WITH source AS (
   SELECT *
   FROM {{ source('snowflake_account_usage','query_history') }}
 
-), 
+),
 
 renamed AS (
 
-  SELECT 
+  SELECT
     query_id::VARCHAR AS query_id,
     query_text::VARCHAR AS query_text,
     database_id::NUMBER AS database_id,
@@ -29,7 +29,7 @@ renamed AS (
     role_name::VARCHAR AS role_name,
     warehouse_id::NUMBER AS warehouse_id,
     warehouse_name::VARCHAR AS warehouse_name,
-    warehouse_size::VARCHAR AS warehouse_size,
+    warehouse_size::VARCHAR AS warehouse_size,  -- noqa: L029
     warehouse_type::VARCHAR AS warehouse_type,
     cluster_number::VARCHAR AS cluster_number,
     query_tag::VARCHAR AS query_tag,
@@ -79,17 +79,18 @@ renamed AS (
     is_client_generated_statement::BOOLEAN AS is_client_generated_statement,
     query_acceleration_bytes_scanned::NUMBER AS query_acceleration_bytes_scanned,
     query_acceleration_partitions_scanned::NUMBER AS query_acceleration_partitions_scanned,
-    query_acceleration_upper_limit_scale_factor::NUMBER AS query_acceleration_upper_limit_scale_factor
+    query_acceleration_upper_limit_scale_factor::NUMBER
+    AS query_acceleration_upper_limit_scale_factor
 
   FROM source
   {% if is_incremental() %}
 
-  -- this filter will only be applied on an incremental run
-  WHERE end_time > (SELECT MAX(end_time)  FROM {{ this }})
+    -- this filter will only be applied on an incremental run
+    WHERE end_time > (SELECT MAX(end_time) FROM {{ this }})
 
   {% endif %}
-  
+
 )
 
-SELECT * 
+SELECT *
 FROM renamed
