@@ -1,12 +1,12 @@
 {{config({
 
+        "snowflake_warehouse": generate_warehouse_name('XL'),
         "unique_key":"behavior_structured_event_pk",
         "materialized":"vault_insert_by_period",
         "period":"week",
         "timestamp_field":"BEHAVIOR_AT",
         "start_date": "2022-08-01",
-        "stop_date": "2022-09-30",
-        "snowflake_warehouse": "generate_warehouse_name('XL')"
+        "stop_date": "2022-09-30"
   })
 
 }}
