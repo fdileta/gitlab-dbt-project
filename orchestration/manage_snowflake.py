@@ -448,17 +448,18 @@ class SnowflakeManager:
 
         input_list = list(model_input)
 
-        print(input_list)
-
-        output_list = []
-        for i in input_list:
-            d = json.loads(i)
-            actual_dependencies = [n for n in d.get('depends_on').get('nodes') if 'seed' not in n]
-            d["actual_dependencies"] = actual_dependencies
-            output_list.append(d)
-
-        for s in sorted(output_list, key=lambda i: len(i['actual_dependencies'])):
-            print(len(s.get('actual_dependencies')))
+        # print(input_list)
+        print(input_list[0])
+        print(type(input_list[0]))
+        # output_list = []
+        # for i in input_list:
+        #     d = json.loads(i)
+        #     actual_dependencies = [n for n in d.get('depends_on').get('nodes') if 'seed' not in n]
+        #     d["actual_dependencies"] = actual_dependencies
+        #     output_list.append(d)
+#
+        # for s in sorted(output_list, key=lambda i: len(i['actual_dependencies'])):
+        #     print(len(s.get('actual_dependencies')))
 
 
 if __name__ == "__main__":
