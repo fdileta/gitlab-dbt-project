@@ -11,7 +11,7 @@ WITH source AS (
       visitor_id::VARCHAR                          AS visitor_id,
 
       --Info
-	    visit_start_time::TIMESTAMP_TZ               AS visit_start_time
+	    visit_start_time::TIMESTAMP_TZ               AS visit_start_time,
       hit_number::NUMBER                           AS hit_number,
       index::FLOAT                                 AS dimension_index,
       value::VARCHAR                               AS dimension_value,
