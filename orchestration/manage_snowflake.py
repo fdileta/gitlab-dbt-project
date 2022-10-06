@@ -444,7 +444,7 @@ class SnowflakeManager:
             grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO GITLAB_CI"""
             query_executor(self.engine, grants_query)
 
-    def clone_models_v2_testing(self, *model_input):
+    def clone_models_v2_testing(self, model_input):
 
         print(type(model_input))
 
