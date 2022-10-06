@@ -100,11 +100,11 @@ SELECT DISTINCT
       fct_w_month_flag.dim_instance_id                                                                            AS dim_instance_id,
       fct_w_month_flag.dim_installation_id                                                                        AS dim_installation_id,
       fct_w_month_flag.ping_created_at                                                                            AS ping_created_at,
-      fct_w_month_flag.TO_DATE(DATEADD('days', -28, fct_w_month_flag.ping_created_at))                            AS ping_created_date_28_days_earlier,
-      fct_w_month_flag.TO_DATE(DATE_TRUNC('YEAR', fct_w_month_flag.ping_created_at))                              AS ping_created_date_year,
-      fct_w_month_flag.TO_DATE(DATE_TRUNC('MONTH', fct_w_month_flag.ping_created_at))                             AS ping_created_date_month,
-      fct_w_month_flag.TO_DATE(DATE_TRUNC('WEEK', fct_w_month_flag.ping_created_at))                              AS ping_created_date_week,
-      fct_w_month_flag.TO_DATE(DATE_TRUNC('DAY', fct_w_month_flag.ping_created_at))                               AS ping_created_date,
+      TO_DATE(DATEADD('days', -28, fct_w_month_flag.ping_created_at))                                             AS ping_created_date_28_days_earlier,
+      TO_DATE(DATE_TRUNC('YEAR', fct_w_month_flag.ping_created_at))                                               AS ping_created_date_year,
+      TO_DATE(DATE_TRUNC('MONTH', fct_w_month_flag.ping_created_at))                                              AS ping_created_date_month,
+      TO_DATE(DATE_TRUNC('WEEK', fct_w_month_flag.ping_created_at))                                               AS ping_created_date_week,
+      TO_DATE(DATE_TRUNC('DAY', fct_w_month_flag.ping_created_at))                                                AS ping_created_date,
       fct_w_month_flag.ip_address_hash                                                                            AS ip_address_hash,
       fct_w_month_flag.version                                                                                    AS version,
       fct_w_month_flag.instance_user_count                                                                        AS instance_user_count,
@@ -147,7 +147,7 @@ SELECT DISTINCT
       fct_w_month_flag.gitaly_filesystems                                                                         AS gitaly_filesystems,
       fct_w_month_flag.gitpod_enabled                                                                             AS gitpod_enabled,
       fct_w_month_flag.object_store                                                                               AS object_store,
-      fct_w_month_flag.s_dependency_proxy_enabled                                                                 AS is_dependency_proxy_enabled,
+      fct_w_month_flag.is_dependency_proxy_enabled                                                                AS is_dependency_proxy_enabled,
       fct_w_month_flag.recording_ce_finished_at                                                                   AS recording_ce_finished_at,
       fct_w_month_flag.recording_ee_finished_at                                                                   AS recording_ee_finished_at,
       fct_w_month_flag.is_ingress_modsecurity_enabled                                                             AS is_ingress_modsecurity_enabled,
@@ -158,13 +158,13 @@ SELECT DISTINCT
       fct_w_month_flag.container_registry_vendor                                                                  AS container_registry_vendor,
       fct_w_month_flag.container_registry_version                                                                 AS container_registry_version,
       IFF(fct_w_month_flag.license_expires_at >= fct_w_month_flag.ping_created_at 
-          OR fct_w_month_flag.license_expires_at IS NULL, fct_w_month_flag.ping_edition, 'EE Free')               AS cleaned_edition,
+          OR fct_w_month_flag.license_expires_at IS NULL, fct_w_month_flag.main_edition, 'EE Free')               AS cleaned_edition,
       REGEXP_REPLACE(NULLIF(fct_w_month_flag.version, ''), '[^0-9.]+')                                            AS cleaned_version,
       IFF(fct_w_month_flag.version ILIKE '%-pre', True, False)                                                    AS version_is_prerelease,
-      SPLIT_PART(fct_w_month_flag.cleaned_version, '.', 1)::NUMBER                                                AS major_version,
-      SPLIT_PART(fct_w_month_flag.cleaned_version, '.', 2)::NUMBER                                                AS minor_version,
-      fct_w_month_flag.major_version || '.' || fct_w_month_flag.minor_version                                     AS major_minor_version,
-      fct_w_month_flag.major_version * 100 + fct_w_month_flag.minor_version                                       AS major_minor_version_id,
+      SPLIT_PART(cleaned_version, '.', 1)::NUMBER                                                                 AS major_version,
+      SPLIT_PART(cleaned_version, '.', 2)::NUMBER                                                                 AS minor_version,
+      major_version || '.' || minor_version                                                                       AS major_minor_version,
+      major_version * 100 + minor_version                                                                         AS major_minor_version_id,
       CASE
         WHEN fct_w_month_flag.uuid = 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f'      THEN 'SaaS'
         ELSE 'Self-Managed'
@@ -174,7 +174,7 @@ SELECT DISTINCT
                      WHERE fct_w_month_flag.uuid = di.uuid)     THEN TRUE
         ELSE FALSE END                                                                                            AS is_saas_dedicated,
       CASE
-        WHEN fct_w_month_flag.ping_delivery_type = 'SaaS'                         THEN TRUE
+        WHEN ping_delivery_type = 'SaaS'                                          THEN TRUE
         WHEN fct_w_month_flag.installation_type = 'gitlab-development-kit'        THEN TRUE
         WHEN fct_w_month_flag.hostname = 'gitlab.com'                             THEN TRUE
         WHEN fct_w_month_flag.hostname ILIKE '%.gitlab.com'                       THEN TRUE
