@@ -452,7 +452,8 @@ class SnowflakeManager:
         # print(model_input[0])
         input_list = list(model_input)
         print(' '.join(input_list))
-
+        print(input_list[0])
+        print(type(input_list[0]))
         #
         # # print(input_list)
         # print(input_list[0])
