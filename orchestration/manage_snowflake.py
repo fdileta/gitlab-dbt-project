@@ -446,8 +446,8 @@ class SnowflakeManager:
     def clone_models_v2_testing(self, *model_input):
 
         print(model_input)
-        input_set = set([i for i in model_input])
-        input_list = list(input_set)
+        # input_set = set([i for i in model_input])
+        input_list = list(model_input)
         print(input_list)
 
 if __name__ == "__main__":
