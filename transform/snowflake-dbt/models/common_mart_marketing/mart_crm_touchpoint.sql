@@ -19,6 +19,7 @@
       -- touchpoint info
       dim_crm_touchpoint.dim_crm_touchpoint_id,
       dim_crm_touchpoint.bizible_touchpoint_date,
+      dim_crm_touchpoint.bizible_touchpoint_month,
       dim_crm_touchpoint.bizible_touchpoint_position,
       dim_crm_touchpoint.bizible_touchpoint_source,
       dim_crm_touchpoint.bizible_touchpoint_source_type,
@@ -40,7 +41,8 @@
       dim_crm_touchpoint.touchpoint_segment,
       dim_crm_touchpoint.gtm_motion,
       dim_crm_touchpoint.integrated_campaign_grouping,
-      dim_crm_touchpoint.utm_content,
+      dim_crm_touchpoint.pipe_name,
+      dim_crm_touchpoint.is_dg_influenced,
       fct_crm_touchpoint.bizible_count_first_touch,
       fct_crm_touchpoint.bizible_count_lead_creation_touch,
       fct_crm_touchpoint.bizible_count_u_shaped,
@@ -78,6 +80,10 @@
       fct_crm_person.last_utm_content,
       fct_crm_person.last_utm_campaign,
       fct_crm_person.true_inquiry_date,
+      dim_crm_person.account_demographics_sales_segment,
+      dim_crm_person.account_demographics_geo,
+      dim_crm_person.account_demographics_region,
+      dim_crm_person.account_demographics_area,
 
       -- campaign info
       dim_campaign.dim_campaign_id,
@@ -186,14 +192,26 @@
 
       -- bizible influenced
        CASE
-        WHEN  dim_campaign.budget_holder = 'fmm'
+        WHEN dim_campaign.budget_holder = 'fmm'
               OR campaign_rep_role_name = 'Field Marketing Manager'
               OR LOWER(dim_crm_touchpoint.utm_content) LIKE '%field%'
               OR LOWER(dim_campaign.type) = 'field event'
               OR LOWER(dim_crm_person.lead_source) = 'field event'
-        THEN 1
+          THEN 1
         ELSE 0
-      END AS is_fmm_influenced
+      END AS is_fmm_influenced,
+      CASE
+        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%FT%' 
+          AND is_fmm_influenced = 1 
+          THEN 1
+        ELSE 0
+      END AS is_fmm_sourced,
+      CASE
+        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%FT%' 
+          AND is_dg_influenced = 1 
+          THEN 1
+        ELSE 0
+      END AS is_dg_sourced
 
     FROM fct_crm_touchpoint
     LEFT JOIN dim_crm_touchpoint
@@ -278,5 +296,5 @@
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2021-02-18",
-    updated_date="2022-09-30"
+    updated_date="2022-10-05"
 ) }}

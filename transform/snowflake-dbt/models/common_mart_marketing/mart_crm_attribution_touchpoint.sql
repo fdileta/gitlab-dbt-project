@@ -14,18 +14,7 @@
     ('mart_crm_opportunity','mart_crm_opportunity')
 ]) }}
 
-, linear_base AS ( --the number of touches a given opp has in total
-    --linear attribution Net_Arr of an opp / all touches (count_touches) for each opp - weighted by the number of touches in the given bucket (campaign,channel,etc)
-
-    SELECT
-      dim_crm_opportunity_id,
-      net_arr,
-      COUNT(dim_crm_touchpoint_id) AS touchpoints_per_opportunity,
-      net_arr/touchpoints_per_opportunity AS weighted_linear_net_arr
-    FROM  mart_crm_attribution_touchpoint
-    GROUP BY 1,2
-
-), final AS (
+, joined AS (
 
     SELECT
       -- touchpoint info
@@ -54,21 +43,19 @@
       dim_crm_touchpoint.gtm_motion,
       dim_crm_touchpoint.integrated_campaign_grouping,
       dim_crm_touchpoint.pipe_name,
-      fct_crm_touchhpoint.touchpoints_per_opportunity,
-      fct_crm_touchhpoint.opps_per_touchpoint,
-      fct_crm_touchhpoint.first_weight,
-      fct_crm_touchhpoint.bizible_count_lead_creation_touch,
-      fct_crm_touchhpoint.full_weight,
-      fct_crm_touchhpoint.u_weight,
-      fct_crm_touchhpoint.w_weight,
-      fct_crm_touchhpoint.custom_weight,
-      (fct_crm_touchpoint.opps_per_touchpoint / linear_base.touchpoints_per_opportunity) AS l_weight,
+      dim_crm_touchpoint.is_dg_influenced,
+      fct_crm_attribution_touchpoint.first_weight,
+      fct_crm_attribution_touchpoint.bizible_count_lead_creation_touch,
+      fct_crm_attribution_touchpoint.full_weight,
+      fct_crm_attribution_touchpoint.u_weight,
+      fct_crm_attribution_touchpoint.w_weight,
+      fct_crm_attribution_touchpoint.custom_weight,
+      fct_crm_attribution_touchpoint.opps_per_touchpoint,
       (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.first_weight) AS first_net_arr,
       (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.w_weight) AS w_net_arr,
       (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.u_weight) AS u_net_arr,
       (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.full_weight) AS full_net_arr,
       (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.custom_weight) AS custom_net_arr,
-      (mart_crm_opportunity.net_arr * l_weight) AS linear_net_arr,
       (mart_crm_opportunity.net_arr / fct_crm_attribution_touchpoint.campaigns_per_opp) AS net_arr_per_campaign,
       fct_crm_attribution_touchpoint.bizible_revenue_full_path,
       fct_crm_attribution_touchpoint.bizible_revenue_custom_model,
@@ -109,6 +96,10 @@
       fct_crm_person.mql_count,
       fct_crm_person.last_utm_content,
       fct_crm_person.last_utm_campaign,
+      dim_crm_person.account_demographics_sales_segment,
+      dim_crm_person.account_demographics_geo,
+      dim_crm_person.account_demographics_region,
+      dim_crm_person.account_demographics_area,
 
       -- campaign info
       dim_campaign.dim_campaign_id,
@@ -257,14 +248,26 @@
 
       -- bizible influenced
        CASE
-        WHEN  dim_campaign.budget_holder = 'fmm'
+        WHEN dim_campaign.budget_holder = 'fmm'
               OR campaign_rep_role_name = 'Field Marketing Manager'
               OR LOWER(dim_crm_touchpoint.utm_content) LIKE '%field%'
               OR LOWER(dim_campaign.type) = 'field event'
               OR LOWER(dim_crm_person.lead_source) = 'field event'
-        THEN 1
+          THEN 1
         ELSE 0
-      END AS is_fmm_influenced
+      END AS is_fmm_influenced,
+      CASE
+        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%FT%' 
+          AND is_fmm_influenced = 1 
+          THEN 1
+        ELSE 0
+      END AS is_fmm_sourced,
+      CASE
+        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%FT%' 
+          AND is_dg_influenced = 1 
+          THEN 1
+        ELSE 0
+      END AS is_dg_sourced
 
     FROM fct_crm_attribution_touchpoint
     LEFT JOIN dim_crm_touchpoint
@@ -285,14 +288,36 @@
       ON fct_campaign.campaign_owner_id = campaign_owner.dim_crm_user_id
     LEFT JOIN mart_crm_opportunity
       ON fct_crm_attribution_touchpoint.dim_crm_opportunity_id = mart_crm_opportunity.dim_crm_opportunity_id
+
+), linear_base AS ( --the number of touches a given opp has in total
+    --linear attribution Net_Arr of an opp / all touches (count_touches) for each opp - weighted by the number of touches in the given bucket (campaign,channel,etc)
+
+    SELECT
+      dim_crm_opportunity_id,
+      net_arr,
+      COUNT(dim_crm_touchpoint_id) AS touchpoints_per_opportunity,
+      net_arr/touchpoints_per_opportunity AS weighted_linear_net_arr
+    FROM  joined
+    GROUP BY 1,2
+
+), final AS (
+
+    SELECT
+      joined.*,
+      linear_base.touchpoints_per_opportunity,
+      (joined.opps_per_touchpoint / linear_base.touchpoints_per_opportunity) AS l_weight,
+      (joined.net_arr * l_weight) AS linear_net_arr
+    FROM joined
     LEFT JOIN linear_base 
-      ON mart_crm_attribution_touchpoint.dim_crm_opportunity_id = linear_base.dim_crm_opportunity_id
+      ON joined.dim_crm_opportunity_id = linear_base.dim_crm_opportunity_id
+
 )
+
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2020-02-18",
-    updated_date="2022-09-12"
+    updated_date="2022-10-05"
 ) }}

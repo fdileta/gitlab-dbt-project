@@ -169,7 +169,11 @@ WITH campaign_details AS (
         WHEN combined_touchpoints.bizible_marketing_channel_path IN ('Sponsorship')
           THEN 'Paid Sponsorship'
         ELSE 'Unknown'
-      END AS pipe_name
+      END AS pipe_name,
+      CASE
+        WHEN touchpoint_segment = 'Demand Gen' THEN 1
+        ELSE 0
+      END AS is_dg_influenced
     FROM combined_touchpoints
     LEFT JOIN bizible_campaign_grouping
       ON combined_touchpoints.dim_crm_touchpoint_id = bizible_campaign_grouping.dim_crm_touchpoint_id
@@ -180,5 +184,5 @@ WITH campaign_details AS (
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2021-01-21",
-    updated_date="2022-09-12"
+    updated_date="2022-10-05"
 ) }}
