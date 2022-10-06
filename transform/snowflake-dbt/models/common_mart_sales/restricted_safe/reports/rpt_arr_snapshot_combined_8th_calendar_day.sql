@@ -43,6 +43,8 @@
       driveload_financial_metrics_program_phase_1_source.mrr,
       driveload_financial_metrics_program_phase_1_source.arr,
       driveload_financial_metrics_program_phase_1_source.quantity,
+      NULL                                                                                        AS is_arpu,
+      NULL                                                                                        AS is_licensed_user,
       driveload_financial_metrics_program_phase_1_source.parent_account_cohort_month,
       driveload_financial_metrics_program_phase_1_source.months_since_parent_account_cohort_start,
       driveload_financial_metrics_program_phase_1_source.parent_crm_account_employee_count_band
@@ -112,6 +114,8 @@
       mart_arr_snapshot_model.mrr,
       mart_arr_snapshot_model.arr,
       mart_arr_snapshot_model.quantity,
+      mart_arr_snapshot_model.is_arpu,
+      mart_arr_snapshot_model.is_licensed_user,
       parent_cohort_month_snapshot.parent_account_cohort_month                                  AS parent_account_cohort_month,
       DATEDIFF(month, parent_cohort_month_snapshot.parent_account_cohort_month, arr_month)      AS months_since_parent_account_cohort_start,
       mart_arr_snapshot_model.parent_crm_account_employee_count_band
@@ -188,6 +192,8 @@
       mrr,
       arr,
       quantity,
+      is_arpu,
+      is_licensed_user,
       parent_account_cohort_month,
       months_since_parent_account_cohort_start,
       COALESCE(parent_arr_band_calc.arr_band_calc, 'Missing crm_account_id')   AS arr_band_calc,
