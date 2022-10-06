@@ -452,9 +452,14 @@ class SnowflakeManager:
         # print(model_input[0])
         input_list = list(model_input)
         print(input_list)
-        print(input_list[0])
-        print(type(input_list[0]))
-        print(' '.join(input_list))
+
+        convert = ''
+
+        for i in input_list:
+            convert = f"{convert}{str(i)}"
+
+        print(convert)
+        print(''.join(input_list))
         #
         # # print(input_list)
         # print(input_list[0])
