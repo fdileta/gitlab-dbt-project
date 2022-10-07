@@ -47,7 +47,7 @@ class SnowflakeManager:
         print(model_input[0])
         print(len(model_input[0]))
 
-        joined = '\n'.join(model_input)
+        joined = ' '.join(model_input)
         print(joined)
 
         input_list = model_input
