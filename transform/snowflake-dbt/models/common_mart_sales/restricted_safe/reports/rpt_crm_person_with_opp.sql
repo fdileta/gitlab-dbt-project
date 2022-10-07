@@ -170,8 +170,6 @@
       ON mart_crm_person.dim_crm_account_id=mart_crm_opportunity.dim_crm_account_id
     LEFT JOIN dim_crm_user 
       ON mart_crm_person.dim_crm_user_id=dim_crm_user.dim_crm_user_id
-    LEFT JOIN rpt_sdr_ramp_daily 
-      ON mart_crm_person.dim_crm_user_id=rpt_sdr_ramp_daily.dim_crm_user_id
     LEFT JOIN upa_base 
       ON mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps 
