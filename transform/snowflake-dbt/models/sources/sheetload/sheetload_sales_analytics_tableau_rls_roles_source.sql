@@ -6,7 +6,7 @@ WITH source AS (
 ), renamed AS (
 
     SELECT
-      role:VARCHAR                              AS role,
+      role::VARCHAR                              AS role,
       key_segment_geo::VARCHAR                  AS key_segment_geo
 
     FROM source
