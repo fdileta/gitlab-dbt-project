@@ -42,7 +42,7 @@ class SnowflakeManager:
 
     def clone_models_v2_testing(self, model_input):
 
-        input_list = model_input.splitlines()
+        input_list = model_input
         output_list = []
         for i in input_list:
             d = json.loads(i)
