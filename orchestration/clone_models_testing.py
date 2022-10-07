@@ -42,6 +42,11 @@ class SnowflakeManager:
 
     def clone_models_v2_testing(self, model_input):
 
+        print(model_input)
+        print(type(model_input))
+        print(model_input[0])
+        print(len(model_input[0]))
+
         input_list = model_input
         output_list = []
         for i in input_list:
