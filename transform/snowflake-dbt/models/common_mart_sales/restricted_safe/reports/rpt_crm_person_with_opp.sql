@@ -158,7 +158,7 @@
       mart_crm_opportunity.is_edu_oss,
       mart_crm_opportunity.stage_name,
       mart_crm_opportunity.is_sao,
-      im_crm_user.crm_user_sales_segment AS user_sales_segment,
+      dim_crm_user.crm_user_sales_segment AS user_sales_segment,
       CASE WHEN is_first_order_available = False THEN mart_crm_opportunity.order_type
            ELSE '1. New - First Order'
       END AS person_order_type,
