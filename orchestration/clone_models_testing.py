@@ -47,6 +47,9 @@ class SnowflakeManager:
         print(model_input[0])
         print(len(model_input[0]))
 
+        joined = '\n'.join(model_input)
+        print(joined)
+
         input_list = model_input
         output_list = []
         for i in input_list:
