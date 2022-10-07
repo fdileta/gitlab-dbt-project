@@ -4,7 +4,6 @@
 
 {{ simple_cte([
     ('rpt_sfdc_bizible_linear','rpt_sfdc_bizible_linear'),
-    ('rpt_pmg_data','rpt_pmg_data'),
     ('rpt_sfdc_bizible_tp_person_lifecycle','rpt_sfdc_bizible_tp_person_lifecycle'),
     ('dim_date','dim_date')
 ]) }}
@@ -342,5 +341,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-01-25",
-    updated_date="2022-09-30"
+    updated_date="2022-10-07"
 ) }}
