@@ -62,6 +62,7 @@
     UNION ALL
     SELECT *
     FROM post_mql_tps
+)
 
 {{ dbt_audit(
     cte_ref="final",
