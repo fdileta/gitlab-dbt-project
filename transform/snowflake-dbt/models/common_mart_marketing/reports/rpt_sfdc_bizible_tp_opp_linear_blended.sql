@@ -182,6 +182,15 @@
       rpt_sfdc_bizible_linear.bizible_referrer_page_raw,
       rpt_sfdc_bizible_linear.bizible_salesforce_campaign,
       rpt_sfdc_bizible_linear.pipe_name,
+      rpt_sfdc_bizible_linear.bizible_touchpoint_source,
+      rpt_sfdc_bizible_linear.bizible_ad_content,
+      rpt_sfdc_bizible_linear.bizible_ad_group_name,
+      rpt_sfdc_bizible_linear.bizible_form_url_raw,
+      rpt_sfdc_bizible_linear.bizible_landing_page_raw,
+      rpt_sfdc_bizible_linear.bizible_referrer_page,
+      rpt_sfdc_bizible_linear.bizible_referrer_page_raw,
+      rpt_sfdc_bizible_linear.bizible_salesforce_campaign,
+      rpt_sfdc_bizible_linear.pipe_name,
       CASE
         WHEN touchpoint_segment = 'Demand Gen' THEN 1
         ELSE 0

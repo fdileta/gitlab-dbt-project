@@ -459,6 +459,9 @@
     cohort_base.dim_crm_account_id,
     cohort_base.opp_dim_crm_account_id,
     cohort_base.opp_dim_parent_crm_account_id,
+    cohort_base.dim_crm_account_id,
+    cohort_base.opp_dim_crm_account_id,
+    cohort_base.opp_dim_parent_crm_account_id,
   
     --person data
     CASE 
@@ -479,6 +482,313 @@
     cohort_base.account_demographics_territory,
     cohort_base.true_inquiry_date,
     cohort_base.mql_date_lastest_pt,
+    cohort_base.dim_crm_user_id,
+    cohort_base.mql_date_first_pt,
+    cohort_base.created_date_pt,
+    cohort_base.created_date,
+    cohort_base.mql_date_first,
+    cohort_base.lead_created_date,
+    cohort_base.lead_created_date_pt,
+    cohort_base.contact_created_date,
+    cohort_base.contact_created_date_pt,
+    cohort_base.inquiry_date,
+    cohort_base.inquiry_date_pt,
+    cohort_base.inquiry_inferred_date,
+    cohort_base.inquiry_inferred_date_pt,
+    cohort_base.accepted_date,
+    cohort_base.accepted_date_pt,
+    cohort_base.qualifying_date,
+    cohort_base.qualifying_date_pt,
+    cohort_base.converted_date,
+    cohort_base.converted_date_pt,
+    cohort_base.worked_date,
+    cohort_base.worked_date_pt,
+    cohort_base.email_domain,
+    cohort_base.was_converted_lead,
+    cohort_base.source_buckets,
+    cohort_base.crm_partner_id,
+    cohort_base.partner_prospect_id,
+    cohort_base.sequence_step_type,
+    cohort_base.name_of_active_sequence,
+    cohort_base.sequence_task_due_date,
+    cohort_base.sequence_status,
+    cohort_base.is_actively_being_sequenced,
+    cohort_base.person_sales_segment_name,
+    cohort_base.person_sales_segment_grouped,
+    cohort_base.person_score,
+    cohort_base.behavior_score,
+    cohort_base.marketo_last_interesting_moment,
+    cohort_base.marketo_last_interesting_moment_date,
+    cohort_base.account_demographics_segment_region_grouped,
+    cohort_base.account_demographics_sales_segment_grouped,
+    cohort_base.account_demographics_upa_state,
+    cohort_base.account_demographics_upa_postal_code,
+    cohort_base.zoominfo_phone_number,
+    cohort_base.zoominfo_mobile_phone_number,
+    cohort_base.zoominfo_do_not_call_direct_phone,
+    cohort_base.zoominfo_do_not_call_mobile_phone,
+    cohort_base.zoominfo_company_employee_count,
+    cohort_base.is_lead_source_trial,
+    cohort_base.is_inquiry,
+    CASE
+    WHEN LOWER(leandata_matched_account_sales_segment) = 'pubsec' THEN 'PubSec'
+    WHEN employee_count >=1 AND employee_count < 100 THEN 'SMB'
+    WHEN employee_count >=100 AND employee_count < 2000 THEN 'MM'
+    WHEN employee_count >=2000  THEN 'Large'
+    ELSE 'Unknown'
+  END AS employee_count_segment,
+  CASE 
+    WHEN LOWER(leandata_matched_account_sales_segment) = 'pubsec' THEN 'PubSec'
+    WHEN employee_bucket = '1-99' THEN 'SMB'
+    WHEN employee_bucket = '100-499' THEN 'MM'
+    WHEN employee_bucket = '500-1,999' THEN 'MM'
+    WHEN employee_bucket = '2,000-9,999' THEN 'Large'
+    WHEN employee_bucket = '10,000+' THEN 'Large'
+    ELSE 'Unknown'
+  END AS employee_bucket_segment,
+  CASE
+    WHEN first_country = 'afghanistan' THEN 'emea'
+    WHEN first_country = 'aland islands' THEN 'emea'
+    WHEN first_country = 'albania' THEN 'emea'
+    WHEN first_country = 'algeria' THEN 'emea'
+    WHEN first_country = 'andorra' THEN 'emea'
+    WHEN first_country = 'angola' THEN 'emea'
+    WHEN first_country = 'anguilla' THEN 'amer'
+    WHEN first_country = 'antigua and barbuda' THEN 'amer'
+    WHEN first_country = 'argentina' THEN 'amer'
+    WHEN first_country = 'armenia' THEN 'emea'
+    WHEN first_country = 'aruba' THEN 'amer'
+    WHEN first_country = 'australia' THEN 'apac'
+    WHEN first_country = 'austria' THEN 'emea'
+    WHEN first_country = 'azerbaijan' THEN 'emea'
+    WHEN first_country = 'bahamas' THEN 'amer'
+    WHEN first_country = 'bahrain' THEN 'emea'
+    WHEN first_country = 'bangladesh' THEN 'apac'
+    WHEN first_country = 'barbados' THEN 'amer'
+    WHEN first_country = 'belarus' THEN 'emea'
+    WHEN first_country = 'belgium' THEN 'emea'
+    WHEN first_country = 'belize' THEN 'amer'
+    WHEN first_country = 'benin' THEN 'emea'
+    WHEN first_country = 'bermuda' THEN 'amer'
+    WHEN first_country = 'bhutan' THEN 'apac'
+    WHEN first_country = 'bolivia' THEN 'amer'
+    WHEN first_country = 'bosnia and herzegovina' THEN 'emea'
+    WHEN first_country = 'bosnia and herzegowina' THEN 'emea'
+    WHEN first_country = 'botswana' THEN 'emea'
+    WHEN first_country = 'brazil' THEN 'amer'
+    WHEN first_country = 'british virgin islands' THEN 'amer'
+    WHEN first_country = 'brunei darussalam' THEN 'apac'
+    WHEN first_country = 'bulgaria' THEN 'emea'
+    WHEN first_country = 'burkina faso' THEN 'emea'
+    WHEN first_country = 'burundi' THEN 'emea'
+    WHEN first_country = 'cambodia' THEN 'apac'
+    WHEN first_country = 'cameroon' THEN 'emea'
+    WHEN first_country = 'canada' THEN 'amer'
+    WHEN first_country = 'cape verde' THEN 'emea'
+    WHEN first_country = 'caribbean netherlands' THEN 'amer'
+    WHEN first_country = 'cayman islands' THEN 'amer'
+    WHEN first_country = 'central african republic' THEN 'emea'
+    WHEN first_country = 'chad' THEN 'emea'
+    WHEN first_country = 'chile' THEN 'amer'
+    WHEN first_country = 'china' THEN 'jihu'
+    WHEN first_country = 'colombia' THEN 'amer'
+    WHEN first_country = 'comoros' THEN 'emea'
+    WHEN first_country = 'congo' THEN 'emea'
+    WHEN first_country = 'cook islands' THEN 'apac'
+    WHEN first_country = 'costa rica' THEN 'amer'
+    WHEN first_country LIKE 'cote' AND first_country LIKE 'ivoire' THEN 'emea'
+    WHEN first_country = 'croatia' THEN 'emea'
+    WHEN first_country = 'cuba' THEN 'amer'
+    WHEN first_country = 'curacao' THEN 'amer'
+    WHEN first_country = 'cyprus' THEN 'emea'
+    WHEN first_country = 'czech republic' THEN 'emea'
+    WHEN first_country = 'democratic republic of the congo' THEN 'emea'
+    WHEN first_country = 'denmark' THEN 'emea'
+    WHEN first_country = 'djibouti' THEN 'emea'
+    WHEN first_country = 'dominica' THEN 'amer'
+    WHEN first_country = 'dominican republic' THEN 'amer'
+    WHEN first_country = 'ecuador' THEN 'amer'
+    WHEN first_country = 'egypt' THEN 'emea'
+    WHEN first_country = 'el salvador' THEN 'amer'
+    WHEN first_country = 'equatorial guinea' THEN 'emea'
+    WHEN first_country = 'eritrea' THEN 'emea'
+    WHEN first_country = 'estonia' THEN 'emea'
+    WHEN first_country = 'eswatini' THEN 'emea'
+    WHEN first_country = 'ethiopia' THEN 'emea'
+    WHEN first_country = 'falkland islands' THEN 'amer'
+    WHEN first_country = 'faroe islands' THEN 'emea'
+    WHEN first_country = 'fiji' THEN 'apac'
+    WHEN first_country = 'finland' THEN 'emea'
+    WHEN first_country = 'france' THEN 'emea'
+    WHEN first_country = 'french guiana' THEN 'amer'
+    WHEN first_country = 'french polynesia' THEN 'apac'
+    WHEN first_country = 'gabon' THEN 'emea'
+    WHEN first_country = 'gambia' THEN 'emea'
+    WHEN first_country = 'georgia' THEN 'emea'
+    WHEN first_country = 'germany' THEN 'emea'
+    WHEN first_country = 'ghana' THEN 'emea'
+    WHEN first_country = 'gibraltar' THEN 'emea'
+    WHEN first_country = 'greece' THEN 'emea'
+    WHEN first_country = 'greenland' THEN 'emea'
+    WHEN first_country = 'grenada' THEN 'amer'
+    WHEN first_country = 'guadeloupe' THEN 'amer'
+    WHEN first_country = 'guatemala' THEN 'amer'
+    when first_country = 'guernsey' THEN 'emea'
+    WHEN first_country = 'guinea' THEN 'emea'
+    WHEN first_country = 'guinea-bissau' THEN 'emea'
+    WHEN first_country = 'guyana' THEN 'amer'
+    WHEN first_country = 'haiti' THEN 'amer'
+    WHEN first_country = 'honduras' THEN 'amer'
+    WHEN first_country = 'hungary' THEN 'emea'
+    WHEN first_country = 'iceland' THEN 'emea'
+    WHEN first_country = 'india' THEN 'apac'
+    WHEN first_country = 'indonesia' THEN 'apac'
+    WHEN first_country = 'iran' THEN 'emea'
+    WHEN first_country = 'iran' THEN 'emea'
+    WHEN first_country = 'iran, islamic republic of' THEN 'emea'
+    WHEN first_country = 'ireland' THEN 'emea'
+    WHEN first_country = 'isle of man' THEN 'emea'
+    WHEN first_country = 'israel' THEN 'emea'
+    WHEN first_country = 'italy' THEN 'emea'
+    WHEN first_country = 'ivory coast' THEN 'emea'
+    WHEN first_country LIKE 'côte d' AND first_country LIKE 'ivoire' THEN 'emea'
+    WHEN first_country = 'jamaica' THEN 'amer'
+    WHEN first_country = 'japan' THEN 'apac'
+    WHEN first_country = 'jersey' THEN 'emea'
+    WHEN first_country = 'jordan' THEN 'emea'
+    WHEN first_country = 'kazakhstan' THEN 'emea'
+    WHEN first_country = 'kenya' THEN 'emea'
+    WHEN first_country = 'kosovo' THEN 'emea'
+    WHEN first_country = 'kuwait' THEN 'emea'
+    WHEN first_country = 'kyrgyzstan' THEN 'emea'
+    WHEN first_country LIKE 'lao people' AND first_country LIKE 'democratic republic' THEN 'apac'
+    WHEN first_country = 'latvia' THEN 'emea'
+    WHEN first_country = 'lebanon' THEN 'emea'
+    WHEN first_country = 'lesotho' THEN 'emea'
+    WHEN first_country = 'liberia' THEN 'emea'
+    WHEN first_country = 'libya' THEN 'emea'
+    WHEN first_country = 'liechtenstein' THEN 'emea'
+    WHEN first_country = 'lithuania' THEN 'emea'
+    WHEN first_country = 'luxembourg' THEN 'emea'
+    WHEN first_country = 'macao' THEN 'jihu'
+    WHEN first_country = 'macedonia' THEN 'emea'
+    WHEN first_country = 'madagascar' THEN 'emea'
+    WHEN first_country = 'malawi' THEN 'emea'
+    WHEN first_country = 'malaysia' THEN 'apac'
+    WHEN first_country = 'maldives' THEN 'apac'
+    WHEN first_country = 'mali' THEN 'emea'
+    WHEN first_country = 'malta' THEN 'emea'
+    WHEN first_country = 'martinique' THEN 'amer'
+    WHEN first_country = 'mauritania' THEN 'emea'
+    WHEN first_country = 'mauritius' THEN 'emea'
+    WHEN first_country = 'mayotte' THEN 'emea'
+    WHEN first_country = 'mexico' THEN 'amer'
+    WHEN first_country = 'moldova' THEN 'emea'
+    WHEN first_country = 'monaco' THEN 'emea'
+    WHEN first_country = 'mongolia' THEN 'apac'
+    WHEN first_country = 'montenegro' THEN 'emea'
+    WHEN first_country = 'montserrat' THEN 'amer'
+    WHEN first_country = 'morocco' THEN 'emea'
+    WHEN first_country = 'mozambique' THEN 'emea'
+    WHEN first_country = 'myanmar' THEN 'apac'
+    WHEN first_country = 'namibia' THEN 'emea'
+    WHEN first_country = 'nauru' THEN 'apac'
+    WHEN first_country = 'nepal' THEN 'apac'
+    WHEN first_country = 'netherlands' THEN 'emea'
+    WHEN first_country = 'new caledonia' THEN 'apac'
+    WHEN first_country = 'new zealand' THEN 'apac'
+    WHEN first_country = 'nicaragua' THEN 'amer'
+    WHEN first_country = 'niger' THEN 'emea'
+    WHEN first_country = 'nigeria' THEN 'emea'
+    WHEN first_country = 'north macedonia' THEN 'emea'
+    WHEN first_country = 'norway' THEN 'emea'
+    WHEN first_country = 'oman' THEN 'emea'
+    WHEN first_country = 'pakistan' THEN 'emea'
+    WHEN first_country = 'palestine' THEN 'emea'
+    WHEN first_country = 'palestine, state of' THEN 'emea'
+    WHEN first_country = 'panama' THEN 'amer'
+    WHEN first_country = 'papua new guinea' THEN 'apac'
+    WHEN first_country = 'paraguay' THEN 'amer'
+    WHEN first_country = 'peru' THEN 'amer'
+    WHEN first_country = 'philippines' THEN 'apac'
+    WHEN first_country = 'poland' THEN 'emea'
+    WHEN first_country = 'portugal' THEN 'emea'
+    WHEN first_country = 'puerto rico' THEN 'amer'
+    WHEN first_country = 'qatar' THEN 'emea'
+    WHEN first_country = 'reunion' THEN 'emea'
+    WHEN first_country = 'romania' THEN 'emea'
+    WHEN first_country = 'russia' THEN 'emea'
+    WHEN first_country = 'rwanda' THEN 'emea'
+    WHEN first_country = 'saint helena' THEN 'emea'
+    WHEN first_country = 'saint kitts and nevis' THEN 'amer'
+    WHEN first_country = 'saint lucia' THEN 'amer'
+    WHEN first_country = 'saint martin' THEN 'amer'
+    WHEN first_country = 'saint vincent and the grenadines' THEN 'amer'
+    WHEN first_country = 'samoa' THEN 'apac'
+    WHEN first_country = 'san marino' THEN 'emea'
+    WHEN first_country = 'sao tome and principe' THEN 'emea'
+    WHEN first_country = 'saudi arabia' THEN 'emea'
+    WHEN first_country = 'senegal' THEN 'emea'
+    WHEN first_country = 'serbia' THEN 'emea'
+    WHEN first_country = 'seychelles' THEN 'emea'
+    WHEN first_country = 'sierra leone' THEN 'emea'
+    WHEN first_country = 'singapore' THEN 'apac'
+    WHEN first_country = 'sint maarten' THEN 'amer'
+    WHEN first_country = 'slovakia' THEN 'emea'
+    WHEN first_country = 'slovenia' THEN 'emea'
+    WHEN first_country = 'solomon islands' THEN 'apac'
+    WHEN first_country = 'somalia' THEN 'emea'
+    WHEN first_country = 'south africa' THEN 'emea'
+    WHEN first_country = 'south korea' THEN 'apac'
+    WHEN first_country = 'south sudan' THEN 'emea'
+    WHEN first_country = 'spain' THEN 'emea'
+    WHEN first_country = 'españa' THEN 'emea'
+    WHEN first_country = 'sri lanka' THEN 'apac'
+    WHEN first_country = 'sudan' THEN 'emea'
+    WHEN first_country = 'suriname' THEN 'amer'
+    WHEN first_country = 'swaziland' THEN 'emea'
+    WHEN first_country = 'sweden' THEN 'emea'
+    WHEN first_country = 'switzerland' THEN 'emea'
+    WHEN first_country = 'syria' THEN 'emea'
+    WHEN first_country = 'taiwan' THEN 'apac'
+    WHEN first_country = 'taiwan, province of china' THEN 'apac'
+    WHEN first_country = 'tajikistan' THEN 'emea'
+    WHEN first_country = 'tanzania' THEN 'emea'
+    WHEN first_country = 'united republic of tanzania' THEN 'emea'
+    WHEN first_country = 'thailand' THEN 'apac'
+    WHEN first_country = 'the netherlands' THEN 'emea'
+    WHEN first_country = 'timor-leste' THEN 'apac'
+    WHEN first_country = 'togo' THEN 'emea'
+    WHEN first_country = 'tonga' THEN 'apac'
+    WHEN first_country = 'trinidad and tobago' THEN 'amer'
+    WHEN first_country = 'tunisia' THEN 'emea'
+    WHEN first_country = 'turkey' THEN 'emea'
+    WHEN first_country = 'turkmenistan' THEN 'emea'
+    WHEN first_country = 'turks and caicos islands' THEN 'amer'
+    WHEN first_country = 'u.s. virgin islands' THEN 'amer'
+    WHEN first_country = 'uganda' THEN 'emea'
+    WHEN first_country = 'ukraine' THEN 'emea'
+    WHEN first_country = 'united arab emirates' THEN 'emea'
+    WHEN first_country = 'united kingdom' THEN 'emea'
+    WHEN first_country = 'uruguay' THEN 'amer'
+    WHEN first_country = 'uzbekistan' THEN 'emea'
+    WHEN first_country = 'vanuatu' THEN 'apac'
+    WHEN first_country = 'vatican' THEN 'emea'
+    WHEN first_country = 'venezuela' THEN 'amer'
+    WHEN first_country = 'vietnam' THEN 'apac'
+    WHEN first_country = 'western sahara' THEN 'emea'
+    WHEN first_country = 'yemen' THEN 'emea'
+    WHEN first_country = 'zambia' THEN 'emea'
+    WHEN first_country = 'zimbabwe' THEN 'emea'
+    WHEN first_country = 'united states' THEN 'amer'
+    WHEN first_country = 'turks and caicos' THEN 'amer'
+    WHEN first_country = 'korea, republic of' THEN 'apac'
+    WHEN first_country LIKE 'lao democratic people' AND first_country LIKE 's republic' THEN 'apac'
+    WHEN first_country = 'macedonia, the former yugoslav republic of' THEN 'emea'
+    WHEN first_country = 'moldova, republic of' THEN 'emea'
+    WHEN first_country = 'russian federation' THEN 'emea'
+    WHEN first_country = 'viet nam' THEN 'apac' 
+  END AS geo,
     cohort_base.dim_crm_user_id,
     cohort_base.mql_date_first_pt,
     cohort_base.created_date_pt,
@@ -939,6 +1249,139 @@
     cohort_base.churned_contraction_net_arr,
     cohort_base.calculated_deal_count,
     cohort_base.days_in_stage,
+    cohort_base.opp_dim_crm_user_id,
+    cohort_base.duplicate_opportunity_id,
+    cohort_base.merged_crm_opportunity_id,
+    cohort_base.record_type_id,
+    cohort_base.ssp_id,
+    cohort_base.opportunity_name,
+    cohort_base.stage_name,
+    cohort_base.reason_for_loss,
+    cohort_base.reason_for_loss_details,
+    cohort_base.risk_type,
+    cohort_base.risk_reasons,
+    cohort_base.downgrade_reason,
+    cohort_base.closed_buckets,
+    cohort_base.opportunity_category,
+    cohort_base.opp_source_buckets,
+    cohort_base.opportunity_sales_development_representative,
+    cohort_base.opportunity_business_development_representative,
+    cohort_base.opportunity_development_representative,
+    cohort_base.sdr_or_bdr,
+    cohort_base.sdr_pipeline_contribution,
+    cohort_base.sales_path,
+    cohort_base.opportunity_deal_size,
+    cohort_base.opp_primary_campaign_source_id,
+    cohort_base.opp_net_new_source_categories,
+    cohort_base.invoice_number,
+    cohort_base.deal_category,
+    cohort_base.deal_group,
+    cohort_base.deal_size,
+    cohort_base.calculated_deal_size,
+    cohort_base.dr_partner_engagement,
+    cohort_base.deal_path_engagement,
+    cohort_base.forecast_category_name,
+    cohort_base.opportunity_owner,
+    cohort_base.churn_contraction_type,
+    cohort_base.churn_contraction_net_arr_bucket,
+    cohort_base.opp_owner_id,
+    cohort_base.opp_order_type_grouped,
+    cohort_base.sales_qualified_source_grouped,
+    cohort_base.crm_account_gtm_strategy,
+    cohort_base.crm_account_focus_account,
+    cohort_base.crm_account_zi_technologies,
+    cohort_base.is_jihu_account,
+    cohort_base.fy22_new_logo_target_list,
+    cohort_base.is_closed,
+    cohort_base.is_edu_oss,
+    cohort_base.is_ps_opp,
+    cohort_base.is_win_rate_calc,
+    cohort_base.is_net_arr_pipeline_created,
+    cohort_base.is_new_logo_first_order,
+    cohort_base.is_closed_won,
+    cohort_base.is_web_portal_purchase,
+    cohort_base.is_lost,
+    cohort_base.is_open,
+    cohort_base.is_renewal,
+    cohort_base.is_duplicate,
+    cohort_base.is_refund,
+    cohort_base.is_deleted,
+    cohort_base.is_excluded_from_pipeline_created,
+    cohort_base.is_contract_reset,
+    cohort_base.is_booked_net_arr,
+    cohort_base.is_downgrade,
+    cohort_base.critical_deal_flag,
+    cohort_base.opp_crm_user_sales_segment,
+    cohort_base.opp_crm_user_sales_segment_grouped,
+    cohort_base.opp_crm_user_geo,
+    cohort_base.opp_crm_user_region,
+    cohort_base.opp_crm_user_area,
+    cohort_base.opp_crm_user_sales_segment_region_grouped,
+    cohort_base.crm_account_user_sales_segment,
+    cohort_base.crm_account_user_sales_segment_grouped,
+    cohort_base.crm_account_user_geo,
+    cohort_base.crm_account_user_region,
+    cohort_base.crm_account_user_area,
+    cohort_base.crm_account_user_sales_segment_region_grouped,
+    cohort_base.sao_crm_opp_owner_sales_segment_stamped,
+    cohort_base.sao_crm_opp_owner_sales_segment_stamped_grouped,
+    cohort_base.sao_crm_opp_owner_geo_stamped,
+    cohort_base.sao_crm_opp_owner_region_stamped,
+    cohort_base.sao_crm_opp_owner_area_stamped,
+    cohort_base.sao_crm_opp_owner_segment_region_stamped_grouped,
+    cohort_base.crm_opp_owner_sales_segment_stamped_grouped,
+    cohort_base.crm_opp_owner_sales_segment_region_stamped_grouped,
+    cohort_base.opportunity_owner_user_segment,
+    cohort_base.opportunity_owner_user_geo,
+    cohort_base.opportunity_owner_user_region,
+    cohort_base.opportunity_owner_user_area,
+    cohort_base.report_opportunity_user_segment,
+    cohort_base.report_opportunity_user_geo,
+    cohort_base.report_opportunity_user_region,
+    cohort_base.report_opportunity_user_area,
+    cohort_base.report_user_segment_geo_region_area,
+    cohort_base.opp_lead_source,
+    cohort_base.dr_partner_deal_type,
+    cohort_base.partner_account,
+    cohort_base.partner_account_name,
+    cohort_base.dr_status,
+    cohort_base.dr_deal_id,
+    cohort_base.dr_primary_registration,
+    cohort_base.is_public_sector_opp,
+    cohort_base.is_registration_from_portal,
+    cohort_base.stage_0_pending_acceptance_date,
+    cohort_base.stage_1_discovery_date,
+    cohort_base.stage_2_scoping_date,
+    cohort_base.stage_3_technical_evaluation_date,
+    cohort_base.stage_4_proposal_date,
+    cohort_base.stage_5_negotiating_date,
+    cohort_base.stage_6_awaiting_signature_date_date,
+    cohort_base.stage_6_closed_won_date,
+    cohort_base.stage_6_closed_lost_date,
+    cohort_base.subscription_start_date,
+    cohort_base.subscription_end_date,
+    cohort_base.sales_qualified_date,
+    cohort_base.last_activity_date,
+    cohort_base.arr_created_date,
+    cohort_base.pipeline_created_date,
+    cohort_base.net_arr_created_date,
+    cohort_base.days_in_0_pending_acceptance,
+    cohort_base.days_in_1_discovery,
+    cohort_base.days_in_2_scoping,
+    cohort_base.days_in_3_technical_evaluation,
+    cohort_base.days_in_4_proposal,
+    cohort_base.days_in_5_negotiating,
+    cohort_base.days_in_sao,
+    cohort_base.calculated_age_in_days,
+    cohort_base.days_since_last_activity,
+    cohort_base.arr_basis,
+    cohort_base.iacv,
+    cohort_base.net_iacv,
+    cohort_base.amount,
+    cohort_base.churned_contraction_deal_count,
+    cohort_base.churned_contraction_net_arr,
+    cohort_base.calculated_deal_count,
+    cohort_base.days_in_stage,
     CASE
       WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_touchpoint_id IS NOT null THEN cohort_base.dim_crm_opportunity_id
       ELSE null
@@ -980,6 +1423,20 @@
     rpt_sfdc_bizible_tp_opp_linear_blended.pipeline_custom_net_arr,
     rpt_sfdc_bizible_tp_opp_linear_blended.won_custom,
     rpt_sfdc_bizible_tp_opp_linear_blended.won_custom_net_arr,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_position,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source,
+    --rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source_type,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_type,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_content,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_group_name,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_form_url_raw,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_landing_page_raw,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_medium,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page_raw,
+    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_salesforce_campaign,
+    rpt_sfdc_bizible_tp_opp_linear_blended.touchpoint_segment,
+    rpt_sfdc_bizible_tp_opp_linear_blended.pipe_name,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_position,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source,
     --rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source_type,
