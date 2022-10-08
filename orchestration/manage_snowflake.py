@@ -447,8 +447,9 @@ class SnowflakeManager:
     def clone_models_v2_testing(self, *model_input):
         # input_list = list(model_input)
         # print(input_list)
-
-        joined = ' '.join(model_input)
+        print(model_input)
+        joined = ' '.join(str(i) for i in model_input)
+        print(joined)
         delimeter = '{"depends_on":'
         my_list = [delimeter + x for x in joined.split(delimeter) if x]
 
