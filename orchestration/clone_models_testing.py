@@ -47,7 +47,7 @@ class SnowflakeManager:
 
         delimeter = '{"depends_on":'
 
-        my_list = [x + delimeter for x in joined.split(delimeter) if x]
+        my_list = [delimeter + x for x in joined.split(delimeter) if x]
 
         for j in my_list:
             print(j)
