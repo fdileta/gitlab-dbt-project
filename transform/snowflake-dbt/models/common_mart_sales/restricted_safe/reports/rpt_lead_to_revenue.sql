@@ -217,7 +217,6 @@
       dim_crm_person.sfdc_record_id,
       person_base.account_demographics_sales_segment,
       person_base.account_demographics_sales_segment_grouped,
-      person_base.account_demographics_sales_segment_grouped,
       person_base.account_demographics_region,
       person_base.account_demographics_geo,
       person_base.account_demographics_area,
