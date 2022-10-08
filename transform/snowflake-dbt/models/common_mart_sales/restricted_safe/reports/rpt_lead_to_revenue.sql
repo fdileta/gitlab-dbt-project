@@ -1077,20 +1077,6 @@
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page_raw,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_salesforce_campaign,
     rpt_sfdc_bizible_tp_opp_linear_blended.touchpoint_segment,
-    rpt_sfdc_bizible_tp_opp_linear_blended.pipe_name,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_position,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source,
-    --rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source_type,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_type,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_content,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_group_name,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_form_url_raw,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_landing_page_raw,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_medium,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page_raw,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_salesforce_campaign,
-    rpt_sfdc_bizible_tp_opp_linear_blended.touchpoint_segment,
     rpt_sfdc_bizible_tp_opp_linear_blended.pipe_name
   FROM cohort_base
   LEFT JOIN rpt_sfdc_bizible_tp_opp_linear_blended
