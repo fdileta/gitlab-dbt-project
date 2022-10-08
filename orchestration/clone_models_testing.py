@@ -43,13 +43,12 @@ class SnowflakeManager:
     def clone_models_v2_testing(self, model_input):
 
 
-        joined = ' '.join(model_input)
-        print(joined)
+        joined = ' '.join(model_input).split('{"depends_on":')
+        for j in joined:
+            print(j)
 
-        for i in model_input:
-            print(i)
 
-        input_list = [joined]
+        input_list = joined
         output_list = []
         for i in input_list:
             d = json.loads(i)
