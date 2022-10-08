@@ -444,17 +444,26 @@ class SnowflakeManager:
             grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO GITLAB_CI"""
             query_executor(self.engine, grants_query)
 
-    def clone_models_v2_testing(self, model_input):
-        print(model_input)
+    def clone_models_v2_testing(self, *model_input):
         input_list = list(model_input)
         print(input_list)
 
-        convert = ''
+        joined = ' '.join(input_list)
+        delimeter = '{"depends_on":'
+        my_list = [delimeter + x for x in joined.split(delimeter) if x]
 
-        for i in input_list:
-            convert = convert + i
+        for j in my_list:
+            print(j)
 
-        print(convert)
+        output_list = []
+        for i in my_list:
+            d = json.loads(i)
+            actual_dependencies = [n for n in d.get('depends_on').get('nodes') if 'seed' not in n]
+            d["actual_dependencies"] = actual_dependencies
+            output_list.append(d)
+
+        for s in sorted(output_list, key=lambda i: len(i['actual_dependencies'])):
+            print(len(s.get('actual_dependencies')))
 
 
 if __name__ == "__main__":
