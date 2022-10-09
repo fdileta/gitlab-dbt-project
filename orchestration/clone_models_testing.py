@@ -18,6 +18,72 @@ import argparse
 logging.basicConfig(stream=sys.stdout, level=20)
 
 
+class Node:
+    def __init__(self, name):
+        self.name = name
+        self.edges = []
+        self.edge_names = []
+
+    def add_edge(self, node):
+        self.edges.append(node)
+
+    def add_edge_name(self, node):
+        self.edge_names.append(node)
+
+    def to_string(self):
+        return f"{self.name} -> {[edge.name for edge in self.edges]}"
+
+
+class DependencyResolver:
+    def __init__(self, dependency_list):
+        self.node_list = []
+        self.resolved_list = []
+
+        self.process_dependency_list(dependency_list)
+
+    def process_dependency_list(self, dependency_list):
+        for nod in dependency_list:
+            n = Node(nod.get('id'))
+
+            for dependency in nod.get('dependencies'):
+                n.add_edge_name(dependency)
+
+            self.node_list.append(n)
+
+        for node in self.node_list:
+            for name in node.edge_names:
+                dep_node = self.get_node(name)
+                if dep_node:
+                    node.add_edge(dep_node)
+                else:
+                    node.add_edge(Node(name))
+
+    def get_node(self, node_name):
+        for node in self.node_list:
+            if node.name == node_name:
+                return node
+
+    def dep_resolve(self, node: Node, resolved, unresolved):
+        unresolved.append(node)
+        for edge in node.edges:
+            if edge not in resolved:
+                if edge in unresolved:
+                    print(f'Circular reference detected: {node.name} -> {edge.name}')
+                self.dep_resolve(edge, resolved, unresolved)
+        resolved.append(node)
+        unresolved.remove(node)
+
+    def simple_resolution(self):
+        """format [{"id": 1, "dependencies": [1,2,3]}]"""
+        resolved = []
+        for node in self.node_list:
+            if node.name not in [r.name for r in resolved]:
+                self.dep_resolve(node, resolved, [])
+
+        clean_resolved = [r for r in resolved if r.name in [s.name for s in self.node_list]]
+
+        return clean_resolved
+
 
 class SnowflakeManager:
     def __init__(self, config_vars: Dict):
@@ -72,10 +138,6 @@ class SnowflakeManager:
 
         my_list = [delimeter + x for x in joined.split(delimeter) if x]
 
-        for j in my_list:
-            print(j)
-
-
         input_list = my_list
         output_list = []
         for i in input_list:
@@ -84,8 +146,24 @@ class SnowflakeManager:
             d["actual_dependencies"] = actual_dependencies
             output_list.append(d)
 
-        sorted_list = [s for s in sorted(output_list, key=lambda i: len(i['actual_dependencies']))]
+        for i in output_list:
+            actual_dependencies = [n for n in i.get('depends_on').get('nodes') if 'seed' not in n]
+            i["actual_dependencies"] = actual_dependencies
 
+        sorted_output = []
+
+        for i in output_list:
+            sorted_output.append({"id": i.get("unique_id"), "dependencies": i.get('actual_dependencies')})
+
+        dr = DependencyResolver(sorted_output)
+        resolved_dependencies = dr.simple_resolution()
+        sorted_list = []
+
+        for r in resolved_dependencies:
+
+            for i in output_list:
+                if i.get('unique_id') == r.name:
+                    sorted_list.append(i)
 
         for i in sorted_list:
             database_name = i.get('database').upper()
