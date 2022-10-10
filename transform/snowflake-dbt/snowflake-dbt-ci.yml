@@ -203,10 +203,10 @@
 clone_model_dbt_select_new_testing:
   <<: *snowflake_dbt_jobs
   script:
-    - export SNOWFLAKE_PREP_DATABASE="PREP"
-    - export SNOWFLAKE_PROD_DATABASE="PROD"
     - dbt deps $CI_PROFILE_TARGET
     - dbt seed --full-refresh $CI_PROFILE_TARGET #seed data from csv
+    - export SNOWFLAKE_PREP_DATABASE="PREP"
+    - export SNOWFLAKE_PROD_DATABASE="PROD"
     - INPUT=$(dbt --quiet ls --models +dim_subscription --output json --output-keys "database schema name depends_on unique_id" --profiles-dir profile --target prod)
     - /builds/gitlab-data/analytics/orchestration/clone_models_testing.py $INPUT
 
