@@ -40,6 +40,7 @@
 
     SELECT DISTINCT
       mart_crm_person.email_hash, 
+      mart_crm_person.sfdc_record_id,
       mart_crm_person.dim_crm_account_id,
       mart_crm_person.mql_date_lastest_pt,
       upa_base.dim_parent_crm_account_id,
@@ -78,7 +79,7 @@
 ), mql_order_type_base AS (
 
     SELECT DISTINCT
-      dim_crm_person.sfdc_record_id,
+      mart_crm_person.sfdc_record_id,
       mart_crm_person.email_hash, 
       CASE 
          WHEN mql_date_lastest_pt < mart_crm_opportunity.close_date THEN mart_crm_opportunity.order_type
@@ -87,8 +88,6 @@
       END AS mql_order_type_historical,
       ROW_NUMBER() OVER( PARTITION BY mart_crm_person.email_hash ORDER BY mql_order_type_historical) AS mql_order_type_number
     FROM mart_crm_person
-    INNER JOIN dim_crm_person ON
-    mart_crm_person.dim_crm_person_id=dim_crm_person.dim_crm_person_id
     FULL JOIN upa_base ON 
     mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps ON
@@ -105,7 +104,7 @@
 ), inquiry_order_type_base AS (
 
     SELECT DISTINCT
-      dim_crm_person.sfdc_record_id,
+      mart_crm_person.sfdc_record_id,
       mart_crm_person.email_hash, 
       CASE 
          WHEN true_inquiry_date < mart_crm_opportunity.close_date THEN mart_crm_opportunity.order_type
@@ -114,8 +113,6 @@
       END AS inquiry_order_type_historical,
       ROW_NUMBER() OVER( PARTITION BY mart_crm_person.email_hash ORDER BY inquiry_order_type_historical) AS inquiry_order_type_number
     FROM mart_crm_person
-    INNER JOIN dim_crm_person ON
-    mart_crm_person.dim_crm_person_id=dim_crm_person.dim_crm_person_id
     FULL JOIN upa_base ON 
     mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps ON
@@ -161,7 +158,7 @@
       mart_crm_person.dim_crm_person_id,
       mart_crm_person.dim_crm_account_id,
       mart_crm_person.is_mql,
-      dim_crm_person.sfdc_record_id,
+      mart_crm_person.sfdc_record_id,
       mart_crm_person.account_demographics_sales_segment,
       mart_crm_person.account_demographics_region,
       mart_crm_person.account_demographics_geo,
@@ -192,13 +189,11 @@
       opp.parent_crm_account_demographics_upa_country,
       opp.parent_crm_account_demographics_territory
     FROM mart_crm_person
-    INNER JOIN dim_crm_person
-      ON mart_crm_person.dim_crm_person_id=dim_crm_person.dim_crm_person_id
     LEFT JOIN upa_base
     ON mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps
       ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
-    FULL JOIN mart_crm_opportunity_stamped_hierarchy_hist opp
+    FULL JOIN mart_crm_opportunity opp
       ON upa_base.dim_parent_crm_account_id=opp.dim_parent_crm_account_id
     LEFT JOIN order_type_final
       ON mart_crm_person.email_hash=order_type_final.email_hash
@@ -254,12 +249,13 @@
     cohort_base.parent_crm_account_demographics_upa_country,
     cohort_base.parent_crm_account_demographics_territory,
     CASE
-      WHEN mart_crm_touchpoint_combined.dim_crm_touchpoint_id IS NOT null THEN cohort_base.dim_crm_opportunity_id
+      WHEN mart_crm_touchpoint_combined.dim_crm_touchpoint_id IS NOT null 
+          THEN cohort_base.dim_crm_opportunity_id
       ELSE null
     END AS influenced_opportunity_id,
   
     --touchpoint data
-    mart_crm_touchpoint_combined.bizible_touchpoint_date_normalized,
+    mart_crm_touchpoint_combined.bizible_touchpoint_date,
     mart_crm_touchpoint_combined.gtm_motion,
     mart_crm_touchpoint_combined.bizible_integrated_campaign_grouping,
     mart_crm_touchpoint_combined.bizible_marketing_channel_path,
@@ -308,8 +304,8 @@
 
 {{ dbt_audit(
     cte_ref="final",
-    created_by="@rkohnke",
-    updated_by="@rkohnke",
-    created_date="2022-07-20",
-    updated_date="2022-09-06",
+    created_by="@michellecooper",
+    updated_by="@michellecooper",
+    created_date="2022-10-05",
+    updated_date="2022-10-05",
   ) }}

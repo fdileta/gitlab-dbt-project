@@ -10,6 +10,7 @@
       mart_crm_touchpoint.bizible_touchpoint_date,
       mart_crm_touchpoint.bizible_integrated_campaign_grouping,
       mart_crm_touchpoint.bizible_marketing_channel_path,
+      mart_crm_touchpoint.bizible_marketing_channel,
       CASE 
         WHEN mart_crm_touchpoint.account_demographics_geo = 'NORAM' THEN 'AMER'
         ELSE mart_crm_touchpoint.account_demographics_geo 
@@ -96,7 +97,7 @@
       0 AS won_custom_net_arr,
       0 AS won_linear_net_arr
     FROM mart_crm_touchpoint
-    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42
+    {{ dbt_utils.group_by(43) }}
     
     UNION ALL
     
@@ -106,6 +107,7 @@
       mart_crm_attribution_touchpoint.bizible_touchpoint_date AS opp_touchpoint_date,
       mart_crm_attribution_touchpoint.bizible_integrated_campaign_grouping AS opp_integrated_campaign_grouping,
       mart_crm_attribution_touchpoint.bizible_marketing_channel_path,
+      mart_crm_attribution_touchpoint.bizible_marketing_channel,
     CASE 
       WHEN mart_crm_attribution_touchpoint.crm_user_region = 'NORAM' THEN 'AMER'
       ELSE mart_crm_attribution_touchpoint.crm_user_region 
@@ -291,7 +293,7 @@
         ELSE 0 
       END AS won_linear_net_arr
     FROM mart_crm_attribution_touchpoint
-    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41
+    {{ dbt_utils.group_by(42) }}
 )
 
 {{ dbt_audit(
