@@ -211,7 +211,45 @@
           AND is_dg_influenced = 1 
           THEN 1
         ELSE 0
-      END AS is_dg_sourced
+      END AS is_dg_sourced,
+
+    -- counts
+     CASE
+        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%LC%' 
+          AND dim_crm_touchpoint.bizible_touchpoint_position NOT LIKE '%PostLC%' 
+          THEN 1
+        ELSE 0
+      END AS count_inquiry,
+      CASE
+        WHEN fct_crm_person.true_inquiry_date >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN 1
+        ELSE 0
+      END AS count_true_inquiry,
+      CASE
+        WHEN fct_crm_person.mql_date_first >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN 1
+        ELSE 0
+      END AS count_mql,
+      CASE
+        WHEN fct_crm_person.mql_date_first >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN fct_crm_touchpoint.bizible_count_lead_creation_touch
+        ELSE 0
+      END AS count_net_new_mql,
+      CASE
+        WHEN fct_crm_person.accepted_date >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN 1
+        ELSE '0'
+      END AS count_accepted,
+      CASE
+        WHEN fct_crm_person.accepted_date >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN fct_crm_touchpoint.bizible_count_lead_creation_touch
+        ELSE 0
+      END AS count_net_new_accepted,
+
+      CASE 
+        WHEN count_mql=1 THEN dim_crm_person.sfdc_record_id
+        ELSE NULL
+      END AS mql_crm_person_id
 
     FROM fct_crm_touchpoint
     LEFT JOIN dim_crm_touchpoint

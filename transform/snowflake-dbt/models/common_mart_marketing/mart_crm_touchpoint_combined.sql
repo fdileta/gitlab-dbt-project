@@ -14,14 +14,14 @@
         WHEN mart_crm_touchpoint.account_demographics_geo = 'NORAM' THEN 'AMER'
         ELSE mart_crm_touchpoint.account_demographics_geo 
       END AS region_normalized, -- 5
-      IFF(mart_crm_touchpoint.sales_segment_name IS null,'Unknown',mart_crm_touchpoint.sales_segment_name) AS sales_segment_name,
+      IFF(mart_crm_touchpoint.touchpoint_crm_user_segment_name_live  IS null,'Unknown',mart_crm_touchpoint.touchpoint_crm_user_segment_name_live) AS sales_segment_name,
       mart_crm_touchpoint.crm_person_status,
       mart_crm_touchpoint.bizible_touchpoint_type, 
       mart_crm_touchpoint.bizible_touchpoint_position,
       null AS sales_type,
-      null AS opp_created_date,
+      null AS opportunity_created_date,
       null AS sales_accepted_date,
-      null AS close_date, 
+      null AS opportunity_close_date, 
       null AS stage_name,
       null AS is_won,-- 15
       null AS is_sao,
@@ -33,7 +33,7 @@
       null AS dim_crm_opportunity_id,
       mart_crm_touchpoint.crm_account_name AS crm_account_name, 
       mart_crm_touchpoint.crm_account_gtm_strategy,
-      UPPER(mart_crm_touchpoint.person_country) AS country,
+      UPPER(mart_crm_touchpoint.crm_person_country) AS country,
       mart_crm_touchpoint.bizible_medium AS bizible_medium,
       mart_crm_touchpoint.touchpoint_segment, -- 25
       mart_crm_touchpoint.gtm_motion,
@@ -41,7 +41,7 @@
       mart_crm_touchpoint.last_utm_content,
       mart_crm_touchpoint.bizible_ad_campaign_name,
       mart_crm_touchpoint.lead_source,
-      mart_crm_touchpoint.campaign_type,
+      mart_crm_touchpoint.type,
       mart_crm_touchpoint.mql_date_first::date AS mql_date_first, --30
       mart_crm_touchpoint.true_inquiry_date,
       mart_crm_touchpoint.dim_crm_person_id AS dim_crm_person_id,
@@ -96,7 +96,7 @@
       0 AS won_custom_net_arr,
       0 AS won_linear_net_arr
     FROM mart_crm_touchpoint
-    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41
+    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42
     
     UNION ALL
     
@@ -105,19 +105,19 @@
       mart_crm_attribution_touchpoint.bizible_touchpoint_month AS opp_touchpoint_month, 
       mart_crm_attribution_touchpoint.bizible_touchpoint_date AS opp_touchpoint_date,
       mart_crm_attribution_touchpoint.bizible_integrated_campaign_grouping AS opp_integrated_campaign_grouping,
-      mart_crm_attribution_touchpoint.marketing_channel_path,
+      mart_crm_attribution_touchpoint.bizible_marketing_channel_path,
     CASE 
       WHEN mart_crm_attribution_touchpoint.crm_user_region = 'NORAM' THEN 'AMER'
       ELSE mart_crm_attribution_touchpoint.crm_user_region 
     END AS region_normalized, --5
-      IFF(mart_crm_attribution_touchpoint.crm_user_sales_segment IS null,'Unknown',mart_crm_attribution_touchpoint.crm_user_sales_segment) AS sales_segment_name,
+      IFF(mart_crm_attribution_touchpoint.touchpoint_crm_user_segment_name_live IS null,'Unknown',mart_crm_attribution_touchpoint.touchpoint_crm_user_segment_name_live) AS sales_segment_name,
       null AS crm_person_status,
       mart_crm_attribution_touchpoint.bizible_touchpoint_type,
       mart_crm_attribution_touchpoint.bizible_touchpoint_position, 
       mart_crm_attribution_touchpoint.sales_type,
-      mart_crm_attribution_touchpoint.opp_created_date, --10
+      mart_crm_attribution_touchpoint.opportunity_created_date, --10
       mart_crm_attribution_touchpoint.sales_accepted_date,
-      mart_crm_attribution_touchpoint.close_date,
+      mart_crm_attribution_touchpoint.opportunity_close_date,
       mart_crm_attribution_touchpoint.stage_name,
       mart_crm_attribution_touchpoint.is_won, 
       mart_crm_attribution_touchpoint.is_sao, --15
@@ -129,7 +129,7 @@
       mart_crm_attribution_touchpoint.dim_crm_opportunity_id AS dim_crm_opportunity_id,
       mart_crm_attribution_touchpoint.crm_account_name,
       mart_crm_attribution_touchpoint.crm_account_gtm_strategy,
-      UPPER(mart_crm_attribution_touchpoint.country) AS country,
+      UPPER(mart_crm_attribution_touchpoint.crm_person_country) AS country,
       mart_crm_attribution_touchpoint.bizible_medium AS bizible_medium, -- 25
       mart_crm_attribution_touchpoint.touchpoint_segment,
       mart_crm_attribution_touchpoint.gtm_motion,
@@ -137,7 +137,7 @@
       mart_crm_attribution_touchpoint.last_utm_content,
       mart_crm_attribution_touchpoint.bizible_ad_campaign_name, --30
       mart_crm_attribution_touchpoint.lead_source,
-      mart_crm_attribution_touchpoint.campaign_type,
+      mart_crm_attribution_touchpoint.type,
       null AS mql_date_first,
       null AS true_inquiry_date,
       null AS dim_crm_person_id,
@@ -291,7 +291,7 @@
         ELSE 0 
       END AS won_linear_net_arr
     FROM mart_crm_attribution_touchpoint
-    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41   
+    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41
 )
 
 {{ dbt_audit(
