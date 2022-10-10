@@ -1,6 +1,7 @@
 {{ config({
     "materialized": "incremental",
-    "unique_key" : "primary_key"
+    "unique_key" : "primary_key",
+    "on_schema_change" : "append_new_columns"
     })
 }}
 
@@ -12,7 +13,7 @@ source AS (
   FROM {{ source('gcp_billing','test_summary_gcp_billing') }}
   {% if is_incremental() %}
 
-  WHERE uploaded_at >= (SELECT MAX(uploaded_at) FROM {{this}})
+  WHERE value['_partition_date']::DATE >= (SELECT MAX(uploaded_at) FROM {{this}})
 
   {% endif %}
 
