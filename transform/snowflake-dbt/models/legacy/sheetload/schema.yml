@@ -189,3 +189,7 @@ models:
       - unique
     - name: stage_name
     - name: section_name
+- name: sheetload_sales_analytics_tableau_rls_users
+  description: Users for SS&A Tableau row-level-security
+- name: sheetload_sales_analytics_tableau_rls_roles
+  description: User roles for SS&A Tableau row-level-security

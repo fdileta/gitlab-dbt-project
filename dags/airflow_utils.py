@@ -30,6 +30,13 @@ analytics_pipelines_dag = [
 ]
 
 
+data_science_pipelines_dag = [
+    "ds_propensity_to_expand",
+    "ds_propensity_to_contract",
+    "ds_propensity_to_purchase_trial",
+]
+
+
 def split_date_parts(day: date, partition: str) -> Dict:
 
     if partition == "month":
@@ -129,6 +136,8 @@ def slack_defaults(context, task_type):
     if task_type == "failure":
         if dag_id in analytics_pipelines_dag:
             slack_channel = "#analytics-pipelines"
+        elif dag_id in data_science_pipelines_dag:
+            slack_channel = "#data-science-pipelines"
         else:
             slack_channel = dag_context.params.get(
                 "slack_channel_override", "#data-pipelines"
@@ -172,6 +181,8 @@ def slack_snapshot_failed_task(context):
 def slack_webhook_conn(slack_channel):
     if slack_channel == "#analytics-pipelines":
         slack_webhook = Variable.get("AIRFLOW_VAR_ANALYTICS_PIPELINES")
+    elif slack_channel == "#data-science-pipelines":
+        slack_webhook = Variable.get("AIRFLOW_VAR_DATA_SCIENCE_PIPELINES")
     else:
         slack_webhook = Variable.get("AIRFLOW_VAR_DATA_PIPELINES")
     airflow_http_con_id = Variable.get("AIRFLOW_VAR_SLACK_CONNECTION")

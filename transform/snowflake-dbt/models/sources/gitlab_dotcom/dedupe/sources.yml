@@ -408,6 +408,8 @@ sources:
         identifier: gitlab_db_group_import_states
       - name: integrations
         identifier: gitlab_db_integrations
+      - name: jira_connect_subscriptions
+        identifier: gitlab_db_jira_connect_subscriptions
       - name: jira_imports
         identifier: gitlab_db_jira_imports
         freshness:
