@@ -45,7 +45,7 @@
       driveload_financial_metrics_program_phase_1_source.quantity,
       NULL                                                                                         AS is_arpu,
       CASE
-        WHEN driveload_financial_metrics_program_phase_1_source.product_tier_name = 'Storage' THEN FALSE
+        WHEN product_tier_name = 'Storage' THEN FALSE
         ELSE TRUE
       END                                                                                          AS is_licensed_user,
       driveload_financial_metrics_program_phase_1_source.parent_account_cohort_month,
