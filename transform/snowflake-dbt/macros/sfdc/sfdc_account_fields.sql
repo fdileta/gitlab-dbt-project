@@ -470,6 +470,10 @@ WITH map_merged_crm_account AS (
       ON sfdc_account.record_type_id = sfdc_record_type.record_type_id
     LEFT JOIN prep_crm_person
       ON sfdc_account.primary_contact_id = prep_crm_person.sfdc_record_id
+    LEFT JOIN pte_scores 
+      ON sfdc_account.account_id = pte_scores.crm_account_id
+    LEFT JOIN ptc_scores
+      ON sfdc_account.account_id = pte_scores.crm_account_id
     {%- if model_type == 'live' %}
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
@@ -501,10 +505,6 @@ WITH map_merged_crm_account AS (
     LEFT JOIN sfdc_users AS last_modified_by
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
         AND sfdc_account.snapshot_id = last_modified_by.snapshot_id
-    LEFT JOIN pte_scores 
-      ON sfdc_account.account_id = pte_scores.crm_account_id
-    LEFT JOIN ptc_scores
-      ON sfdc_account.account_id = pte_scores.crm_account_id
     {%- endif %}
 
 )
