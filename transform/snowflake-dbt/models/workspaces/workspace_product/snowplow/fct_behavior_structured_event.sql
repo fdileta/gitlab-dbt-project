@@ -1,5 +1,6 @@
 {{config({
 
+        "snowflake_warehouse": generate_warehouse_name('XL'),
         "unique_key":"behavior_structured_event_pk",
         "materialized":"vault_insert_by_period",
         "period":"week",
