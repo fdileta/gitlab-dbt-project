@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import logging
 import sys
-import json
 from os import environ as env
 from typing import Dict, List
 
@@ -31,10 +30,9 @@ class SnowflakeManager:
 
         # Snowflake database name should be in CAPS
         # see https://gitlab.com/meltano/analytics/issues/491
-        self.branch_name = config_vars["BRANCH_NAME"].upper()
-        self.prep_database = "{}_PREP".format(self.branch_name)
-        self.prod_database = "{}_PROD".format(self.branch_name)
-        self.raw_database = "{}_RAW".format(self.branch_name)
+        self.prep_database = "{}_PREP".format(config_vars["BRANCH_NAME"].upper())
+        self.prod_database = "{}_PROD".format(config_vars["BRANCH_NAME"].upper())
+        self.raw_database = "{}_RAW".format(config_vars["BRANCH_NAME"].upper())
 
     def generate_db_queries(
         self,
@@ -132,7 +130,7 @@ class SnowflakeManager:
                 connection.execute(queries[0])
                 logging.info("DBs exist...")
                 db_exists = True
-            except Exception:
+            except:
                 logging.info("DB does not exist...")
                 db_exists = False
             finally:
@@ -238,12 +236,11 @@ class SnowflakeManager:
         :param database:
         :param schema:
         """
-
         stages_query = f"""
-        SELECT
+             SELECT 
                  stage_schema,
                  stage_name,
-                 stage_url,
+                 stage_url, 
                  stage_type
              FROM {database}.information_schema.stages
              {f"WHERE stage_schema = '{schema.upper()}'" if schema != "" else ""}
@@ -261,7 +258,8 @@ class SnowflakeManager:
             if stage["stage_type"] == "External Named":
 
                 clone_stage_query = f"""
-                    CREATE OR REPLACE STAGE {output_stage_name} LIKE {from_stage_name}
+                    CREATE OR REPLACE STAGE {output_stage_name} LIKE   
+                    {from_stage_name}
                     """
 
                 grants_query = f"""
@@ -270,7 +268,7 @@ class SnowflakeManager:
 
             else:
                 clone_stage_query = f"""
-                    CREATE OR REPLACE STAGE {output_stage_name}
+                    CREATE OR REPLACE STAGE {output_stage_name}  
                     """
 
                 grants_query = f"""
@@ -289,180 +287,6 @@ class SnowflakeManager:
             except ProgrammingError as prg:
                 # Catches permissions errors
                 logging.error(prg._sql_message(as_unicode=False))
-
-    def clone_schemas(self, *schema_input):
-        """
-            Runs through a list of schemas, creating each in the CI DB provided.
-        :param: schema_input:
-        :return: None
-        """
-        # Distinct values of input
-        input_set = set([i for i in schema_input])
-        input_list = list(input_set)
-
-        for i in input_list:
-            i = i.replace('"', "")
-            output_schema = f"{self.branch_name}_{i}"
-            clone_statement = f"CREATE OR REPLACE SCHEMA {output_schema} CLONE {i};"
-            logging.info(f"Running {clone_statement}")
-            query_executor(self.engine, clone_statement)
-            logging.info(f"{clone_statement} run")
-
-            logging.info("Granting rights on stage to GITLAB_CI")
-            grants_query = f"""GRANT ALL ON SCHEMA {output_schema} TO GITLAB_CI"""
-            res = query_executor(self.engine, grants_query)
-            logging.info(res[0])
-
-            logging.info("Granting rights on stage to LOADER")
-            grants_query = f"""GRANT ALL ON SCHEMA {output_schema} TO TRANSFORMER"""
-            res = query_executor(self.engine, grants_query)
-            logging.info(res[0])
-
-    def create_schema(self, schema_name):
-        """
-
-        :param schema_name:
-        :return:
-        """
-        logging.info("Creating schema if it does not exist")
-
-        query = f"""CREATE SCHEMA IF NOT EXISTS {schema_name};"""
-        query_executor(self.engine, query)
-
-        logging.info("Granting rights on stage to TRANSFORMER")
-        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
-        query_executor(self.engine, grants_query)
-
-        logging.info("Granting rights on stage to GITLAB_CI")
-        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
-        query_executor(self.engine, grants_query)
-
-        return True
-
-    def clone_models(self, *model_input):
-        """
-            Runs through a list of schemas, creating each in the CI DB provided.
-        :param: schema_input:
-        :return: None
-        """
-        # Distinct values of input
-        input_set = set([i for i in model_input])
-        input_list = list(input_set)
-
-        for i in input_list:
-            i = i.replace('"', "")
-
-            database_name = i.split(".")[0]
-            schema_name = i.split(".")[1]
-            table_name = i.split(".")[-1]
-
-            output_table_name = f"{self.branch_name}_{i}"
-            output_schema_name = output_table_name.replace(f".{table_name}", "")
-
-            query = f"""
-                SELECT
-                    TABLE_TYPE,
-                    IS_TRANSIENT
-                FROM {database_name}.INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_SCHEMA = UPPER('{schema_name}')
-                AND TABLE_NAME = UPPER('{table_name}')
-            """
-
-            res = query_executor(self.engine, query)
-
-            self.create_schema(output_schema_name)
-
-            table_or_view = res[0][0]
-            if table_or_view == "VIEW":
-                logging.info("Cloning view")
-
-                query = f"""
-                    SELECT GET_DDL('VIEW', '{i}', TRUE)
-                """
-                print(query)
-                res = query_executor(self.engine, query)
-
-                base_dll = res[0][0]
-
-                # Essentially, this code is finding and replacing the DB name in only the first line for recreating
-                # views. This is because we have a database & schema named PREP, which creates a special case in the
-                # rest of the views they are replaced completely.
-                split_file = base_dll.splitlines()
-
-                first_line = base_dll.splitlines()[0]
-                find_db_name = (
-                    first_line[base_dll.find("view") :]
-                    .split(".")[0]
-                    .replace("PREP", self.prep_database)
-                    .replace("PROD", self.prod_database)
-                )
-                new_first_line = f"{first_line[:base_dll.find('view')]}{find_db_name}{first_line[base_dll.find('.'):]}"
-
-                replaced_file = [
-                    f.replace("PREP", self.prep_database).replace(
-                        "PROD", self.prod_database
-                    )
-                    for f in split_file
-                ]
-                joined_lines = "\n".join(replaced_file[1:])
-
-                output_query = new_first_line + "\n" + joined_lines
-                query_executor(self.engine, output_query)
-                logging.info(f"View {i} successfully created. ")
-
-                logging.info("Granting rights on VIEW to TRANSFORMER")
-                grants_query = f"""GRANT OWNERSHIP ON VIEW {output_table_name} TO TRANSFORMER REVOKE CURRENT GRANTS"""
-                query_executor(self.engine, grants_query)
-
-                logging.info("Granting rights on VIEW to GITLAB_CI")
-                grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO GITLAB_CI"""
-                query_executor(self.engine, grants_query)
-
-                continue
-
-            transient_table = res[0][1]
-            # TODO: This can be a one-liner
-            if transient_table == "YES":
-                clone_statement = f"CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {i} COPY GRANTS;"
-            else:
-                clone_statement = (
-                    f"CREATE OR REPLACE {output_table_name} CLONE {i} COPY GRANTS;"
-                )
-
-            query_executor(self.engine, clone_statement)
-            logging.info(f"{clone_statement} successfully run. ")
-
-            logging.info("Granting rights on TABLE to TRANSFORMER")
-            grants_query = f"""GRANT OWNERSHIP ON TABLE {output_table_name} TO TRANSFORMER REVOKE CURRENT GRANTS"""
-            query_executor(self.engine, grants_query)
-
-            logging.info("Granting rights on TABLE to GITLAB_CI")
-            grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO GITLAB_CI"""
-            query_executor(self.engine, grants_query)
-
-    def clone_models_v2_testing(self, *model_input):
-        # input_list = list(model_input)
-        # print(input_list)
-        print(model_input)
-        joined = " ".join(str(i) for i in model_input)
-        print(joined)
-        delimeter = '{"depends_on":'
-        my_list = [delimeter + x for x in joined.split(delimeter) if x]
-
-        for j in my_list:
-            print(j)
-
-        output_list = []
-        for i in my_list:
-            d = json.loads(i)
-            actual_dependencies = [
-                n for n in d.get("depends_on").get("nodes") if "seed" not in n
-            ]
-            d["actual_dependencies"] = actual_dependencies
-            output_list.append(d)
-
-        for s in sorted(output_list, key=lambda i: len(i["actual_dependencies"])):
-            print(len(s.get("actual_dependencies")))
 
 
 if __name__ == "__main__":
