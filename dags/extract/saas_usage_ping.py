@@ -10,13 +10,11 @@ from airflow_utils import (
     gitlab_defaults,
     slack_failed_task,
     gitlab_pod_env_vars,
-    clone_and_setup_extraction_cmd,
 )
 from kube_secrets import (
     SNOWFLAKE_ACCOUNT,
     SNOWFLAKE_LOAD_ROLE,
     SNOWFLAKE_LOAD_USER,
-    SNOWFLAKE_LOAD_WAREHOUSE,
     SNOWFLAKE_LOAD_PASSWORD,
     SNOWFLAKE_PASSWORD,
     SNOWFLAKE_USER,

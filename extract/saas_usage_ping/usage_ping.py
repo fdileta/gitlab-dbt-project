@@ -138,10 +138,10 @@ class UsagePing(object):
                 try:
                     data_to_write = error_data_to_write = None
                     query_output = pd.read_sql(sql=query, con=connection)
-                    #standardize column case across pandas versions
+                    # standardize column case across pandas versions
                     query_output.columns = query_output.columns.str.lower()
                     info(query_output)
-                    #convert 'numpy int' to 'int' so json can be written
+                    # convert 'numpy int' to 'int' so json can be written
                     data_to_write = int(query_output.loc[0, "counter_value"])
                 except (KeyError, ValueError):
                     data_to_write = 0

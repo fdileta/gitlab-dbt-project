@@ -7,7 +7,6 @@ from logging import info
 
 from os import environ as env
 import re
-from flatten_dict import flatten
 import sqlparse
 from sqlparse.sql import Token, TokenList
 from sqlparse.tokens import Whitespace
@@ -186,7 +185,7 @@ def get_sql_dict(payload: dict) -> dict:
     - preserve original JSON structure for 'valid' key:values
     """
 
-    sql_dict = {}
+    sql_dict: Dict[Any, Any] = dict()
     for metric_name, metric_sql in payload.items():
         if isinstance(metric_sql, dict):
             return_dict = get_sql_dict(metric_sql)
@@ -442,7 +441,7 @@ def perform_action_on_query_str(original_dict: Dict[Any, Any], action: Callable[
     If the value is a dictionary, recursively call this function,
     so that eventually all 'child' query strings can be actioned.
     """
-    new_dict = {}
+    new_dict: Dict[Any, Any] = dict()
     for k, v in original_dict.items():
         # if dict, rerun this function recursively
         if isinstance(v, dict):
