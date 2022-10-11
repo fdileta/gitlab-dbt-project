@@ -317,6 +317,7 @@ class SnowflakeManager:
             grants_query = f"""GRANT ALL ON SCHEMA {output_schema} TO TRANSFORMER"""
             res = query_executor(self.engine, grants_query)
             logging.info(res[0])
+
     def create_schema(self, schema_name):
         """
 
@@ -329,15 +330,11 @@ class SnowflakeManager:
         query_executor(self.engine, query)
 
         logging.info("Granting rights on stage to TRANSFORMER")
-        grants_query = (
-            f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
-        )
+        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
         query_executor(self.engine, grants_query)
 
         logging.info("Granting rights on stage to GITLAB_CI")
-        grants_query = (
-            f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
-        )
+        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
         query_executor(self.engine, grants_query)
 
         return True
@@ -378,7 +375,6 @@ class SnowflakeManager:
             table_or_view = res[0][0]
             if table_or_view == "VIEW":
                 logging.info("Cloning view")
-
 
                 query = f"""
                     SELECT GET_DDL('VIEW', '{i}', TRUE)
@@ -448,7 +444,7 @@ class SnowflakeManager:
         # input_list = list(model_input)
         # print(input_list)
         print(model_input)
-        joined = ' '.join(str(i) for i in model_input)
+        joined = " ".join(str(i) for i in model_input)
         print(joined)
         delimeter = '{"depends_on":'
         my_list = [delimeter + x for x in joined.split(delimeter) if x]
@@ -459,12 +455,14 @@ class SnowflakeManager:
         output_list = []
         for i in my_list:
             d = json.loads(i)
-            actual_dependencies = [n for n in d.get('depends_on').get('nodes') if 'seed' not in n]
+            actual_dependencies = [
+                n for n in d.get("depends_on").get("nodes") if "seed" not in n
+            ]
             d["actual_dependencies"] = actual_dependencies
             output_list.append(d)
 
-        for s in sorted(output_list, key=lambda i: len(i['actual_dependencies'])):
-            print(len(s.get('actual_dependencies')))
+        for s in sorted(output_list, key=lambda i: len(i["actual_dependencies"])):
+            print(len(s.get("actual_dependencies")))
 
 
 if __name__ == "__main__":

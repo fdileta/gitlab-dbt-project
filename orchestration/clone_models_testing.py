@@ -17,6 +17,7 @@ from simple_dependency_resolver.simple_dependency_resolver import DependencyReso
 # Set logging defaults
 logging.basicConfig(stream=sys.stdout, level=20)
 
+
 class SnowflakeManager:
     def __init__(self, config_vars: Dict):
         self.engine = create_engine(
@@ -48,15 +49,11 @@ class SnowflakeManager:
         query_executor(self.engine, query)
 
         logging.info("Granting rights on stage to TRANSFORMER")
-        grants_query = (
-            f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
-        )
+        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
         query_executor(self.engine, grants_query)
 
         logging.info("Granting rights on stage to GITLAB_CI")
-        grants_query = (
-            f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
-        )
+        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
         query_executor(self.engine, grants_query)
 
         return True
@@ -67,7 +64,7 @@ class SnowflakeManager:
         :param model_input:
         :return:
         """
-        joined = ' '.join(model_input)
+        joined = " ".join(model_input)
 
         delimeter = '{"depends_on":'
 
@@ -78,14 +75,18 @@ class SnowflakeManager:
         list_of_dicts = []
         for i in input_list:
             d = json.loads(i)
-            actual_dependencies = [n for n in d.get('depends_on').get('nodes') if 'seed' not in n]
+            actual_dependencies = [
+                n for n in d.get("depends_on").get("nodes") if "seed" not in n
+            ]
             d["actual_dependencies"] = actual_dependencies
             list_of_dicts.append(d)
 
         sorted_output = []
 
         for i in list_of_dicts:
-            sorted_output.append({"id": i.get("unique_id"), "dependencies": i.get('actual_dependencies')})
+            sorted_output.append(
+                {"id": i.get("unique_id"), "dependencies": i.get("actual_dependencies")}
+            )
 
         dr = DependencyResolver(sorted_output)
         resolved_dependencies = dr.simple_resolution()
@@ -93,7 +94,7 @@ class SnowflakeManager:
 
         for r in resolved_dependencies:
             for i in list_of_dicts:
-                if i.get('unique_id') == r.name:
+                if i.get("unique_id") == r.name:
                     sorted_list.append(i)
 
         return sorted_list
@@ -113,18 +114,25 @@ class SnowflakeManager:
         query_executor(self.engine, grants_query)
 
         logging.info(f"Granting rights on {object_type} to GITLAB_CI")
-        grants_query = f"""GRANT ALL ON {object_type.upper()} {object_name.upper()} TO GITLAB_CI"""
+        grants_query = (
+            f"""GRANT ALL ON {object_type.upper()} {object_name.upper()} TO GITLAB_CI"""
+        )
         query_executor(self.engine, grants_query)
 
     def clean_view_dll(self, dll_input):
-        # Essentially, this code is finding and replacing the DB name in only the first line for recreating
-        # views. This is because we have a database & schema named PREP, which creates a special case in the
-        # rest of the views they are replaced completely.
+        """
+        Essentially, this code is finding and replacing the DB name in only the first line for recreating
+        views. This is because we have a database & schema named PREP, which creates a special case in the
+        rest of the views they are replaced completely.
+
+        :param dll_input:
+        :return:
+        """
         split_file = dll_input.splitlines()
 
         first_line = dll_input.splitlines()[0]
         find_db_name = (
-            first_line[dll_input.find("view"):]
+            first_line[dll_input.find("view") :]
             .split(".")[0]
             .replace("PREP", self.prep_database)
             .replace("PROD", self.prod_database)
@@ -132,9 +140,7 @@ class SnowflakeManager:
         new_first_line = f"{first_line[:dll_input.find('view')]}{find_db_name}{first_line[dll_input.find('.'):]}"
 
         replaced_file = [
-            f.replace("PREP", self.prep_database).replace(
-                    "PROD", self.prod_database
-            )
+            f.replace("PREP", self.prep_database).replace("PROD", self.prod_database)
             for f in split_file
         ]
         joined_lines = "\n".join(replaced_file[1:])
@@ -152,9 +158,9 @@ class SnowflakeManager:
         sorted_list = self.clean_dbt_input(model_input)
 
         for i in sorted_list:
-            database_name = i.get('database').upper()
-            schema_name = i.get('schema').upper()
-            table_name = i.get('name').upper()
+            database_name = i.get("database").upper()
+            schema_name = i.get("schema").upper()
+            table_name = i.get("name").upper()
 
             full_name = f"{database_name}.{schema_name}.{table_name}"
 
@@ -178,10 +184,7 @@ class SnowflakeManager:
             if table_or_view == "VIEW":
                 logging.info("Cloning view")
 
-                query = f"""
-                    SELECT GET_DDL('VIEW', '{full_name}', TRUE)
-                """
-                print(query)
+                query = f"""SELECT GET_DDL('VIEW', '{full_name}', TRUE)"""
                 res = query_executor(self.engine, query)
 
                 base_dll = res[0][0]
@@ -190,7 +193,7 @@ class SnowflakeManager:
                 query_executor(self.engine, output_query)
                 logging.info(f"View {full_name} successfully created. ")
 
-                self.grant_table_view_rights('view', output_table_name)
+                self.grant_table_view_rights("view", output_table_name)
 
                 continue
 
@@ -199,22 +202,17 @@ class SnowflakeManager:
             if transient_table == "YES":
                 clone_statement = f"CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
             else:
-                clone_statement = (
-                    f"CREATE OR REPLACE {output_table_name} CLONE {full_name} COPY GRANTS;"
-                )
+                clone_statement = f"CREATE OR REPLACE {output_table_name} CLONE {full_name} COPY GRANTS;"
 
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
 
-            self.grant_table_view_rights('table', output_table_name)
-
-
-
+            self.grant_table_view_rights("table", output_table_name)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('INPUT', nargs='+')
+    parser.add_argument("INPUT", nargs="+")
     args = parser.parse_args()
 
     snowflake_manager = SnowflakeManager(env.copy())
