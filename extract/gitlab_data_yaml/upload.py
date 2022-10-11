@@ -36,7 +36,7 @@ if __name__ == "__main__":
     )
 
     pi_internal_hb_file_dict = dict(
-        corporate_finance_pi="corporate_finance",
+        #corporate_finance_pi="corporate_finance",
         dev_section_pi="dev_section",
         enablement_section_pi="enablement_section",
         ops_section_pi="ops_section",
@@ -87,22 +87,27 @@ if __name__ == "__main__":
 
         # Load the content in json
         api_response_json = response.json()
-        # Get the content from response
-        file_content = api_response_json.get("content")
-        message_bytes = base64.b64decode(file_content)
-        output_json_request = yaml.load(message_bytes, Loader=yaml.Loader)
-        # write to the Json file
-        with open(f"{file_name}.json", "w") as f:
-            json.dump(output_json_request, f, indent=4)
+        #check if the file is empty or not present.
+        record_count = len(api_response_json)
+        if record_count > 1:
+            # Get the content from response
+            file_content = api_response_json.get("content")
+            message_bytes = base64.b64decode(file_content)
+            output_json_request = yaml.load(message_bytes, Loader=yaml.Loader)
+            # write to the Json file
+            with open(f"{file_name}.json", "w") as f:
+                json.dump(output_json_request, f, indent=4)
+            logging.info(f"Uploading to {file_name}.json to Snowflake stage.")
 
-        logging.info(f"Uploading to {file_name}.json to Snowflake stage.")
-
-        snowflake_stage_load_copy_remove(
+            snowflake_stage_load_copy_remove(
             f"{file_name}.json",
             "gitlab_data_yaml.gitlab_data_yaml_load",
             f"gitlab_data_yaml.{table_name}",
             snowflake_engine,
         )
+        else:
+            logging.ERROR(f"Empty file or the location has changed investigate ")
+        
 
     def curl_and_upload(table_name, file_name, base_url, private_token=None):
         """This function uses Curl to download the file and convert the YAML to JSON.
