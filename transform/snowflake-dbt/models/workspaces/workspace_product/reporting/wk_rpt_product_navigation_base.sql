@@ -65,7 +65,7 @@ WITH filtered_snowplow_events AS (
         event_action = 'render' AND event_label = 'user_side_navigation'
       )
     )
-  {% if is_incremental %}
+  {% if is_incremental() %}
 
     AND  derived_tstamp > (SELECT MAX(derived_tstamp) FROM {{ this }})
 
