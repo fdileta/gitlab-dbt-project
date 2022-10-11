@@ -175,10 +175,10 @@ def get_keyword_index(token_list: list, defined_keyword: str) -> int:
     return 0
 
 
-def get_query_dict(payload: dict) -> dict:
+def get_sql_dict(payload: dict) -> dict:
     """
     Filtered out data and keep real SQLs in
-    the query_dict dict
+    the sql_dict dict
 
     The logic:
     - Only keep any 'valid' key:values that have a select value OR
@@ -186,15 +186,15 @@ def get_query_dict(payload: dict) -> dict:
     - preserve original JSON structure for 'valid' key:values
     """
 
-    query_dict = {}
+    sql_dict = {}
     for metric_name, metric_sql in payload.items():
         if isinstance(metric_sql, dict):
-            return_dict = get_query_dict(metric_sql)
+            return_dict = get_sql_dict(metric_sql)
             if return_dict:
-                query_dict[metric_name] = return_dict
+                sql_dict[metric_name] = return_dict
         elif isinstance(metric_sql, str) and metric_sql.startswith("SELECT"):
-            query_dict[metric_name] = metric_sql
-    return query_dict
+            sql_dict[metric_name] = metric_sql
+    return sql_dict
 
 
 def get_trimmed_query(query: str) -> str:
@@ -468,9 +468,9 @@ def transform(json_data: Dict[Any, Any]) -> Dict[Any, Any]:
     Main input point to transform queries
     """
 
-    query_dict = get_query_dict(json_data)
+    sql_dict = get_sql_dict(json_data)
 
-    prepared = perform_action_on_query_str(original_dict=query_dict, action=add_counter_name_as_column, action_arg_type='both')
+    prepared = perform_action_on_query_str(original_dict=sql_dict, action=add_counter_name_as_column, action_arg_type='both')
 
     transformed = perform_action_on_query_str(original_dict=prepared, action=get_renamed_query_tables, action_arg_type='value')
 
@@ -509,11 +509,11 @@ if __name__ == "__main__":
         private_token=config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"]
     )
 
-    final_sql_query_dict = transform(payload)
+    final_sql__dict = transform(payload)
     final_meta_data = keep_meta_data(payload)
     info("Processed final sql queries")
 
     save_to_json_file(
-        file_name=TRANSFORMED_INSTANCE_QUERIES_FILE, json_data=final_sql_query_dict
+        file_name=TRANSFORMED_INSTANCE_QUERIES_FILE, json_data=final_sql__dict
     )
     save_to_json_file(file_name=META_DATA_INSTANCE_QUERIES_FILE, json_data=final_meta_data)

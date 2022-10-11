@@ -127,7 +127,8 @@ class UsagePing(object):
             # if the 'query' is a dictionary, then recursively call
             if isinstance(query, dict):
                 results_returned, errors_returned = self.evaluate_saas_queries(connection, query)
-                results[key] = results_returned
+                if results_returned:
+                    results[key] = results_returned
                 if errors_returned:
                     errors[key] = errors_returned
             # reached a 'select statement' value, run it in snowflake
