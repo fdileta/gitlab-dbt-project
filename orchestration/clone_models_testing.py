@@ -108,12 +108,12 @@ class SnowflakeManager:
 
         logging.info(f"Granting rights on {object_type} to TRANSFORMER")
         grants_query = f"""
-            GRANT OWNERSHIP ON {object_type.upper()} {object_name.upper} TO TRANSFORMER REVOKE CURRENT GRANTS
+            GRANT OWNERSHIP ON {object_type.upper()} {object_name.upper()} TO TRANSFORMER REVOKE CURRENT GRANTS
             """
         query_executor(self.engine, grants_query)
 
         logging.info(f"Granting rights on {object_type} to GITLAB_CI")
-        grants_query = f"""GRANT ALL ON {object_type.upper()} {object_name.upper} TO GITLAB_CI"""
+        grants_query = f"""GRANT ALL ON {object_type.upper()} {object_name.upper()} TO GITLAB_CI"""
         query_executor(self.engine, grants_query)
 
     def clean_view_dll(self, dll_input):
