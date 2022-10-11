@@ -135,6 +135,16 @@ WITH map_merged_crm_account AS (
     FROM sfdc_account
     WHERE account_id = ultimate_parent_account_id
 
+), pte_scores AS (
+
+    SELECT * 
+    FROM {{ ref('pte_scores') }}
+
+), ptc_scores AS (
+
+    SELECT * 
+    FROM {{ ref('ptc_scores') }}
+
 ), final AS (
 
     SELECT
@@ -433,6 +443,15 @@ WITH map_merged_crm_account AS (
       IFNULL(lam_corrections.dev_count, sfdc_account.lam_dev_count)       AS parent_crm_account_lam_dev_count,
       {%- endif %}
 
+      -- PtC and PtE 
+      pte_scores.score                                                    AS pte_score,
+      pte_scores.decile                                                   AS pte_decile,
+      pte_scores.score_group                                              AS pte_score_group,
+      ptc_scores.score                                                    AS ptc_score,
+      ptc_scores.decile                                                   AS ptc_decile,
+      ptc_scores.score_group                                              AS ptc_score_group,
+
+
       --metadata
       sfdc_account.created_by_id,
       created_by.name                                                     AS created_by_name,
@@ -442,7 +461,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.last_modified_date,
       {{ get_date_id('sfdc_account.last_activity_date') }}                AS last_activity_date_id,
       sfdc_account.last_activity_date,
-      sfdc_account.is_deleted
+      sfdc_account.is_deleted,
 
     FROM sfdc_account
     LEFT JOIN map_merged_crm_account
@@ -482,6 +501,10 @@ WITH map_merged_crm_account AS (
     LEFT JOIN sfdc_users AS last_modified_by
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
         AND sfdc_account.snapshot_id = last_modified_by.snapshot_id
+    LEFT JOIN pte_scores 
+      ON sfdc_account.account_id = pte_scores.crm_account_id
+    LEFT JOIN ptc_scores
+      ON sfdc_account.account_id = pte_scores.crm_account_id
     {%- endif %}
 
 )
