@@ -5,10 +5,8 @@ import json
 from os import environ as env
 from typing import Dict, List
 
-from fire import Fire
 from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
-from sqlalchemy.exc import ProgrammingError
 
 from gitlabdata.orchestration_utils import query_executor
 import argparse
@@ -63,9 +61,12 @@ class SnowflakeManager:
 
         return True
 
-    def clone_models_v2_testing(self, model_input):
+    def clean_dbt_input(self, model_input):
+        """
 
-
+        :param model_input:
+        :return:
+        """
         joined = ' '.join(model_input)
 
         delimeter = '{"depends_on":'
@@ -73,20 +74,17 @@ class SnowflakeManager:
         my_list = [delimeter + x for x in joined.split(delimeter) if x]
 
         input_list = my_list
-        output_list = []
+
+        list_of_dicts = []
         for i in input_list:
             d = json.loads(i)
             actual_dependencies = [n for n in d.get('depends_on').get('nodes') if 'seed' not in n]
             d["actual_dependencies"] = actual_dependencies
-            output_list.append(d)
-
-        for i in output_list:
-            actual_dependencies = [n for n in i.get('depends_on').get('nodes') if 'seed' not in n]
-            i["actual_dependencies"] = actual_dependencies
+            list_of_dicts.append(d)
 
         sorted_output = []
 
-        for i in output_list:
+        for i in list_of_dicts:
             sorted_output.append({"id": i.get("unique_id"), "dependencies": i.get('actual_dependencies')})
 
         dr = DependencyResolver(sorted_output)
@@ -94,10 +92,20 @@ class SnowflakeManager:
         sorted_list = []
 
         for r in resolved_dependencies:
-
-            for i in output_list:
+            for i in list_of_dicts:
                 if i.get('unique_id') == r.name:
                     sorted_list.append(i)
+
+        return sorted_list
+
+    def clone_models_v2_testing(self, model_input):
+        """
+
+        :param model_input:
+        :return:
+        """
+
+        sorted_list = self.clean_dbt_input(model_input)
 
         for i in sorted_list:
             database_name = i.get('database').upper()
