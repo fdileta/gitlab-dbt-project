@@ -44,7 +44,10 @@
       driveload_financial_metrics_program_phase_1_source.arr,
       driveload_financial_metrics_program_phase_1_source.quantity,
       NULL                                                                                         AS is_arpu,
-      NULL                                                                                         AS is_licensed_user,
+      CASE
+        WHEN common_product_tier.product_tier_name = 'Storage' THEN FALSE
+        ELSE TRUE
+      END                                                                                          AS is_licensed_user,
       driveload_financial_metrics_program_phase_1_source.parent_account_cohort_month,
       driveload_financial_metrics_program_phase_1_source.months_since_parent_account_cohort_start,
       driveload_financial_metrics_program_phase_1_source.parent_crm_account_employee_count_band
