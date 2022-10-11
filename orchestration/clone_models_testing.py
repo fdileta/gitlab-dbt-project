@@ -202,7 +202,7 @@ class SnowflakeManager:
             if transient_table == "YES":
                 clone_statement = f"CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
             else:
-                clone_statement = f"CREATE OR REPLACE {output_table_name} CLONE {full_name} COPY GRANTS;"
+                clone_statement = f"CREATE OR REPLACE TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
 
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
