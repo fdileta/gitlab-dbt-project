@@ -24,12 +24,16 @@ WITH filtered_snowplow_events AS (
     AND (
       (
         event_label IN (
-        'main_navigation',
-        'click_whats_new_drawer',
-        'click_forum',
-        'profile_dropdown',
-        'groups_side_navigation',
-        'kubernetes_sections_tabs'
+          'main_navigation',
+          'profile_dropdown',
+          'groups_side_navigation',
+          'kubernetes_sections_tabs'
+        )
+      ) OR
+      (
+        event_action IN (
+          'click_whats_new_drawer',
+          'click_forum'
         )
       ) OR
       (
@@ -72,6 +76,6 @@ WITH filtered_snowplow_events AS (
     cte_ref="filtered_snowplow_events",
     created_by="@mdrussell",
     updated_by="@mdrussell",
-    created_date="2022-09-30",
-    updated_date="2022-09-30"
+    created_date="2022-10-11",
+    updated_date="2022-10-11"
 ) }}
