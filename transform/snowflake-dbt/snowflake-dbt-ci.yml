@@ -179,28 +179,7 @@
 # DBT cloning
 # ======
 
-➕🔆clone_schema_dbt_select:
-  <<: *snowflake_dbt_jobs
-  script:
-    - export SNOWFLAKE_PREP_DATABASE="PREP"
-    - export SNOWFLAKE_PROD_DATABASE="PROD"
-    - dbt deps $CI_PROFILE_TARGET
-    - INPUT=$(dbt --quiet ls --models +dim_subscription --output json --output-keys "database schema"  --profiles-dir profile --target prod | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
-    - cd /builds/gitlab-data/analytics
-    - orchestration/manage_snowflake.py clone_schemas $INPUT
-
-
-➕🔆⚡️clone_model_dbt_select:
-  <<: *snowflake_dbt_jobs
-  script:
-    - export SNOWFLAKE_PREP_DATABASE="PREP"
-    - export SNOWFLAKE_PROD_DATABASE="PROD"
-    - dbt deps $CI_PROFILE_TARGET
-    - INPUT=$(dbt --quiet ls --models +dim_subscription --output json --output-keys "database schema name"  --profiles-dir profile --target prod | sed "s/{\"database\"://g" | sed "s/, \"schema\":/./g" | sed "s/, \"name\":/./g" | sed "s/}//g" | sed "s/ //g")
-    - cd /builds/gitlab-data/analytics
-    - orchestration/manage_snowflake.py clone_models $INPUT
-
-clone_model_dbt_select_new_testing:
+clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
     - dbt deps $CI_PROFILE_TARGET
@@ -208,7 +187,7 @@ clone_model_dbt_select_new_testing:
     - export SNOWFLAKE_PREP_DATABASE="PREP"
     - export SNOWFLAKE_PROD_DATABASE="PROD"
     - INPUT=$(dbt --quiet ls --models $DBT_MODELS --output json --output-keys "database schema name depends_on unique_id" --profiles-dir profile --target prod)
-    - /builds/gitlab-data/analytics/orchestration/clone_models_testing.py $INPUT
+    - /builds/gitlab-data/analytics/orchestration/clone_models_dbt_select.py $INPUT
 
 # dbt tests
 .dbt_misc_jobs: &dbt_misc_jobs

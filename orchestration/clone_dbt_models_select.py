@@ -88,8 +88,8 @@ class SnowflakeManager:
                 {"id": i.get("unique_id"), "dependencies": i.get("actual_dependencies")}
             )
 
-        dr = DependencyResolver(sorted_output)
-        resolved_dependencies = dr.simple_resolution()
+        dr = DependencyResolver()
+        resolved_dependencies = dr.simple_resolution(sorted_output)
         sorted_list = []
 
         for r in resolved_dependencies:
@@ -148,7 +148,7 @@ class SnowflakeManager:
         output_query = new_first_line + "\n" + joined_lines
         return output_query
 
-    def clone_models_v2_testing(self, model_input):
+    def clone_dbt_models(self, model_input):
         """
 
         :param model_input:
@@ -216,4 +216,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     snowflake_manager = SnowflakeManager(env.copy())
-    snowflake_manager.clone_models_v2_testing(args.INPUT)
+    snowflake_manager.clone_dbt_models(args.INPUT)
