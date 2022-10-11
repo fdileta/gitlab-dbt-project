@@ -249,7 +249,7 @@ WITH first_contact  AS (
 
     SELECT DISTINCT
       sfdc_zqu_quote_source.zqu__opportunity                AS dim_crm_opportunity_id,
-      sfdc_zqu_quote_source.quote_id                        AS dim_quote_id,
+      sfdc_zqu_quote_source.zqu_quote_id                    AS dim_quote_id,
       sfdc_zqu_quote_source.zqu__start_date::DATE           AS quote_start_date,
       (ROW_NUMBER() OVER (PARTITION BY sfdc_zqu_quote_source.zqu__opportunity ORDER BY sfdc_zqu_quote_source.created_date DESC))
                                                             AS record_number
