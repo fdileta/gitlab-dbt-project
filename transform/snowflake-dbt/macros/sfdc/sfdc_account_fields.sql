@@ -461,7 +461,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.last_modified_date,
       {{ get_date_id('sfdc_account.last_activity_date') }}                AS last_activity_date_id,
       sfdc_account.last_activity_date,
-      sfdc_account.is_deleted,
+      sfdc_account.is_deleted
 
     FROM sfdc_account
     LEFT JOIN map_merged_crm_account
