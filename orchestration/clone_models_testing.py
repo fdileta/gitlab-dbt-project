@@ -98,6 +98,50 @@ class SnowflakeManager:
 
         return sorted_list
 
+    def grant_table_view_rights(self, object_type, object_name):
+        """
+            Right type can be table or view
+        :param object_type:
+        :param object_name:
+        :return:
+        """
+
+        logging.info(f"Granting rights on {object_type} to TRANSFORMER")
+        grants_query = f"""
+            GRANT OWNERSHIP ON {object_type.upper()} {object_name.upper} TO TRANSFORMER REVOKE CURRENT GRANTS
+            """
+        query_executor(self.engine, grants_query)
+
+        logging.info(f"Granting rights on {object_type} to GITLAB_CI")
+        grants_query = f"""GRANT ALL ON {object_type.upper()} {object_name.upper} TO GITLAB_CI"""
+        query_executor(self.engine, grants_query)
+
+    def clean_view_dll(self, dll_input):
+        # Essentially, this code is finding and replacing the DB name in only the first line for recreating
+        # views. This is because we have a database & schema named PREP, which creates a special case in the
+        # rest of the views they are replaced completely.
+        split_file = dll_input.splitlines()
+
+        first_line = dll_input.splitlines()[0]
+        find_db_name = (
+            first_line[dll_input.find("view"):]
+            .split(".")[0]
+            .replace("PREP", self.prep_database)
+            .replace("PROD", self.prod_database)
+        )
+        new_first_line = f"{first_line[:dll_input.find('view')]}{find_db_name}{first_line[dll_input.find('.'):]}"
+
+        replaced_file = [
+            f.replace("PREP", self.prep_database).replace(
+                    "PROD", self.prod_database
+            )
+            for f in split_file
+        ]
+        joined_lines = "\n".join(replaced_file[1:])
+
+        output_query = new_first_line + "\n" + joined_lines
+        return output_query
+
     def clone_models_v2_testing(self, model_input):
         """
 
@@ -134,7 +178,6 @@ class SnowflakeManager:
             if table_or_view == "VIEW":
                 logging.info("Cloning view")
 
-
                 query = f"""
                     SELECT GET_DDL('VIEW', '{full_name}', TRUE)
                 """
@@ -143,39 +186,11 @@ class SnowflakeManager:
 
                 base_dll = res[0][0]
 
-                # Essentially, this code is finding and replacing the DB name in only the first line for recreating
-                # views. This is because we have a database & schema named PREP, which creates a special case in the
-                # rest of the views they are replaced completely.
-                split_file = base_dll.splitlines()
-
-                first_line = base_dll.splitlines()[0]
-                find_db_name = (
-                    first_line[base_dll.find("view") :]
-                    .split(".")[0]
-                    .replace("PREP", self.prep_database)
-                    .replace("PROD", self.prod_database)
-                )
-                new_first_line = f"{first_line[:base_dll.find('view')]}{find_db_name}{first_line[base_dll.find('.'):]}"
-
-                replaced_file = [
-                    f.replace("PREP", self.prep_database).replace(
-                        "PROD", self.prod_database
-                    )
-                    for f in split_file
-                ]
-                joined_lines = "\n".join(replaced_file[1:])
-
-                output_query = new_first_line + "\n" + joined_lines
+                output_query = self.clean_view_dll(base_dll)
                 query_executor(self.engine, output_query)
                 logging.info(f"View {full_name} successfully created. ")
 
-                logging.info("Granting rights on VIEW to TRANSFORMER")
-                grants_query = f"""GRANT OWNERSHIP ON VIEW {output_table_name} TO TRANSFORMER REVOKE CURRENT GRANTS"""
-                query_executor(self.engine, grants_query)
-
-                logging.info("Granting rights on VIEW to GITLAB_CI")
-                grants_query = f"""GRANT ALL ON VIEW {output_table_name} TO GITLAB_CI"""
-                query_executor(self.engine, grants_query)
+                self.grant_table_view_rights('view', output_table_name)
 
                 continue
 
@@ -191,13 +206,7 @@ class SnowflakeManager:
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
 
-            logging.info("Granting rights on TABLE to TRANSFORMER")
-            grants_query = f"""GRANT OWNERSHIP ON TABLE {output_table_name} TO TRANSFORMER REVOKE CURRENT GRANTS"""
-            query_executor(self.engine, grants_query)
-
-            logging.info("Granting rights on TABLE to GITLAB_CI")
-            grants_query = f"""GRANT ALL ON TABLE {output_table_name} TO GITLAB_CI"""
-            query_executor(self.engine, grants_query)
+            self.grant_table_view_rights('table', output_table_name)
 
 
 
