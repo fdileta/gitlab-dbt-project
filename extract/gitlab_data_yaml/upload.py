@@ -140,7 +140,7 @@ if __name__ == "__main__":
         )
 
     for key, value in handbook_dict.items():
-        curl_and_upload(key, value + ".yml", handbook_url)
+        curl_and_upload(key, value + ".yml", HANDBOOK_URL)
 
     for key, value in pi_file_dict.items():
         curl_and_upload(key, value + ".yml", pi_url)
