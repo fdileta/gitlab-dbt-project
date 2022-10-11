@@ -1,4 +1,4 @@
-{{ config(alias='report_pipeline_deltas') }}
+{{ config(alias='report_pipeline_deltas_net_arr') }}
 
 WITH sfdc_opportunity_xf AS (
 
@@ -41,12 +41,12 @@ WITH sfdc_opportunity_xf AS (
           WHEN is_pipeline_created_flag = 1
             THEN 'Pipe Gen'
           ELSE 'Existing Pipe'
-        END AS pipeline_category,
+      END AS pipeline_category,
 
-      -- Based on deal stage of the deal at the snapshot time
+      -- Based on deal stage of the deal at the snapshot tiime
       'Open' AS deal_status,
       'Open' AS deal_status_group,
-        
+      
       -- This field track if the type of pipeline "motion", if it expands / contract / create pipeline, or if it closes it
       'Expansion / Contraction' AS pipeline_motion
 
@@ -87,109 +87,7 @@ WITH sfdc_opportunity_xf AS (
     FROM snapshot_oppty
     QUALIFY delta_net_arr <> 0
 
- ), closed_pipeline AS (
-
-    /* This CTE captures the closed deals that exited the pipeline, that's why positive net arr is
-    converted into a negative value to represent that they are removed from the total open pipeline amount. */
-
-    SELECT
-      oppty.opportunity_id,
-      oppty.owner_id,
-      oppty.close_date                            AS report_date,
-      oppty.close_fiscal_quarter_date             AS report_fiscal_quarter_date,
-      oppty.close_fiscal_quarter_name             AS report_fiscal_quarter_name,
-      oppty.close_fiscal_year                     AS report_fiscal_year,
-      close_date.day_of_fiscal_quarter_normalised AS report_day_of_fiscal_quarter_normalised,
-
-      CASE
-        WHEN oppty.pipeline_created_fiscal_quarter_name = oppty.close_fiscal_quarter_name
-          AND oppty.is_eligible_created_pipeline_flag = 1
-            THEN 1
-        ELSE 0
-      END AS is_pipeline_created_flag,
-
-      CASE
-        WHEN is_pipeline_created_flag = 1
-            THEN 'Pipe Gen'
-        ELSE 'Existing Pipe'
-      END AS pipeline_category,
-
-      CASE
-        WHEN oppty.is_won = 1
-            THEN 'Won'
-        ELSE 'Lost'
-      END                                     AS deal_status,
-      'Closed'                                AS deal_status_group,
-      'Removal'                               AS pipeline_motion,
-
-      net_arr,
-      CASE
-        WHEN oppty.net_arr > 0
-            THEN -1 * oppty.net_arr
-        WHEN oppty.net_arr < 0
-            THEN oppty.net_arr
-      END                                     AS delta_net_arr,
-
-      is_closed,
-      is_open,
-      is_won,
-      is_lost
-
-    FROM sfdc_opportunity_xf AS oppty
-    LEFT JOIN date_details AS close_date
-      ON close_date.date_actual = oppty.close_date
-    WHERE (oppty.is_won = 1 OR oppty.is_lost = 1)
-      AND oppty.net_arr <> 0
-      AND oppty.close_date < CURRENT_DATE
-
-
-), deltas_consolidated AS (
-
-    SELECT
-      opportunity_id,
-      owner_id,
-      report_date::date AS report_date,
-      report_fiscal_quarter_date,
-      report_fiscal_quarter_name,
-      report_day_of_fiscal_quarter_normalised,
-      report_fiscal_year,
-      is_pipeline_created_flag,
-      pipeline_category,
-      deal_status,
-      deal_status_group,
-      pipeline_motion,
-      --net_arr,
-      -- NULL              AS prev_net_arr,
-      delta_net_arr,
-      is_closed,
-      is_open,
-      is_won,
-      is_lost
-    FROM closed_pipeline
-    UNION ALL
-    SELECT
-      opportunity_id,
-      owner_id,
-      report_date::date AS report_date,
-      report_fiscal_quarter_date,
-      report_fiscal_quarter_name,
-      report_day_of_fiscal_quarter_normalised,
-      report_fiscal_year,
-      is_pipeline_created_flag,
-      pipeline_category,
-      deal_status,
-      deal_status_group,
-      pipeline_motion,
-      -- net_arr,
-      -- prev_net_arr,
-      delta_net_arr,
-      is_closed,
-      is_open,
-      is_won,
-      is_lost
-    FROM net_arr_delta
-
-), final AS (
+ ), final AS (
 
     SELECT 
       deltas.*,
@@ -231,12 +129,12 @@ WITH sfdc_opportunity_xf AS (
       oppty.sales_team_avp_rd_level,
       oppty.sales_team_asm_level
 
-    FROM deltas_consolidated AS deltas
+    FROM net_arr_delta AS deltas
     LEFT JOIN sfdc_opportunity_xf AS oppty
       ON oppty.opportunity_id = deltas.opportunity_id
     LEFT JOIN sfdc_users_xf AS users
       ON deltas.owner_id = users.user_id
-    
+
 )
 
 SELECT *
