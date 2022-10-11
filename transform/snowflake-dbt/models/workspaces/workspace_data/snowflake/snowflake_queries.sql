@@ -2,7 +2,7 @@
   config(
     materialized='incremental',
     unique_key='query_id',
-    on_schema_change='append_new_columns'
+    on_schema_change='sync_all_columns'
   )
 }}
 
@@ -54,23 +54,21 @@ expanded AS (
     credits_used_cloud_services,
     percentage_scanned_from_cache,
     try_parse_json(regexp_substr(query_text, '\{\"app\".*\}')) AS dbt_metadata,
-    dbt_metadata['app']::VARCHAR AS app,
     dbt_metadata['dbt_version']::VARCHAR AS dbt_version,
-    dbt_metadata['profile_name']::VARCHAR AS profile_name,
-    dbt_metadata['target_name']::VARCHAR AS target_name,
-    dbt_metadata['target_user']::VARCHAR AS target_user,
-    dbt_metadata['invocation_id']::VARCHAR AS invocation_id,
-    dbt_metadata['run_started_at']::VARCHAR AS run_started_at,
-    dbt_metadata['full_refresh']::VARCHAR AS full_refresh,
-    dbt_metadata['is_full_refresh']::VARCHAR AS is_full_refresh,
-    dbt_metadata['materialized']::VARCHAR AS model_materialized,
-    dbt_metadata['runner']::VARCHAR AS runner,
-    dbt_metadata['file']::VARCHAR AS model_file,
-    dbt_metadata['node_id']::VARCHAR AS node_id,
-    dbt_metadata['node_name']::VARCHAR AS node_name,
+    dbt_metadata['profile_name']::VARCHAR AS dbt_profile_name,
+    dbt_metadata['target_name']::VARCHAR AS dbt_target_name,
+    dbt_metadata['target_user']::VARCHAR AS dbt_target_user,
+    dbt_metadata['invocation_id']::VARCHAR AS dbt_invocation_id,
+    dbt_metadata['run_started_at']::VARCHAR AS dbt_run_started_at,
+    dbt_metadata['full_refresh']::BOOLEAN AS is_model_full_refresh,
+    dbt_metadata['is_full_refresh']::BOOLEAN AS is_invocation_full_refresh,
+    dbt_metadata['materialized']::VARCHAR AS model_materialization,
+    dbt_metadata['runner']::VARCHAR AS dbt_runner,
+    dbt_metadata['file']::VARCHAR AS resource_file,
+    dbt_metadata['node_id']::VARCHAR AS resource_id,
+    dbt_metadata['node_name']::VARCHAR AS resource_name,
     dbt_metadata['resource_type']::VARCHAR AS resource_type,
     dbt_metadata['package_name']::VARCHAR AS package_name,
-    dbt_metadata['relation']::VARCHAR AS relation,
     dbt_metadata['relation']['database']::VARCHAR AS relation_database,
     dbt_metadata['relation']['schema']::VARCHAR AS relation_schema,
     dbt_metadata['relation']['identifier']::VARCHAR AS relation_identifier
