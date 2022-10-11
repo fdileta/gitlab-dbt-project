@@ -82,9 +82,8 @@ if __name__ == "__main__":
 
         # Check if there is private token issued for the URL
         if private_token is not None:
-            header = f"{'Authorization': 'Bearer {private_token}',}"
             request_url = f"{base_url}{file_name}{suffix_url}"
-            response = requests.request("GET", request_url, headers=header)
+            response = requests.request("GET", request_url, headers={"Private-Token": private_token})
 
         # Load the content in json
         api_response_json = response.json()
