@@ -181,6 +181,8 @@ def slack_snapshot_failed_task(context):
 def slack_webhook_conn(slack_channel):
     if slack_channel == "#analytics-pipelines":
         slack_webhook = Variable.get("AIRFLOW_VAR_ANALYTICS_PIPELINES")
+    elif slack_channel == "#data-science-pipelines":
+        slack_webhook = Variable.get("AIRFLOW_VAR_DATA_SCIENCE_PIPELINES")
     else:
         slack_webhook = Variable.get("AIRFLOW_VAR_DATA_PIPELINES")
     airflow_http_con_id = Variable.get("AIRFLOW_VAR_SLACK_CONNECTION")
