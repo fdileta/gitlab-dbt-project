@@ -84,6 +84,7 @@ config_dict = {
         "dag_name": "el_gitlab_com",
         "env_vars": {"HOURS": "96"},
         "extract_schedule_interval": "0 */6 * * *",
+        "incremental_backfill_interval": "0 2 * * *",
         "secrets": [
             GITLAB_COM_DB_USER,
             GITLAB_COM_DB_PASS,
@@ -101,6 +102,7 @@ config_dict = {
         "dag_name": "el_gitlab_com_ci",
         "env_vars": {"HOURS": "96"},
         "extract_schedule_interval": "0 */6 * * *",
+        "incremental_backfill_interval": "0 2 * * *",
         "secrets": [
             GITLAB_COM_CI_DB_NAME,
             GITLAB_COM_CI_DB_HOST,
@@ -150,6 +152,7 @@ config_dict = {
         "dag_name": "el_gitlab_ops",
         "env_vars": {"HOURS": "48"},
         "extract_schedule_interval": "0 */6 * * *",
+        "incremental_backfill_interval": "0 3 * * *",
         "secrets": [
             GCP_PROJECT,
             GCP_REGION,
@@ -334,7 +337,7 @@ for source_name, config in config_dict.items():
         incremental_backfill_dag = DAG(
             f"{config['dag_name']}_db_incremental_backfill",
             default_args=incremental_backfill_dag_args,
-            schedule_interval=config["extract_schedule_interval"],
+            schedule_interval=config["incremental_backfill_interval"],
             concurrency=1,
             description=config["description_incremental"],
         )
