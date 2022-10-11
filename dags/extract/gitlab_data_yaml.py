@@ -1,3 +1,4 @@
+"""The DAG is designed to extract data from handbook using API"""
 import os
 from datetime import datetime, timedelta
 

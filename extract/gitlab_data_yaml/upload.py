@@ -1,3 +1,4 @@
+"""Source code to perform extraction of YAML file from Gitlab handbook, internal handbook, comp calculator"""
 import logging
 import subprocess
 import sys
@@ -78,7 +79,8 @@ if __name__ == "__main__":
 
         if private_token is not None:
             header = f'--header "PRIVATE-TOKEN: {private_token}"'
-            command = f"curl {header} '{base_url}{file_name}%2Eyml/raw?ref=main' | yaml2json -o {json_file_name}.json"
+            command = f"curl {header} '{base_url}{file_name}%2Eyml?ref=main' | yaml2json -o {json_file_name}.json"
+            #command = f"curl {header} '{base_url}{file_name}%2Eyml/raw?ref=main' | yaml2json -o {json_file_name}.json"
         else:
             command = f"curl {base_url}{file_name} | yaml2json -o {json_file_name}.json"
 
