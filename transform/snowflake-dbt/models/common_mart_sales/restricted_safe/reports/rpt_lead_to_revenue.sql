@@ -955,13 +955,6 @@
     UPPER(geo) AS inferred_geo
     FROM fo_inquiry_with_tp
 
-), final_prep AS (
-
-    SELECT DISTINCT fo_inquiry_with_tp.*,
-    COALESCE(employee_count_segment,employee_bucket_segment) AS inferred_employee_segment,
-    UPPER(geo) AS inferred_geo
-    FROM fo_inquiry_with_tp
-
 ), final AS (
 
   SELECT *
