@@ -87,8 +87,8 @@ instance_redis_metrics_cmd = f"""
 instance_ping = KubernetesPodOperator(
     **gitlab_defaults,
     image=DATA_IMAGE,
-    task_id="saas-instance-usage-ping",
-    name="saas-instance-usage-ping",
+    task_id="saas-instance-usage-ping-sql-metrics",
+    name="saas-instance-usage-ping-sql-metrics",
     secrets=secrets,
     env_vars=pod_env_vars,
     arguments=[instance_cmd],
