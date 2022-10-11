@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
     # Iterate over Internal handbook
     for key, value in pi_internal_hb_file_dict.items():
-        curl_and_upload(key, value + ".yml", pi_internal_hb_url, gitlab_in_hb_token)
+        curl_and_upload(key, value , pi_internal_hb_url, gitlab_in_hb_token)
 
     for key, value in comp_calc_dict.items():
         curl_and_upload(
