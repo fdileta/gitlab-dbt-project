@@ -68,9 +68,7 @@ class DbtModelClone:
 
         delimeter = '{"depends_on":'
 
-        my_list = [delimeter + x for x in joined.split(delimeter) if x]
-
-        input_list = my_list
+        input_list = [delimeter + x for x in joined.split(delimeter) if x]
 
         list_of_dicts = []
         for i in input_list:
