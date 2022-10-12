@@ -106,7 +106,7 @@ if __name__ == "__main__":
             snowflake_engine,
         )
         else:
-            logging.ERROR(f"Empty file or the location has changed investigate ")
+            logging.error(f"The file for {file_name} is either empty or the location has changed investigate")
         
 
     def curl_and_upload(table_name, file_name, base_url, private_token=None):
