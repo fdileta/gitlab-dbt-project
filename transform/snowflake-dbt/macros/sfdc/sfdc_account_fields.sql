@@ -473,7 +473,7 @@ WITH map_merged_crm_account AS (
     LEFT JOIN pte_scores 
       ON sfdc_account.account_id = pte_scores.crm_account_id
     LEFT JOIN ptc_scores
-      ON sfdc_account.account_id = pte_scores.crm_account_id
+      ON sfdc_account.account_id = ptc_scores.crm_account_id
     {%- if model_type == 'live' %}
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
