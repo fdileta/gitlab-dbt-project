@@ -179,7 +179,7 @@
 # DBT cloning
 # ======
 
-clone_model_dbt_select:
+➕🔆⚡️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
     - dbt deps $CI_PROFILE_TARGET
