@@ -37,7 +37,7 @@ class SnowflakeManager:
         self.prod_database = "{}_PROD".format(self.branch_name)
         self.raw_database = "{}_RAW".format(self.branch_name)
 
-    def create_schema(self, schema_name):
+    def create_schema(self, schema_name: str):
         """
 
         :param schema_name:
@@ -58,7 +58,7 @@ class SnowflakeManager:
 
         return True
 
-    def clean_dbt_input(self, model_input):
+    def clean_dbt_input(self, model_input: List[str]) -> List[Dict]:
         """
 
         :param model_input:
@@ -99,7 +99,7 @@ class SnowflakeManager:
 
         return sorted_list
 
-    def grant_table_view_rights(self, object_type, object_name):
+    def grant_table_view_rights(self, object_type: str, object_name: str) -> None:
         """
             Right type can be table or view
         :param object_type:
@@ -119,7 +119,7 @@ class SnowflakeManager:
         )
         query_executor(self.engine, grants_query)
 
-    def clean_view_dll(self, dll_input):
+    def clean_view_dll(self, dll_input: str) -> str:
         """
         Essentially, this code is finding and replacing the DB name in only the first line for recreating
         views. This is because we have a database & schema named PREP, which creates a special case in the
@@ -130,7 +130,7 @@ class SnowflakeManager:
         """
         split_file = dll_input.splitlines()
 
-        first_line = dll_input.splitlines()[0]
+        first_line = split_file[0]
         find_db_name = (
             first_line[dll_input.find("view") :]
             .split(".")[0]
@@ -146,9 +146,10 @@ class SnowflakeManager:
         joined_lines = "\n".join(replaced_file[1:])
 
         output_query = new_first_line + "\n" + joined_lines
+
         return output_query
 
-    def clone_dbt_models(self, model_input):
+    def clone_dbt_models(self, model_input: List[str]):
         """
 
         :param model_input:
