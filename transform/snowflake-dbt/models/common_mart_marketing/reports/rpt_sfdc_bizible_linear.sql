@@ -92,20 +92,20 @@
       SUM(mart_crm_attribution_touchpoint.bizible_attribution_percent_full_path) AS full_weight,
       SUM(mart_crm_attribution_touchpoint.bizible_count_custom_model) AS custom_weight,
       COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) AS l_touches,
-      (l_touches / count_touches) AS l_weight,
+      (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / linear_base.count_touches) AS l_weight,
       (mart_crm_attribution_touchpoint.net_arr * first_weight) AS first_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * w_weight) AS w_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * u_weight) AS u_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * full_weight) AS full_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * custom_weight) AS custom_net_arr,
-      (mart_crm_attribution_touchpoint.net_arr * l_weight) AS linear_net_arr
+      (mart_crm_attribution_touchpoint.net_arr * (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / linear_base.count_touches)) AS linear_net_arr
     FROM
     mart_crm_attribution_touchpoint
     LEFT JOIN linear_base ON
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id = linear_base.dim_crm_opportunity_id
     LEFT JOIN  campaigns_per_opp ON
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id =      campaigns_per_opp.dim_crm_opportunity_id
-    {{ dbt_utils.group_by(n=55) }}
+    {{ dbt_utils.group_by(n=54) }}
 
 )
 
