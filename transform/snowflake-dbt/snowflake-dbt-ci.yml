@@ -187,7 +187,7 @@ clone_model_dbt_select:
     - export SNOWFLAKE_PREP_DATABASE="PREP"
     - export SNOWFLAKE_PROD_DATABASE="PROD"
     - INPUT=$(dbt --quiet ls --models $DBT_MODELS --output json --output-keys "database schema name depends_on unique_id" --profiles-dir profile --target prod)
-    - /builds/gitlab-data/analytics/orchestration/clone_models_dbt_select.py $INPUT
+    - /builds/gitlab-data/analytics/orchestration/clone_dbt_models_select.py $INPUT
 
 # dbt tests
 .dbt_misc_jobs: &dbt_misc_jobs
