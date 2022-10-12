@@ -63,14 +63,12 @@ WITH bizible_attribution_touchpoints AS (
       -- counts
       opps_per_touchpoint.opps_per_touchpoint,
       campaigns_per_opp.campaigns_per_opp,
-
-      -- attribution weights
-      bizible_attribution_touchpoints.bizible_count_first_touch AS first_weight,
+      bizible_attribution_touchpoints.bizible_count_first_touch,
       bizible_attribution_touchpoints.bizible_count_lead_creation_touch,
-      bizible_attribution_touchpoints.bizible_attribution_percent_full_path AS full_weight,
-      bizible_attribution_touchpoints.bizible_count_u_shaped AS u_weight,
-      bizible_attribution_touchpoints.bizible_count_w_shaped AS w_weight,
-      bizible_attribution_touchpoints.bizible_count_custom_model AS custom_weight,
+      bizible_attribution_touchpoints.bizible_attribution_percent_full_path,
+      bizible_attribution_touchpoints.bizible_count_u_shaped,
+      bizible_attribution_touchpoints.bizible_count_w_shaped,
+      bizible_attribution_touchpoints.bizible_count_custom_model,
 
       -- touchpoint revenue info
       bizible_attribution_touchpoints.bizible_revenue_full_path,

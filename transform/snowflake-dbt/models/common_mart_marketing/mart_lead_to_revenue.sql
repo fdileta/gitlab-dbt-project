@@ -2,39 +2,26 @@
     ('mart_crm_opportunity','mart_crm_opportunity'),
     ('mart_crm_person','mart_crm_person'),
     ('mart_crm_touchpoint_combined','mart_crm_touchpoint_combined'),
-    ('dim_crm_account','dim_crm_account')
+    ('mart_crm_account','mart_crm_account')
 ]) }}
 
 , upa_base AS ( 
     SELECT 
       dim_parent_crm_account_id,
       dim_crm_account_id
-    FROM dim_crm_account
-
-), first_order_opps AS ( 
-
-    SELECT
-      dim_parent_crm_account_id,
-      dim_crm_account_id,
-      dim_crm_opportunity_id,
-      close_date,
-      is_sao,
-      sales_accepted_date
-    FROM mart_crm_opportunity
-    WHERE is_won = true
-      AND order_type = '1. New - First Order'
+    FROM mart_crm_account
 
 ), accounts_with_first_order_opps AS ( 
 
     SELECT
-      upa_base.dim_parent_crm_account_id,
-      upa_base.dim_crm_account_id,
-      first_order_opps.dim_crm_opportunity_id,
+      mart_crm_opportunity.dim_parent_crm_account_id,
+      mart_crm_opportunity.dim_crm_account_id,
+      mart_crm_opportunity.dim_crm_opportunity_id,
       FALSE AS is_first_order_available
-    FROM upa_base 
-    LEFT JOIN first_order_opps
-      ON upa_base.dim_crm_account_id=first_order_opps.dim_crm_account_id
-    WHERE dim_crm_opportunity_id IS NOT NULL
+    FROM mart_crm_opportunity 
+    INNER JOIN mart_crm_account
+      ON mart_crm_opportunity.dim_crm_account_id = mart_crm_opportunity.dim_crm_account_id
+    WHERE mart_crm_account.is_first_order_available = TRUE
 
 ), person_order_type_base AS (
 
@@ -111,7 +98,7 @@
          WHEN true_inquiry_date > mart_crm_opportunity.close_date THEN '3. Growth'
       ELSE null
       END AS inquiry_order_type_historical,
-      ROW_NUMBER() OVER( PARTITION BY mart_crm_person.email_hash ORDER BY inquiry_order_type_historical) AS inquiry_order_type_number
+      ROW_NUMBER() OVER( PARTITION BY mart_crm_person.email_hash ORDER BY inquiry_order_type_historical) AS inquiry_order_type_number -- move this back to dim_crm_person
     FROM mart_crm_person
     FULL JOIN upa_base ON 
     mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
