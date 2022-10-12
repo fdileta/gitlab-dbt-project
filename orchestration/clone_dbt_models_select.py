@@ -2,6 +2,7 @@
 import logging
 import sys
 import json
+import argparse
 from os import environ as env
 from typing import Dict, List
 
@@ -9,7 +10,6 @@ from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
 
 from gitlabdata.orchestration_utils import query_executor
-import argparse
 
 from simple_dependency_resolver.simple_dependency_resolver import DependencyResolver
 
@@ -19,6 +19,7 @@ logging.basicConfig(stream=sys.stdout, level=20)
 
 
 class DbtModelClone:
+    """"""
     def __init__(self, config_vars: Dict):
         self.engine = create_engine(
             URL(
@@ -33,9 +34,9 @@ class DbtModelClone:
         # Snowflake database name should be in CAPS
         # see https://gitlab.com/meltano/analytics/issues/491
         self.branch_name = config_vars["BRANCH_NAME"].upper()
-        self.prep_database = "{}_PREP".format(self.branch_name)
-        self.prod_database = "{}_PROD".format(self.branch_name)
-        self.raw_database = "{}_RAW".format(self.branch_name)
+        self.prep_database = f"{self.branch_name}_PREP"
+        self.prod_database = f"{self.branch_name}_PROD"
+        self.raw_database =  f"{self.branch_name}_RAW"
 
     def create_schema(self, schema_name: str):
         """
@@ -72,12 +73,12 @@ class DbtModelClone:
 
         list_of_dicts = []
         for i in input_list:
-            d = json.loads(i)
+            loaded_dict = json.loads(i)
             actual_dependencies = [
-                n for n in d.get("depends_on").get("nodes") if "seed" not in n
+                n for n in loaded_dict.get("depends_on").get("nodes") if "seed" not in n
             ]
-            d["actual_dependencies"] = actual_dependencies
-            list_of_dicts.append(d)
+            loaded_dict["actual_dependencies"] = actual_dependencies
+            list_of_dicts.append(loaded_dict)
 
         sorted_output = []
 
@@ -86,13 +87,13 @@ class DbtModelClone:
                 {"id": i.get("unique_id"), "dependencies": i.get("actual_dependencies")}
             )
 
-        dr = DependencyResolver()
-        resolved_dependencies = dr.simple_resolution(sorted_output)
+        dep_resolver = DependencyResolver()
+        resolved_dependencies = dep_resolver.simple_resolution(sorted_output)
         sorted_list = []
 
-        for r in resolved_dependencies:
+        for resolved_dependency in resolved_dependencies:
             for i in list_of_dicts:
-                if i.get("unique_id") == r.name:
+                if i.get("unique_id") == resolved_dependency.name:
                     sorted_list.append(i)
 
         return sorted_list
