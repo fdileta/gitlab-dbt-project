@@ -129,7 +129,7 @@ if __name__ == "__main__":
         try:
             process_check = subprocess.run(command, shell=True, check=True)
             process_check.check_returncode()
-        except:  # pylint: disable=bare-except
+        except IOError:
             traceback.print_exc()
             logging.error(
                 f"The file for {file_name} is either empty or the location has changed investigate"
