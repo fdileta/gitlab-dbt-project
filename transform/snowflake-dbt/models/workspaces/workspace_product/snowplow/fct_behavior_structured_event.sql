@@ -1,11 +1,11 @@
-{{config({
+{{config(
 
-    "materialized":"incremental",
-    "unique_key":"behavior_structured_event_pk",
-    "full_refresh":false,
-    "on_schema_change":"sync_all_columns"
+    materialized='incremental',
+    unique_key='behavior_structured_event_pk',
+    full_refresh= true if flags.FULL_REFRESH and var('full_refresh_force', false) else false,
+    on_schema_change='sync_all_columns'
 
-  })
+  )
 
 }}
 {{ 
