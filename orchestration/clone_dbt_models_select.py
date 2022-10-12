@@ -18,7 +18,7 @@ from simple_dependency_resolver.simple_dependency_resolver import DependencyReso
 logging.basicConfig(stream=sys.stdout, level=20)
 
 
-class SnowflakeManager:
+class DbtModelClone:
     def __init__(self, config_vars: Dict):
         self.engine = create_engine(
             URL(
@@ -220,5 +220,5 @@ if __name__ == "__main__":
     parser.add_argument("INPUT", nargs="+")
     args = parser.parse_args()
 
-    snowflake_manager = SnowflakeManager(env.copy())
-    snowflake_manager.clone_dbt_models(args.INPUT)
+    cloner = DbtModelClone(env.copy())
+    cloner.clone_dbt_models(args.INPUT)
