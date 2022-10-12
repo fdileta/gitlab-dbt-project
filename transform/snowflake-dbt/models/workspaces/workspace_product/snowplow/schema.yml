@@ -1,6 +1,22 @@
 version: 2
 
 models:
+  - name: dim_behavior_browser
+    description: Dimension for the analysis of browsers in Snowplow.
+    columns: 
+      - name: dim_behavior_browser_sk
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_behavior_operating_system
+    description: Dimension for the analysis of operating systems in Snowplow.
+    columns: 
+      - name: dim_behavior_operating_system_sk
+        tests:
+          - not_null
+          - unique
+
   - name: dim_behavior_website_page
     description: Dimension for the analysis of webpages used according to the page_urlpath in Snowplow.
     columns:
