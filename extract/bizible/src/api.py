@@ -66,7 +66,7 @@ class BizibleSnowFlakeExtractor:
         columns = results.keys()
         fetched_rows = results.fetchall()
         f = open(file_name, 'w')
-        out = csv.writer(f, delimeter='|')
+        out = csv.writer(f, delimiter='|')
         out.writerow([r for r in columns])
 
         for r in fetched_rows:
