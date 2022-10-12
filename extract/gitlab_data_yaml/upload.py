@@ -107,7 +107,7 @@ if __name__ == "__main__":
         )
         else:
             logging.error(f"The file for {file_name} is either empty or the location has changed investigate")
-        
+            job_failed = True
 
     def curl_and_upload(table_name, file_name, base_url, private_token=None):
         """This function uses Curl to download the file and convert the YAML to JSON.
@@ -167,4 +167,5 @@ if __name__ == "__main__":
     curl_and_upload("usage_ping_metrics", "", usage_ping_metrics_url)
 
     if job_failed:
+        logging.error(f"Search for value 'ERROR:root:The file for'in the log file for internal handbook extraction.")
         sys.exit(1)
