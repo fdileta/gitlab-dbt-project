@@ -198,15 +198,7 @@ class DbtModelClone:
 
             transient_table = res[0][1]
 
-            if transient_table == "YES":
-                new_clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
-                clone_statement = f"CREATE OR REPLACE TRANSIENT TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
-            else:
-                new_clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
-                clone_statement = f"CREATE OR REPLACE TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
-
-            print(f"New clone statement: {new_clone_statement}")
-            print(f"Clone statement: {clone_statement}")
+            clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
             query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
 
