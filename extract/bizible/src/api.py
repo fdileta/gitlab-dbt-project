@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 
 import csv
 
+
 class BizibleSnowFlakeExtractor:
     def __init__(self, config_dict: Dict):
         """
@@ -60,13 +61,19 @@ class BizibleSnowFlakeExtractor:
         return {table_name: {}}
 
     def write_query_to_csv(self, engine, file_name, query):
-        """ Small function using the built-in CSV class rather than pandas. """
+        """
+            Small function using the built-in CSV class rather than pandas.
+        :param engine:
+        :param file_name:
+        :param query:
+        :return:
+        """
         connection = engine.connect()
         results = connection.execute(query)
         columns = results.keys()
         fetched_rows = results.fetchall()
-        f = open(file_name, 'w')
-        out = csv.writer(f, delimiter='|')
+        f = open(file_name, "w")
+        out = csv.writer(f, delimiter="|")
         out.writerow([r for r in columns])
 
         for r in fetched_rows:
