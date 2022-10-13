@@ -1,5 +1,11 @@
 import logging
 import os
+import csv
+
+from typing import Dict
+
+from dateutil import rrule
+from datetime import datetime, timedelta
 
 from gitlabdata.orchestration_utils import (
     query_dataframe,
@@ -7,13 +13,6 @@ from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
     bizible_snowflake_engine_factory,
 )
-from typing import Dict
-
-from dateutil import rrule
-from datetime import datetime, timedelta
-
-import csv
-
 
 class BizibleSnowFlakeExtractor:
     def __init__(self, config_dict: Dict):
