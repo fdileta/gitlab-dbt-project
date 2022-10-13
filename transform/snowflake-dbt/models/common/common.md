@@ -4,12 +4,6 @@ A fact table bridging opportunities with contacts. One opportunity can have mult
 
 {% enddocs %}
 
-{% docs bdg_crm_person_crm_opportunity %}
-
-A table bridging leads and contacts to opportunities through their CRM accounts. One person (a lead/converted contact) can have multiple opportunities, and one opportunity can be associated with multiple people.
-
-{% enddocs %}
-
 {% docs bdg_epic_user_request %}
 
 A bridge table that connects epics user requests, these epics being in the `Gitlab-org` group, with SFDC Opportunities / Accounts and Zendesk tickets links. It also picks the priorities that have been assigned to the epic request.

@@ -10,14 +10,6 @@ models:
           - unique
           - not_null
 
-  - name: bdg_crm_person_crm_opportunity
-    description: '{{ doc("bdg_crm_person_crm_opportunity") }}'
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - dim_crm_person_id
-            - dim_crm_opportunity_id
-
   - name: bdg_epic_user_request
     description: ' {{ doc("bdg_epic_user_request") }}'
     columns:
