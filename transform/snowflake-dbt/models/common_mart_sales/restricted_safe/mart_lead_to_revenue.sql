@@ -199,18 +199,19 @@
     LEFT JOIN order_type_final
       ON mart_crm_person.email_hash=order_type_final.email_hash
 
-), fo_inquiry_with_tp AS (
+), cohort AS (
   
   SELECT DISTINCT
   
-    --Key IDs
-    cohort_base.email_hash,
+    -- surrogate keys
     cohort_base.dim_crm_person_id,
     cohort_base.dim_crm_opportunity_id,
     mart_crm_touchpoint_combined.dim_crm_touchpoint_id,
+    cohort_base.dim_crm_account_id, 
     cohort_base.sfdc_record_id,
   
-    --person data
+    --person attributes
+    cohort_base.email_hash,
     CASE 
       WHEN cohort_base.person_order_type IS null AND cohort_base.opp_order_type IS null THEN 'Missing order_type_name'
       WHEN cohort_base.person_order_type IS null THEN cohort_base.opp_order_type
@@ -218,7 +219,7 @@
     END AS person_order_type,
     cohort_base.inquiry_order_type_historical,
     cohort_base.mql_order_type_historical,
-    cohort_base.lead_source,    
+    cohort_base.lead_source,
     cohort_base.email_domain_type,
     cohort_base.is_mql,
     cohort_base.account_demographics_sales_segment,
@@ -230,7 +231,7 @@
     cohort_base.true_inquiry_date,
     cohort_base.mql_date_lastest_pt,
   
-    --opportunity data
+    --opportunity attributes
     cohort_base.opp_created_date,
     cohort_base.sales_accepted_date,
     cohort_base.close_date,
@@ -255,7 +256,7 @@
       ELSE null
     END AS influenced_opportunity_id,
   
-    --touchpoint data
+    --touchpoint attributes
     mart_crm_touchpoint_combined.bizible_touchpoint_date,
     mart_crm_touchpoint_combined.gtm_motion,
     mart_crm_touchpoint_combined.bizible_integrated_campaign_grouping,
@@ -344,7 +345,7 @@
 ), final AS (
 
     SELECT DISTINCT *
-    FROM fo_inquiry_with_tp
+    FROM cohort
 
 )
 

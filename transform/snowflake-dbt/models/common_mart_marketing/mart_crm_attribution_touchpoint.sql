@@ -44,6 +44,7 @@
       dim_crm_touchpoint.integrated_campaign_grouping,
       dim_crm_touchpoint.pipe_name,
       dim_crm_touchpoint.is_dg_influenced,
+      dim_crm_touchpoint.is_dg_sourced,
       fct_crm_attribution_touchpoint.opps_per_touchpoint,
       fct_crm_attribution_touchpoint.bizible_count_lead_creation_touch,
       fct_crm_attribution_touchpoint.bizible_count_first_touch,
@@ -167,6 +168,8 @@
       dim_crm_user.crm_user_geo                             AS touchpoint_crm_user_geo_name_live,
       dim_crm_user.crm_user_region                          AS touchpoint_crm_user_region_name_live,
       dim_crm_user.crm_user_area                            AS touchpoint_crm_user_area_name_live,
+      dim_crm_user.sdr_sales_segment,
+      dim_crm_user.sdr_region,
 
       -- account info
       dim_crm_account.dim_crm_account_id,
@@ -261,13 +264,7 @@
           AND is_fmm_influenced = 1 
           THEN 1
         ELSE 0
-      END AS is_fmm_sourced,
-      CASE
-        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%FT%' 
-          AND is_dg_influenced = 1 
-          THEN 1
-        ELSE 0
-      END AS is_dg_sourced
+      END AS is_fmm_sourced
 
     FROM fct_crm_attribution_touchpoint
     LEFT JOIN dim_crm_touchpoint

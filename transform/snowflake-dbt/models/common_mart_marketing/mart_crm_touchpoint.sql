@@ -43,6 +43,7 @@
       dim_crm_touchpoint.integrated_campaign_grouping,
       dim_crm_touchpoint.pipe_name,
       dim_crm_touchpoint.is_dg_influenced,
+      dim_crm_touchpoint.is_dg_sourced,
       fct_crm_touchpoint.bizible_count_first_touch,
       fct_crm_touchpoint.bizible_count_lead_creation_touch,
       fct_crm_touchpoint.bizible_count_u_shaped,
@@ -206,12 +207,6 @@
           THEN 1
         ELSE 0
       END AS is_fmm_sourced,
-      CASE
-        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%FT%' 
-          AND is_dg_influenced = 1 
-          THEN 1
-        ELSE 0
-      END AS is_dg_sourced,
 
     -- counts
      CASE

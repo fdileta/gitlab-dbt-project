@@ -173,7 +173,13 @@ WITH campaign_details AS (
       CASE
         WHEN touchpoint_segment = 'Demand Gen' THEN 1
         ELSE 0
-      END AS is_dg_influenced
+      END AS is_dg_influenced,
+      CASE
+        WHEN combined_touchpoints.bizible_touchpoint_position LIKE '%FT%' 
+          AND is_dg_influenced = 1
+          THEN 1
+        ELSE 0
+      END AS is_dg_sourced
     FROM combined_touchpoints
     LEFT JOIN bizible_campaign_grouping
       ON combined_touchpoints.dim_crm_touchpoint_id = bizible_campaign_grouping.dim_crm_touchpoint_id

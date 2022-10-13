@@ -8,9 +8,74 @@ models:
           tests:
               - not_null
               - unique
+        - name: sdr_sales_segment
+          description: Sales segment of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
+        - name: sdr_region
+          description: Region of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
+        - name: is_dg_influenced
+          description: Flag indicating a touchpoint is influenced by Demand Gen base on its segment being Demand Gen.
+        - name: is_dg_sourced
+          description: Flag indicating a touchpoint is sourced from Demand Gen based on its segment being Demand Gen as well as its position being first touch.
+        - name: opps_per_touchpoint
+          description: Count of opportunities associated with a touchpoint.
+        - name: bizible_count_first_touch
+          description: Count of touchpoints that are first touch.
+        - name: bizible_count_lead_creation_touch
+          description: Count of lead creation touchpoints.
+        - name: bizible_attribution_percent_full_path
+          description: Weight of touchpoint in [full path attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#full-path) which tracks the entire lifecycle of the record from `First Touch` through the point of becoming a customer - `Customer Close`.
+        - name: bizible_count_u_shaped
+          description: Weight of touchpoint in [u-shaped attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#u-shaped) which racks every single touchpoint up to the point of lead creation. It emphasizes the importance of two touchpoints -
+            1. the first touch that brought the lead to us (while anonymous) - `First Touch` 
+            2. the touchpoint that converted the lead to a known prospect - `Lead Creation`
+        - name: bizible_count_w_shaped
+          description: Weight of touchpoint in [w-shaped attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#w-shaped) which emphasizes the importance of three touchpoints - 
+            1. the first touch that brought the lead to us (while anonymous) - `First Touch`
+            2. the touchpoint that converted the lead to a known prospect - `Lead Creation`
+            3. the touchpoint that converted that prospect to an opportunity - `Opportunity Creation`
+        - name: bizible_count_custom_model
+          description:  Weight of touchpoint in [custom attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#custom-attribution-based-on-bizible-machine-learning-algorithm) which is based on the Bizible machine learning attribution model uses our touchpoint data to calculate how much attribution weighting should be assigned to each stage. This is determined by how important each stage was in driving deals to close.
+        - name: first_net_arr
+          description: Net ARR associated with touchpoint under first touch attribution model.
+        - name: w_net_arr
+          description: Net ARR associated with touchpoint under [w-shaped attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#w-shaped).
+        - name: u_net_arr
+          description: Net ARR associated with touchpoint under[u-shaped attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#u-shaped).
+        - name: full_net_arr
+          description: Net ARR associated with touchpoint under [full path attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#full-path).
+        - name: custom_net_arr
+          description: Net ARR associated with touchpoint under [Bizible custom attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#custom-attribution-based-on-bizible-machine-learning-algorithm).
+        - name: net_arr_per_campaign
+          description: Average net ARR associated with a campaign based on the number of campaigns connected to an opportunity that is tied to the touchpoint.
 
     - name: mart_crm_touchpoint
       description: Model containing Bizible touchpoints (non-attribution) along with contact, lead, account, and campaign details.
+      columns:
+        - name: dim_crm_touchpoint_id
+          tests:
+              - not_null
+              - unique
+        - name: sdr_sales_segment
+          description: Sales segment of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
+        - name: sdr_region
+          description: Region of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
+        - name: is_dg_influenced
+          description: Flag indicating a touchpoint is influenced by Demand Gen base on its segment being Demand Gen.
+        - name: is_dg_sourced
+          description: Flag indicating a touchpoint is sourced from Demand Gen based on its segment being Demand Gen as well as its position being first touch.
+        - name: count_inquiry
+          description: Count of touchpoints associated with the creation of a lead based on their position.
+        - name: count_true_inquiry
+          description: Count of touchpoints that occured on or before the `true_inquiry_date`. 
+        - name: count_mql
+          description: Count of touchpoints that occured on or before the`mql_date`.
+        - name: count_net_new_mql
+          description: Count of touchpoints that occured on or before the `mql_date` that are also Lead Created.
+        - name: count_net_new_accepted
+          description: Count of touchpoints that occured on or before the `accepted_date` that are also Lead Created.
+
+    - name: mart_crm_touchpoint_combined
+      description: Model containing both Bizible attribution touchpoints and non-attribution touchpoints along with contact, lead, account, and campaign details.
       columns:
         - name: dim_crm_touchpoint_id
           tests:
@@ -25,6 +90,10 @@ models:
               - not_null
               - unique
           tags: ["tdf", "mart", "sales_funnel"]
+        - name: sdr_sales_segment
+          description: Sales segment of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
+        - name: sdr_region
+          description: Region of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
 
     - name: mart_marketing_contact_no_pii
       description: Non sensitive version of the mart_marketing_contact model.
