@@ -91,6 +91,9 @@ WITH biz_person AS (
       NULL                                          AS matched_account_sdr_assigned,
       NULL                                          AS matched_account_type,
       NULL                                          AS matched_account_gtm_strategy,
+      is_first_order_initial_mql,
+      is_first_order_mql,
+      is_first_order_person,
       last_utm_content,
       last_utm_campaign,
       sequence_step_type,
@@ -198,6 +201,9 @@ WITH biz_person AS (
       matched_account_sdr_assigned,
       matched_account_type,
       matched_account_gtm_strategy,
+      is_first_order_initial_mql,
+      is_first_order_mql,
+      is_first_order_person,
       last_utm_content,
       last_utm_campaign,
       sequence_step_type,
@@ -283,5 +289,5 @@ WITH biz_person AS (
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-09-27"
+    updated_date="2022-09-30"
 ) }}

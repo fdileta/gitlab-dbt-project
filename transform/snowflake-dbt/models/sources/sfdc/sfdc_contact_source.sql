@@ -108,6 +108,11 @@ renamed AS (
     sequence_task_due_date__c::DATE AS sequence_task_due_date,
     sequence_status__c AS sequence_status,
     actively_being_sequenced__c::BOOLEAN AS is_actively_being_sequenced,
+    fo_initial_mql__c AS is_first_order_initial_mql,
+    fo_mql__c AS is_first_order_mql,
+    is_first_order_person__c AS is_first_order_person,
+    true_initial_mql_date__c AS true_initial_mql_date,
+    true_mql_date__c AS true_mql_date,
     {{ sfdc_source_buckets('leadsource') }}
 
 

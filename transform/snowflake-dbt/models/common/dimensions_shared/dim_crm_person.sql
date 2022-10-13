@@ -57,6 +57,9 @@ WITH crm_person AS (
       matched_account_sdr_assigned,
       matched_account_type,
       matched_account_gtm_strategy,
+      is_first_order_initial_mql,
+      is_first_order_mql,
+      is_first_order_person,
       cognism_company_office_city,
       cognism_company_office_state,
       cognism_company_office_country,
@@ -103,5 +106,5 @@ WITH crm_person AS (
     created_by="@jjstark",
     updated_by="@rkohnke",
     created_date="2020-09-10",
-    updated_date="2022-09-14"
+    updated_date="2022-09-30"
 ) }}
