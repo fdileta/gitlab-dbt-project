@@ -21,6 +21,11 @@ GITLAB_ANALYTICS_PRIVATE_TOKEN = Secret(
     "env", "GITLAB_ANALYTICS_PRIVATE_TOKEN", "airflow", "GITLAB_ANALYTICS_PRIVATE_TOKEN"
 )
 
+# gitlab internal handbook  private token
+GITLAB_INTERNAL_HANDBOOK_TOKEN = Secret(
+    "env", "GITLAB_INTERNAL_HANDBOOK_TOKEN", "airflow", "GITLAB_INTERNAL_HANDBOOK_TOKEN"
+)
+
 # GCP Related
 GCP_SERVICE_CREDS = Secret(
     "env", "GCP_SERVICE_CREDS", "airflow", "cloudsql-credentials"
