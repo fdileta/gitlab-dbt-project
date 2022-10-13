@@ -1073,6 +1073,36 @@ roles:
                     - raw.snapshots.*
                     - raw.gcp_billing.*
 
+    - sales_analytics:
+        warehouses:
+            - dev_xs
+        member_of:
+            - analyst_sales
+            - restricted_safe
+            - data_team_analyst
+            - bi_tool_eval_read
+            - xactly
+        owns:
+            schemas:
+                - raw.sales_analytics
+        privileges:
+            databases:
+                read:
+                    - raw
+                write:
+                    - raw
+            schemas:
+                read:
+                    - raw.sales_analytics
+                write:
+                    - raw.sales_analytics
+            tables:
+                read:
+                    - raw.sales_analytics.*
+                write:
+                    - raw.sales_analytics.*
+
+
 
 # ==========================================
 # Object Roles
@@ -3006,6 +3036,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - sales_analytics
         warehouses:
             - dev_xs
         owns:
@@ -3811,6 +3842,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - sales_analytics
         warehouses:
             - dev_xs
         owns:
@@ -4939,7 +4971,7 @@ users:
             - accountadmin
 
     - rrendon:
-        can_login: yes 
+        can_login: yes
         member_of:
             - rrendon
 
