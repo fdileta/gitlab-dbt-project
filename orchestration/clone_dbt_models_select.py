@@ -184,7 +184,6 @@ class DbtModelClone:
                 WHERE TABLE_SCHEMA = UPPER('{schema_name}')
                 AND TABLE_NAME = UPPER('{table_name}')
             """
-            logging.info(f"Running {query}")
             res = query_executor(self.engine, query)
 
             self.create_schema(output_schema_name)
