@@ -1,8 +1,9 @@
 {{ simple_cte([
     ('mart_crm_opportunity','mart_crm_opportunity'),
     ('mart_crm_person','mart_crm_person'),
-    ('mart_crm_touchpoint_combined','mart_crm_touchpoint_combined'),
-    ('dim_crm_account','dim_crm_account')
+    ('dim_crm_account','dim_crm_account'),
+    ('mart_crm_touchpoint_combined', 'mart_crm_touchpoint_combined'), 
+    ('dim_date', 'dim_date')
 ]) }}
 
 , upa_base AS ( 
@@ -289,10 +290,56 @@
     mart_crm_touchpoint_combined.custom_sao,
     mart_crm_touchpoint_combined.pipeline_custom_net_arr,
     mart_crm_touchpoint_combined.won_custom,
-    mart_crm_touchpoint_combined.won_custom_net_arr
+    mart_crm_touchpoint_combined.won_custom_net_arr,
+
+     --inquiry_date fields
+    inquiry_date.fiscal_year                     AS inquiry_date_range_year,
+    inquiry_date.fiscal_quarter_name_fy          AS inquiry_date_range_quarter,
+    DATE_TRUNC(month, inquiry_date.date_actual)  AS inquiry_date_range_month,
+    inquiry_date.first_day_of_week               AS inquiry_date_range_week,
+    inquiry_date.date_id                         AS inquiry_date_range_id,
+  
+    --mql_date fields
+    mql_date.fiscal_year                     AS mql_date_range_year,
+    mql_date.fiscal_quarter_name_fy          AS mql_date_range_quarter,
+    DATE_TRUNC(month, mql_date.date_actual)  AS mql_date_range_month,
+    mql_date.first_day_of_week               AS mql_date_range_week,
+    mql_date.date_id                         AS mql_date_range_id,
+  
+    --opp_create_date fields
+    opp_create_date.fiscal_year                     AS opportunity_created_date_range_year,
+    opp_create_date.fiscal_quarter_name_fy          AS opportunity_created_date_range_quarter,
+    DATE_TRUNC(month, opp_create_date.date_actual)  AS opportunity_created_date_range_month,
+    opp_create_date.first_day_of_week               AS opportunity_created_date_range_week,
+    opp_create_date.date_id                         AS opportunity_created_date_range_id,
+  
+    --sao_date fields
+    sao_date.fiscal_year                     AS sao_date_range_year,
+    sao_date.fiscal_quarter_name_fy          AS sao_date_range_quarter,
+    DATE_TRUNC(month, sao_date.date_actual)  AS sao_date_range_month,
+    sao_date.first_day_of_week               AS sao_date_range_week,
+    sao_date.date_id                         AS sao_date_range_id,
+  
+    --closed_date fields
+    closed_date.fiscal_year                     AS closed_date_range_year,
+    closed_date.fiscal_quarter_name_fy          AS closed_date_range_quarter,
+    DATE_TRUNC(month, closed_date.date_actual)  AS closed_date_range_month,
+    closed_date.first_day_of_week               AS closed_date_range_week,
+    closed_date.date_id                         AS closed_date_range_id
+  
   FROM cohort_base
   LEFT JOIN mart_crm_touchpoint_combined
-    ON mart_crm_touchpoint_combined.email_hash=cohort_base.email_hash
+    ON mart_crm_touchpoint_combined.email_hash = cohort_base.email_hash
+  LEFT JOIN dim_date AS inquiry_date 
+    ON cohort_base.true_inquiry_date = inquiry_date.date_day
+  LEFT JOIN dim_date AS mql_date
+    ON cohort_base.mql_date_lastest_pt = mql_date.date_day
+  LEFT JOIN dim_date AS opp_create_date
+    ON cohort_base.opp_created_date = opp_create_date.date_day
+  LEFT JOIN dim_date AS sao_date
+    ON cohort_base.sales_accepted_date = sao_date.date_day
+  LEFT JOIN dim_date AS closed_date
+    ON cohort_base.close_date=closed_date.date_day
 
 ), final AS (
 

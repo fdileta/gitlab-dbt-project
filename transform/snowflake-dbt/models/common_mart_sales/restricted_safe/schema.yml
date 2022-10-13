@@ -373,3 +373,5 @@ models:
         - not_null
         - unique
       tags: ["tdf", "mart", "arr", "retention"]
+  - name: mart_lead_to_revenue
+    description: Maps a person (unconverted lead or a contact) to an opportunity through their associated Salesforce account and connects any of their related touchpoints.  
