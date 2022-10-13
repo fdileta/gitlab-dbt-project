@@ -1,16 +1,6 @@
 version: 2
 
 models:
-  - name: gcp_billing_export_source
-    description: Base model for gcp billing export
-    columns:
-      - name: primary_key
-        tests:
-          - not_null
-      - name: billing_account_id
-        tests:
-          - not_null
-
   - name: summary_gcp_billing_source
     description: Base model for gcp billing summary data. Column descriptions can be found at https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables/standard-usage
     columns:
