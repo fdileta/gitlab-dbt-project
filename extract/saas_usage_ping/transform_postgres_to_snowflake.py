@@ -429,7 +429,11 @@ def get_transformed_having_clause(postgres_sql: str) -> str:
     return snowflake_having_clause
 
 
-def perform_action_on_query_str(original_dict: Dict[Any, Any], action: Callable[..., str], action_arg_type: str = 'both') -> Dict[Any, Any]:
+def perform_action_on_query_str(
+    original_dict: Dict[Any, Any],
+    action: Callable[..., str],
+    action_arg_type: str = "both",
+) -> Dict[Any, Any]:
     """
     Iterate over a nested dictionary object.
     If the value is a 'select statement' string...
@@ -446,12 +450,14 @@ def perform_action_on_query_str(original_dict: Dict[Any, Any], action: Callable[
             new_dict[k] = return_dict
         # if string and select statement, apply the action
         elif isinstance(v, str) and v.startswith("SELECT"):
-            if action_arg_type == 'both':
+            if action_arg_type == "both":
                 new_val = action(k, v)
-            elif action_arg_type == 'value':
+            elif action_arg_type == "value":
                 new_val = action(v)
             else:
-                raise ValueError('Invalid action_arg_type for perform_action_on_query_str(), can choose either "both" or "value"')
+                raise ValueError(
+                    'Invalid action_arg_type for perform_action_on_query_str(), can choose either "both" or "value"'
+                )
             new_dict[k] = new_val
         # else, keep the dict as is
         else:
@@ -466,9 +472,15 @@ def transform(json_data: Dict[Any, Any]) -> Dict[Any, Any]:
 
     sql_dict = get_sql_dict(json_data)
 
-    prepared = perform_action_on_query_str(original_dict=sql_dict, action=add_counter_name_as_column, action_arg_type='both')
+    prepared = perform_action_on_query_str(
+        original_dict=sql_dict,
+        action=add_counter_name_as_column,
+        action_arg_type="both",
+    )
 
-    transformed = perform_action_on_query_str(original_dict=prepared, action=get_renamed_query_tables, action_arg_type='value')
+    transformed = perform_action_on_query_str(
+        original_dict=prepared, action=get_renamed_query_tables, action_arg_type="value"
+    )
 
     return transformed
 
@@ -512,4 +524,6 @@ if __name__ == "__main__":
     save_to_json_file(
         file_name=TRANSFORMED_INSTANCE_QUERIES_FILE, json_data=final_sql__dict
     )
-    save_to_json_file(file_name=META_DATA_INSTANCE_QUERIES_FILE, json_data=final_meta_data)
+    save_to_json_file(
+        file_name=META_DATA_INSTANCE_QUERIES_FILE, json_data=final_meta_data
+    )

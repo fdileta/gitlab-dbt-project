@@ -126,7 +126,9 @@ class UsagePing(object):
         for key, query in saas_queries.items():
             # if the 'query' is a dictionary, then recursively call
             if isinstance(query, dict):
-                results_returned, errors_returned = self.evaluate_saas_queries(connection, query)
+                results_returned, errors_returned = self.evaluate_saas_queries(
+                    connection, query
+                )
                 if results_returned:
                     results[key] = results_returned
                 if errors_returned:
