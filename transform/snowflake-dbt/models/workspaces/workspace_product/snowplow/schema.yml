@@ -1,18 +1,37 @@
 version: 2
 
 models:
-  - name: dim_website_page
-    description: Dimension for the analysis of webpages used according to the page_urlpath in Snowplow.
-    columns:
-      - name: dim_website_page_sk
+  - name: dim_behavior_browser
+    description: Dimension for the analysis of browsers in Snowplow.
+    columns: 
+      - name: dim_behavior_browser_sk
         tests:
           - not_null
           - unique
 
-  - name: fct_website_page_view
-    description: TBD
-    columns:
-      - name: website_page_view_pk
+  - name: dim_behavior_operating_system
+    description: Dimension for the analysis of operating systems in Snowplow.
+    columns: 
+      - name: dim_behavior_operating_system_sk
         tests:
           - not_null
           - unique
+
+  - name: dim_behavior_website_page
+    description: Dimension for the analysis of webpages used according to the page_urlpath in Snowplow.
+    columns:
+      - name: dim_behavior_website_page_sk
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_behavior_website_page_view
+    description: TBD
+    columns:
+      - name: behavior_website_page_view_pk
+        tests:
+          - not_null
+          - unique
+
+  - name: prep_snowplow_structured_event_all_source
+    description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of strutured events if the model is not run incrementally.

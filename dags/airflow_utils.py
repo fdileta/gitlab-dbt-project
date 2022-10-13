@@ -12,7 +12,7 @@ from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperato
 SSH_REPO = "git@gitlab.com:gitlab-data/analytics.git"
 HTTP_REPO = "https://gitlab.com/gitlab-data/analytics.git"
 DATA_IMAGE = "registry.gitlab.com/gitlab-data/data-image/data-image:v0.0.27"
-DBT_IMAGE = "registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.5"
+DBT_IMAGE = "registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.9"
 PERMIFROST_IMAGE = "registry.gitlab.com/gitlab-data/permifrost:v0.13.1"
 ANALYST_IMAGE = "registry.gitlab.com/gitlab-data/data-image/analyst-image:v1.0.7"
 
@@ -27,6 +27,13 @@ analytics_pipelines_dag = [
     "dbt_snowplow_full_refresh",
     "saas_usage_ping",
     "t_prep_dotcom_usage_events_backfill",
+]
+
+
+data_science_pipelines_dag = [
+    "ds_propensity_to_expand",
+    "ds_propensity_to_contract",
+    "ds_propensity_to_purchase_trial",
 ]
 
 
@@ -93,8 +100,7 @@ def slack_defaults(context, task_type):
     """
     Function to handle switching between a task failure and success.
     """
-    # base_url = "https://airflow.gitlabdata.com"
-    base_url = "http://35.233.169.210:8080"
+    base_url = "https://airflow.gitlabdata.com"
     execution_date = context["ts"]
     dag_context = context["dag"]
     dag_name = dag_context.dag_id
@@ -130,6 +136,8 @@ def slack_defaults(context, task_type):
     if task_type == "failure":
         if dag_id in analytics_pipelines_dag:
             slack_channel = "#analytics-pipelines"
+        elif dag_id in data_science_pipelines_dag:
+            slack_channel = "#data-science-pipelines"
         else:
             slack_channel = dag_context.params.get(
                 "slack_channel_override", "#data-pipelines"
@@ -151,7 +159,7 @@ def slack_defaults(context, task_type):
                 {"title": "Timestamp", "value": execution_date_pretty, "short": True},
             ],
             "footer": "Airflow",
-            "footer_icon": "http://35.233.169.210:8080/static/pin_100.png",
+            "footer_icon": "https://airflow.gitlabdata.com/static/pin_100.png",
             "ts": execution_date_epoch,
         }
     ]
@@ -173,6 +181,8 @@ def slack_snapshot_failed_task(context):
 def slack_webhook_conn(slack_channel):
     if slack_channel == "#analytics-pipelines":
         slack_webhook = Variable.get("AIRFLOW_VAR_ANALYTICS_PIPELINES")
+    elif slack_channel == "#data-science-pipelines":
+        slack_webhook = Variable.get("AIRFLOW_VAR_DATA_SCIENCE_PIPELINES")
     else:
         slack_webhook = Variable.get("AIRFLOW_VAR_DATA_PIPELINES")
     airflow_http_con_id = Variable.get("AIRFLOW_VAR_SLACK_CONNECTION")

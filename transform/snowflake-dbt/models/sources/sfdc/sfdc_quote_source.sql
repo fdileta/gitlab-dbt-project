@@ -13,6 +13,8 @@ WITH source AS (
       ownerid                           AS owner_id,
       zqu__zuoraaccountid__c            AS zuora_account_id,
       zqu__zuorasubscriptionid__c       AS zuora_subscription_id,
+      zqu__BillToContact__c             AS bill_to_contact,
+      zqu__SoldToContact__c             AS sold_to_contact,
 
       -- info
       zqu__startdate__c                 AS contract_effective_date,

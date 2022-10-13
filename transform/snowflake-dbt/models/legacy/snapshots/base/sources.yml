@@ -13,6 +13,8 @@ sources:
       identifier: false
 
     tables:
+      - name: bizible_attribution_touchpoint_snapshots
+      - name: bizible_touchpoint_snapshots
       - name: customers_db_customers_snapshots
       - name: customers_db_orders_snapshots
       - name: dim_subscription_snapshot
@@ -32,6 +34,8 @@ sources:
       - name: license_db_licenses_snapshots
       - name: customers_db_licenses_snapshots
       - name: sfdc_account_snapshots
+      - name: sfdc_bizible_attribution_touchpoint_snapshots
+      - name: sfdc_bizible_touchpoint_snapshots
       - name: sfdc_opportunity_snapshots
       - name: sfdc_user_snapshots
       - name: sheetload_comp_band_snapshots

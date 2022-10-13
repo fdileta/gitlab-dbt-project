@@ -3,7 +3,8 @@
 WITH sfdc_account_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
 
 ), opportunity AS (
 
@@ -14,16 +15,16 @@ WITH sfdc_account_xf AS (
 
     SELECT 
 
-        LOWER(opportunity.user_segment_stamped)       AS report_opportunity_user_segment,
-        LOWER(opportunity.user_geo_stamped)           AS report_opportunity_user_geo,
-        LOWER(opportunity.user_region_stamped)        AS report_opportunity_user_region,
-        LOWER(opportunity.user_area_stamped)          AS report_opportunity_user_area,
-        LOWER(opportunity.order_type_stamped)         AS order_type_stamped,
+        LOWER(opportunity.user_segment_stamped)                                       AS report_opportunity_user_segment,
+        LOWER(opportunity.user_geo_stamped)                                           AS report_opportunity_user_geo,
+        LOWER(opportunity.user_region_stamped)                                        AS report_opportunity_user_region,
+        LOWER(opportunity.user_area_stamped)                                          AS report_opportunity_user_area,
+        LOWER(COALESCE(opportunity.order_type_stamped, 'Missing order_type_name'))    AS order_type_stamped,
   
         CASE
           WHEN opportunity.sales_qualified_source = 'BDR Generated'
               THEN 'SDR Generated'
-          ELSE COALESCE(opportunity.sales_qualified_source,'other')
+          ELSE COALESCE(opportunity.sales_qualified_source, 'Missing sales_qualified_source_name')
         END                                                           AS sales_qualified_source,
 
         -- medium level grouping of the order type field
@@ -37,7 +38,7 @@ WITH sfdc_account_xf AS (
           WHEN opportunity.order_type_stamped IN ('5. Churn - Partial','6. Churn - Final')
             THEN '4. Churn'
           ELSE '5. Other' 
-        END                                                                   AS deal_category,
+        END                                                           AS deal_category,
 
         CASE 
           WHEN opportunity.order_type_stamped = '1. New - First Order' 
@@ -45,7 +46,7 @@ WITH sfdc_account_xf AS (
           WHEN opportunity.order_type_stamped IN ('2. New - Connected', '3. Growth', '5. Churn - Partial','6. Churn - Final','4. Contraction') 
             THEN '2. Growth' 
           ELSE '3. Other'
-        END                                                                   AS deal_group,
+        END                                                           AS deal_group,
 
         account.account_owner_user_segment,
         account.account_owner_user_geo, 
@@ -65,11 +66,11 @@ WITH sfdc_account_xf AS (
         LOWER(report_opportunity_user_region)        AS report_opportunity_user_region,
         LOWER(report_opportunity_user_area)          AS report_opportunity_user_area,
         
-        LOWER(sales_qualified_source)           AS sales_qualified_source,
-        LOWER(order_type_stamped)               AS order_type_stamped,
+        LOWER(sales_qualified_source)                AS sales_qualified_source,
+        LOWER(order_type_stamped)                    AS order_type_stamped,
   
-        LOWER(deal_category)                    AS deal_category,
-        LOWER(deal_group)                       AS deal_group,
+        LOWER(deal_category)                         AS deal_category,
+        LOWER(deal_group)                            AS deal_group,
 
         LOWER(CONCAT(report_opportunity_user_segment, '-',report_opportunity_user_geo, '-',report_opportunity_user_region, '-',report_opportunity_user_area))                                                          AS report_user_segment_geo_region_area,
         LOWER(CONCAT(report_opportunity_user_segment, '-',report_opportunity_user_geo, '-',report_opportunity_user_region, '-',report_opportunity_user_area, '-', sales_qualified_source, '-', order_type_stamped))    AS report_user_segment_geo_region_area_sqs_ot
@@ -78,16 +79,16 @@ WITH sfdc_account_xf AS (
   UNION ALL
   
   SELECT         
-        LOWER(account_owner_user_segment)       AS report_opportunity_user_segment,
-        LOWER(account_owner_user_geo)           AS report_opportunity_user_geo,
-        LOWER(account_owner_user_region)        AS report_opportunity_user_region,
-        LOWER(account_owner_user_area)          AS report_opportunity_user_area,
+        LOWER(account_owner_user_segment)            AS report_opportunity_user_segment,
+        LOWER(account_owner_user_geo)                AS report_opportunity_user_geo,
+        LOWER(account_owner_user_region)             AS report_opportunity_user_region,
+        LOWER(account_owner_user_area)               AS report_opportunity_user_area,
         
-        LOWER(sales_qualified_source)           AS sales_qualified_source,
-        LOWER(order_type_stamped)               AS order_type_stamped,
+        LOWER(sales_qualified_source)                AS sales_qualified_source,
+        LOWER(order_type_stamped)                    AS order_type_stamped,
   
-        LOWER(deal_category)                    AS deal_category,
-        LOWER(deal_group)                       AS deal_group,
+        LOWER(deal_category)                         AS deal_category,
+        LOWER(deal_group)                            AS deal_group,
   
         LOWER(CONCAT(account_owner_user_segment,'-',account_owner_user_geo,'-',account_owner_user_region,'-',account_owner_user_area))                                                          AS report_user_segment_geo_region_area,
         LOWER(CONCAT(account_owner_user_segment,'-',account_owner_user_geo,'-',account_owner_user_region,'-',account_owner_user_area, '-', sales_qualified_source, '-', order_type_stamped))    AS report_user_segment_geo_region_area_sqs_ot

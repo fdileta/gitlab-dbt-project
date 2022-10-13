@@ -29,7 +29,8 @@ we can delete this connection and use the mart table directly.
 ), sfdc_accounts_xf AS (
 
     SELECT * 
-    FROM {{ref('sfdc_accounts_xf')}}
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 
 ), date_details AS (
@@ -139,10 +140,11 @@ we can delete this connection and use the mart table directly.
       sfdc_opportunity_xf.downgrade_reason,
       sfdc_opportunity_xf.renewal_acv,
       sfdc_opportunity_xf.renewal_amount,
+      
       CASE
         WHEN sfdc_opportunity_xf.sales_qualified_source = 'BDR Generated'
             THEN 'SDR Generated'
-        ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source,'NA')
+        ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source, 'Missing sales_qualified_source_name')
       END                                                           AS sales_qualified_source,
 
       sfdc_opportunity_xf.solutions_to_be_replaced,
@@ -155,9 +157,8 @@ we can delete this connection and use the mart table directly.
       -----------------------------------------------------------
       -----------------------------------------------------------
       -- New fields for FY22 - including user segment / region fields
-
       sfdc_opportunity_xf.order_type_live,
-      sfdc_opportunity_xf.order_type_stamped,
+      COALESCE(sfdc_opportunity_xf.order_type_stamped, 'Missing order_type_name') AS order_type_stamped,
 
       COALESCE(sfdc_opportunity_xf.net_arr,0)                 AS raw_net_arr,
       sfdc_opportunity_xf.recurring_amount,
@@ -362,28 +363,28 @@ we can delete this connection and use the mart table directly.
       --                adding is_open check here to default open deals to opportunity owners fields (instead of stamped)
       CASE 
         WHEN sfdc_opportunity_xf.user_segment_stamped IS NULL 
-            OR sfdc_opportunity_xf.is_open = 1
+            OR sfdc_opportunity_xf.stage_name NOT IN ('8-Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate') 
           THEN opportunity_owner.user_segment 
         ELSE sfdc_opportunity_xf.user_segment_stamped
       END                                                                   AS opportunity_owner_user_segment,
 
       CASE 
         WHEN sfdc_opportunity_xf.user_geo_stamped IS NULL 
-            OR sfdc_opportunity_xf.is_open = 1
+            OR sfdc_opportunity_xf.stage_name NOT IN ('8-Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate') 
           THEN opportunity_owner.user_geo
         ELSE sfdc_opportunity_xf.user_geo_stamped
       END                                                                   AS opportunity_owner_user_geo,
 
       CASE 
         WHEN sfdc_opportunity_xf.user_region_stamped IS NULL
-             OR sfdc_opportunity_xf.is_open = 1
+             OR sfdc_opportunity_xf.stage_name NOT IN ('8-Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate') 
           THEN opportunity_owner.user_region
           ELSE sfdc_opportunity_xf.user_region_stamped
       END                                                                   AS opportunity_owner_user_region,
 
       CASE
         WHEN sfdc_opportunity_xf.user_area_stamped IS NULL
-             OR sfdc_opportunity_xf.is_open = 1
+             OR sfdc_opportunity_xf.stage_name NOT IN ('8-Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate') 
           THEN opportunity_owner.user_area
         ELSE sfdc_opportunity_xf.user_area_stamped
       END                                                                   AS opportunity_owner_user_area,
@@ -498,16 +499,6 @@ we can delete this connection and use the mart table directly.
       -----------------------------------------------------------------------------------------------------      
       -----------------------------------------------------------------------------------------------------
       
-      --sfdc_opportunity_xf.partner_initiated_opportunity,
-      --sfdc_opportunity_xf.true_up_value,
-      --sfdc_opportunity_xf.is_swing_deal,
-      --sfdc_opportunity_xf.probability,
-      --sfdc_opportunity_xf.pushed_count,
-      --sfdc_opportunity_xf.refund_iacv,
-      --sfdc_opportunity_xf.downgrade_iacv,
-      --sfdc_opportunity_xf.upside_swing_deal_iacv,
-      --sfdc_opportunity_xf.weighted_iacv,
-
       -- fields form opportunity source
       sfdc_opportunity.opportunity_category,
       sfdc_opportunity.product_category,
@@ -717,11 +708,11 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
       sfdc_accounts_xf.account_demographics_territory,
       -- account_demographics_subarea_stamped
 
-      sfdc_accounts_xf.account_demographics_sales_segment    AS upa_demographics_segment,
-      sfdc_accounts_xf.account_demographics_geo              AS upa_demographics_geo,
-      sfdc_accounts_xf.account_demographics_region           AS upa_demographics_region,
-      sfdc_accounts_xf.account_demographics_area             AS upa_demographics_area,
-      sfdc_accounts_xf.account_demographics_territory        AS upa_demographics_territory,
+      upa.account_demographics_sales_segment    AS upa_demographics_segment,
+      upa.account_demographics_geo              AS upa_demographics_geo,
+      upa.account_demographics_region           AS upa_demographics_region,
+      upa.account_demographics_area             AS upa_demographics_area,
+      upa.account_demographics_territory        AS upa_demographics_territory,
       -----------------------------------------------
 
       CASE
@@ -830,8 +821,10 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
 
     FROM sfdc_opportunity_xf
     CROSS JOIN today
-    LEFT JOIN sfdc_accounts_xf
+    INNER JOIN sfdc_accounts_xf
       ON sfdc_accounts_xf.account_id = sfdc_opportunity_xf.account_id
+    INNER JOIN sfdc_accounts_xf upa
+      ON sfdc_accounts_xf.ultimate_parent_account_id = upa.account_id
     LEFT JOIN churn_metrics 
       ON churn_metrics.opportunity_id = sfdc_opportunity_xf.opportunity_id
     
@@ -950,12 +943,11 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
 
 
       -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
+      -- 2022-08-23 JK: using the central is_sao logic 
       CASE
         WHEN oppty_final.sales_accepted_date IS NOT NULL
           AND oppty_final.is_edu_oss = 0
-          AND oppty_final.is_deleted = 0
-          AND oppty_final.is_renewal = 0
-          AND oppty_final.stage_name NOT IN ('00-Pre Opportunity','10-Duplicate', '9-Unqualified','0-Pending Acceptance')
+          AND oppty_final.stage_name NOT IN ('10-Duplicate')
             THEN 1
         ELSE 0
       END                                                         AS is_eligible_sao_flag,

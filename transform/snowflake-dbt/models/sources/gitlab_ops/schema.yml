@@ -50,8 +50,8 @@ models:
         tags: ["tdf","gitlab_ops"]
         tests:
           - not_null
-          - no_overlapping_valid_from_to_dates
-          - unique_where_currently_valid
+          - unique:
+              where: "valid_to = NULL"
       - name: valid_from
         tags: ["tdf","gitlab_ops"]
         tests:
@@ -80,8 +80,8 @@ models:
         tags: ["tdf","gitlab_ops"]
         tests:
           - not_null
-          - no_overlapping_valid_from_to_dates
-          - unique_where_currently_valid
+          - unique:
+              where: "valid_to = NULL"
       - name: valid_from
         tags: ["tdf","gitlab_ops"]
         tests:

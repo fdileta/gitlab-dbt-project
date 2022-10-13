@@ -1,3 +1,7 @@
+{{ config(
+    tags=["product"]
+) }}
+    
 {{ simple_cte ([
   ('marketing_contact', 'dim_marketing_contact'),
   ('marketing_contact_order', 'bdg_marketing_contact_order'),
@@ -9,10 +13,11 @@
   ('customers_db_charges_xf', 'customers_db_charges_xf'),
   ('customers_db_trials', 'customers_db_trials'),
   ('customers_db_leads', 'customers_db_leads_source'),
-  ('gitlab_dotcom_daily_usage_data_events', 'gitlab_dotcom_daily_usage_data_events'),
-  ('gitlab_dotcom_xmau_metrics', 'gitlab_dotcom_xmau_metrics'),
-  ('services', 'gitlab_dotcom_services_source'),
-  ('project', 'prep_project')
+  ('fct_event_user_daily', 'fct_event_user_daily'),
+  ('map_gitlab_dotcom_xmau_metrics', 'map_gitlab_dotcom_xmau_metrics'),
+  ('services', 'gitlab_dotcom_integrations_source'),
+  ('project', 'prep_project'),
+  ('ptpt_scores_by_user', 'prep_ptpt_scores_by_user')
 ]) }}
 
 -------------------------- Start of PQL logic: --------------------------
@@ -144,14 +149,14 @@
       subscriptions.min_subscription_start_date,
       ARRAYAGG(DISTINCT events.stage_name)       AS list_of_stages,
       COUNT(DISTINCT events.stage_name)          AS active_stage_count
-    FROM gitlab_dotcom_daily_usage_data_events   AS events
+    FROM fct_event_user_daily   AS events
     INNER JOIN namespaces 
-      ON namespaces.dim_namespace_id = events.namespace_id 
-    LEFT JOIN gitlab_dotcom_xmau_metrics AS xmau 
-      ON xmau.events_to_include = events.event_name
+      ON namespaces.dim_namespace_id = events.dim_ultimate_parent_namespace_id 
+    LEFT JOIN map_gitlab_dotcom_xmau_metrics AS xmau 
+      ON xmau.common_events_to_include = events.event_name
     LEFT JOIN subscriptions 
       ON subscriptions.namespace_id = namespaces.dim_namespace_id
-    WHERE days_since_namespace_creation BETWEEN 0 AND 365
+    WHERE days_since_namespace_creation_at_event_date BETWEEN 0 AND 365
       AND events.plan_name_at_event_date IN ('trial','free', 'ultimate_trial') --Added in to only use events from a free or trial namespace (which filters based on the selection chose for the `free_or_trial` filter
       AND xmau.smau = TRUE
       AND events.event_date BETWEEN namespaces.namespace_created_at_date AND IFNULL(subscriptions.min_subscription_start_date,CURRENT_DATE)
@@ -268,16 +273,6 @@
     SELECT DISTINCT
       dim_marketing_contact_id,
       dim_subscription_id,
-      smau_manage_analytics_total_unique_counts_monthly,
-      smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly,
-      smau_create_repo_writes,
-      smau_verify_ci_pipelines_users_28_days,
-      smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly,
-      smau_release_release_creation_users_28_days,
-      smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly,
-      smau_monitor_incident_management_activer_user_28_days,
-      smau_secure_secure_scanners_users_28_days,
-      smau_protect_container_scanning_jobs_users_28_days,
       usage_umau_28_days_user,
       usage_action_monthly_active_users_project_repo_28_days_user,
       usage_merge_requests_28_days_user,
@@ -300,7 +295,7 @@
       usage_user_license_management_jobs_28_days_user,
       usage_user_secret_detection_jobs_28_days_user,
       usage_projects_with_packages_all_time_event,
-      usage_projects_with_packages_28_days_user,
+      usage_projects_with_packages_28_days_event,
       usage_deployments_28_days_user,
       usage_releases_28_days_user,
       usage_epics_28_days_user,
@@ -314,16 +309,6 @@
 
     SELECT 
       dim_marketing_contact_id,
-      SUM(smau_manage_analytics_total_unique_counts_monthly)                                        AS smau_manage_analytics_total_unique_counts_monthly,
-      SUM(smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly)         AS smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly,
-      SUM(smau_create_repo_writes)                                                                  AS smau_create_repo_writes,
-      SUM(smau_verify_ci_pipelines_users_28_days)                                                   AS smau_verify_ci_pipelines_users_28_days,
-      SUM(smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly)  AS smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly,
-      SUM(smau_release_release_creation_users_28_days)                                              AS smau_release_release_creation_users_28_days,
-      SUM(smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly)   AS smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly,
-      SUM(smau_monitor_incident_management_activer_user_28_days)                                    AS smau_monitor_incident_management_activer_user_28_days,
-      SUM(smau_secure_secure_scanners_users_28_days)                                                AS smau_secure_secure_scanners_users_28_days,
-      SUM(smau_protect_container_scanning_jobs_users_28_days)                                       AS smau_protect_container_scanning_jobs_users_28_days,
       SUM(usage_umau_28_days_user)                                                                  AS usage_umau_28_days_user,
       SUM(usage_action_monthly_active_users_project_repo_28_days_user)                              AS usage_action_monthly_active_users_project_repo_28_days_user,
       SUM(usage_merge_requests_28_days_user)                                                        AS usage_merge_requests_28_days_user,
@@ -346,7 +331,7 @@
       SUM(usage_user_license_management_jobs_28_days_user)                                          AS usage_user_license_management_jobs_28_days_user,
       SUM(usage_user_secret_detection_jobs_28_days_user)                                            AS usage_user_secret_detection_jobs_28_days_user,
       SUM(usage_projects_with_packages_all_time_event)                                              AS usage_projects_with_packages_all_time_event,
-      SUM(usage_projects_with_packages_28_days_user)                                                AS usage_projects_with_packages_28_days_user,
+      SUM(usage_projects_with_packages_28_days_event)                                               AS usage_projects_with_packages_28_days_event,
       SUM(usage_deployments_28_days_user)                                                           AS usage_deployments_28_days_user,
       SUM(usage_releases_28_days_user)                                                              AS usage_releases_28_days_user,
       SUM(usage_epics_28_days_user)                                                                 AS usage_epics_28_days_user,
@@ -634,20 +619,36 @@
           THEN TRUE
         ELSE FALSE
       END                                                                                        AS has_free_namespace_with_public_project,
+      CASE
+        WHEN MAX(marketing_contact_order.is_ultimate_parent_namespace_public) = TRUE
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                        AS is_member_of_public_ultimate_parent_namespace,
+      CASE
+        WHEN MAX(marketing_contact_order.is_ultimate_parent_namespace_private) = TRUE
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                        AS is_member_of_private_ultimate_parent_namespace,
+      ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_public = TRUE, marketing_contact_order.dim_namespace_id, NULL))
+                                                                                                 AS public_ultimate_parent_namespaces,
+      ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_private = TRUE, marketing_contact_order.dim_namespace_id, NULL))
+                                                                                                 AS private_ultimate_parent_namespaces,
       ARRAY_AGG(
-                DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
-                  IFNULL(marketing_contact_order.saas_product_tier, '') || IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Role') 
-               )                                                                                 AS role_tier_text,
-      ARRAY_AGG(
-                DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
-                  IFNULL(marketing_contact_order.namespace_path, CASE 
-                                          WHEN marketing_contact_order.self_managed_product_tier IS NOT NULL
-                                            THEN 'Self-Managed' 
-                                          ELSE '' 
-                                        END)  || ' | ' || 
-                  IFNULL(marketing_contact_order.saas_product_tier, '') || 
-                  IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Namespace')
-               )                                                                                 AS role_tier_namespace_text
+                DISTINCT
+                CASE
+                  WHEN marketing_contact_order.is_ultimate_parent_namespace = FALSE
+                    THEN NULL
+                  ELSE IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
+                    IFNULL(marketing_contact_order.namespace_path, CASE 
+                                            WHEN marketing_contact_order.self_managed_product_tier IS NOT NULL
+                                              THEN 'Self-Managed' 
+                                            ELSE '' 
+                                          END)  || ' | ' || 
+                    IFNULL(marketing_contact_order.saas_product_tier, '') || 
+                    IFNULL(marketing_contact_order.self_managed_product_tier, ''),
+                    
+                    'No Namespace') END
+               )                                                                                 AS role_tier_ultimate_namespace_text
 
     FROM marketing_contact
     LEFT JOIN  marketing_contact_order
@@ -697,6 +698,9 @@
       IFF(is_saas_delivery
         OR is_self_managed_delivery,
         TRUE, FALSE)                                        AS is_paid_tier,
+      marketing_contact.is_paid_tier_marketo,
+      IFF(is_paid_tier = TRUE OR (is_paid_tier = FALSE AND marketing_contact.is_paid_tier_marketo = TRUE), TRUE, FALSE)
+                                                            AS is_paid_tier_change,
       subscription_aggregate.min_subscription_start_date,
       subscription_aggregate.max_subscription_end_date,
       paid_subscription_aggregate.nbr_of_paid_subscriptions,
@@ -754,6 +758,9 @@
       marketing_contact.customer_db_created_date,
       marketing_contact.customer_db_confirmed_date,
       IFF(latest_pql.email IS NOT NULL, TRUE, FALSE) AS is_pql,
+      marketing_contact.is_pql_marketo,
+      IFF(is_pql = TRUE OR (is_pql = FALSE AND marketing_contact.is_pql_marketo = TRUE), TRUE, FALSE)
+                                            AS is_pql_change,
       latest_pql.pql_namespace_id,
       latest_pql.pql_namespace_name,
       latest_pql.pql_namespace_name_masked,
@@ -774,16 +781,17 @@
       marketing_contact.zuora_active_state,
       marketing_contact.wip_is_valid_email_address,
       marketing_contact.wip_invalid_email_address_reason,
-      usage_metrics.smau_manage_analytics_total_unique_counts_monthly,
-      usage_metrics.smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly,
-      usage_metrics.smau_create_repo_writes,
-      usage_metrics.smau_verify_ci_pipelines_users_28_days,
-      usage_metrics.smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly,
-      usage_metrics.smau_release_release_creation_users_28_days,
-      usage_metrics.smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly,
-      usage_metrics.smau_monitor_incident_management_activer_user_28_days,
-      usage_metrics.smau_secure_secure_scanners_users_28_days,
-      usage_metrics.smau_protect_container_scanning_jobs_users_28_days,
+
+      -- Propensity to purchase trials fields
+      IFF(ptpt_scores_by_user.namespace_id IS NOT NULL, TRUE, FALSE)
+                                                  AS is_ptpt_contact,
+      ptpt_scores_by_user.namespace_id            AS ptpt_namespace_id,
+      ptpt_scores_by_user.score_group             AS ptpt_score_group,
+      ptpt_scores_by_user.insights                AS ptpt_insights,
+      ptpt_scores_by_user.score_date              AS ptpt_score_date,
+      ptpt_scores_by_user.past_score_group        AS ptpt_past_score_group,
+      ptpt_scores_by_user.past_score_date         AS ptpt_past_score_date,
+
       usage_metrics.usage_umau_28_days_user,
       usage_metrics.usage_action_monthly_active_users_project_repo_28_days_user,
       usage_metrics.usage_merge_requests_28_days_user,
@@ -806,7 +814,7 @@
       usage_metrics.usage_user_license_management_jobs_28_days_user,
       usage_metrics.usage_user_secret_detection_jobs_28_days_user,
       usage_metrics.usage_projects_with_packages_all_time_event,
-      usage_metrics.usage_projects_with_packages_28_days_user,
+      usage_metrics.usage_projects_with_packages_28_days_event,
       usage_metrics.usage_deployments_28_days_user,
       usage_metrics.usage_releases_28_days_user,
       usage_metrics.usage_epics_28_days_user,
@@ -830,6 +838,8 @@
       ON services_by_email.email = marketing_contact.email_address
     LEFT JOIN users_role_by_email
       ON users_role_by_email.email = marketing_contact.email_address
+    LEFT JOIN ptpt_scores_by_user
+      ON ptpt_scores_by_user.dim_marketing_contact_id = marketing_contact.dim_marketing_contact_id
 )
 
 {{ hash_diff(
@@ -900,16 +910,6 @@
       'pql_nbr_namespace_users',
       'wip_is_valid_email_address',
       'wip_invalid_email_address_reason',
-      'smau_manage_analytics_total_unique_counts_monthly',
-      'smau_plan_redis_hll_counters_issues_edit_issues_edit_total_unique_counts_monthly',
-      'smau_create_repo_writes',
-      'smau_verify_ci_pipelines_users_28_days',
-      'smau_package_redis_hll_counters_user_packages_user_packages_total_unique_counts_monthly',
-      'smau_release_release_creation_users_28_days',
-      'smau_configure_redis_hll_counters_terraform_p_terraform_state_api_unique_users_monthly',
-      'smau_monitor_incident_management_activer_user_28_days',
-      'smau_secure_secure_scanners_users_28_days',
-      'smau_protect_container_scanning_jobs_users_28_days',
       'usage_umau_28_days_user',
       'usage_action_monthly_active_users_project_repo_28_days_user',
       'usage_merge_requests_28_days_user',
@@ -932,7 +932,7 @@
       'usage_user_license_management_jobs_28_days_user',
       'usage_user_secret_detection_jobs_28_days_user',
       'usage_projects_with_packages_all_time_event',
-      'usage_projects_with_packages_28_days_user',
+      'usage_projects_with_packages_28_days_event',
       'usage_deployments_28_days_user',
       'usage_releases_28_days_user',
       'usage_epics_28_days_user',
@@ -945,7 +945,10 @@
       'pql_nbr_integrations_installed',
       'pql_integrations_installed',
       'pql_namespace_creator_job_description',
-      'is_pql'
+      'is_pql',
+      'is_paid_tier',
+      'is_pql_change',
+      'is_paid_tier_change'
       ]
 ) }}
 
@@ -954,7 +957,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-09",
-    updated_date="2022-08-08"
+    updated_date="2022-09-29"
 ) }}
-
-

@@ -30,7 +30,7 @@ sources:
               - not_null
           - name: usage_data_id
             tests:
-              - not_null              
+              - not_null
       - name: fortune_companies
         freshness: null
       - name: hosts
@@ -88,7 +88,7 @@ sources:
               - not_null
           - name: updated_at
             tests:
-              - not_null        
+              - not_null
       - name: usage_ping_errors
         loaded_at_field: created_at::TIMESTAMP
         columns:
@@ -97,4 +97,13 @@ sources:
               - not_null
           - name: created_at
             tests:
-              - not_null   
+              - not_null
+      - name: usage_ping_metadata
+        loaded_at_field: created_at::TIMESTAMP
+        columns:
+          - name: id
+            tests:
+              - not_null
+          - name: created_at
+            tests:
+              - not_null

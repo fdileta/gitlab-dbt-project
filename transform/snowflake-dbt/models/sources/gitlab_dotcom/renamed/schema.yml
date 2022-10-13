@@ -1550,7 +1550,8 @@ models:
       - name: created_at
         tags: ["tdf","gitlab_dotcom"]
         tests:
-          - not_null
+          - not_null :
+              severity: warn
 
   - name: gitlab_dotcom_resource_iteration_events_source
     description: A base model for Gitlab.com Gitlab.com resource_iteration_events.
@@ -1611,23 +1612,6 @@ models:
         tests:
           - not_null
           - unique
-
-  - name: gitlab_dotcom_services_source
-    description: Base model for Gitlab.com services
-    columns:
-      - name: service_id
-        tags: ["tdf","gitlab_dotcom"]
-        tests:
-          - not_null
-          - unique
-      - name: created_at
-        tags: ["tdf","gitlab_dotcom"]
-        tests:
-          - not_null
-      - name: updated_at
-        tags: ["tdf","gitlab_dotcom"]
-        tests:
-          - not_null
 
   - name: gitlab_dotcom_integrations_source
     description: Base model for Gitlab.com integrations

@@ -1,0 +1,44 @@
+version: 2
+
+models:
+    - name: snowflake_queries
+      description: A table that can be used for reporting on query activity.
+      columns:
+        - name: dbt_metadata
+          description: The metadata string added to the end of the query by the `query_comment` option in dbt.
+        - name: dbt_version
+          description: The version of dbt used for the invocation.
+        - name: dbt_profile_name
+          description: The profile used to identify connection details.
+        - name: dbt_target_name
+          description: The name of the target, within the profile, that dbt will use to make connections to the database.
+        - name: dbt_target_user
+          description: The name of the user, from the profile, that dbt will be executed as.
+        - name: dbt_invocation_id
+          description: A unique if for the execution of dbt.
+        - name: dbt_run_started_at
+          description: The timestamp the dbt invocation started at.
+        - name: is_model_full_refresh
+          description: A flag to indicate if a model is configured to full refresh.
+        - name: is_invocation_full_refresh
+          description: A flag to indicate if a dbt invocation was set to full refresh at run time.
+        - name: model_materialization
+          description: The selected materialization of the dbt model
+        - name: dbt_runner
+          description: A variable passed at run time to identify what started the dbt invocation.
+        - name: resource_file
+          description: The file that originates the dbt resource.
+        - name: resource_id
+          description: The unique node id of the dbt resource.
+        - name: resource_name
+          description: The name of the dbt resource.
+        - name: resource_type
+          description: The type of dbt resource.
+        - name: package_name
+          description: The name of the package of the dbt model
+        - name: relation_database
+          description: The database where the model is materialized
+        - name: relation_schema
+          description: The schema where the model is materialized
+        - name: relation_identifier
+          description: The table name of the model

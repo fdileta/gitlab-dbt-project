@@ -1,6 +1,6 @@
 {{ config(alias='sfdc_opportunity_snapshot_history_xf') }}
--- TODO
--- Add CS churn fields into model from wk_sales_opportunity object
+
+-- NF 20220907 Original model, deprecated in favor of the one using EDM as source fields
 
 WITH date_details AS (
 
@@ -10,7 +10,8 @@ WITH date_details AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}} 
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 
 ), sfdc_opportunity_xf AS (
@@ -25,7 +26,6 @@ WITH date_details AS (
       deal_group,
       opportunity_owner_manager,
       is_edu_oss,
-      account_owner_team_stamped, 
 
       -- Opportunity Owner Stamped fields
       opportunity_owner_user_segment,
@@ -750,21 +750,7 @@ WITH date_details AS (
           THEN opp_snapshot.incremental_acv 
         ELSE 0 
       END                                                         AS created_in_snapshot_quarter_iacv,
-
-      -- field used for FY21 bookings reporitng
-      sfdc_opportunity_xf.account_owner_team_stamped, 
      
-      -- temporary, to deal with global reports that use account_owner_team_stamp field
-      CASE 
-        WHEN sfdc_opportunity_xf.account_owner_team_stamped IN ('Commercial - SMB','SMB','SMB - US','SMB - International')
-          THEN 'SMB'
-        WHEN sfdc_opportunity_xf.account_owner_team_stamped IN ('APAC','EMEA','Channel','US West','US East','Public Sector')
-          THEN 'Large'
-        WHEN sfdc_opportunity_xf.account_owner_team_stamped IN ('MM - APAC','MM - East','MM - EMEA','Commercial - MM','MM - West','MM-EMEA')
-          THEN 'Mid-Market'
-        ELSE 'SMB'
-      END                                                         AS account_owner_team_stamped_cro_level,   
-
       -- Team Segment / ASM - RD 
       -- As the snapshot history table is used to compare current perspective with the past, I leverage the most recent version
       -- of the truth ato cut the data, that's why instead of using the stampped version, I take the current fields.
@@ -873,12 +859,11 @@ WITH date_details AS (
       sfdc_accounts_xf.account_demographics_territory,
       -- account_demographics_subarea_stamped        
 
-      sfdc_accounts_xf.account_demographics_sales_segment    AS upa_demographics_segment,
-      sfdc_accounts_xf.account_demographics_geo              AS upa_demographics_geo,
-      sfdc_accounts_xf.account_demographics_region           AS upa_demographics_region,
-      sfdc_accounts_xf.account_demographics_area             AS upa_demographics_area,
-      sfdc_accounts_xf.account_demographics_territory        AS upa_demographics_territory
-      
+      upa.account_demographics_sales_segment    AS upa_demographics_segment,
+      upa.account_demographics_geo              AS upa_demographics_geo,
+      upa.account_demographics_region           AS upa_demographics_region,
+      upa.account_demographics_area             AS upa_demographics_area,
+      upa.account_demographics_territory        AS upa_demographics_territory  
 
     FROM sfdc_opportunity_snapshot_history opp_snapshot
     INNER JOIN sfdc_opportunity_xf    
@@ -995,12 +980,11 @@ WITH date_details AS (
       END                                                      AS is_eligible_created_pipeline_flag,
 
       -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
+      -- 2022-08-23 JK: using the central is_sao logic
       CASE
         WHEN opp_snapshot.sales_accepted_date IS NOT NULL
           AND opp_snapshot.is_edu_oss = 0
-          AND opp_snapshot.is_deleted = 0
-          AND opp_snapshot.is_renewal = 0
-          AND opp_snapshot.stage_name NOT IN ('10-Duplicate', '9-Unqualified','0-Pending Acceptance')
+          AND opp_snapshot.stage_name NOT IN ('10-Duplicate')
             THEN 1
         ELSE 0
       END                                                     AS is_eligible_sao_flag,

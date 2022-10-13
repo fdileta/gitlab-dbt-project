@@ -89,10 +89,16 @@ default_args = {
 dag = DAG("dbt_snapshots", default_args=default_args, schedule_interval="0 */8 * * *")
 
 # dbt-snapshot for daily tag
+# manifest only uploaded to MC from this dag
+# run results from every dag
 dbt_snapshot_cmd = f"""
     {dbt_install_deps_nosha_cmd} &&
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
     dbt snapshot -s tag:daily --profiles-dir profile --exclude path:snapshots/zuora path:snapshots/sfdc path:snapshots/gitlab_dotcom; ret=$?;
+    montecarlo import dbt-manifest \
+    target/manifest.json --project-name gitlab-analysis --batch-size 500;
+    montecarlo import dbt-run-results \
+    target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py snapshots; exit $ret
 """
 

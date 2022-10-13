@@ -36,6 +36,10 @@ sheets:
     owner: '@kwiebers'
     tabs:
       - gitlab_product_mrs_size
+  - name: low_touch_targets_fy23
+    owner: '@mfleisher'
+    tabs:
+      - low_touch_targets_fy23 
   - name: opt_out_contacts
     owner: '@Jean Peguero'
     tabs:
@@ -44,21 +48,6 @@ sheets:
     owner: '@Jean Peguero'
     tabs:
       - pricing_list
-  - name: ptc_scores
-    owner: '@kmagda'
-    tabs:
-      - ptc_scores_20211221
-      - ptc_scores_202202
-      - ptc_scores_20211221_updated
-      - ptc_scores_20211209
-      - ptc_scores_202206
-  - name: pte_scores
-    owner: '@kdietz'
-    tabs:
-      - pte_scores_20211013
-      - pte_scores_20211101
-      - pte_scores_202202
-      - pte_scores_202206
   - name: q4fy2021_system_usability_scale_results
     owner: '@rbacovic'
     tabs:
@@ -82,4 +71,5 @@ sheets:
   - name: namespace_segmentation
     owner: '@kmagda'
     tabs:
-      - namespace_segmentation_202202  
+      - namespace_segmentation_202202
+      - namespace_segmentation_202208
