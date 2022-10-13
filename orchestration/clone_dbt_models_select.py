@@ -161,7 +161,12 @@ class DbtModelClone:
             database_name = i.get("database").upper()
             schema_name = i.get("schema").upper()
             table_name = i.get("name").upper()
-            alias = i.get('config').get('alias').upper()
+            config = i.get('config')
+
+            if config:
+                alias = config.get('alias').upper()
+            else:
+                alias = None
 
             if alias:
                 full_name = f"{database_name}.{schema_name}.{alias}"
