@@ -22,3 +22,8 @@ The join to `dim_subscription_snapshot_bottom_up` uses a datediff of -1 day so t
 Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
 
 {% enddocs %}
+
+{% docs pump_gainsight_metrics_monthly_paid %}
+
+
+{% enddocs %}

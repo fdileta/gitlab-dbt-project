@@ -363,3 +363,13 @@
 - [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
 
 {% enddocs %}
+
+{% docs rpt_saas_gainsight_metrics_monthly_paid %}
+
+
+{% enddocs %}
+
+{% docs rpt_sm_gainsight_metrics_monthly_paid %}
+
+
+{% enddocs %}

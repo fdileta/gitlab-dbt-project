@@ -30,3 +30,13 @@ Additional identifier/key fields - `dim_ci_runner_id`, `dim_ci_pipeline_id`, `di
 Only activity since 2020-01-01 is being processed due to the high volume of the data.
 
 {% enddocs %}
+
+{% docs mart_ping_instance_metric_gainsight_wave %}
+
+
+{% enddocs %}
+
+{% docs mart_saas_usage_ping_subscription_mapped_gainsight_metrics %}
+
+
+{% enddocs %}
