@@ -2,7 +2,7 @@
     materialized='incremental',
     unique_key='primary_key',
     on_schema_change='append_new_columns',
-    full_refresh=true if flags.FULL_REFRESH and var('full_refresh_force', false) else false
+    full_refresh=only_force_full_refresh()
     )
 }}
 
@@ -14,7 +14,7 @@ source AS (
   FROM {{ source('gcp_billing','summary_gcp_billing') }}
   {% if is_incremental() %}
 
-  WHERE TO_TIMESTAMP(value['gcs_export_time']::INT, 6) >= (SELECT MAX(uploaded_at) FROM {{ this }})
+  WHERE TO_TIMESTAMP(value['gcs_export_time']::INT, 6) > (SELECT MAX(uploaded_at) FROM {{ this }})
 
   {% endif %}
 
