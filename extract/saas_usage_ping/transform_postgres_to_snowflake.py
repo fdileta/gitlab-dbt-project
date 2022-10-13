@@ -414,12 +414,9 @@ def get_transformed_having_clause(postgres_sql: str) -> str:
     to
     (COUNT(approval_project_rules_users.id) < MAX(approvals_required))
     """
-    having_clause_pattern = re.compile(
-        "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
-    )
     snowflake_having_clause = postgres_sql
 
-    if having_clause_pattern.findall(snowflake_having_clause):
+    if HAVING_CLAUSE_PATTERN.findall(snowflake_having_clause):
 
         snowflake_having_clause = postgres_sql.replace(
             "(approval_project_rules_users)", "(approval_project_rules_users.id)"
