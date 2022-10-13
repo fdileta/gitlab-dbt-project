@@ -182,8 +182,7 @@
 ➕🔆⚡️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   script:
-    - dbt deps $CI_PROFILE_TARGET
-    - dbt seed --full-refresh $CI_PROFILE_TARGET #seed data from csv
+    - *deps_and_seed
     - export SNOWFLAKE_PREP_DATABASE="PREP"
     - export SNOWFLAKE_PROD_DATABASE="PROD"
     - INPUT=$(dbt --quiet ls --models $DBT_MODELS --output json --output-keys "database schema name depends_on unique_id config" --profiles-dir profile --target prod)
