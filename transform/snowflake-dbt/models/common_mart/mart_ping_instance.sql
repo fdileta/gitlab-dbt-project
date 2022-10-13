@@ -1,6 +1,6 @@
 {{ config(
     tags=["product", "mnpi_exception"],
-    materialized = "incremental",
+    materialized = "table",
     unique_key = "ping_instance_id"
 ) }}
 
