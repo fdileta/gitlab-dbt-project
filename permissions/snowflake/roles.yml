@@ -1082,6 +1082,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - loader
         owns:
             schemas:
                 - raw.sales_analytics
