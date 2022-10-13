@@ -168,10 +168,7 @@ class DbtModelClone:
             else:
                 alias = None
 
-            if alias:
-                full_name = f"{database_name}.{schema_name}.{alias}"
-            else:
-                full_name = f"{database_name}.{schema_name}.{table_name}"
+            full_name = f"{database_name}.{schema_name}.{alias if alias else table_name}"
 
             output_table_name = f"{self.branch_name}_{full_name}"
             output_schema_name = output_table_name.replace(f".{table_name}", "")
