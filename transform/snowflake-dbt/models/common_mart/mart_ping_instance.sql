@@ -1,6 +1,6 @@
 {{ config(
     tags=["product", "mnpi_exception"],
-    materialized = "incremental",
+    materialized = "table",
     unique_key = "ping_instance_id"
 ) }}
 
@@ -237,5 +237,5 @@
     created_by="@icooper-acp",
     updated_by="@tpoole1",
     created_date="2022-03-11",
-    updated_date="2022-10-06"
+    updated_date="2022-10-13"
 ) }}
