@@ -164,11 +164,6 @@ databases:
     - nfiguera_prep:
         shared: no
 
-    - ngalang_prod:
-        shared: no
-    - ngalang_prep:
-        shared: no
-
     - nraisinghani_prod:
         shared: no
     - nraisinghani_prep:
@@ -3846,46 +3841,6 @@ roles:
                     - nfiguera_prep.*.*
                     - nfiguera_prod.*.*
 
-    - ngalang:
-        member_of:
-            - analyst_growth
-            - restricted_safe
-            - bi_tool_eval_read
-        warehouses:
-            - dev_xs
-        owns:
-            databases:
-                - ngalang_prep
-                - ngalang_prod
-            schemas:
-                - ngalang_prep.*
-                - ngalang_prod.*
-            tables:
-                - ngalang_prep.*.*
-                - ngalang_prod.*.*
-        privileges:
-            databases:
-                read:
-                    - ngalang_prep
-                    - ngalang_prod
-                write:
-                    - ngalang_prep
-                    - ngalang_prod
-            schemas:
-                read:
-                    - ngalang_prep.*
-                    - ngalang_prod.*
-                write:
-                    - ngalang_prep.*
-                    - ngalang_prod.*
-            tables:
-                read:
-                    - ngalang_prep.*.*
-                    - ngalang_prod.*.*
-                write:
-                    - ngalang_prep.*.*
-                    - ngalang_prod.*.*
-
     - nkhanna:
         member_of:
             - reporter
@@ -4866,11 +4821,6 @@ users:
         can_login: yes
         member_of:
             - nfiguera
-
-    - ngalang:
-        can_login: yes
-        member_of:
-            - ngalang
 
     - nkhanna:
         can_login: yes
