@@ -78,6 +78,7 @@
 
       -- Attributes
       page_url_path,
+      referrer_url_path,
       event_name,
       NULL                                                                          AS sf_formid,
       engaged_seconds,

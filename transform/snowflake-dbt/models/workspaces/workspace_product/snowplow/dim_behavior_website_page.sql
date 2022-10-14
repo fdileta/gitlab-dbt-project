@@ -14,6 +14,7 @@
       app_id,
       page_urlhost                                                                  AS page_url_host,
       {{ clean_url('page_urlpath') }}                                               AS clean_url_path,
+      refr_urlpath                                                                  AS referrer_url_path,
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
@@ -30,7 +31,7 @@
 
     {% endif %}
 
-    {{ dbt_utils.group_by(n=7) }}
+    {{ dbt_utils.group_by(n=8) }}
 
 ), dim_with_sk AS (
 
@@ -48,6 +49,7 @@
       page_type,
       page_sub_type,
       referrer_medium,
+      referrer_url_path,
       min_event_timestamp,
       max_event_timestamp
     FROM page
@@ -57,7 +59,7 @@
 {{ dbt_audit(
     cte_ref="dim_with_sk",
     created_by="@chrissharp",
-    updated_by="@chrissharp",
+    updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-09-02"
+    updated_date="2022-10-14"
 ) }}
