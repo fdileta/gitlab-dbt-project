@@ -47,7 +47,7 @@ default_args = {
 dag = DAG(
     "sales_analytics_weekly_notebooks",
     default_args=default_args,
-    schedule_interval="0 6 * * *",
+    schedule_interval="0 6 * * 1",
     concurrency=1,
 )
 
