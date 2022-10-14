@@ -164,6 +164,11 @@ databases:
     - nfiguera_prep:
         shared: no
 
+    - nhervas_prod:
+        shared: no
+    - nhervas_prep:
+        shared: no
+
     - nraisinghani_prod:
         shared: no
     - nraisinghani_prep:
@@ -3841,6 +3846,46 @@ roles:
                     - nfiguera_prep.*.*
                     - nfiguera_prod.*.*
 
+    - nhervas:
+        member_of:
+            - analyst_growth
+            - restricted_safe
+            - bi_tool_eval_read
+        warehouses:
+            - dev_xs
+        owns:
+            databases:
+                - nhervas_prep
+                - nhervas_prod
+            schemas:
+                - nhervas_prep.*
+                - nhervas_prod.*
+            tables:
+                - nhervas_prep.*.*
+                - nhervas_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - nhervas_prep
+                    - nhervas_prod
+                write:
+                    - nhervas_prep
+                    - nhervas_prod
+            schemas:
+                read:
+                    - nhervas_prep.*
+                    - nhervas_prod.*
+                write:
+                    - nhervas_prep.*
+                    - nhervas_prod.*
+            tables:
+                read:
+                    - nhervas_prep.*.*
+                    - nhervas_prod.*.*
+                write:
+                    - nhervas_prep.*.*
+                    - nhervas_prod.*.*
+
     - nkhanna:
         member_of:
             - reporter
@@ -4821,6 +4866,11 @@ users:
         can_login: yes
         member_of:
             - nfiguera
+
+    - nhervas:
+        can_login: yes
+        member_of:
+            - nhervas
 
     - nkhanna:
         can_login: yes
