@@ -37,22 +37,22 @@ Aggregate CTE to determine count of arr, subscriptions and licensed users for ea
 agg_subscriptions AS (
 
   SELECT
-    {{ dbt_utils.surrogate_key(['ping_created_date_month', 'metrics_path', 'ping_edition']) }}        AS ping_subscriptions_on_versions_counts_monthly_id,
-    ping_created_date_month                                                                           AS ping_created_date_month,
-    metrics_path                                                                                      AS metrics_path,
-    ping_edition                                                                                      AS ping_edition,
-    SUM(arr)                                                                                          AS total_arr,
-    COUNT(DISTINCT latest_subscription_id)                                                            AS total_subscription_count,
-    SUM(licensed_user_count)                                                                          AS total_licensed_users
+    {{ dbt_utils.surrogate_key(['ping_created_date_month', 'metrics_path', 'ping_edition']) }}  AS ping_subscriptions_on_versions_counts_monthly_id,
+    ping_created_date_month                                                                     AS ping_created_date_month,
+    metrics_path                                                                                AS metrics_path,
+    ping_edition                                                                                AS ping_edition,
+    SUM(arr)                                                                                    AS total_arr,
+    COUNT(DISTINCT latest_subscription_id)                                                      AS total_subscription_count,
+    SUM(licensed_user_count)                                                                    AS total_licensed_users
   FROM latest_subscriptions_by_metric
   {{ dbt_utils.group_by(n=4) }}
 
 )
 
- {{ dbt_audit(
-     cte_ref="agg_subscriptions",
-     created_by="@icooper-acp",
-     updated_by="@cbraza",
-     created_date="2022-04-20",
-     updated_date="2022-10-14"
- ) }}
+{{ dbt_audit(
+    cte_ref="agg_subscriptions",
+    created_by="@icooper-acp",
+    updated_by="@cbraza",
+    created_date="2022-04-20",
+    updated_date="2022-10-14"
+) }}

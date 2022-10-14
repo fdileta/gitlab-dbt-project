@@ -33,8 +33,8 @@ arr_joined AS (
   INNER JOIN latest_subscriptions
     ON mart_ping_instance_metric_monthly.latest_subscription_id = latest_subscriptions.latest_subscription_id
       AND mart_ping_instance_metric_monthly.ping_created_date_month = latest_subscriptions.ping_created_date_month
-  WHERE time_frame IN ('28d', 'all')
-    AND ping_delivery_type = 'Self-Managed'
+  WHERE mart_ping_instance_metric_monthly.time_frame IN ('28d', 'all')
+    AND mart_ping_instance_metric_monthly.ping_delivery_type = 'Self-Managed'
   {{ dbt_utils.group_by(n=12) }}
 
 ),
@@ -139,18 +139,18 @@ unioned_counts AS (
 
 final AS (
 
-SELECT
-    {{ dbt_utils.surrogate_key(['ping_created_date_month', 'metrics_path', 'ping_edition','estimation_grain']) }}         AS ping_subscriptions_on_versions_estimate_factors_monthly_id,
+  SELECT
+    {{ dbt_utils.surrogate_key(['ping_created_date_month', 'metrics_path', 'ping_edition','estimation_grain']) }} AS ping_subscriptions_on_versions_estimate_factors_monthly_id,
     *,
-    {{ pct_w_counters('reporting_count', 'not_reporting_count') }}                                                        AS percent_reporting
- FROM unioned_counts
+    {{ pct_w_counters('reporting_count', 'not_reporting_count') }}                                                AS percent_reporting
+  FROM unioned_counts
 
 )
 
- {{ dbt_audit(
-     cte_ref="final",
-     created_by="@icooper-acp",
-     updated_by="@cbraza",
-     created_date="2022-04-07",
-     updated_date="2022-10-14"
- ) }}
+{{ dbt_audit(
+    cte_ref="final",
+    created_by="@icooper-acp",
+    updated_by="@cbraza",
+    created_date="2022-04-07",
+    updated_date="2022-10-14"
+) }}
