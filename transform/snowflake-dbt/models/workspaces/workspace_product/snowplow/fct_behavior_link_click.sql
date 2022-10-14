@@ -5,8 +5,7 @@
 ) }}
 
 {{ simple_cte([
-    ('events', 'fct_behavior_unstructured_event'),
-    ('dim_event', 'dim_behavior_event')
+    ('events', 'fct_behavior_unstructured_event')
     ])
 }}
 
@@ -15,14 +14,12 @@
     SELECT
       fct_behavior_unstructured_sk,
       behavior_at,
-      events.dim_behavior_event_sk,
+      dim_behavior_event_sk,
       dim_behavior_website_page_sk,
       gsc_pseudonymized_user_id,
       session_id,
       link_click_target_url
     FROM events
-    INNER JOIN dim_event
-      ON events.dim_behavior_event_sk = dim_event.dim_behavior_event_sk
     WHERE dim_event.event_name = 'link_click'
       AND behavior_at >= DATEADD(MONTH, -25, CURRENT_DATE)
 
