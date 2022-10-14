@@ -4,7 +4,7 @@
 ) }}
 
 {{ simple_cte([
-    ('metric_opt_in', 'rpt_ping_metric_first_last_versions'),
+    ('metric_versions', 'rpt_ping_metric_first_last_versions'),
     ('latest_subscriptions', 'rpt_ping_latest_subscriptions_monthly')
     ])
 }},
@@ -16,16 +16,16 @@ Attach metrics_path to subscription IF the subscription is on a version with the
 latest_subscriptions_by_metric AS (
 
   SELECT
-    latest_subscriptions.ping_created_date_month                        AS ping_created_date_month,
-    latest_subscriptions.arr                                            AS arr,
-    latest_subscriptions.latest_subscription_id                         AS latest_subscription_id,
-    latest_subscriptions.licensed_user_count                            AS licensed_user_count,
-    metric_opt_in.ping_edition                                          AS ping_edition,
-    metric_opt_in.metrics_path                                          AS metrics_path
+    latest_subscriptions.ping_created_date_month    AS ping_created_date_month,
+    latest_subscriptions.arr                        AS arr,
+    latest_subscriptions.latest_subscription_id     AS latest_subscription_id,
+    latest_subscriptions.licensed_user_count        AS licensed_user_count,
+    metric_versions.ping_edition                    AS ping_edition,
+    metric_versions.metrics_path                    AS metrics_path
   FROM latest_subscriptions
-  INNER JOIN metric_opt_in
-    ON latest_subscriptions.major_minor_version_id BETWEEN metric_opt_in.first_major_minor_version_id_with_counter AND metric_opt_in.last_major_minor_version_id_with_counter
-      AND latest_subscriptions.version_is_prerelease = metric_opt_in.version_is_prerelease
+  INNER JOIN metric_versions
+    ON latest_subscriptions.major_minor_version_id BETWEEN metric_versions.first_major_minor_version_id_with_counter AND metric_versions.last_major_minor_version_id_with_counter
+      AND latest_subscriptions.version_is_prerelease = metric_versions.version_is_prerelease
   {{ dbt_utils.group_by(n=6) }}
 
 ),
