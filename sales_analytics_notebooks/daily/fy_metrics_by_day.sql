@@ -1,0 +1,3 @@
+SELECT *
+FROM prod.restricted_safe_workspace_sales.report_pipeline_metrics_fy_day
+
