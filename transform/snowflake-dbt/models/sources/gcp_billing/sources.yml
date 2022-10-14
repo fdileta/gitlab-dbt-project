@@ -13,15 +13,8 @@ sources:
       schema: false
       identifier: false
 
-    freshness:
-      warn_after: {count: 24, period: hour}
-      error_after: {count: 48, period: hour}
 
     tables:
-      - name: gcp_billing_export_combined
-
-      - name: test_summary_gcp_billing
-
       - name: detail_gcp_billing
         description: "GCP Billing detail table exported from bigQuery"
         external:
