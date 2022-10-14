@@ -1,7 +1,6 @@
 {{ config({
     "materialized": "incremental",
-    "unique_key": "id",
-    tags=["mnpi_exception"]
+    "unique_key": "id"
     })
 }}
 
