@@ -6,7 +6,7 @@
 
 {{ simple_cte([
     ('events', 'prep_snowplow_unstructured_events_all'),
-    ('dim_event', 'dim_behavior_website_event'),
+    ('dim_event', 'dim_behavior_event'),
     ('dim_page', 'dim_behavior_website_page')
     ])
 }}
@@ -51,7 +51,7 @@
       session_id,
 
       -- Surrogate Keys
-      dim_event.dim_behavior_website_event_sk,
+      dim_event.dim_behavior_event_sk,
       dim_page.dim_behavior_website_page_sk,
 
       --Time Attributes
