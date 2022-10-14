@@ -164,9 +164,9 @@ databases:
     - nfiguera_prep:
         shared: no
 
-    - ngalang_prod:
+    - nhervas_prod:
         shared: no
-    - ngalang_prep:
+    - nhervas_prep:
         shared: no
 
     - nraisinghani_prod:
@@ -3846,7 +3846,7 @@ roles:
                     - nfiguera_prep.*.*
                     - nfiguera_prod.*.*
 
-    - ngalang:
+    - nhervas:
         member_of:
             - analyst_growth
             - restricted_safe
@@ -3855,36 +3855,36 @@ roles:
             - dev_xs
         owns:
             databases:
-                - ngalang_prep
-                - ngalang_prod
+                - nhervas_prep
+                - nhervas_prod
             schemas:
-                - ngalang_prep.*
-                - ngalang_prod.*
+                - nhervas_prep.*
+                - nhervas_prod.*
             tables:
-                - ngalang_prep.*.*
-                - ngalang_prod.*.*
+                - nhervas_prep.*.*
+                - nhervas_prod.*.*
         privileges:
             databases:
                 read:
-                    - ngalang_prep
-                    - ngalang_prod
+                    - nhervas_prep
+                    - nhervas_prod
                 write:
-                    - ngalang_prep
-                    - ngalang_prod
+                    - nhervas_prep
+                    - nhervas_prod
             schemas:
                 read:
-                    - ngalang_prep.*
-                    - ngalang_prod.*
+                    - nhervas_prep.*
+                    - nhervas_prod.*
                 write:
-                    - ngalang_prep.*
-                    - ngalang_prod.*
+                    - nhervas_prep.*
+                    - nhervas_prod.*
             tables:
                 read:
-                    - ngalang_prep.*.*
-                    - ngalang_prod.*.*
+                    - nhervas_prep.*.*
+                    - nhervas_prod.*.*
                 write:
-                    - ngalang_prep.*.*
-                    - ngalang_prod.*.*
+                    - nhervas_prep.*.*
+                    - nhervas_prod.*.*
 
     - nkhanna:
         member_of:
@@ -4867,10 +4867,10 @@ users:
         member_of:
             - nfiguera
 
-    - ngalang:
+    - nhervas:
         can_login: yes
         member_of:
-            - ngalang
+            - nhervas
 
     - nkhanna:
         can_login: yes
