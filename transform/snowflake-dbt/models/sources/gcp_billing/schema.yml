@@ -15,5 +15,5 @@ models:
       - name: uploaded_at
         description: derived from the `gcs_export_time` that is generated when the data is exported from BigQuery
       - name: occurrence_multiplier
-        description: Given that the unique key is determined by the valued of all of the columns this filed indicated how many times the row was repeated in the original data.  It is used to correctly calculated numeric values in this and any downstream columns.
+        description: Given that the unique key is determined by the valued of all of the columns this field indicated how many times the row was repeated in the original data.  It is used to correctly calculated numeric values in this and any downstream columns.
 
