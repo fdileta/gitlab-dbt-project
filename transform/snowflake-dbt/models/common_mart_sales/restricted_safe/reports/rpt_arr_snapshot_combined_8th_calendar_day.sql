@@ -1,7 +1,8 @@
 {{ simple_cte([
     ('driveload_financial_metrics_program_phase_1_source','driveload_financial_metrics_program_phase_1_source'),
     ('dim_date','dim_date'),
-    ('mart_arr_snapshot_model','mart_arr_snapshot_model')
+    ('mart_arr_snapshot_model','mart_arr_snapshot_model'),
+    ('mart_arr','mart_arr')
 ]) }}
 
 , phase_one AS (
@@ -32,6 +33,7 @@
       driveload_financial_metrics_program_phase_1_source.subscription_status,
       driveload_financial_metrics_program_phase_1_source.subscription_sales_type,
       driveload_financial_metrics_program_phase_1_source.product_name,
+      NULL                                                                                         AS product_rate_plan_name,
       driveload_financial_metrics_program_phase_1_source.product_category                          AS product_tier_name,
       CASE
         WHEN  driveload_financial_metrics_program_phase_1_source.delivery = 'Others' THEN 'SaaS'
@@ -106,6 +108,7 @@
         WHEN mart_arr_snapshot_model.product_tier_name = 'SaaS - Bronze'           THEN 'Bronze/Starter'
         ELSE mart_arr_snapshot_model.product_tier_name
       END                                                                                       AS product_name,
+      mart_arr_snapshot_model.product_rate_plan_name,
       mart_arr_snapshot_model.product_tier_name,
       CASE
         WHEN  mart_arr_snapshot_model.product_delivery_type = 'Others' THEN 'SaaS'
@@ -163,6 +166,20 @@
       END                                        AS arr_band_calc
     FROM parent_arr
 
+), edu_subscriptions AS (
+
+    /*
+    The is_arpu flag was added in 2022-08-01 to the mart_arr and mart_arr_snapshot_model models. There is no historical data for the is_arpu
+    flag prior to 2022-08-01. Moreover, the required product_rate_plan_name is not in the driveload financial metrics file to build out the flag.
+    Therefore, we can search for the subscriptions themselves to flag the EDU subscriptions and use the product_tier_name to flag the storage
+    related charges to fill in the historical data.
+    */
+    SELECT DISTINCT
+      subscription_name
+    FROM mart_arr
+    WHERE product_rate_plan_name LIKE '%EDU%'
+      AND arr_month <= '2022-07-01'
+
 ), final AS (
     --Snap in arr_band_calc based on correct logic. Some historical in mart_arr_snapshot_model do not have the arr_band_calc.
     SELECT
@@ -183,10 +200,11 @@
       parent_crm_account_industry,
       parent_crm_account_owner_team,
       parent_crm_account_sales_territory,
-      subscription_name,
+      combined.subscription_name,
       subscription_status,
       subscription_sales_type,
       product_name,
+      product_rate_plan_name,
       product_tier_name,
       product_delivery_type,
       product_ranking,
@@ -195,7 +213,16 @@
       mrr,
       arr,
       quantity,
-      is_arpu,
+      --This logic fills in the missing data and uses the core logic found in prep_product_detail to make the is_arpu flag.
+      CASE
+        WHEN combined.is_arpu IS NOT NULL
+          THEN is_arpu
+        WHEN combined.product_tier_name = 'Storage'
+          THEN FALSE
+        WHEN combined.product_rate_plan_name LIKE '%EDU%' OR edu_subscriptions.subscription_name IS NOT NULL
+          THEN FALSE
+        ELSE TRUE
+      END                                                                               AS is_arpu,
       is_licensed_user,
       parent_account_cohort_month,
       months_since_parent_account_cohort_start,
@@ -205,13 +232,15 @@
     LEFT JOIN parent_arr_band_calc
       ON combined.dim_parent_crm_account_id = parent_arr_band_calc.dim_parent_crm_account_id
       AND combined.arr_month = parent_arr_band_calc.arr_month
+    LEFT JOIN edu_subscriptions
+      ON combined.subscription_name = edu_subscriptions.subscription_name
 
 )
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@lisvinueza",
+    updated_by="@iweeks",
     created_date="2021-08-16",
-    updated_date="2022-10-11"
+    updated_date="2022-10-15"
 ) }}
