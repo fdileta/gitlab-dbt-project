@@ -41,7 +41,7 @@ Below are some tips, tricks, and methods to evaluate some routine and periodic M
 How to resolve and reconcile the related alerts for a DBT Model Run failure and the resulting volume alert failures in Monte Carlo?
 
 1. [ ] Determine if a DBT Model Run failure is the root cause of the volume alerts in Monte Carlo. If so, the triager can simply reference all of the relevant Monte Carlo alerts and failures in the DBT Model run issue. There is no need to open multiple issues for the same root cause DBT Model Run failure.
-1. [ ] Determine if the Monte Carlo Alert or Failure is a result of an extraction. Check the extraction logs or incident issues for more details. **WIP: List more specific detailed steps on the methods to evaluate extraction failures. 
+1. [ ] If there is a volume alert or failure in Monte Carlo, but no correspinding DBT Model Run failure that could be the root cause, then the volume alert or failure may be related to the extraction. Determine if the Monte Carlo alert or failure is a result of an extraction. Check the extraction logs or incident issues for more details. **WIP: List more specific detailed steps on the methods to evaluate extraction failures. 
 
 </details>
 
