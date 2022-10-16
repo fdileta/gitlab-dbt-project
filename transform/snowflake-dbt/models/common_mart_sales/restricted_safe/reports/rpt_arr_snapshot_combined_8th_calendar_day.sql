@@ -46,8 +46,13 @@
       driveload_financial_metrics_program_phase_1_source.arr,
       driveload_financial_metrics_program_phase_1_source.quantity,
       NULL                                                                                         AS is_arpu,
+      /*
+      The is_licensed_user is not available in the driveload file. We can use the product_tier_name to fill in the historical data.
+      This is the same logic found in prep_product_detail.
+      */
       CASE
         WHEN product_tier_name = 'Storage' THEN FALSE
+        WHEN product_tier_name = 'Other' THEN FALSE
         ELSE TRUE
       END                                                                                          AS is_licensed_user,
       driveload_financial_metrics_program_phase_1_source.parent_account_cohort_month,
@@ -121,7 +126,19 @@
       mart_arr_snapshot_model.arr,
       mart_arr_snapshot_model.quantity,
       mart_arr_snapshot_model.is_arpu,
-      mart_arr_snapshot_model.is_licensed_user,
+      /*
+      The is_licensed_user flag was added in 2022-08-01 to the mart_arr and mart_arr_snapshot_model models. There is no historical data for the is_licensed_user
+      flag prior to 2022-08-01. We can use the product_tier_name to fill in the historical data. This is the same logic found in prep_product_detail.
+      */
+      CASE
+        WHEN mart_arr_snapshot_model.is_licensed_user IS NOT NULL
+          THEN mart_arr_snapshot_model.is_licensed_user
+        WHEN mart_arr_snapshot_model.product_tier_name = 'Storage'
+          THEN FALSE
+        WHEN mart_arr_snapshot_model.product_tier_name = 'Other'
+          THEN FALSE
+        ELSE TRUE
+      END                                                                                       AS is_licensed_user,
       parent_cohort_month_snapshot.parent_account_cohort_month                                  AS parent_account_cohort_month,
       DATEDIFF(month, parent_cohort_month_snapshot.parent_account_cohort_month, arr_month)      AS months_since_parent_account_cohort_start,
       mart_arr_snapshot_model.parent_crm_account_employee_count_band
