@@ -55,9 +55,9 @@
       {{ dbt_utils.surrogate_key(['event_id','behavior_at']) }} AS fct_behavior_unstructured_sk,
 
       -- Natural Key
-      app_id,
-      event_id,
-      session_id,
+      unstruct_event.app_id,
+      unstruct_event.event_id,
+      unstruct_event.session_id,
 
       -- Surrogate Keys
       dim_event.dim_behavior_event_sk,
