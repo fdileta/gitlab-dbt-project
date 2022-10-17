@@ -255,6 +255,9 @@ Convenience macro created to assist in the creation of new Dimensions based off 
 This macro takes in a variant field, converts it to a varchar field and then to a Number field with lower case values. 
 {% enddocs %}
 
+{% docs rolling_window_delete %}
+This macro standardizes the syntax for adding a `DELETE` post-hook for rolling window models. 
+{% enddocs %}
 
 {% docs only_force_full_refresh %}
 This macro is for setting the `full_refresh` property of an incremental model to only allow forced full refreshes and is usually combined with an `on_schema_change` configuration.  A forced full refresh requires an additional variable, `full_refresh_force` to be passed at run time in addition to the `--full-refresh` flag.
