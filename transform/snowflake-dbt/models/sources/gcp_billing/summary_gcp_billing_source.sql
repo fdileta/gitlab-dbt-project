@@ -1,8 +1,9 @@
-{{ config({
-    "materialized": "incremental",
-    "unique_key" : "primary_key",
-    "on_schema_change" : "append_new_columns"
-    })
+{{ config(
+    materialized='incremental',
+    unique_key='primary_key',
+    on_schema_change='append_new_columns',
+    full_refresh=only_force_full_refresh()
+    )
 }}
 
 WITH
@@ -10,10 +11,10 @@ source AS (
   
   SELECT
     parse_json(value) AS value
-  FROM {{ source('gcp_billing','test_summary_gcp_billing') }}
+  FROM {{ source('gcp_billing','summary_gcp_billing') }}
   {% if is_incremental() %}
 
-  WHERE value['_partition_date']::DATE >= (SELECT MAX(uploaded_at) FROM {{this}})
+  WHERE TO_TIMESTAMP(value['gcs_export_time']::INT, 6) > (SELECT MAX(uploaded_at) FROM {{ this }})
 
   {% endif %}
 
@@ -23,7 +24,7 @@ grouped AS (
   
   SELECT
     value,
-    count(*) occurrence_multiplier
+    count(*) AS occurrence_multiplier
   FROM source
   GROUP BY 1
 ),
@@ -38,7 +39,7 @@ renamed AS (
     value['credits']::VARIANT AS credits,
     value['currency']::VARCHAR AS currency,
     value['currency_conversion_rate']::FLOAT AS currency_conversion_rate,
-    ((value['export_time']::INT) / 1000000)::TIMESTAMP AS export_time,
+    TO_TIMESTAMP(value['export_time']::INT, 6) AS export_time,
     TO_DATE(value['invoice']['month']::STRING, 'YYYYMM') AS invoice_month,
     value['labels']::VARIANT AS labels,
     value['location']['country']::VARCHAR AS resource_country,
@@ -59,10 +60,10 @@ renamed AS (
     value['usage']['amount']::FLOAT * occurrence_multiplier AS usage_amount,
     value['usage']['amount_in_pricing_units']::FLOAT * occurrence_multiplier AS usage_amount_in_pricing_units,
     value['usage']['unit']::VARCHAR AS usage_unit,
-    ((value['usage_start_time']::INT) / 1000000)::TIMESTAMP AS usage_start_time,
-    ((value['usage_end_time']::INT) / 1000000)::TIMESTAMP AS usage_end_time,
+    TO_TIMESTAMP(value['usage_start_time']::INT, 6) AS usage_start_time,
+    TO_TIMESTAMP(value['usage_end_time']::INT, 6) AS usage_end_time,
     value['_partition_date']::DATE AS partition_date,
-    value['_partition_date']::DATE AS uploaded_at, -- substitute during testing
+    TO_TIMESTAMP(value['gcs_export_time']::INT, 6) AS uploaded_at,
     occurrence_multiplier
   
   

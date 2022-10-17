@@ -77,7 +77,7 @@ _**Iterative with 3b & 3c**_
    - [ ] Are there are potential risks for [data leakage](https://en.wikipedia.org/wiki/Leakage_(machine_learning)) from the lookback window into the prediction window by using this data source?
 
 **Considerations**:
-- It is not necessary to go too deep into creating features at this phase. What is important is to get a sense if the data source will be useful and proper for modeling the outcome/target.  It may also be helpful to start constructing the framework your ETL code (most likely SQL) during this phase. See the [PtE base query](https://gitlab.com/gitlab-data/propensity-to-expand/-/blob/main/v01/pte_base_query.sql) for an example of how the outcome/target and feature datasets are constructed.
+- It is not necessary to go too deep into creating features at this phase. What is important is to get a sense if the data source will be useful and proper for modeling the outcome/target.  It may also be helpful to start constructing the framework your ETL code (most likely SQL) during this phase. See the [PtE base query](https://gitlab.com/gitlab-data/data-science-projects/propensity-to-expand/-/blob/main/dev/v02/pte_base_query.sql) for an example of how the outcome/target and feature datasets are constructed.
 
 **Completion Criteria:** 
 - [ ] Generate syntax for outcome/target and verify sufficient count exists for modeling
@@ -100,7 +100,7 @@ _**Iterative with 3a & 3c**_
 - [ ] Identify a list of features that will be constructed
    - [ ] Identify which table(s) will be used to construct each feature
 - [ ] Construct SQL code to build the model training dataset
-   - [ ] [PtE Query](https://gitlab.com/gitlab-data/data-science/-/blob/main/deployments/pte/pte_base_query.sql) can be used for reference.
+   - [ ] [PtE Query](https://gitlab.com/gitlab-data/data-science-projects/propensity-to-expand/-/blob/main/dev/v02/pte_base_query.sql) can be used for reference.
    - [ ] Parameterize your code so you can easily change time periods on the fly, and to make it possible to use one query for both training and scoring the model.
    - [ ] Ensure that there is no leakage from your Prediction Window to your Lookback Period. For example, if your Prediction Window is data within the last 90 days, the feature data should only come from data at least 91 days in the past
    - [ ] Ensure that your dataset is aggregated/rolled-up to the appropriate level. For example, if you are making a prediction about accounts, the output of your SQL code should be aggregated at the account level.
@@ -113,7 +113,7 @@ _**Iterative with 3a & 3c**_
 
 **Completion Criteria:** 
 - [ ] Generate SQL code that can be run in Snowflake to produce your modeling dataset.
-- [ ] SQL Code can also be run in Jupyter/Python (this is a requirement for our production pipelines). See these examples of [production SQL code](https://gitlab.com/gitlab-data/data-science/-/blob/main/deployments/pte/pte_base_query.sql) and [notebook](https://gitlab.com/gitlab-data/data-science/-/blob/main/deployments/pte/scoring_code.ipynb) for how each needs formatted.
+- [ ] SQL Code can also be run in Jupyter/Python (this is a requirement for our production pipelines). See these examples of [production SQL code](https://gitlab.com/gitlab-data/data-science-projects/propensity-to-expand/-/blob/main/dev/v02/pte_base_query.sql) and [notebook](https://gitlab.com/gitlab-data/data-science-projects/propensity-to-expand/-/blob/main/dev/v02/training_code%20-%20over%20license%20count.ipynb) for how each needs formatted.
 
 ## 3c: Modeling & Implementation Plan
 _**Iterative with 3a & 3b**_
@@ -217,9 +217,10 @@ In the project issue, document the following:
 
 **Tasks:** 
 - [ ] Place all your model parameters into a scoring_parameters.yml file.
-   - For example, see [PtE scoring.params.yml](https://gitlab.com/gitlab-data/data-science/-/blob/main/deployments/pte/scoring_params.yml) 
+   - For example, see [PtE scoring.params.yml](https://gitlab.com/gitlab-data/data-science-projects/propensity-to-expand/-/blob/main/prod/scoring_params.yml) 
 - [ ] Create a new scoring notebook.
-   - For example, see [PtE scoring_code.pynb](https://gitlab.com/gitlab-data/data-science/-/blob/main/deployments/pte/scoring_code.ipynb) 
+   - The [Scoring Template](https://gitlab.com/gitlab-data/data-science/-/blob/main/templates/propensity/Score%20Model.ipynb) provides Step by Step directions for how to do this.
+   - For example, see [PtE scoring_code.pynb](https://gitlab.com/gitlab-data/data-science-projects/propensity-to-expand/-/blob/main/prod/scoring_code.ipynb) 
    - [ ] Create any hard-codes that are necessary. For example, if you performed outliers for training, use those values in your scoring code (as opposed to calculating new outliers on your scoring dataset)
    - [ ] Create dummy codes for any dummy-coded features in your model
    - [ ] Make sure you are completing all the same model prep steps in the scoring score as you did in the training code.
@@ -227,8 +228,7 @@ In the project issue, document the following:
    - [ ]If the numbers are not aligning up, it is most likely due to an issue with your scoring code. The best way to check this is to look at the descriptives of the features. Look at the descriptive right before they get scored in the training code and in the scoring code. If one or more features are off, then you have most likely located the issue.
 - [ ] Now you can run your code with your scoring dataset. Be sure update your sql code so it is parameterized to use the most current data available.
 - [ ] Examine the model decile distribution of your scored records. They should be roughly equal. If they are wildly off, or if they vary widely in each scoring run, it could be a sign that your model is overfit/underfit and cannot generalize beyond the training dataset.
-- [ ] Add .sql file, parameters.yml, model artifacts, and jupyter notebook to the [data-science deployments](https://gitlab.com/gitlab-data/data-science/-/tree/main/deployments/pte) directory and create a MR
-- [ ] Create a new issue using the [Scheduling Notebook Request](https://gitlab.com/gitlab-data/analytics/-/blob/0aaf0f724dd9073a8883c691d2d8092a6d301d85/.gitlab/issue_templates/Scheduling%20Notebook%20Request.md) template and tag `@gitlab-data/engineers`
+- [ ] Create a new issue using the [Scheduling Notebook Request](https://gitlab.com/gitlab-data/analytics/-/blob/master/.gitlab/issue_templates/Scheduling%20Notebook%20Request.md) template and tag `@gitlab-data/engineers`
 
 **Considerations**:
 - This step is prone to a lot of human error, so completing the tasks outlined above is helpful to ensure accurate scoring of the model.
@@ -247,8 +247,8 @@ In the project issue, document the following:
 **Purpose:** The purpose of setting up dashboards for your model are two-fold: 1) Monitor model performance and lift "in the wild" and; 2) Provide an easy point of access to end-users to consume and understand model outputs. As we migrate to a new data visualization and data observability tools, we hope to streamline, automate, and simplify creating model dashboards.  
 
 **Tasks:** 
-- [ ] Create an "Inspector" dashboard that is targeted towards end-users/consumers of the model outputs. See [PtE Inspector](https://app.periscopedata.com/app/gitlab/990126/PtE-Inspector) as an example
-- [ ] Create a "Results" dashboard to track model performance over time. See [PtE Results](https://app.periscopedata.com/app/gitlab:safe-dashboard/958412/PtE-Results-2021-11-to-2022-01) (**SAFE access required**) as an example
+- [ ] Create an "Inspector" dashboard that is targeted towards end-users/consumers of the model outputs. See [PtE Inspector](https://app.periscopedata.com/app/gitlab:safe-dashboard/951374/PtE-Inspector) (**SAFE access required**) as an example
+- [ ] Create a "Results" dashboard to track model performance over time. See [PtE Results](https://app.periscopedata.com/app/gitlab:safe-dashboard/1054667/PtE-Performance-Results) (**SAFE access required**) as an example
 
 **Considerations**:
 - This process will hopefully become more streamlined as we shift to a new analytics visualization solution
@@ -262,7 +262,7 @@ In the project issue, document the following:
 **Purpose:** The purpose of the retrospective is to help the data science team learn and improve as much as possible from every project.
 
 **Tasks:** 
-- [ ] Create retrospective issue. See [PtE Retrospective](https://gitlab.com/gitlab-data/propensity-to-expand/-/issues/33) as an example
+- [ ] Create retrospective issue. See [PtE Retrospective](https://gitlab.com/gitlab-data/data-science-projects/propensity-to-expand/-/issues/33) as an example
 - [ ] Invite and solicit feedback from everyone involved in the project (stakeholders, contributors, etc.). Specifically, we want to know: 
    1. What praise do you have for the group? 
    1. What went well with this project?

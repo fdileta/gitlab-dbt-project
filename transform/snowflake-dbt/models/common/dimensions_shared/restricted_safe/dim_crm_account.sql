@@ -113,6 +113,8 @@ WITH final AS (
       prep_crm_account.zoom_info_company_city,
       prep_crm_account.zoom_info_company_state_province,
       prep_crm_account.zoom_info_company_country,
+      prep_crm_account.account_phone,
+      prep_crm_account.zoominfo_account_phone,
       prep_crm_account.abm_tier,
       prep_crm_account.health_score,
       prep_crm_account.health_number,
@@ -130,6 +132,8 @@ WITH final AS (
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
       prep_crm_account.forbes_2000_rank,
+      prep_crm_account.parent_account_industry_hierarchy,
+      prep_crm_account.sales_development_rep,
 
       --measures (maintain for now to not break reporting)
       prep_crm_account.parent_crm_account_lam,
@@ -189,7 +193,7 @@ WITH final AS (
     created_by="@msendal",
     updated_by="@j_kim",
     created_date="2020-06-01",
-    updated_date="2022-08-31"
+    updated_date="2022-10-12"
 ) }}
 
 

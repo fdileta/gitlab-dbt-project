@@ -100,4 +100,6 @@ macros:
     description: '{{ doc("convert_variant_to_number_field") }}'
   - name: rolling_window_delete
     description: '{{ doc("rolling_window_delete") }}'
+  - name: only_force_full_refresh
+    description: '{{ doc("only_force_full_refresh") }}'
 

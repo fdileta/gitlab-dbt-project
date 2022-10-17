@@ -1,3 +1,4 @@
+"""The DAG is designed to extract data from handbook using API"""
 import os
 from datetime import datetime, timedelta
 
@@ -18,6 +19,7 @@ from kube_secrets import (
     SNOWFLAKE_LOAD_WAREHOUSE,
     GITLAB_ANALYTICS_PRIVATE_TOKEN,
     GITLAB_COM_API_TOKEN,
+    GITLAB_INTERNAL_HANDBOOK_TOKEN,
 )
 from kubernetes_helpers import get_affinity, get_toleration
 
@@ -64,6 +66,7 @@ data_yaml_extract = KubernetesPodOperator(
         SNOWFLAKE_LOAD_PASSWORD,
         GITLAB_ANALYTICS_PRIVATE_TOKEN,
         GITLAB_COM_API_TOKEN,
+        GITLAB_INTERNAL_HANDBOOK_TOKEN,
     ],
     affinity=get_affinity(False),
     tolerations=get_toleration(False),
