@@ -19,7 +19,6 @@
       events.dim_behavior_website_page_sk,
       events.dim_behavior_browser_sk,
       events.dim_behavior_operating_system_sk,
-      events.dim_behavior_website_page_sk,
       events.gsc_pseudonymized_user_id,
       events.session_id,
       events.link_click_target_url
