@@ -15,19 +15,15 @@
       event_name,
       platform,
       gsc_environment       AS environment,
-      MAX(collector_tstamp) AS max_collector_timestamp
+      MAX(derived_tstamp)   AS max_timestamp
     FROM events
     WHERE true
 
     {% if is_incremental() %}
     
-    AND collector_tstamp > (SELECT MAX(max_collector_timestamp) FROM {{this}})
+    AND derived_tstamp > (SELECT MAX(max_timestamp) FROM {{this}})
     
     {% endif %}
-
-    AND domain_sessionid IS NOT NULL
-    AND domain_sessionidx IS NOT NULL
-    AND domain_userid IS NOT NULL
 
     {{ dbt_utils.group_by(n=4) }}
 )
@@ -45,7 +41,7 @@
       environment,
 
       --Time Attributes for Incremental Load
-      max_collector_timestamp
+      max_timestamp
     FROM event_source
 )
 

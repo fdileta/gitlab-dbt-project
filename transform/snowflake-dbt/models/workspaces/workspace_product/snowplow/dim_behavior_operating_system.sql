@@ -14,19 +14,15 @@ WITH device_information AS (
     os_timezone::VARCHAR                                        AS os_timezone,
     dvce_type::VARCHAR                                          AS device_type,
     dvce_ismobile::BOOLEAN                                      AS is_device_mobile,
-    MAX(collector_tstamp)                                       AS max_collector_timestamp
+    MAX(derived_tstamp)                                         AS max_timestamp
   FROM {{ ref('prep_snowplow_unnested_events_all') }}
   WHERE true
 
   {% if is_incremental() %}
     
-  AND collector_tstamp > (SELECT MAX(max_collector_timestamp) FROM {{this}})
+  AND derived_tstamp > (SELECT MAX(max_timestamp) FROM {{this}})
     
   {% endif %}
-
-  AND domain_sessionid IS NOT NULL
-  AND domain_sessionidx IS NOT NULL
-  AND domain_userid IS NOT NULL
 
   {{ dbt_utils.group_by(n=7) }}
 

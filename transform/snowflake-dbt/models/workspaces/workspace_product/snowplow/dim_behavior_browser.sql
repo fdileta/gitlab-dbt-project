@@ -22,19 +22,15 @@ WITH browser_information AS (
     -- attributes
     br_renderengine::VARCHAR    AS browser_engine,
     br_lang::VARCHAR            AS browser_language,
-    MAX(collector_tstamp)       AS max_collector_timestamp
+    MAX(derived_tstamp)       AS max_timestamp
   FROM {{ ref('prep_snowplow_unnested_events_all') }}
   WHERE true
 
   {% if is_incremental() %}
     
-  AND collector_tstamp > (SELECT MAX(max_collector_timestamp) FROM {{this}})
+  AND derived_tstamp > (SELECT MAX(max_timestamp) FROM {{this}})
     
   {% endif %}
-
-  AND domain_sessionid IS NOT NULL
-  AND domain_sessionidx IS NOT NULL
-  AND domain_userid IS NOT NULL
 
   {{ dbt_utils.group_by(n=6) }}
 
