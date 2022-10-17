@@ -106,7 +106,7 @@ gitlab-org/security-products/dast-runner-validation,26751150
 gitlab-org/security-products/dast-cwe-checks,27060148
 gitlab-org/security-products/analyzers/browserker,21351796
 gitlab-org/security-products/dependency-scanning,5779760
-gitlab-org/security-products/gemnasium-db,12006272, @ogonzalez
+gitlab-org/security-products/gemnasium-db,12006272, @mark.art
 gitlab-org/security-products/gemnasium/api,5777179
 gitlab-org/security-products/gemnasium/croncli,5777819
 gitlab-org/security-products/gemnasium/gcp-config,5772881
@@ -277,8 +277,8 @@ gitlab-org/gl-openshift/gitlab-runner-operator,22848448
 gitlab-org/cloud-native/gitlab-operator,18899486
 gitlab-com/gl-infra/customersdot-ansible,26392061
 gitlab-org/ruby/gems/tanuki_emoji,27628435
-gitlab-org/opstrace/opstrace,32149347
-gitlab-org/opstrace/opstrace-ui,32189602
+gitlab-org/opstrace/opstrace,32149347, @sebastienpahl
+gitlab-org/opstrace/opstrace-ui,32189602, @sebastienpahl
 gitlab-org/analytics-section/product-intelligence/snowplow-pseudonymization,28496898
 gitlab-org/analytics-section/product-intelligence/metric-dictionary,27919014, @timzallmann
 gitlab-org/modelops/applied-ml/review-recommender/recommendation-engine,31203840
