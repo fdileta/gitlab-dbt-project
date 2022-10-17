@@ -13,13 +13,16 @@
 , link_click AS (
 
     SELECT
-      fct_behavior_unstructured_sk,
-      behavior_at,
+      events.fct_behavior_unstructured_sk,
+      events.behavior_at,
       events.dim_behavior_event_sk,
-      dim_behavior_website_page_sk,
-      gsc_pseudonymized_user_id,
-      session_id,
-      link_click_target_url
+      events.dim_behavior_website_page_sk,
+      events.dim_behavior_browser_sk,
+      events.dim_behavior_operating_system_sk,
+      events.dim_behavior_website_page_sk,
+      events.gsc_pseudonymized_user_id,
+      events.session_id,
+      events.link_click_target_url
     FROM events
     INNER JOIN dim_event
       ON events.dim_behavior_event_sk = dim_event.dim_behavior_event_sk
