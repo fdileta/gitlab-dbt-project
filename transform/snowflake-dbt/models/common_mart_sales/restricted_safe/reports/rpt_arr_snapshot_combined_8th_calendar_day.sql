@@ -2,7 +2,7 @@
     ('driveload_financial_metrics_program_phase_1_source','driveload_financial_metrics_program_phase_1_source'),
     ('dim_date','dim_date'),
     ('mart_arr_snapshot_model','mart_arr_snapshot_model'),
-    ('mart_arr','mart_arr')
+    ('mart_arr','mart_arr_snapshot_bottom_up')
 ]) }}
 
 , phase_one AS (
