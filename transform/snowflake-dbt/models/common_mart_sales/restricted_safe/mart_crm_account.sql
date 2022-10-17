@@ -143,6 +143,8 @@
       dim_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       dim_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
       dim_crm_account.forbes_2000_rank,
+      dim_crm_account.parent_account_industry_hierarchy,
+      dim_crm_account.sales_development_rep,
 
       --degenerative dimensions
       dim_crm_account.is_sdr_target_account,
@@ -204,6 +206,7 @@
       fct_crm_account.number_of_licenses_this_account,
       fct_crm_account.crm_account_zoom_info_number_of_developers,
       fct_crm_account.decision_maker_count_linkedin,
+      fct_crm_account.number_of_employees,
 
       --metadata
       fct_crm_account.created_by_id,
@@ -227,7 +230,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@rkohnke",
+    updated_by="@j_kim",
     created_date="2022-08-10",
-    updated_date="2022-09-27"
+    updated_date="2022-10-12"
 ) }}

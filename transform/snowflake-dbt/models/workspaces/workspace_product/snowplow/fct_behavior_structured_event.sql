@@ -1,13 +1,11 @@
-{{config({
+{{config(
 
-        "snowflake_warehouse": generate_warehouse_name('XL'),
-        "unique_key":"behavior_structured_event_pk",
-        "materialized":"vault_insert_by_period",
-        "period":"week",
-        "timestamp_field":"BEHAVIOR_AT",
-        "start_date": "2022-08-01",
-        "stop_date": "2022-09-30"
-  })
+    materialized='incremental',
+    unique_key='behavior_structured_event_pk',
+    full_refresh= true if flags.FULL_REFRESH and var('full_refresh_force', false) else false,
+    on_schema_change='sync_all_columns'
+
+  )
 
 }}
 {{ 
@@ -107,7 +105,12 @@
     LEFT JOIN dim_behavior_operating_system
       ON structured_events_w_clean_url.os_name = dim_behavior_operating_system.os_name
         AND structured_events_w_clean_url.os_timezone = dim_behavior_operating_system.os_timezone
-    WHERE __PERIOD_FILTER__
+    {% if is_incremental() %}
+
+    WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
+
+    {% endif %}
+
 )
 
 {{ dbt_audit(
@@ -115,5 +118,5 @@
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-09-01",
-    updated_date="2022-10-03"
+    updated_date="2022-10-12"
 ) }}

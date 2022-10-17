@@ -18,6 +18,12 @@ WITH sfdc_opportunity_xf AS (
     FROM {{ ref('wk_sales_date_details') }}
     --FROM workspace_sales.date_details
 
+), sfdc_users_xf AS (
+    
+    SELECT *
+    FROM {{ref('wk_sales_sfdc_users_xf')}}
+    --FROM prod.workspace_sales.sfdc_users_xf
+
 ), snapshot_oppty AS (
 
     SELECT
@@ -29,34 +35,31 @@ WITH sfdc_opportunity_xf AS (
         ELSE 0
       END AS is_pipeline_created_flag,
 
-      -- if the deal was not created in the snapshot quarter (or not eligible) we asume it was crerated
-      -- in previous quarters
+      /* If the deal was not created in the snapshot quarter (or not eligible) we assume it was created
+      in previous quarters */
       CASE
           WHEN is_pipeline_created_flag = 1
             THEN 'Pipe Gen'
           ELSE 'Existing Pipe'
         END AS pipeline_category,
 
-        -- Based on deal stage of the deal at the snapshot tiime
-        'Open' AS deal_status,
-        'Open' AS deal_status_group,
+      -- Based on deal stage of the deal at the snapshot time
+      'Open' AS deal_status,
+      'Open' AS deal_status_group,
         
-        -- This field track if the type of pipeline "motion", if it expands / contract / create pipeline, or if it closes
-        -- it
-        'Expansion / Contraction' AS pipeline_motion
+      -- This field track if the type of pipeline "motion", if it expands / contract / create pipeline, or if it closes it
+      'Expansion / Contraction' AS pipeline_motion
 
-    FROM sfdc_opportunity_snapshot_history_xf snapshot_oppty
-      INNER JOIN sfdc_opportunity_xf oppty -- we use the latest ARR Creaated date to accommodate corrections
-        ON oppty.opportunity_id = snapshot_oppty.opportunity_id
-    WHERE snapshot_oppty.is_open = 1
-        AND snapshot_oppty.is_stage_1_plus = 1
-        AND snapshot_oppty.opportunity_category NOT IN  ('Ramp Deal')
+    FROM sfdc_opportunity_snapshot_history_xf AS snapshot_oppty
+    INNER JOIN sfdc_opportunity_xf AS oppty -- we use the latest ARR Creaated date to accommodate corrections
+      ON oppty.opportunity_id = snapshot_oppty.opportunity_id
+    WHERE snapshot_oppty.is_eligible_open_pipeline_flag = 1
+      AND snapshot_oppty.opportunity_category NOT IN ('Ramp Deal')
 
 ), net_arr_delta AS (
 
-    -- The goal of this CTE is to calculate the delta between the current considered line and the last
-    -- one, we are interested in keeping <> 0 deltas within the model, together with the date of the 
-    -- event.
+    /* The goal of this CTE is to calculate the delta between the current considered line and the last
+    one. We are interested in keeping <> 0 deltas within the model, together with the date of the event. */
 
     SELECT 
       snapshot_date                                 AS report_date,
@@ -65,6 +68,7 @@ WITH sfdc_opportunity_xf AS (
       snapshot_day_of_fiscal_quarter_normalised     AS report_day_of_fiscal_quarter_normalised,
       snapshot_fiscal_year                          AS report_fiscal_year,
       opportunity_id,
+      owner_id,
       is_pipeline_created_flag,
       pipeline_category,
       deal_status,
@@ -85,12 +89,12 @@ WITH sfdc_opportunity_xf AS (
 
  ), closed_pipeline AS (
 
-    -- This CTE captures the closed deals that exited the pipeline, that's why positive net arr is
-    -- converted into a negative value, to represent that they are removed from the total open pipeline 
-    -- amount.
+    /* This CTE captures the closed deals that exited the pipeline, that's why positive net arr is
+    converted into a negative value to represent that they are removed from the total open pipeline amount. */
 
     SELECT
       oppty.opportunity_id,
+      oppty.owner_id,
       oppty.close_date                            AS report_date,
       oppty.close_fiscal_quarter_date             AS report_fiscal_quarter_date,
       oppty.close_fiscal_quarter_name             AS report_fiscal_quarter_name,
@@ -131,9 +135,9 @@ WITH sfdc_opportunity_xf AS (
       is_won,
       is_lost
 
-    FROM sfdc_opportunity_xf oppty
-      LEFT JOIN date_details close_date
-        ON close_date.date_actual = oppty.close_date
+    FROM sfdc_opportunity_xf AS oppty
+    LEFT JOIN date_details AS close_date
+      ON close_date.date_actual = oppty.close_date
     WHERE (oppty.is_won = 1 OR oppty.is_lost = 1)
       AND oppty.net_arr <> 0
       AND oppty.close_date < CURRENT_DATE
@@ -143,6 +147,7 @@ WITH sfdc_opportunity_xf AS (
 
     SELECT
       opportunity_id,
+      owner_id,
       report_date::date AS report_date,
       report_fiscal_quarter_date,
       report_fiscal_quarter_name,
@@ -154,7 +159,7 @@ WITH sfdc_opportunity_xf AS (
       deal_status_group,
       pipeline_motion,
       --net_arr,
-     -- NULL              AS prev_net_arr,
+      -- NULL              AS prev_net_arr,
       delta_net_arr,
       is_closed,
       is_open,
@@ -164,6 +169,7 @@ WITH sfdc_opportunity_xf AS (
     UNION ALL
     SELECT
       opportunity_id,
+      owner_id,
       report_date::date AS report_date,
       report_fiscal_quarter_date,
       report_fiscal_quarter_name,
@@ -174,8 +180,8 @@ WITH sfdc_opportunity_xf AS (
       deal_status,
       deal_status_group,
       pipeline_motion,
-     -- net_arr,
-     -- prev_net_arr,
+      -- net_arr,
+      -- prev_net_arr,
       delta_net_arr,
       is_closed,
       is_open,
@@ -187,6 +193,7 @@ WITH sfdc_opportunity_xf AS (
 
     SELECT 
       deltas.*,
+      users.user_email AS opportunity_owner_email, 
       oppty.sales_qualified_source,
       oppty.order_type_stamped,
       oppty.opportunity_category,
@@ -224,10 +231,12 @@ WITH sfdc_opportunity_xf AS (
       oppty.sales_team_avp_rd_level,
       oppty.sales_team_asm_level
 
-    FROM deltas_consolidated deltas
-      LEFT JOIN sfdc_opportunity_xf oppty
-        ON oppty.opportunity_id = deltas.opportunity_id
-
+    FROM deltas_consolidated AS deltas
+    LEFT JOIN sfdc_opportunity_xf AS oppty
+      ON oppty.opportunity_id = deltas.opportunity_id
+    LEFT JOIN sfdc_users_xf AS users
+      ON deltas.owner_id = users.user_id
+    
 )
 
 SELECT *
