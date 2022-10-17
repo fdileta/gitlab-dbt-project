@@ -10,13 +10,11 @@ from airflow_utils import (
     gitlab_defaults,
     slack_failed_task,
     gitlab_pod_env_vars,
-    clone_and_setup_extraction_cmd,
 )
 from kube_secrets import (
     SNOWFLAKE_ACCOUNT,
     SNOWFLAKE_LOAD_ROLE,
     SNOWFLAKE_LOAD_USER,
-    SNOWFLAKE_LOAD_WAREHOUSE,
     SNOWFLAKE_LOAD_PASSWORD,
     SNOWFLAKE_PASSWORD,
     SNOWFLAKE_USER,
@@ -25,13 +23,6 @@ from kube_secrets import (
 
 # Load the env vars into a dict and set env vars
 env = os.environ.copy()
-GIT_BRANCH = env["GIT_BRANCH"]
-pod_env_vars = {
-    "SNOWFLAKE_LOAD_DATABASE": "RAW"
-    if GIT_BRANCH == "master"
-    else f"{GIT_BRANCH.upper()}_RAW",
-    "CI_PROJECT_DIR": "/analytics",
-}
 
 # tomorrow_ds -  the day after the execution date as YYYY-MM-DD
 # ds - the execution date as YYYY-MM-DD
@@ -74,7 +65,7 @@ dag = DAG("saas_usage_ping", default_args=default_args, schedule_interval="0 7 *
 instance_cmd = f"""
     {clone_repo_cmd} &&
     cd analytics/extract/saas_usage_ping/ &&
-    python3 transform_instance_level_queries_to_snowsql.py &&
+    python3 transform_postgres_to_snowflake.py &&
     python3 usage_ping.py saas_instance_ping
 """
 
@@ -87,8 +78,8 @@ instance_redis_metrics_cmd = f"""
 instance_ping = KubernetesPodOperator(
     **gitlab_defaults,
     image=DATA_IMAGE,
-    task_id="saas-instance-usage-ping",
-    name="saas-instance-usage-ping",
+    task_id="saas-instance-usage-ping-sql-metrics",
+    name="saas-instance-usage-ping-sql-metrics",
     secrets=secrets,
     env_vars=pod_env_vars,
     arguments=[instance_cmd],
