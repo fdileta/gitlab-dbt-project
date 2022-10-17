@@ -236,7 +236,9 @@
           THEN is_arpu
         WHEN combined.product_tier_name = 'Storage'
           THEN FALSE
-        WHEN combined.product_rate_plan_name LIKE '%EDU%' OR edu_subscriptions.subscription_name IS NOT NULL
+        WHEN combined.product_rate_plan_name LIKE '%EDU%'
+          THEN FALSE
+        WHEN edu_subscriptions.subscription_name IS NOT NULL
           THEN FALSE
         ELSE TRUE
       END                                                                               AS is_arpu,
