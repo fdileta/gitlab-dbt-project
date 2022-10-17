@@ -13,7 +13,7 @@ models:
         - name: sdr_region
           description: Region of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
         - name: is_dg_influenced
-          description: Flag indicating a touchpoint is influenced by Demand Gen base on its segment being Demand Gen.
+          description: Flag indicating a touchpoint is influenced by Demand Gen based on its segment being Demand Gen.
         - name: is_dg_sourced
           description: Flag indicating a touchpoint is sourced from Demand Gen based on its segment being Demand Gen as well as its position being first touch.
         - name: opps_per_touchpoint
@@ -60,7 +60,7 @@ models:
         - name: sdr_region
           description: Region of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
         - name: is_dg_influenced
-          description: Flag indicating a touchpoint is influenced by Demand Gen base on its segment being Demand Gen.
+          description: Flag indicating a touchpoint is influenced by Demand Gen based on its segment being Demand Gen.
         - name: is_dg_sourced
           description: Flag indicating a touchpoint is sourced from Demand Gen based on its segment being Demand Gen as well as its position being first touch.
         - name: count_inquiry
