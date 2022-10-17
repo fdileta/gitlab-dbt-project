@@ -15,7 +15,7 @@
     SELECT
       fct_behavior_unstructured_sk,
       behavior_at,
-      dim_behavior_event_sk,
+      events.dim_behavior_event_sk,
       dim_behavior_website_page_sk,
       gsc_pseudonymized_user_id,
       session_id,
