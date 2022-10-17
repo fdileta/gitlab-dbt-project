@@ -106,7 +106,7 @@ gitlab-org/security-products/dast-runner-validation,26751150
 gitlab-org/security-products/dast-cwe-checks,27060148
 gitlab-org/security-products/analyzers/browserker,21351796
 gitlab-org/security-products/dependency-scanning,5779760
-gitlab-org/security-products/gemnasium-db,12006272
+gitlab-org/security-products/gemnasium-db,12006272, @ogonzalez
 gitlab-org/security-products/gemnasium/api,5777179
 gitlab-org/security-products/gemnasium/croncli,5777819
 gitlab-org/security-products/gemnasium/gcp-config,5772881
