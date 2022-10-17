@@ -300,14 +300,13 @@
     SELECT DISTINCT
       sub_1.subscription_name,
       sub_1.zuora_renewal_subscription_name,
-      DATE_TRUNC('month',sub_2.subscription_end_date) AS subscription_end_month,
-      RANK() OVER (PARTITION BY sub_1.subscription_name ORDER BY sub_2.subscription_end_date DESC) AS rank
+      DATE_TRUNC('month',sub_2.subscription_end_date) AS subscription_end_month
     FROM dim_subscription_last_term sub_1
     INNER JOIN dim_subscription_last_term sub_2
       ON sub_1.zuora_renewal_subscription_name = sub_2.subscription_name
     WHERE sub_1.zuora_renewal_subscription_name != ''
       AND sub_1.last_version = 1
-    QUALIFY rank = 1
+      AND sub_2.last_version = 1
 
 ), base_{{renewal_fiscal_year}} AS (--get the base data set of recurring charges.
 
@@ -974,5 +973,5 @@
     created_by="@michellecooper",
     updated_by="@iweeks",
     created_date="2021-12-06",
-    updated_date="2022-09-07"
+    updated_date="2022-10-15"
 ) }}
