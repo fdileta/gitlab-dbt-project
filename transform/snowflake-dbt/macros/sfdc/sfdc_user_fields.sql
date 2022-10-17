@@ -2,13 +2,32 @@
 
 {{ simple_cte([
     ('sfdc_user_roles_source','sfdc_user_roles_source'),
-    ('date_details_source','date_details_source'),
+    ('dim_date','dim_date'),
     ('sfdc_users_source', 'sfdc_users_source'),
-    ('sfdc_user_snapshots_source', 'sfdc_user_snapshots_source'),
-    ('sheetload_mapping_sdr_sfdc_bamboohr_source','sheetload_mapping_sdr_sfdc_bamboohr_source')
+    ('sfdc_user_snapshots_source', 'sfdc_user_snapshots_source')
 ]) }}
 
-, sfdc_users AS (
+, sheetload_mapping_sdr_sfdc_bamboohr_source AS (
+
+    SELECT *
+    FROM {{ ref('sheetload_mapping_sdr_sfdc_bamboohr_source') }}
+
+{%- if model_type == 'snapshot' %}
+
+), snapshot_dates AS (
+
+    SELECT *
+    FROM dim_date
+    WHERE date_actual >= '2020-03-01' and date_actual <= CURRENT_DATE
+    {% if is_incremental() %}
+
+   -- this filter will only be applied on an incremental run
+   AND date_id > (SELECT max(snapshot_id) FROM {{ this }})
+
+   {% endif %}
+{%- endif %}
+
+), sfdc_users AS (
 
     SELECT 
       {%- if model_type == 'live' %}
@@ -27,20 +46,6 @@
         ON snapshot_dates.date_actual >= sfdc_user_snapshots_source.dbt_valid_from
         AND snapshot_dates.date_actual < COALESCE(sfdc_user_snapshots_source.dbt_valid_to, '9999-12-31'::TIMESTAMP)
     {%- endif %}
-
-{%- if model_type == 'snapshot' %}
-), snapshot_dates AS (
-
-    SELECT *
-    FROM date_details_source
-    WHERE date_actual >= '2020-03-01' and date_actual <= CURRENT_DATE
-    {% if is_incremental() %}
-
-   -- this filter will only be applied on an incremental run
-   AND date_id > (SELECT max(snapshot_id) FROM {{ this }})
-
-   {% endif %}
-{%- endif %}
 
 ), final AS (
 
