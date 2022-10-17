@@ -4478,6 +4478,13 @@ roles:
                     - tnguyen_prep.*.*
                     - tnguyen_prod.*.*
 
+    - tscott:
+        member_of:
+            - data_team_analyst
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - vagrawal:
         member_of:
             - adaptive
@@ -5008,6 +5015,11 @@ users:
         can_login: yes
         member_of:
             - tnguyen
+
+    - tscott:
+        can_login: yes 
+        member_of:
+            - tscott
 
     - vagrawal:
         can_login: yes
