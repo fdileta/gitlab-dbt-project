@@ -1,7 +1,3 @@
-{{ config(
-    tags=["mnpi_exception"]
-) }}
-
 WITH source AS (
 
   SELECT *
