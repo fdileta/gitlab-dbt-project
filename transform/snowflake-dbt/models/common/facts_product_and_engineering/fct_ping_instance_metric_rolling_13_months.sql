@@ -3,7 +3,6 @@
     materialized='incremental',
     unique_key='ping_instance_metric_id',
     on_schema_change='sync_all_columns',
-    full_refresh=false,
     post_hook=["{{ rolling_window_delete('ping_created_date','month',13) }}"]        
 ) }}
 
