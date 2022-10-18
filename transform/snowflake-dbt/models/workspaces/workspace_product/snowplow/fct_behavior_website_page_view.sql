@@ -85,16 +85,15 @@
       page_view_index,
       page_view_in_session_index
     FROM page_views_w_clean_url
-    LEFT JOIN dim_website_page ON page_views_w_clean_url.clean_url_path = dim_website_page.clean_url_path
-    AND page_views_w_clean_url.page_url_host = dim_website_page.page_url_host
-    AND page_views_w_clean_url.app_id = dim_website_page.app_id
+    LEFT JOIN dim_website_page 
+      ON page_views_w_clean_url.page_url = dim_website_page.page_url
 
 )
 
 {{ dbt_audit(
     cte_ref="page_views_w_dim",
     created_by="@chrissharp",
-    updated_by="@chrissharp",
+    updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-09-02"
+    updated_date="2022-10-17"
 ) }}

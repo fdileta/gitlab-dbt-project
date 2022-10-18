@@ -78,11 +78,6 @@
       structured_events_w_clean_url.session_id,
       structured_events_w_clean_url.user_snowplow_domain_id,
       structured_events_w_clean_url.contexts,
-      structured_events_w_clean_url.page_url,
-      structured_events_w_clean_url.page_url_path,
-      structured_events_w_clean_url.page_url_scheme,
-      structured_events_w_clean_url.page_url_host,
-      structured_events_w_clean_url.page_url_fragment,
 
       -- Degenerate Dimensions (Gitlab Standard Context Attributes)
       structured_events_w_clean_url.gsc_google_analytics_client_id,
@@ -94,9 +89,7 @@
 
     FROM structured_events_w_clean_url
     LEFT JOIN dim_behavior_website_page
-      ON structured_events_w_clean_url.clean_url_path = dim_behavior_website_page.clean_url_path
-        AND structured_events_w_clean_url.page_url_host = dim_behavior_website_page.page_url_host
-        AND structured_events_w_clean_url.app_id = dim_behavior_website_page.app_id
+      ON structured_events_w_clean_url.page_url = dim_behavior_website_page.page_url
     LEFT JOIN dim_behavior_browser
       ON structured_events_w_clean_url.browser_name = dim_behavior_browser.browser_name
         AND structured_events_w_clean_url.browser_major_version = dim_behavior_browser.browser_major_version
