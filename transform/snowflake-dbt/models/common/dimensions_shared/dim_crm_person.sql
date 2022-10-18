@@ -80,6 +80,7 @@ WITH crm_person AS (
       zoominfo_company_country,
       zoominfo_phone_number, 
       zoominfo_mobile_phone_number,
+      zoominfo_contact_id,
       zoominfo_do_not_call_direct_phone,
       zoominfo_do_not_call_mobile_phone,
       zoominfo_company_employee_count,
@@ -106,5 +107,5 @@ WITH crm_person AS (
     created_by="@jjstark",
     updated_by="@rkohnke",
     created_date="2020-09-10",
-    updated_date="2022-09-30"
+    updated_date="2022-10-18"
 ) }}

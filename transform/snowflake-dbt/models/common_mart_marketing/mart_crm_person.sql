@@ -166,6 +166,7 @@
       dim_crm_person.zoominfo_do_not_call_direct_phone,
       dim_crm_person.zoominfo_do_not_call_mobile_phone,
       dim_crm_person.zoominfo_company_employee_count,
+      dim_crm_person.zoominfo_contact_id,
       fct_crm_person.is_mql,
       fct_crm_person.is_inquiry,
       CASE
@@ -256,5 +257,5 @@
     created_by="@iweeks",
     updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-10-06",
+    updated_date="2022-10-18",
   ) }}  
