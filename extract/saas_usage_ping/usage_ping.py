@@ -1,5 +1,5 @@
 from os import environ as env
-from typing import Dict, List
+from typing import Dict, List, Any
 from hashlib import md5
 
 from logging import info
@@ -10,6 +10,7 @@ import os
 import sys
 import requests
 import pandas as pd
+import yaml
 
 
 from transform_postgres_to_snowflake import (
@@ -43,6 +44,25 @@ class UsagePing(object):
 
         self.start_date_28 = self.end_date - datetime.timedelta(28)
         self.dataframe_api_columns = META_API_COLUMNS
+        self.missing_definitions = {'sql': [], 'redis': []}
+
+    def get_metrics_definitions(self):
+        config_dict = env.copy()
+        headers = {
+            "PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
+        }
+
+        response = requests.get(
+            "http://gitlab.com/api/v4/usage_data/metric_definitions", headers=headers
+        )
+
+        metric_definitions = yaml.safe_load(response.text)
+
+        new_metric_dict = {
+            metric_dict['key_path']: metric_dict
+            for metric_dict in metric_definitions
+        }
+        return new_metric_dict
 
     def _get_instance_queries(self) -> Dict:
         """
@@ -109,6 +129,87 @@ class UsagePing(object):
 
         return meta_data
 
+    def check_data_source(
+        self, payload_source, metric_definitions, concat_metric_name,
+        prev_concat_metric_name
+    ):
+        '''
+        Determines if payload data source matches the defined data source.
+
+        A metric from the redis payload is valid if the data_source != database
+        Conversely, a metric from sql payload is valid if data_source == database
+
+        Both the concatted metric name, i.e key1.key2.key3
+        and the previous metric name, i.e key1.key2
+        need to be checked because some metrics are only defined by their parent name
+        '''
+        is_match_defined_source = {
+            'redis': lambda defined_data_source: defined_data_source and defined_data_source != 'database',
+            'sql': lambda defined_data_source: defined_data_source == 'database'
+        }
+        metric_definition = metric_definitions.get(concat_metric_name, {})
+        # need to check parent_metric_definition too, because some metrics only have the parent defined, i.e `usage_activity_by_stage.manage.user_auth_by_provider.*`
+        parent_metric_definition = metric_definitions.get(
+            prev_concat_metric_name, {}
+        )
+
+        if metric_definition or parent_metric_definition:
+            if is_match_defined_source[payload_source](
+                metric_definition.get('data_source')
+            ) or is_match_defined_source[payload_source](
+                parent_metric_definition.get('data_source')
+            ):
+                return 'valid_source'
+
+            else:
+                return 'invalid_source'
+        else:
+            return 'missing_definition'
+
+    def keep_valid_metric_definitions(
+        self,
+        payload: dict,
+        payload_source,
+        metric_definitions,
+        prev_concat_metric_name: str = ''
+    ) -> dict:
+        """
+        For each payload- sourced either from sql or redis- check against
+        the metric_definition.yaml file if it is a valid metric.
+
+        A valid metric is one whose payload source matches the defined data_source in the yaml file.
+
+        Do this recursively to keep the structure of the original payload
+        """
+
+        valid_metric_dict: Dict[Any, Any] = dict()
+        for metric_name, metric_value in payload.items():
+            if prev_concat_metric_name:
+                concat_metric_name = prev_concat_metric_name + '.' + metric_name
+            else:
+                concat_metric_name = metric_name
+
+            if isinstance(metric_value, dict):
+                return_dict = self.keep_valid_metric_definitions(
+                    metric_value, payload_source, concat_metric_name
+                )
+                if return_dict:
+                    valid_metric_dict[metric_name] = return_dict
+            # elif isinstance(metric_value, str) or isinstance(metric_value, int):
+            else:
+                data_source_status = self.check_data_source(
+                    payload_source, metric_definitions, concat_metric_name,
+                    prev_concat_metric_name
+                )
+                if data_source_status == 'valid_source':
+                    valid_metric_dict[metric_name] = metric_value
+                elif data_source_status == 'invalid_source':
+                    pass # do nothing, invalid sources are expected
+                elif data_source_status == 'missing_definition':
+                    self.missing_definitions[payload_source].append(concat_metric_name)
+
+        return valid_metric_dict
+
     def evaluate_saas_queries(self, connection, saas_queries):
         """
         For each 'select statement' in the dict,
@@ -162,18 +263,23 @@ class UsagePing(object):
 
         return results, errors
 
-    def saas_instance_sql_metrics(self, saas_queries):
+    def saas_instance_sql_metrics(self, metric_definitions, saas_queries):
         """
         Take a dictionary of {ping_name: sql_query} and run each
         query to then upload to a table in raw.
         """
         connection = self.loader_engine.connect()
 
-        sql_metrics, sql_metric_errors = self.evaluate_saas_queries(connection, saas_queries)
+        payload_source = 'sql'
+        saas_queries_with_valid_definitions = self.keep_valid_metric_definitions(saas_queries, payload_source, metric_definitions)
+
+        sql_metrics, sql_metric_errors = self.evaluate_saas_queries(connection, saas_queries_with_valid_definitions)
 
         info("Processed queries")
         connection.close()
         self.loader_engine.dispose()
+
+        return sql_metrics, sql_metric_errors
 
         '''
         ping_to_upload = pd.DataFrame(
@@ -221,7 +327,7 @@ class UsagePing(object):
         self.loader_engine.dispose()
         '''
 
-    def saas_instance_redis_metrics(self):
+    def saas_instance_redis_metrics(self, metric_definitions):
 
         """
         Call the Non SQL Metrics API and store the results in Snowflake RAW database
@@ -235,6 +341,9 @@ class UsagePing(object):
             "https://gitlab.com/api/v4/usage_data/non_sql_metrics", headers=headers
         )
         redis_metrics = json.loads(response.text)
+
+        payload_source = 'redis'
+        redis_metrics = self.keep_valid_metric_definitions(redis_metrics, payload_source, metric_definitions)
         return redis_metrics
 
         '''
@@ -298,13 +407,16 @@ class UsagePing(object):
         )
         self.loader_engine.dispose()
 
-    def combine_metrics(self):
+    def saas_instance_combined_metrics(self):
+        metric_definitions = self.get_metrics_definitions()
         saas_queries = self._get_instance_queries()
-        sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(saas_queries)
 
-        redis_metrics = self.saas_instance_redis_metrics()
+        sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(metric_definitions, saas_queries)
+        redis_metrics = self.saas_instance_redis_metrics(metric_definitions)
 
-        combined_metrics = {**sql_metrics, **redis_metrics}
+        # do not switch order: if duplicate key, sql_metrics k:v will take priority
+        combined_metrics = {**redis_metrics, **sql_metrics}
+
         self.upload_combined_metrics(combined_metrics, saas_queries)
         if sql_metric_errors:
             self.upload_sql_metric_errors(sql_metric_errors)
