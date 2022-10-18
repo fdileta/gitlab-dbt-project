@@ -162,20 +162,20 @@ class UsagePing(object):
 
         return results, errors
 
-    def saas_instance_ping(self):
+    def saas_instance_sql_metrics(self, saas_queries):
         """
         Take a dictionary of {ping_name: sql_query} and run each
         query to then upload to a table in raw.
         """
         connection = self.loader_engine.connect()
-        saas_queries = self._get_instance_queries()
 
-        results, errors = self.evaluate_saas_queries(connection, saas_queries)
+        sql_metrics, sql_metric_errors = self.evaluate_saas_queries(connection, saas_queries)
 
         info("Processed queries")
         connection.close()
         self.loader_engine.dispose()
 
+        '''
         ping_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
             + self.dataframe_api_columns
@@ -183,7 +183,7 @@ class UsagePing(object):
 
         ping_to_upload.loc[0] = [
             saas_queries,
-            json.dumps(results),
+            json.dumps(sql_metrics),
             self.end_date,
             self._get_md5(datetime.datetime.utcnow().timestamp()),
         ] + self._get_dataframe_api_values(
@@ -200,14 +200,14 @@ class UsagePing(object):
         """
         Handling error data part to load data into table: raw.saas_usage_ping.instance_sql_errors
         """
-        if errors:
+        if sql_metric_errors:
             error_data_to_upload = pd.DataFrame(
                 columns=["run_id", "sql_errors", "ping_date"]
             )
 
             error_data_to_upload.loc[0] = [
                 self._get_md5(datetime.datetime.utcnow().timestamp()),
-                json.dumps(errors),
+                json.dumps(sql_metric_errors),
                 self.end_date,
             ]
 
@@ -219,6 +219,7 @@ class UsagePing(object):
             )
 
         self.loader_engine.dispose()
+        '''
 
     def saas_instance_redis_metrics(self):
 
@@ -233,8 +234,10 @@ class UsagePing(object):
         response = requests.get(
             "https://gitlab.com/api/v4/usage_data/non_sql_metrics", headers=headers
         )
-        json_data = json.loads(response.text)
+        redis_metrics = json.loads(response.text)
+        return redis_metrics
 
+        '''
         redis_data_to_upload = pd.DataFrame(
             columns=["jsontext", "ping_date", "run_id"] + self.dataframe_api_columns
         )
@@ -251,6 +254,66 @@ class UsagePing(object):
             "instance_redis_metrics",
             "saas_usage_ping",
         )
+        '''
+
+    def upload_combined_metrics(self, combined_metrics, saas_queries):
+        df_to_upload = pd.DataFrame(
+            columns=["query_map", "run_results", "ping_date", "run_id"]
+            + self.dataframe_api_columns
+        )
+
+        df_to_upload.loc[0] = [
+            saas_queries,
+            json.dumps(combined_metrics),
+            self.end_date,
+            self._get_md5(datetime.datetime.utcnow().timestamp()),
+        ] + self._get_dataframe_api_values(
+            self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
+        )
+
+        dataframe_uploader(
+            df_to_upload,
+            self.loader_engine,
+            "instance_combined_metrics",
+            "saas_usage_ping",
+        )
+        self.loader_engine.dispose()
+
+    def upload_sql_metric_errors(self, sql_metric_errors):
+        df_to_upload = pd.DataFrame(
+            columns=["run_id", "sql_errors", "ping_date"]
+        )
+
+        df_to_upload.loc[0] = [
+            self._get_md5(datetime.datetime.utcnow().timestamp()),
+            json.dumps(sql_metric_errors),
+            self.end_date,
+        ]
+
+        dataframe_uploader(
+            df_to_upload,
+            self.loader_engine,
+            "instance_sql_errors",
+            "saas_usage_ping",
+        )
+        self.loader_engine.dispose()
+
+    def combine_metrics(self):
+        saas_queries = self._get_instance_queries()
+        sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(saas_queries)
+
+        redis_metrics = self.saas_instance_redis_metrics()
+
+        combined_metrics = {**sql_metrics, **redis_metrics}
+        self.upload_combined_metrics(combined_metrics, saas_queries)
+        if sql_metric_errors:
+            self.upload_sql_metric_errors(sql_metric_errors)
+
+        # TODO need to implement
+        # self.check_missing_definitions()
+        # TODO need to implement
+        # self.check_dups_in_combined_metrics(sql_metrics, redis_metrics)
+        return combined_metrics
 
     def _get_namespace_queries(self) -> List[Dict]:
         """
