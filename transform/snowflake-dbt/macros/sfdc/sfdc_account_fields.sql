@@ -105,6 +105,7 @@ WITH map_merged_crm_account AS (
       tsp_region,
       tsp_area,
       gtm_strategy,
+      tsp_account_employees,
       tsp_max_family_employees,
       account_demographics_sales_segment,
       account_demographics_geo,
@@ -164,6 +165,7 @@ WITH map_merged_crm_account AS (
                                                                           AS parent_crm_account_sales_segment,
       ultimate_parent_account.billing_country                             AS parent_crm_account_billing_country,
       ultimate_parent_account.billing_country_code                        AS parent_crm_account_billing_country_code,
+      ultimate_parent_account.industry                                    AS parent_crm_account_industry,
       sfdc_account.parent_account_industry_hierarchy                      AS parent_crm_account_industry_hierarchy,
       ultimate_parent_account.tsp_territory                               AS parent_crm_account_sales_territory,
       ultimate_parent_account.tsp_region                                  AS parent_crm_account_tsp_region,
@@ -210,6 +212,7 @@ WITH map_merged_crm_account AS (
         ELSE 'Non - Focus Account'
       END                                                                 AS crm_account_focus_account,
       sfdc_account.account_owner_user_segment                             AS crm_account_owner_user_segment,
+      sfdc_account.tsp_account_employees                                  AS crm_account_tsp_account_employees,
       sfdc_account.tsp_max_family_employees                               AS crm_account_tsp_max_family_employees,
       sfdc_account.billing_country                                        AS crm_account_billing_country,
       sfdc_account.billing_country_code                                   AS crm_account_billing_country_code,
@@ -218,6 +221,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.tsp_territory                                          AS crm_account_sales_territory,
       sfdc_account.tsp_region                                             AS crm_account_tsp_region,
       sfdc_account.tsp_area                                               AS crm_account_tsp_area,
+      sfdc_account.tsp_max_hierarchy_sales_segment                        AS tsp_max_hierarchy_sales_segment,
       CASE
          WHEN sfdc_account.tsp_max_family_employees > 2000 THEN 'Employees > 2K'
          WHEN sfdc_account.tsp_max_family_employees <= 2000 AND sfdc_account.tsp_max_family_employees > 1500 THEN 'Employees > 1.5K'
