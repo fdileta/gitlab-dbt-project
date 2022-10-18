@@ -476,7 +476,6 @@ roles:
             - google_ads
             - google_analytics_360
             - netsuite
-            - keyhole_twitter
             - mailgun
             - marketo
             - pmg
@@ -753,7 +752,6 @@ roles:
                 - raw.prometheus
                 - raw.pto
                 - raw.rspec
-                - raw.keyhole_twitter
                 - raw.snowplow
                 - raw.snowflake_imports
                 - raw.tap_postgres
@@ -765,7 +763,6 @@ roles:
                 - raw.engineering_extracts.*
                 - raw.gitlab_data_yaml.*
                 - raw.gitter.*
-                - raw.keyhole_twitter.*
                 - raw.pmg.*
                 - raw.prometheus.*
                 - raw.pto.*
@@ -1851,21 +1848,6 @@ roles:
                 read:
                     - prep.license_db.*
                     - raw.license_db.*
-
-    - keyhole_twitter:
-        privileges:
-            databases:
-                read:
-                    - prep
-                    - raw
-            schemas:
-                read:
-                    - prep.keyhole_twitter
-                    - raw.keyhole_twitter
-            tables:
-                read:
-                    - prep.keyhole_twitter.*
-                    - raw.keyhole_twitter.*
 
     - maxmind:
         privileges:
