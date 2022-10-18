@@ -14,7 +14,8 @@ from airflow_utils import (
     gitlab_pod_env_vars,
     slack_failed_task,
     clone_repo_cmd,
-    data_test_ssh_key_cmd,
+    SALES_ANALYTICS_NOTEBOOKS_PATH,
+    get_sales_analytics_notebooks,
 )
 from kube_secrets import (
     SNOWFLAKE_ACCOUNT,
@@ -52,24 +53,8 @@ dag = DAG(
 )
 
 
-DAILY_NOTEBOOKS_PATH = "analytics/sales_analytics_notebooks/quarterly/"
-SALES_ANALYTICS_NOTEBOOKS_SSH_REPO = "git@gitlab.com:gitlab-data/analytics.git"
-SALES_ANALYTICS_NOTEBOOKS_HTTP_REPO = "https://gitlab.com/gitlab-data/analytics.git"
-
-
-def get_quarterly_notebooks(path):
-    notebooks = []
-    fileNames = []
-    for file in os.listdir(path):
-        filename = os.fsdecode(file)
-        if filename.endswith(".ipynb"):
-            notebooks.append(filename)
-            fileNames.append(os.path.splitext(filename)[0])
-        else:
-            continue
-    return dict(zip(notebooks, fileNames))
-
-notebooks = get_quarterly_notebooks(DAILY_NOTEBOOKS_PATH)
+QUARTERLY_NOTEBOOKS_PATH = f'{SALES_ANALYTICS_NOTEBOOKS_PATH}/quarterly/'
+notebooks = get_sales_analytics_notebooks(frequency='quarterly')
 
 # Task 1
 start = DummyOperator(task_id="Start", dag=dag)
@@ -78,7 +63,7 @@ for notebook, task_name in notebooks.items():
     # Set the command for the container for loading the data
     container_cmd_load = f"""
         {clone_repo_cmd} &&
-        cd {DAILY_NOTEBOOKS_PATH} &&
+        cd {QUARTERLY_NOTEBOOKS_PATH} &&
         papermill {notebook} -p is_local_development True
         """
     task_identifier = f"{task_name}"
