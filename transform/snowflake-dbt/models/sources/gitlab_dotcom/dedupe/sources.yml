@@ -285,6 +285,8 @@ sources:
         identifier: gitlab_db_protected_branches
       - name: protected_branch_merge_access_levels
         identifier: gitlab_db_protected_branch_merge_access_levels
+      - name: protected_branch_push_access_levels
+        identifier: gitlab_db_protected_branch_push_access_levels
       - name: protected_environment_approval_rules
         identifier: gitlab_db_protected_environment_approval_rules
         freshness: null
