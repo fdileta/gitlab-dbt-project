@@ -338,7 +338,8 @@ class UsagePing(object):
 
     def backfill(self):
         """
-        Routine to backfilling data for namespace ping
+        Routine to back-filling
+        data for namespace ping
         """
         filter = lambda query_dict: query_dict.get("time_window_query", False)
         self.saas_namespace_ping(filter)

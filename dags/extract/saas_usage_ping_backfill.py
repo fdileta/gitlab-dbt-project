@@ -1,7 +1,15 @@
-import logging
+"""
+Unit to generate backfill data for namespace
+Need a parameter in json ie:
+Name: NAMESPACE_BACKFILL_VAR
+Content:
+{"start_date": "2022-10-01",
+ "end_date": "2022-10-25",
+ "metrics_backfill": ["metric_x_last_28_days", "metric_x_all_time"]}
+"""
+
 import os
 from datetime import date, datetime, timedelta
-
 
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
@@ -13,25 +21,23 @@ from airflow_utils import (
     gitlab_defaults,
     slack_failed_task,
     gitlab_pod_env_vars,
-    clone_and_setup_extraction_cmd,
-    partitions,
 )
 
 from kube_secrets import (
     SNOWFLAKE_ACCOUNT,
     SNOWFLAKE_LOAD_ROLE,
     SNOWFLAKE_LOAD_USER,
-    SNOWFLAKE_LOAD_WAREHOUSE,
     SNOWFLAKE_LOAD_PASSWORD,
     SNOWFLAKE_PASSWORD,
     SNOWFLAKE_USER,
 )
 
-# Load the env vars into a dict and set env vars
 env = os.environ.copy()
+
+DAG_NAME = "saas_usage_ping_backfill"
 GIT_BRANCH = env["GIT_BRANCH"]
 
-backfill_param = Variable.get("NAMESPACE_BACKFILL_VAR")
+backfill_param = Variable.get("NAMESPACE_BACKFILL_VAR", deserialize_json=True)
 
 secrets = [
     SNOWFLAKE_ACCOUNT,
@@ -48,11 +54,8 @@ default_args = {
     "on_failure_callback": slack_failed_task,
     "owner": "airflow",
     "retries": 0,
-    "start_date": datetime(2020, 6, 7),
-    "dagrun_timeout": timedelta(hours=48),
+    "start_date": datetime(2019, 1, 1, 0, 0, 0),
 }
-
-dag = DAG("saas_usage_ping_backfill", default_args=default_args, schedule_interval=None)
 
 
 def get_command():
@@ -63,26 +66,33 @@ def get_command():
     cmd = f"""
             {clone_repo_cmd} &&
             cd analytics/extract/saas_usage_ping/ &&
-            python3 usage_ping.py backfill --start_date=$START_DATE --end_date=$END_DATE
+            python3 usage_ping.py backfill --ping_date=$RUN_DATE
         """
     return cmd
 
 
-def get_task_name(start_date: date, end_date: date) -> str:
+def date_to_str(input_date: date):
+    """
+    Convert date to string to assign it to DAG name
+    """
+    return input_date.strftime("%Y%m%d")
+
+
+def get_task_name(start: date) -> str:
     """
     Generate task name
     """
+    start_monday = date_to_str(input_date=start)
+    return f"namespace-{start_monday}"
 
-    return f"saas-namespace-usage-ping-{start_date}{end_date}"
 
-
-def get_pod_env_var(start_date: date, end_date: date) -> dict:
+def get_pod_env_var(start: date, metrics: list) -> dict:
     """
     Get pod environment variables
     """
     pod_env_vars = {
-        "START_DATE": start_date,
-        "END_DATE": end_date,
+        "RUN_DATE": start,
+        "METRICS": metrics,
         "SNOWFLAKE_SYSADMIN_ROLE": "TRANSFORMER",
         "SNOWFLAKE_LOAD_WAREHOUSE": "USAGE_PING",
     }
@@ -92,22 +102,19 @@ def get_pod_env_var(start_date: date, end_date: date) -> dict:
     return pod_env_vars
 
 
-def generate_task(start_date: date, end_date: date) -> None:
+def get_date_range(start: datetime, end: datetime) -> list:
     """
-    Generate tasks for backfilling DAG start from Monday,
-    as the original pipeline run on Monday
+    Generate date range for loop to create tasks
     """
+    res = []
+    curr_date = start
 
-    KubernetesPodOperator(
-        **gitlab_defaults,
-        image=DATA_IMAGE,
-        task_id=get_task_name(start_date=start_date, end_date=end_date),
-        name=get_task_name(start_date=start_date, end_date=end_date),
-        secrets=secrets,
-        env_vars=get_pod_env_var(start_date=start_date, end_date=end_date),
-        arguments=[get_command()],
-        dag=dag,
-    )
+    while curr_date < end:
+        res.append(curr_date)
+
+        curr_date += timedelta(days=7)
+
+    return res
 
 
 def get_monday(day: datetime):
@@ -119,22 +126,50 @@ def get_monday(day: datetime):
     return res
 
 
-def get_date_range(start_date: datetime, end_date: datetime) -> list:
-    res = []
-    date = start_date
+def generate_task(run_date: date, metrics: list) -> None:
+    """
+    Generate tasks for back-filling DAG start from Monday,
+    as the original pipeline run on Monday
+    """
 
-    while date < end_date:
-        res.append((date, date + timedelta(days=7)))
+    return KubernetesPodOperator(
+        **gitlab_defaults,
+        image=DATA_IMAGE,
+        task_id=get_task_name(start=run_date),
+        name=get_task_name(start=run_date),
+        secrets=secrets,
+        env_vars=get_pod_env_var(start=run_date, metrics=metrics),
+        arguments=[get_command],
+        dag=dag,
+    )
 
-        date = date + timedelta(days=7)
+
+def get_date_from_param(param: str) -> str:
+    """
+    Return start_date for DAG
+    """
+    res = backfill_param.get(param)
 
     return res
 
 
-start_date = get_monday(backfill_param.get("start_date"))
-end_date = backfill_param.get("end_date")
+def get_date(param: str) -> datetime:
+    """
+    Get starting date (Monday in this case)
+    """
+    res = get_date_from_param(param=param)
 
-date_range = get_date_range(start_date=start_date, end_date=end_date)
+    return datetime.strptime(res, "%Y-%m-%d")
 
-for start, end in date_range:
-    get_task_name(start_date=start, end_date=end)
+
+start_date = get_date("start_date")
+start_date = get_monday(day=start_date)
+
+end_date = get_date("end_date")
+
+metrics_backfill = backfill_param.get("metrics_backfill")
+
+dag = DAG(DAG_NAME, default_args=default_args, schedule_interval=None)
+
+for run in get_date_range(start=start_date, end=end_date):
+    generate_task(run_date=run, metrics=metrics_backfill)
