@@ -26,7 +26,8 @@ WITH account_dims_mapping AS (
       name_of_active_sequence,
       sequence_task_due_date,
       sequence_status,
-      last_activity_date
+      last_activity_date,
+      zoominfo_contact_id
       
 
     FROM {{ref('prep_crm_person')}}
@@ -154,6 +155,7 @@ marketo_qualified_lead_date::timestamp
       crm_person.sfdc_record_id       AS sfdc_record_id,
       crm_person.bizible_person_id    AS bizible_person_id,
       crm_person.ga_client_id         AS ga_client_id,
+      crm_person.zoominfo_contact_id  AS zoominfo_contact_id,
 
      -- common dimension keys
       crm_person.dim_crm_user_id                                                                               AS dim_crm_user_id,
@@ -304,5 +306,5 @@ marketo_qualified_lead_date::timestamp
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-12-01",
-    updated_date="2022-10-05"
+    updated_date="2022-10-18"
 ) }}
