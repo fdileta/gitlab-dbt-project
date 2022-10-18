@@ -662,7 +662,7 @@ models:
 snapshots:
   +post-hook:
     - "{{ mask_model() }}"
-    - "alter table {{ this }} set DATA_RETENTION_TIME_IN_DAYS= 30"
+    - "alter table {{ this }} set DATA_RETENTION_TIME_IN_DAYS = 30"
   +query_tag: dbt
   gitlab_snowflake:
     target_database: "{{ env_var('SNOWFLAKE_SNAPSHOT_DATABASE') }}" #RAW in production
