@@ -5,6 +5,8 @@ from datetime import date, datetime, timedelta
 
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
+from airflow.models import Variable
+
 from airflow_utils import (
     DATA_IMAGE,
     clone_repo_cmd,
@@ -14,6 +16,7 @@ from airflow_utils import (
     clone_and_setup_extraction_cmd,
     partitions,
 )
+
 from kube_secrets import (
     SNOWFLAKE_ACCOUNT,
     SNOWFLAKE_LOAD_ROLE,
@@ -28,6 +31,8 @@ from kube_secrets import (
 env = os.environ.copy()
 GIT_BRANCH = env["GIT_BRANCH"]
 
+backfill_param = Variable.get("NAMESPACE_BACKFILL_VAR")
+
 secrets = [
     SNOWFLAKE_ACCOUNT,
     SNOWFLAKE_LOAD_ROLE,
@@ -37,7 +42,6 @@ secrets = [
     SNOWFLAKE_USER,
 ]
 
-# Default arguments for the DAG
 default_args = {
     "catchup": False,
     "depends_on_past": False,
@@ -45,50 +49,92 @@ default_args = {
     "owner": "airflow",
     "retries": 0,
     "start_date": datetime(2020, 6, 7),
-    "dagrun_timeout": timedelta(hours=8),
+    "dagrun_timeout": timedelta(hours=48),
 }
 
-# Create the DAG
-#  Sunday at 0900 UTC
 dag = DAG("saas_usage_ping_backfill", default_args=default_args, schedule_interval=None)
 
 
-def generate_task(vars_dict):
+def get_command():
+    """
+    Namespace, Group, Project, User Level Usage Ping
+    Generate execution command to call Python code
+    """
+    cmd = f"""
+            {clone_repo_cmd} &&
+            cd analytics/extract/saas_usage_ping/ &&
+            python3 usage_ping.py backfill --start_date=$START_DATE --end_date=$END_DATE
+        """
+    return cmd
 
-    run_date = date(year=int(vars_dict["year"]), month=int(vars_dict["month"]), day=1)
 
-    run_date_formatted = run_date.isoformat()
+def get_task_name(start_date: date, end_date: date) -> str:
+    """
+    Generate task name
+    """
 
+    return f"saas-namespace-usage-ping-{start_date}{end_date}"
+
+
+def get_pod_env_var(start_date: date, end_date: date) -> dict:
+    """
+    Get pod environment variables
+    """
     pod_env_vars = {
-        "RUN_DATE": run_date_formatted,
+        "START_DATE": start_date,
+        "END_DATE": end_date,
         "SNOWFLAKE_SYSADMIN_ROLE": "TRANSFORMER",
         "SNOWFLAKE_LOAD_WAREHOUSE": "USAGE_PING",
     }
 
     pod_env_vars = {**gitlab_pod_env_vars, **pod_env_vars}
 
-    # Namespace, Group, Project, User Level Usage Ping
-    namespace_cmd = f"""
-        {clone_repo_cmd} &&
-        cd analytics/extract/saas_usage_ping/ &&
-        python3 usage_ping.py backfill --ping_date=$RUN_DATE
+    return pod_env_vars
+
+
+def generate_task(start_date: date, end_date: date) -> None:
+    """
+    Generate tasks for backfilling DAG start from Monday,
+    as the original pipeline run on Monday
     """
 
     KubernetesPodOperator(
         **gitlab_defaults,
         image=DATA_IMAGE,
-        task_id=f"saas-namespace-usage-ping-{vars_dict['year']}-{vars_dict['month']}",
-        name=f"saas-namespace-usage-ping-{vars_dict['year']}-{vars_dict['month']}",
+        task_id=get_task_name(start_date=start_date, end_date=end_date),
+        name=get_task_name(start_date=start_date, end_date=end_date),
         secrets=secrets,
-        env_vars=pod_env_vars,
-        arguments=[namespace_cmd],
+        env_vars=get_pod_env_var(start_date=start_date, end_date=end_date),
+        arguments=[get_command()],
         dag=dag,
     )
 
 
-for month in partitions(
-    date.today() - timedelta(days=365),
-    date.today().replace(day=1) - timedelta(days=1),
-    "month",
-):
-    generate_task(month)
+def get_monday(day: datetime):
+    """
+    Get Monday from the input day
+    """
+    res = day - timedelta(days=day.weekday())
+
+    return res
+
+
+def get_date_range(start_date: datetime, end_date: datetime) -> list:
+    res = []
+    date = start_date
+
+    while date < end_date:
+        res.append((date, date + timedelta(days=7)))
+
+        date = date + timedelta(days=7)
+
+    return res
+
+
+start_date = get_monday(backfill_param.get("start_date"))
+end_date = backfill_param.get("end_date")
+
+date_range = get_date_range(start_date=start_date, end_date=end_date)
+
+for start, end in date_range:
+    get_task_name(start_date=start, end_date=end)
