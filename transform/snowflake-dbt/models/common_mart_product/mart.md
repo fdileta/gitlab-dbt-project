@@ -31,12 +31,36 @@ Only activity since 2020-01-01 is being processed due to the high volume of the 
 
 {% enddocs %}
 
-{% docs mart_ping_instance_metric_gainsight_wave %}
+{% docs mart_ping_instance_metric_gainsight_wave_self_managed %}
 
+**Description:** Joins together facts and dimensions related to Self-Managed Service Pings, and does a simple aggregation to pivot out and standardize metric values. The data from this table will be used for customer product insights. Most notably, this data is pumped into Gainsight and aggregated into customer health scores for use by TAMs.
+
+**Data Grain:**
+- Service Ping
+- Metric
+
+**Filters:**
+- Only includes Service Ping metrics that have been added via the "wave" process.
+- Only includes pings that have a license associated with them.
 
 {% enddocs %}
 
-{% docs mart_saas_usage_ping_subscription_mapped_gainsight_metrics %}
+{% docs mart_ping_namespace_metric_gainsight_wave_saas %}
 
+**Description:** Joins together facts and dimensions related to SaaS Namespace Service Pings, and does a simple aggregation to pivot out and standardize metric values. The data from this table will be used for customer product insights. Most notably, this data is pumped into Gainsight and aggregated into customer health scores for use by TAMs.
+
+**Data Grain:**
+- Namespace
+- Subscription
+- Month
+
+**Filters:**
+- Only includes Service Ping metrics that have been added via the "wave" process.
+- Only includes pings that have a license associated with them.
+
+**Business Logic in this Model:**
+- Resolves a one-to-many relationship between namespaces and instance types by prioritizing production instances above other instance types
+- Limits down to last ping of the month for each namespace-subscription
+- Currently, bridges uses the order to bridge from subscription to namespace. In the future, we will use Zuora subscription tables to get the namespace directly from the subscription.
 
 {% enddocs %}

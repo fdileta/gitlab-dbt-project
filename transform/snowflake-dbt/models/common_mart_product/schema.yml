@@ -561,8 +561,8 @@ models:
       - name: is_latest_data
         description: Flags the row with the most recently received data from Usage Ping
 
-  - name: mart_ping_instance_metric_gainsight_wave
-    description: '{{ doc("mart_ping_instance_metric_gainsight_wave") }}'
+  - name: mart_ping_instance_metric_gainsight_wave_self_managed
+    description: '{{ doc("mart_ping_instance_metric_gainsight_wave_self_managed") }}'
 
-  - name: mart_saas_usage_ping_subscription_mapped_gainsight_metrics
-    description: '{{ doc("mart_saas_usage_ping_subscription_mapped_gainsight_metrics") }}'
+  - name: mart_ping_namespace_metric_gainsight_wave_saas
+    description: '{{ doc("mart_ping_namespace_metric_gainsight_wave_saas") }}'

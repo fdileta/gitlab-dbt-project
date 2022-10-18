@@ -9,7 +9,7 @@
 }}
 
 {{ simple_cte([
-    ('saas_usage_ping', 'mart_saas_usage_ping_subscription_mapped_gainsight_metrics'),
+    ('saas_usage_ping', 'mart_ping_namespace_metric_gainsight_wave_saas'),
     ('bdg_subscription_product_rate_plan', 'bdg_subscription_product_rate_plan'),
     ('gitlab_subscriptions', 'gitlab_dotcom_gitlab_subscriptions_snapshots_namespace_id_base'),
     ('dates', 'dim_date'),

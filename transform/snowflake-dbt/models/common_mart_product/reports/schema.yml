@@ -239,8 +239,8 @@ models:
     - name: ping_created_date_month
       description: The month when the ping was created (YYYY-MM-01)
         
-  - name: rpt_saas_gainsight_metrics_monthly_paid
-    description: '{{ doc("rpt_saas_gainsight_metrics_monthly_paid") }}'
+  - name: rpt_gainsight_metrics_monthly_paid_saas
+    description: '{{ doc("rpt_gainsight_metrics_monthly_paid_saas") }}'
     columns:
       - name: dim_subscription_id
         tests:
@@ -627,8 +627,8 @@ models:
       - name: is_latest_data
         description: Flags the row with the most recently received data from Usage Ping
 
-  - name: rpt_sm_gainsight_metrics_monthly_paid
-    description: '{{ doc("rpt_sm_gainsight_metrics_monthly_paid") }}'
+  - name: rpt_gainsight_metrics_monthly_paid_self_managed
+    description: '{{ doc("rpt_gainsight_metrics_monthly_paid_self_managed") }}'
     columns:
       - name: dim_subscription_id
         tests:

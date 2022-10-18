@@ -25,5 +25,22 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 
 {% docs pump_gainsight_metrics_monthly_paid %}
 
+**Description:** This table unions together a select set of Service Ping metrics for both Self-Managed and SaaS **paid users**. The data from this table will be used for customer product insights. Most notably, this data is pumped into Gainsight and aggregated into customer health scores for use by TAMs.
+
+**Data Grain:**
+- Subscription (`dim_subscription_id_original`)
+- Month (`snapshot_month`)
+- Delivery Type (`delivery_type`)
+- Installation/Namespace (For Self-Managed, `uuid`-`hostname`; for SaaS, `namespace_id`)
+
+**Filters:**
+Inherits filters from parent models, but most notably:
+  - Only includes paid customers.
+  - Only includes Service Ping metrics that have been added via the "wave" process.
+  - Only includes subscriptions that have a usage ping payload associated with them.
+
+**Other Comments:**
+- For Self-Managed customers, this data orgininates in [Service Ping](https://docs.gitlab.com/ee/development/service_ping/), which sends a weekly payload of customer product usage metrics to GitLab. For SaaS customers, we mimic the Service Ping queries using the [SaaS Service Ping process](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/). Specifically, the namespace-level Service Ping queries can be found [here](https://gitlab.com/gitlab-data/analytics/-/blob/master/extract/saas_usage_ping/usage_ping_namespace_queries.json).
+- For SaaS customers, not all metrics can be calculated via the namespace-level Service Ping. For metrics that originate from `redis_hll`, Snowplow counters are used to track event-level data. Then, the data team aggregates those counters in Snowflake to mimic the Service Ping calcuation.
 
 {% enddocs %}
