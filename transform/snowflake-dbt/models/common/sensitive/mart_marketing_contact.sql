@@ -392,7 +392,7 @@
       CASE 
         WHEN MAX(CASE 
                   WHEN marketing_contact_order.is_individual_namespace = 1 
-                    THEN marketing_contact_order.is_saas_trial 
+                    THEN marketing_contact_order.is_saas_trial AND marketing_contact_order.trial_end_date >= CURRENT_DATE
                   ELSE NULL 
                 END) >= 1 THEN TRUE 
         ELSE FALSE 
@@ -433,7 +433,7 @@
         WHEN MAX(CASE 
                   WHEN marketing_contact_order.is_group_namespace = 1
                     AND marketing_contact_order.marketing_contact_role = 'Group Namespace Member'
-                    THEN marketing_contact_order.is_saas_trial 
+                    THEN marketing_contact_order.is_saas_trial AND marketing_contact_order.trial_end_date >= CURRENT_DATE
                   ELSE NULL 
                 END) >= 1 THEN TRUE 
         ELSE FALSE 
@@ -480,7 +480,7 @@
                     AND marketing_contact_order.marketing_contact_role IN (
                                                                           'Group Namespace Owner'
                                                                          ) 
-                    THEN marketing_contact_order.is_saas_trial 
+                    THEN marketing_contact_order.is_saas_trial AND marketing_contact_order.trial_end_date >= CURRENT_DATE
                   ELSE NULL 
                 END) >= 1 THEN TRUE 
         ELSE FALSE 
@@ -536,7 +536,7 @@
                                                                           'Customer DB Owner'
                                                                           , 'Zuora Billing Contact'
                                                                          ) 
-                    THEN marketing_contact_order.is_saas_trial 
+                    THEN marketing_contact_order.is_saas_trial AND marketing_contact_order.trial_end_date >= CURRENT_DATE
                   ELSE NULL 
                 END) >= 1 THEN TRUE 
         ELSE FALSE 
@@ -957,5 +957,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-09",
-    updated_date="2022-09-29"
+    updated_date="2022-10-17"
 ) }}
