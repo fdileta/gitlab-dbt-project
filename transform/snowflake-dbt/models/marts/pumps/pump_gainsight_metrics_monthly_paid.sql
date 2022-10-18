@@ -6,8 +6,8 @@
 }}
 
 {{ simple_cte([
-    ('monthly_saas_metrics','mart_saas_gainsight_metrics_monthly_paid'),
-    ('monthly_sm_metrics','mart_sm_gainsight_metrics_monthly_paid'),
+    ('monthly_saas_metrics','rpt_gainsight_metrics_monthly_paid_saas'),
+    ('monthly_sm_metrics','rpt_gainsight_metrics_monthly_paid_self_managed'),
     ('billing_accounts','dim_billing_account'),
     ('location_country', 'dim_location_country'),
     ('subscriptions', 'dim_subscription'),
