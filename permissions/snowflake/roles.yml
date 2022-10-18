@@ -1076,6 +1076,10 @@ roles:
     - sales_analytics:
         warehouses:
             - dev_xs
+            - loading
+        member_of:
+            - analyst_sales
+            - restricted_safe
         owns:
             schemas:
                 - raw.sales_analytics
