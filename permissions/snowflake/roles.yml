@@ -164,9 +164,9 @@ databases:
     - nfiguera_prep:
         shared: no
 
-    - ngalang_prod:
+    - nhervas_prod:
         shared: no
-    - ngalang_prep:
+    - nhervas_prep:
         shared: no
 
     - nraisinghani_prod:
@@ -1072,6 +1072,30 @@ roles:
                     - prod.*.*
                     - raw.snapshots.*
                     - raw.gcp_billing.*
+
+    - sales_analytics:
+        warehouses:
+            - dev_xs
+        owns:
+            schemas:
+                - raw.sales_analytics
+        privileges:
+            databases:
+                read:
+                    - raw
+                write:
+                    - raw
+            schemas:
+                read:
+                    - raw.sales_analytics
+                write:
+                    - raw.sales_analytics
+            tables:
+                read:
+                    - raw.sales_analytics.*
+                write:
+                    - raw.sales_analytics.*
+
 
 
 # ==========================================
@@ -3006,6 +3030,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - sales_analytics
         warehouses:
             - dev_xs
         owns:
@@ -3811,6 +3836,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - sales_analytics
         warehouses:
             - dev_xs
         owns:
@@ -3846,7 +3872,7 @@ roles:
                     - nfiguera_prep.*.*
                     - nfiguera_prod.*.*
 
-    - ngalang:
+    - nhervas:
         member_of:
             - analyst_growth
             - restricted_safe
@@ -3855,36 +3881,36 @@ roles:
             - dev_xs
         owns:
             databases:
-                - ngalang_prep
-                - ngalang_prod
+                - nhervas_prep
+                - nhervas_prod
             schemas:
-                - ngalang_prep.*
-                - ngalang_prod.*
+                - nhervas_prep.*
+                - nhervas_prod.*
             tables:
-                - ngalang_prep.*.*
-                - ngalang_prod.*.*
+                - nhervas_prep.*.*
+                - nhervas_prod.*.*
         privileges:
             databases:
                 read:
-                    - ngalang_prep
-                    - ngalang_prod
+                    - nhervas_prep
+                    - nhervas_prod
                 write:
-                    - ngalang_prep
-                    - ngalang_prod
+                    - nhervas_prep
+                    - nhervas_prod
             schemas:
                 read:
-                    - ngalang_prep.*
-                    - ngalang_prod.*
+                    - nhervas_prep.*
+                    - nhervas_prod.*
                 write:
-                    - ngalang_prep.*
-                    - ngalang_prod.*
+                    - nhervas_prep.*
+                    - nhervas_prod.*
             tables:
                 read:
-                    - ngalang_prep.*.*
-                    - ngalang_prod.*.*
+                    - nhervas_prep.*.*
+                    - nhervas_prod.*.*
                 write:
-                    - ngalang_prep.*.*
-                    - ngalang_prod.*.*
+                    - nhervas_prep.*.*
+                    - nhervas_prod.*.*
 
     - nkhanna:
         member_of:
@@ -4478,6 +4504,13 @@ roles:
                     - tnguyen_prep.*.*
                     - tnguyen_prod.*.*
 
+    - tscott:
+        member_of:
+            - data_team_analyst
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - vagrawal:
         member_of:
             - adaptive
@@ -4867,10 +4900,10 @@ users:
         member_of:
             - nfiguera
 
-    - ngalang:
+    - nhervas:
         can_login: yes
         member_of:
-            - ngalang
+            - nhervas
 
     - nkhanna:
         can_login: yes
@@ -4939,7 +4972,7 @@ users:
             - accountadmin
 
     - rrendon:
-        can_login: yes 
+        can_login: yes
         member_of:
             - rrendon
 
@@ -5008,6 +5041,11 @@ users:
         can_login: yes
         member_of:
             - tnguyen
+
+    - tscott:
+        can_login: yes 
+        member_of:
+            - tscott
 
     - vagrawal:
         can_login: yes

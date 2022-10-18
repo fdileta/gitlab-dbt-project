@@ -759,6 +759,20 @@ tables:
       FROM issues
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
+  jira_connect_subscriptions:
+    export_schema: "gitlab_com"
+    export_table: jira_connect_subscriptions
+    export_table_primary_key: id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT id
+      , jira_connect_installation_id
+      , namespace_id
+      , created_at
+      , updated_at
+      FROM jira_connect_subscriptions
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
   jira_imports:
     export_schema: "gitlab_com"
     export_table: jira_imports
@@ -1458,6 +1472,41 @@ tables:
       , updated_at
       , code_owner_approval_required
       FROM protected_branches
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
+  protected_branch_merge_access_levels:
+    dbt_source_model: true
+    export_schema: 'gitlab_com'
+    export_table: 'protected_branch_merge_access_levels'
+    export_table_primary_key: id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT id
+      , protected_branch_id
+      , access_level
+      , created_at
+      , updated_at
+      , user_id
+      , group_id 
+      FROM protected_branch_merge_access_levels
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
+  protected_branch_push_access_levels:
+    dbt_source_model: true
+    export_schema: 'gitlab_com'
+    export_table: 'protected_branch_push_access_levels'
+    export_table_primary_key: id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT id
+      , protected_branch_id
+      , access_level
+      , created_at
+      , updated_at
+      , user_id
+      , group_id
+      , deploy_key_id 
+      FROM protected_branch_push_access_levels
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
   protected_environment_approval_rules:

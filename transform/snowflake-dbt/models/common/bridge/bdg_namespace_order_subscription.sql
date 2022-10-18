@@ -122,11 +122,14 @@
       IFF(IFNULL(orders.order_end_date, CURRENT_DATE) >= CURRENT_DATE,
           TRUE, FALSE)                                                  AS is_order_active
     FROM orders
-    INNER JOIN product_rate_plans
+    LEFT JOIN product_rate_plans
       ON orders.product_rate_plan_id = product_rate_plans.product_rate_plan_id
     LEFT JOIN trial_tiers
       ON orders.order_is_trial = TRUE
-    WHERE orders.order_start_date IS NOT NULL 
+    WHERE orders.order_start_date IS NOT NULL
+      AND (product_rate_plans.product_rate_plan_id IS NOT NULL
+          OR orders.product_rate_plan_id IN ('premium-saas-trial-plan-id', 'ultimate-saas-trial-plan-id', 'free-plan-id')
+          )
 
 ), final AS (
 
@@ -218,7 +221,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@ischweickartDD",
-    updated_by="@iweeks",
+    updated_by="@jpeguero",
     created_date="2021-01-14",
-    updated_date="2022-04-04"
+    updated_date="2022-10-17"
 ) }}

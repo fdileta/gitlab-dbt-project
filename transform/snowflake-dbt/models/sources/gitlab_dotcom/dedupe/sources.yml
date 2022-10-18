@@ -283,6 +283,10 @@ sources:
         freshness: null #https://gitlab.com/gitlab-data/analytics/-/issues/10835
       - name: protected_branches
         identifier: gitlab_db_protected_branches
+      - name: protected_branch_merge_access_levels
+        identifier: gitlab_db_protected_branch_merge_access_levels
+      - name: protected_branch_push_access_levels
+        identifier: gitlab_db_protected_branch_push_access_levels
       - name: protected_environment_approval_rules
         identifier: gitlab_db_protected_environment_approval_rules
         freshness: null
@@ -408,6 +412,8 @@ sources:
         identifier: gitlab_db_group_import_states
       - name: integrations
         identifier: gitlab_db_integrations
+      - name: jira_connect_subscriptions
+        identifier: gitlab_db_jira_connect_subscriptions
       - name: jira_imports
         identifier: gitlab_db_jira_imports
         freshness:

@@ -71,4 +71,5 @@ sheets:
   - name: namespace_segmentation
     owner: '@kmagda'
     tabs:
-      - namespace_segmentation_202202  
+      - namespace_segmentation_202202
+      - namespace_segmentation_202208

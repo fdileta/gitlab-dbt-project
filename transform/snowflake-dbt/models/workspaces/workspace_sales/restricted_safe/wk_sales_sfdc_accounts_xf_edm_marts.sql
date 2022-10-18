@@ -184,3 +184,5 @@ LEFT JOIN parent_account
     ON mart.dim_parent_crm_account_id = parent_account.dim_crm_account_id
 LEFT JOIN sfdc_record_type
     ON mart.record_type_id = sfdc_record_type.record_type_id
+
+WHERE mart.is_deleted = FALSE

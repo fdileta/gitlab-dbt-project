@@ -1,5 +1,11 @@
 import logging
 import os
+import csv
+
+from typing import Dict
+
+from dateutil import rrule
+from datetime import datetime, timedelta
 
 from gitlabdata.orchestration_utils import (
     query_dataframe,
@@ -7,11 +13,6 @@ from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
     bizible_snowflake_engine_factory,
 )
-from typing import Dict
-
-from dateutil import rrule
-from datetime import datetime, timedelta
-
 
 class BizibleSnowFlakeExtractor:
     def __init__(self, config_dict: Dict):
@@ -58,6 +59,27 @@ class BizibleSnowFlakeExtractor:
 
         return {table_name: {}}
 
+    def write_query_to_csv(self, engine, file_name, query):
+        """
+            Small function using the built-in CSV class rather than pandas.
+        :param engine:
+        :param file_name:
+        :param query:
+        :return:
+        """
+        connection = engine.connect()
+        results = connection.execute(query)
+        columns = results.keys()
+        fetched_rows = results.fetchall()
+        f = open(file_name, "w")
+        out = csv.writer(f, delimiter="|")
+        out.writerow([r for r in columns])
+
+        for r in fetched_rows:
+            out.writerow([c for c in r])
+
+        connection.close()
+
     def upload_query(self, table_name: str, file_name: str, query: str) -> None:
         """
 
@@ -69,10 +91,7 @@ class BizibleSnowFlakeExtractor:
         :type query:
         """
         logging.info(f"Running {query}")
-        df = query_dataframe(self.bizible_engine, query)
-
-        logging.info(f"Creating {file_name}")
-        df.to_csv(file_name, index=False, sep="|")
+        self.write_query_to_csv(self.bizible_engine, file_name, query)
 
         logging.info(f"Processing {file_name} to {table_name}")
         snowflake_stage_load_copy_remove(

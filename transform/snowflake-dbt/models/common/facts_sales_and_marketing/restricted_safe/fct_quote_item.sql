@@ -53,7 +53,7 @@ WITH crm_account AS (
                                    'COALESCE(rate_plan_charge.zqu_product_rate_plan_charge_zuora_id, MD5(-1))']
                                 ) }}                                                                AS quote_item_id,
       quote_amendment.zqu_quote_amendment_id                                                        AS quote_amendment_id,
-      quote.quote_id                                                                                AS dim_quote_id,
+      quote.zqu_quote_id                                                                            AS dim_quote_id,
       quote.owner_id                                                                                AS dim_crm_user_id,
 
       --relational keys
