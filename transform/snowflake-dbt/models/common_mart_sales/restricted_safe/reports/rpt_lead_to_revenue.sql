@@ -4,7 +4,7 @@
     ('dim_crm_person','dim_crm_person'),
     ('mart_crm_opportunity_stamped_hierarchy_hist','mart_crm_opportunity_stamped_hierarchy_hist'),
     ('rpt_sfdc_bizible_tp_opp_linear_blended','rpt_sfdc_bizible_tp_opp_linear_blended'),
-    ('dim_crm_account','dim_crm_account')
+    ('dim_crm_account','dim_crm_account'),
 	('map_custom_lead_demographics','map_custom_lead_demographics')
 ]) }}
 
