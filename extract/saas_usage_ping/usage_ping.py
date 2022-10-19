@@ -422,7 +422,7 @@ class UsagePing(object):
         for key in sql_metrics:
             if key in redis_metrics:
                 if isinstance(redis_metrics[key], dict) and isinstance(sql_metrics[key], dict):
-                    self.merge(redis_metrics[key], sql_metrics[key], path + [str(key)])
+                    self.merge_dicts(redis_metrics[key], sql_metrics[key], path + [str(key)])
                 elif redis_metrics[key] == sql_metrics[key]:
                     pass  # same leaf value
                 else:
