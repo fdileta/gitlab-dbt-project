@@ -23,12 +23,14 @@ WITH mapping as (
           OVER  (PARTITION BY employee_id ORDER BY effective_date, job_sequence) AS last_division       
     FROM {{ ref ('blended_job_info_source') }}
 
-), cost_center AS (
+), country_cost_center AS (
 
     SELECT
       employee_id,
       LAST_VALUE(cost_center) RESPECT NULLS
-          OVER ( PARTITION BY employee_id ORDER BY effective_date) AS last_cost_center  
+          OVER ( PARTITION BY employee_id ORDER BY effective_date) AS last_cost_center,
+      LAST_VALUE(country) RESPECT NULLS
+          OVER ( PARTITION BY employee_id ORDER BY effective_date) AS last_country
     FROM {{ ref ('bamboohr_job_role') }}
 
 ), location_factor as (
@@ -65,6 +67,7 @@ WITH mapping as (
       mapping.last_name,
       mapping.first_name || ' ' || mapping.last_name                            AS full_name,
       mapping.region_modified                                                   AS region_modified,
+      country_cost_center.last_country                                          AS country,
       bamboohr_directory.work_email                                             AS last_work_email,
       IFF(rehire.is_rehire = 'True', initial_hire.hire_date, mapping.hire_date) AS hire_date,
       rehire.rehire_date,
@@ -74,7 +77,7 @@ WITH mapping as (
       department_info.last_supervisor,
       department_info.last_department,
       department_info.last_division,
-      cost_center.last_cost_center,
+      country_cost_center.last_cost_center,
       location_factor.hire_location_factor,
       mapping.greenhouse_candidate_id
     FROM mapping
@@ -88,8 +91,8 @@ WITH mapping as (
       ON initial_hire.employee_id = mapping.employee_id
     LEFT JOIN rehire
       ON rehire.employee_id = mapping.employee_id
-    LEFT JOIN cost_center
-      ON cost_center.employee_id = mapping.employee_id  
+    LEFT JOIN country_cost_center
+      ON country_cost_center.employee_id = mapping.employee_id  
 
 )
 
