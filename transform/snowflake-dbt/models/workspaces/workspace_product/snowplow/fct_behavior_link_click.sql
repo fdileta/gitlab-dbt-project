@@ -1,7 +1,10 @@
 {{ config(
+    
         materialized = "incremental",
         unique_key = "fct_behavior_unstructured_sk",
-        full_refresh = false
+        full_refresh = true if flags.FULL_REFRESH and var('full_refresh_force', false) else false,
+        on_schema_change = 'sync_all_columns'
+
 ) }}
 
 {{ simple_cte([
