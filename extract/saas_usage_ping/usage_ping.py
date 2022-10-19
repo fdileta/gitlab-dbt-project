@@ -191,7 +191,7 @@ class UsagePing(object):
 
             if isinstance(metric_value, dict):
                 return_dict = self.keep_valid_metric_definitions(
-                    metric_value, payload_source, concat_metric_name
+                    metric_value, payload_source, metric_definitions, concat_metric_name
                 )
                 if return_dict:
                     valid_metric_dict[metric_name] = return_dict
