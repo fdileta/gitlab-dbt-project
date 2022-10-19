@@ -347,6 +347,7 @@ class UsagePing(object):
         payload_source = 'redis'
         redis_metrics = self.keep_valid_metric_definitions(redis_metrics, payload_source, metric_definitions)
 
+        '''
         redis_data_to_upload = pd.DataFrame(
             columns=["jsontext", "ping_date", "run_id"] + self.dataframe_api_columns
         )
@@ -363,6 +364,7 @@ class UsagePing(object):
             "instance_redis_metrics",
             "saas_usage_ping",
         )
+        '''
         return redis_metrics
 
     def upload_combined_metrics(self, combined_metrics, saas_queries):
@@ -413,16 +415,31 @@ class UsagePing(object):
         dups = list(set(sql_flattened.keys() & redis_flattened.keys()))
         return dups
 
+    def merge_dicts(self, redis_metrics, sql_metrics, path=None):
+        "merges sql_metrics into redis_metrics, https://stackoverflow.com/a/7205107"
+        if path is None:
+            path = []
+        for key in sql_metrics:
+            if key in redis_metrics:
+                if isinstance(redis_metrics[key], dict) and isinstance(sql_metrics[key], dict):
+                    self.merge(redis_metrics[key], sql_metrics[key], path + [str(key)])
+                elif redis_metrics[key] == sql_metrics[key]:
+                    pass  # same leaf value
+                else:
+                    redis_metrics[key] = sql_metrics[key]
+                    # raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+            else:
+                redis_metrics[key] = sql_metrics[key]
+        return redis_metrics
+
     def saas_instance_combined_metrics(self):
         metric_definitions = self.get_metrics_definitions()
         saas_queries = self._get_instance_queries()
 
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(metric_definitions, saas_queries)
-        self.upload_combined_metrics(sql_metrics, saas_queries)
         redis_metrics = self.saas_instance_redis_metrics(metric_definitions)
 
-        # do not switch order: if duplicate key, sql_metrics k:v will take priority
-        combined_metrics = {**redis_metrics, **sql_metrics}
+        combined_metrics = self.merge_dicts(redis_metrics, sql_metrics)
 
         self.upload_combined_metrics(combined_metrics, saas_queries)
         if sql_metric_errors:
@@ -432,7 +449,7 @@ class UsagePing(object):
         # self.check_missing_definitions()
         # TODO need to implement
         # self.check_dups_in_combined_metrics(sql_metrics, redis_metrics)
-        return combined_metrics
+        # return combined_metrics
 
     def _get_namespace_queries(self) -> List[Dict]:
         """
