@@ -696,7 +696,8 @@
 
 ), final_prep AS (
 
-    SELECT DISTINCT fo_inquiry_with_tp.*,
+    SELECT 
+	fo_inquiry_with_tp.*,
     COALESCE(employee_count_segment_custom,employee_bucket_segment_custom) AS inferred_employee_segment,
     UPPER(geo_custom) AS inferred_geo
     FROM fo_inquiry_with_tp
@@ -714,5 +715,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-07-20",
-    updated_date="2022-10-18",
+    updated_date="2022-10-19",
   ) }}
