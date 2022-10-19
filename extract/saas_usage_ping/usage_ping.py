@@ -1,6 +1,8 @@
 from os import environ as env
 from typing import Dict, List, Any
 from hashlib import md5
+from flatten_dict import flatten
+from flatten_dict.reducer import make_reducer
 
 from logging import info
 import datetime
@@ -406,6 +408,12 @@ class UsagePing(object):
             "saas_usage_ping",
         )
         self.loader_engine.dispose()
+
+    def check_dups_in_combined_metrics(sql_metrics, redis_metrics):
+        sql_flattened = flatten(sql_metrics, reducer=make_reducer(delimiter="."))
+        redis_flattened = flatten(redis_metrics, reducer=make_reducer(delimiter="."))
+        dups = list(set(sql_flattened.keys() & redis_flattened.keys()))
+        return dups
 
     def saas_instance_combined_metrics(self):
         metric_definitions = self.get_metrics_definitions()
