@@ -28,10 +28,34 @@ models:
   - name: fct_behavior_website_page_view
     description: TBD
     columns:
-      - name: behavior_website_page_view_pk
+      - name: behavior_website_page_view_sk
         tests:
           - not_null
           - unique
 
   - name: prep_snowplow_structured_event_all_source
     description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of strutured events if the model is not run incrementally.
+
+  - name: fct_behavior_link_click
+    description: Fact table containing details of links clicked.
+    columns: 
+      - name: fct_behavior_unstructured_sk
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_behavior_event
+    description: Dimensional model containing distinct events types from Snowplow.
+    columns:
+      - name: dim_behavior_event_sk
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_behavior_unstructured_event
+    description: atomic fact table for unstructured events
+    columns:
+      - name: fct_behavior_unstructured_sk
+        tests:
+          - not_null
+          - unique
