@@ -1,5 +1,8 @@
+"""
+Automated Service Ping main unit
+"""
 from os import environ as env
-from typing import Dict, List
+from typing import Dict
 from hashlib import md5
 
 from logging import info
@@ -11,6 +14,14 @@ import sys
 import requests
 import pandas as pd
 
+from fire import Fire
+
+from gitlabdata.orchestration_utils import (
+    dataframe_uploader,
+    snowflake_engine_factory,
+)
+
+from sqlalchemy.exc import SQLAlchemyError
 
 from transform_postgres_to_snowflake import (
     META_API_COLUMNS,
@@ -18,15 +29,11 @@ from transform_postgres_to_snowflake import (
     META_DATA_INSTANCE_QUERIES_FILE,
     METRICS_EXCEPTION,
 )
-from fire import Fire
-from gitlabdata.orchestration_utils import (
-    dataframe_uploader,
-    snowflake_engine_factory,
-)
-from sqlalchemy.exc import SQLAlchemyError
+
+ENCODING = "utf8"
 
 
-class UsagePing(object):
+class UsagePing:
     """
     Usage ping class represent as an umbrella
     to sort out service ping data import
@@ -50,9 +57,10 @@ class UsagePing(object):
         to generate the {ping_name: sql_query} dictionary
         """
         with open(
-            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE)
-        ) as f:
-            saas_queries = json.load(f)
+            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE),
+            encoding=ENCODING,
+        ) as file:
+            saas_queries = json.load(file)
 
         # exclude metrics we do not want to track
         saas_queries = {
@@ -100,12 +108,14 @@ class UsagePing(object):
 
     def _get_meta_data(self, file_name: str) -> dict:
         """
-        Load meta data from .json file from the file system
+        Load metadata from .json file from the file system
         param file_name: str
         return: dict
         """
-        with open(os.path.join(os.path.dirname(__file__), file_name)) as f:
-            meta_data = json.load(f)
+        with open(
+            os.path.join(os.path.dirname(__file__), file_name), encoding=ENCODING
+        ) as file:
+            meta_data = json.load(file)
 
         return meta_data
 
@@ -147,8 +157,8 @@ class UsagePing(object):
                     data_to_write = int(query_output.loc[0, "counter_value"])
                 except (KeyError, ValueError):
                     data_to_write = 0
-                except SQLAlchemyError as e:
-                    error_data_to_write = str(e.__dict__["orig"])
+                except SQLAlchemyError as err:
+                    error_data_to_write = str(err.__dict__["orig"])
 
                 if data_to_write is not None:
                     results[key] = data_to_write
@@ -197,9 +207,8 @@ class UsagePing(object):
             "saas_usage_ping",
         )
 
-        """
-        Handling error data part to load data into table: raw.saas_usage_ping.instance_sql_errors
-        """
+        # Handling error data part to load data into table:
+        # raw.saas_usage_ping.instance_sql_errors
         if errors:
             error_data_to_upload = pd.DataFrame(
                 columns=["run_id", "sql_errors", "ping_date"]
@@ -252,26 +261,11 @@ class UsagePing(object):
             "saas_usage_ping",
         )
 
-    def _get_namespace_queries(self) -> List[Dict]:
-        """
-        can be updated to query an end point or query other functions
-        to generate:
-        {
-            { counter_name: ping_name,
-              counter_query: sql_query,
-              time_window_query: true,
-              level: namespace,
-            }
-        }
-        """
-        with open(
-            os.path.join(os.path.dirname(__file__), "usage_ping_namespace_queries.json")
-        ) as namespace_file:
-            saas_queries = json.load(namespace_file)
-
-        return saas_queries
-
     def process_namespace_ping(self, query_dict, connection):
+        """
+        Process namespace ping and upload to Snowflake
+        """
+
         base_query = query_dict.get("counter_query")
         ping_name = query_dict.get("counter_name", "Missing Name")
         logging.info(f"Running ping {ping_name}...")
@@ -292,8 +286,8 @@ class UsagePing(object):
             # Expecting [id, namespace_ultimate_parent_id, counter_value]
             results = pd.read_sql(sql=base_query, con=connection)
             error = "Success"
-        except SQLAlchemyError as e:
-            error = str(e.__dict__["orig"])
+        except SQLAlchemyError as err:
+            error = str(err.__dict__["orig"])
             results = pd.DataFrame(
                 columns=["id", "namespace_ultimate_parent_id", "counter_value"]
             )
@@ -312,7 +306,7 @@ class UsagePing(object):
             "saas_usage_ping",
         )
 
-    def saas_namespace_ping(self, filter=lambda _: True):
+    def saas_namespace_ping(self, metrics_filter=lambda _: True):
         """
         Take a dictionary of the following type and run each
         query to then upload to a table in raw.
@@ -325,12 +319,14 @@ class UsagePing(object):
             }
         }
         """
-        saas_queries = self._get_namespace_queries()
+        saas_queries = self._get_meta_data(
+            "usage_ping_namespace_queries.json"
+        )  # _get_namespace_queries()
 
         connection = self.loader_engine.connect()
 
         for query_dict in saas_queries:
-            if filter(query_dict):
+            if metrics_filter(query_dict):
                 self.process_namespace_ping(query_dict, connection)
 
         connection.close()
@@ -341,8 +337,12 @@ class UsagePing(object):
         Routine to back-filling
         data for namespace ping
         """
-        filter = lambda query_dict: query_dict.get("time_window_query", False)
-        self.saas_namespace_ping(filter)
+
+        def filtering():
+            return lambda query_dict: query_dict.get("time_window_query", False)
+
+        backfill_filter = filtering()
+        self.saas_namespace_ping(backfill_filter)
 
 
 if __name__ == "__main__":

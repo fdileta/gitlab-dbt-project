@@ -66,7 +66,7 @@ def get_command():
     cmd = f"""
             {clone_repo_cmd} &&
             cd analytics/extract/saas_usage_ping/ &&
-            python3 usage_ping.py backfill --ping_date=$RUN_DATE
+            python3 usage_ping.py backfill --ping_date=$RUN_DATE --metrics_backfill=$METRICS_BACKFILL
         """
     return cmd
 
@@ -92,7 +92,7 @@ def get_pod_env_var(start: date, metrics: list) -> dict:
     """
     pod_env_vars = {
         "RUN_DATE": start,
-        "METRICS": metrics,
+        "METRICS_BACKFILL": metrics,
         "SNOWFLAKE_SYSADMIN_ROLE": "TRANSFORMER",
         "SNOWFLAKE_LOAD_WAREHOUSE": "USAGE_PING",
     }
@@ -162,10 +162,10 @@ def get_date(param: str) -> datetime:
     return datetime.strptime(res, "%Y-%m-%d")
 
 
-start_date = get_date("start_date")
+start_date = get_date(param="start_date")
 start_date = get_monday(day=start_date)
 
-end_date = get_date("end_date")
+end_date = get_date(param="end_date")
 
 metrics_backfill = backfill_param.get("metrics_backfill")
 
