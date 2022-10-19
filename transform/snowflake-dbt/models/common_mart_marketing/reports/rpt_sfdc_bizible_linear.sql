@@ -3,7 +3,8 @@
 ) }}
 
 {{ simple_cte([
-    ('mart_crm_attribution_touchpoint','mart_crm_attribution_touchpoint')
+    ('mart_crm_attribution_touchpoint','mart_crm_attribution_touchpoint'),
+    ('mart_crm_opportunity', 'mart_crm_opportunity')
 ]) }}
 
 , linear_base AS ( --the number of touches a given opp has in total
@@ -75,8 +76,8 @@
       mart_crm_attribution_touchpoint.is_sao,
       mart_crm_attribution_touchpoint.deal_path_name,
       mart_crm_attribution_touchpoint.order_type,
-      mart_crm_attribution_touchpoint.crm_user_sales_segment,
-      mart_crm_attribution_touchpoint.crm_user_region,
+      mart_crm_opportunity.crm_user_sales_segment,
+      mart_crm_opportunity.crm_user_region,
       DATE_TRUNC('month',mart_crm_attribution_touchpoint.bizible_touchpoint_date)::date AS bizible_touchpoint_date_month_yr,
       mart_crm_attribution_touchpoint.bizible_touchpoint_date::date AS bizible_touchpoint_date_normalized,
       mart_crm_attribution_touchpoint.type AS campaign_type,
@@ -105,6 +106,8 @@
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id = linear_base.dim_crm_opportunity_id
     LEFT JOIN  campaigns_per_opp ON
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id =      campaigns_per_opp.dim_crm_opportunity_id
+    LEFT JOIN mart_crm_opportunity
+      ON mart_crm_attribution_touchpoint.dim_crm_opportunity_id = mart_crm_opportunity.dim_crm_opportunity_id
     {{ dbt_utils.group_by(n=54) }}
 
 )

@@ -2,7 +2,7 @@
     ('mart_crm_opportunity','mart_crm_opportunity'),
     ('mart_crm_person','mart_crm_person'),
     ('dim_crm_account','dim_crm_account'),
-    ('mart_crm_touchpoint_combined', 'mart_crm_touchpoint_combined'), 
+    ('rpt_crm_touchpoint_combined', 'rpt_crm_touchpoint_combined'), 
     ('dim_date', 'dim_date')
 ]) }}
 
@@ -206,7 +206,7 @@
     -- surrogate keys
     cohort_base.dim_crm_person_id,
     cohort_base.dim_crm_opportunity_id,
-    mart_crm_touchpoint_combined.dim_crm_touchpoint_id,
+    rpt_crm_touchpoint_combined.dim_crm_touchpoint_id,
     cohort_base.dim_crm_account_id, 
     cohort_base.sfdc_record_id,
   
@@ -251,47 +251,47 @@
     cohort_base.parent_crm_account_demographics_upa_country,
     cohort_base.parent_crm_account_demographics_territory,
     CASE
-      WHEN mart_crm_touchpoint_combined.dim_crm_touchpoint_id IS NOT null 
+      WHEN rpt_crm_touchpoint_combined.dim_crm_touchpoint_id IS NOT null 
           THEN cohort_base.dim_crm_opportunity_id
       ELSE null
     END AS influenced_opportunity_id,
   
     --touchpoint attributes
-    mart_crm_touchpoint_combined.bizible_touchpoint_date,
-    mart_crm_touchpoint_combined.gtm_motion,
-    mart_crm_touchpoint_combined.bizible_integrated_campaign_grouping,
-    mart_crm_touchpoint_combined.bizible_marketing_channel_path,
-    mart_crm_touchpoint_combined.bizible_marketing_channel,
-    mart_crm_touchpoint_combined.bizible_ad_campaign_name,
-    mart_crm_touchpoint_combined.bizible_form_url,
-    mart_crm_touchpoint_combined.bizible_landing_page,
-    mart_crm_touchpoint_combined.is_dg_influenced,
-    mart_crm_touchpoint_combined.is_fmm_influenced,
-    mart_crm_touchpoint_combined.mql_sum,
-    mart_crm_touchpoint_combined.inquiry_sum,
-    mart_crm_touchpoint_combined.accepted_sum,
-    mart_crm_touchpoint_combined.linear_opp_created,
-    mart_crm_touchpoint_combined.linear_net_arr,
-    mart_crm_touchpoint_combined.linear_sao,
-    mart_crm_touchpoint_combined.pipeline_linear_net_arr,
-    mart_crm_touchpoint_combined.won_linear,
-    mart_crm_touchpoint_combined.won_linear_net_arr,
-    mart_crm_touchpoint_combined.w_shaped_sao,
-    mart_crm_touchpoint_combined.pipeline_w_net_arr,
-    mart_crm_touchpoint_combined.won_w,
-    mart_crm_touchpoint_combined.won_w_net_arr,
-    mart_crm_touchpoint_combined.u_shaped_sao,
-    mart_crm_touchpoint_combined.pipeline_u_net_arr,
-    mart_crm_touchpoint_combined.won_u,
-    mart_crm_touchpoint_combined.won_u_net_arr,
-    mart_crm_touchpoint_combined.first_sao,
-    mart_crm_touchpoint_combined.pipeline_first_net_arr,
-    mart_crm_touchpoint_combined.won_first,
-    mart_crm_touchpoint_combined.won_first_net_arr,
-    mart_crm_touchpoint_combined.custom_sao,
-    mart_crm_touchpoint_combined.pipeline_custom_net_arr,
-    mart_crm_touchpoint_combined.won_custom,
-    mart_crm_touchpoint_combined.won_custom_net_arr,
+    rpt_crm_touchpoint_combined.bizible_touchpoint_date,
+    rpt_crm_touchpoint_combined.gtm_motion,
+    rpt_crm_touchpoint_combined.bizible_integrated_campaign_grouping,
+    rpt_crm_touchpoint_combined.bizible_marketing_channel_path,
+    rpt_crm_touchpoint_combined.bizible_marketing_channel,
+    rpt_crm_touchpoint_combined.bizible_ad_campaign_name,
+    rpt_crm_touchpoint_combined.bizible_form_url,
+    rpt_crm_touchpoint_combined.bizible_landing_page,
+    rpt_crm_touchpoint_combined.is_dg_influenced,
+    rpt_crm_touchpoint_combined.is_fmm_influenced,
+    rpt_crm_touchpoint_combined.mql_sum,
+    rpt_crm_touchpoint_combined.inquiry_sum,
+    rpt_crm_touchpoint_combined.accepted_sum,
+    rpt_crm_touchpoint_combined.linear_opp_created,
+    rpt_crm_touchpoint_combined.linear_net_arr,
+    rpt_crm_touchpoint_combined.linear_sao,
+    rpt_crm_touchpoint_combined.pipeline_linear_net_arr,
+    rpt_crm_touchpoint_combined.won_linear,
+    rpt_crm_touchpoint_combined.won_linear_net_arr,
+    rpt_crm_touchpoint_combined.w_shaped_sao,
+    rpt_crm_touchpoint_combined.pipeline_w_net_arr,
+    rpt_crm_touchpoint_combined.won_w,
+    rpt_crm_touchpoint_combined.won_w_net_arr,
+    rpt_crm_touchpoint_combined.u_shaped_sao,
+    rpt_crm_touchpoint_combined.pipeline_u_net_arr,
+    rpt_crm_touchpoint_combined.won_u,
+    rpt_crm_touchpoint_combined.won_u_net_arr,
+    rpt_crm_touchpoint_combined.first_sao,
+    rpt_crm_touchpoint_combined.pipeline_first_net_arr,
+    rpt_crm_touchpoint_combined.won_first,
+    rpt_crm_touchpoint_combined.won_first_net_arr,
+    rpt_crm_touchpoint_combined.custom_sao,
+    rpt_crm_touchpoint_combined.pipeline_custom_net_arr,
+    rpt_crm_touchpoint_combined.won_custom,
+    rpt_crm_touchpoint_combined.won_custom_net_arr,
 
      --inquiry_date fields
     inquiry_date.fiscal_year                     AS inquiry_date_range_year,
@@ -329,8 +329,8 @@
     closed_date.date_id                         AS closed_date_range_id
   
   FROM cohort_base
-  LEFT JOIN mart_crm_touchpoint_combined
-    ON mart_crm_touchpoint_combined.email_hash = cohort_base.email_hash
+  LEFT JOIN rpt_crm_touchpoint_combined
+    ON rpt_crm_touchpoint_combined.email_hash = cohort_base.email_hash
   LEFT JOIN dim_date AS inquiry_date 
     ON cohort_base.true_inquiry_date = inquiry_date.date_day
   LEFT JOIN dim_date AS mql_date

@@ -11,7 +11,9 @@
     ('fct_crm_person', 'fct_crm_person'),
     ('dim_crm_account','dim_crm_account'),
     ('dim_crm_user','dim_crm_user'),
-    ('mart_crm_opportunity','mart_crm_opportunity')
+    ('fct_crm_opportunity','fct_crm_opportunity'),
+    ('dim_crm_opportunity', 'dim_crm_opportunity'),
+    ('dim_date', 'dim_date')
 ]) }}
 
 , joined AS (
@@ -52,12 +54,12 @@
       fct_crm_attribution_touchpoint.bizible_count_custom_model,
       fct_crm_attribution_touchpoint.bizible_count_u_shaped,
       fct_crm_attribution_touchpoint.bizible_count_w_shaped,
-      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_first_touch) AS first_net_arr,
-      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_w_shaped) AS w_net_arr,
-      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_u_shaped) AS u_net_arr,
-      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_attribution_percent_full_path) AS full_net_arr,
-      (mart_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_custom_model) AS custom_net_arr,
-      (mart_crm_opportunity.net_arr / fct_crm_attribution_touchpoint.campaigns_per_opp) AS net_arr_per_campaign,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_first_touch) AS first_net_arr,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_w_shaped) AS w_net_arr,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_u_shaped) AS u_net_arr,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_attribution_percent_full_path) AS full_net_arr,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_custom_model) AS custom_net_arr,
+      (fct_crm_opportunity.net_arr / fct_crm_attribution_touchpoint.campaigns_per_opp) AS net_arr_per_campaign,
       fct_crm_attribution_touchpoint.bizible_revenue_full_path,
       fct_crm_attribution_touchpoint.bizible_revenue_custom_model,
       fct_crm_attribution_touchpoint.bizible_revenue_first_touch,
@@ -209,45 +211,34 @@
 
       -- opportunity info
       fct_crm_attribution_touchpoint.dim_crm_opportunity_id,
-      mart_crm_opportunity.sales_accepted_date,
-      mart_crm_opportunity.sales_accepted_month,
-      mart_crm_opportunity.close_date                                       AS opportunity_close_date,
-      mart_crm_opportunity.close_month                                      AS opportunity_close_month,
-      mart_crm_opportunity.created_date                                     AS opportunity_created_date,
-      mart_crm_opportunity.created_month                                    AS opportunity_created_month,
-      mart_crm_opportunity.is_won,
-      mart_crm_opportunity.is_closed,
-      mart_crm_opportunity.days_in_sao,
-      mart_crm_opportunity.iacv,
-      mart_crm_opportunity.net_arr,
-      mart_crm_opportunity.amount,
-      mart_crm_opportunity.is_edu_oss,
-      mart_crm_opportunity.stage_name,
-      mart_crm_opportunity.reason_for_loss,
-      mart_crm_opportunity.is_sao,
-      mart_crm_opportunity.crm_opp_owner_sales_segment_stamped               AS crm_opp_owner_sales_segment_stamped,
-      mart_crm_opportunity.crm_opp_owner_geo_stamped                         AS crm_opp_owner_geo_stamped,
-      mart_crm_opportunity.crm_opp_owner_region_stamped                      AS crm_opp_owner_region_stamped,
-      mart_crm_opportunity.crm_opp_owner_area_stamped                        AS crm_opp_owner_area_stamped,
-      mart_crm_opportunity.crm_user_sales_segment,
-      mart_crm_opportunity.crm_user_geo,
-      mart_crm_opportunity.crm_user_region,
-      mart_crm_opportunity.crm_user_area,
-      mart_crm_opportunity.deal_path_name,
-      mart_crm_opportunity.order_type,
-      mart_crm_opportunity.sales_qualified_source_name,
-      mart_crm_opportunity.sales_type,
-      mart_crm_opportunity.closed_buckets,
-      mart_crm_opportunity.source_buckets                                   AS opportunity_source_buckets,
-      mart_crm_opportunity.opportunity_sales_development_representative,
-      mart_crm_opportunity.opportunity_business_development_representative,
-      mart_crm_opportunity.sdr_or_bdr,
-      mart_crm_opportunity.opportunity_development_representative,
-      mart_crm_opportunity.is_web_portal_purchase,
-      mart_crm_opportunity.count_crm_attribution_touchpoints                AS crm_attribution_touchpoints_per_opp,
-      mart_crm_opportunity.weighted_linear_iacv,
-      mart_crm_opportunity.count_campaigns                                  AS count_campaigns_per_opp,
-      (mart_crm_opportunity.iacv / mart_crm_opportunity.count_campaigns)    AS iacv_per_campaign,
+      fct_crm_opportunity.sales_accepted_date,
+      fct_crm_opportunity.close_date                                       AS opportunity_close_date,
+      fct_crm_opportunity.created_date                                     AS opportunity_created_date,
+      dim_crm_opportunity.is_won,
+      fct_crm_opportunity.is_closed,
+      fct_crm_opportunity.days_in_sao,
+      fct_crm_opportunity.iacv,
+      fct_crm_opportunity.net_arr,
+      fct_crm_opportunity.amount,
+      dim_crm_opportunity.is_edu_oss,
+      dim_crm_opportunity.stage_name,
+      dim_crm_opportunity.reason_for_loss,
+      fct_crm_opportunity.is_sao,
+      dim_crm_opportunity.deal_path AS deal_path_name,
+      dim_crm_opportunity.order_type,
+      dim_crm_opportunity.sales_qualified_source AS sales_qualified_source_name,
+      dim_crm_opportunity.sales_type,
+      fct_crm_opportunity.closed_buckets,
+      dim_crm_opportunity.source_buckets                                   AS opportunity_source_buckets,
+      dim_crm_opportunity.opportunity_sales_development_representative,
+      dim_crm_opportunity.opportunity_business_development_representative,
+      dim_crm_opportunity.sdr_or_bdr,
+      dim_crm_opportunity.opportunity_development_representative,
+      dim_crm_opportunity.is_web_portal_purchase,
+      fct_crm_opportunity.count_crm_attribution_touchpoints                AS crm_attribution_touchpoints_per_opp,
+      fct_crm_opportunity.weighted_linear_iacv,
+      fct_crm_opportunity.count_campaigns                                  AS count_campaigns_per_opp,
+      (fct_crm_opportunity.iacv / fct_crm_opportunity.count_campaigns)     AS iacv_per_campaign,
 
       -- bizible influenced
        CASE
@@ -283,8 +274,10 @@
       ON fct_crm_attribution_touchpoint.dim_crm_user_id = dim_crm_user.dim_crm_user_id
     LEFT JOIN dim_crm_user AS campaign_owner
       ON fct_campaign.campaign_owner_id = campaign_owner.dim_crm_user_id
-    LEFT JOIN mart_crm_opportunity
-      ON fct_crm_attribution_touchpoint.dim_crm_opportunity_id = mart_crm_opportunity.dim_crm_opportunity_id
+    LEFT JOIN fct_crm_opportunity
+      ON fct_crm_attribution_touchpoint.dim_crm_opportunity_id = fct_crm_opportunity.dim_crm_opportunity_id
+    LEFT JOIN dim_crm_opportunity
+      ON fct_crm_attribution_touchpoint.dim_crm_opportunity_id = dim_crm_opportunity.dim_crm_opportunity_id
 
 ), linear_base AS ( --the number of touches a given opp has in total
     --linear attribution Net_Arr of an opp / all touches (count_touches) for each opp - weighted by the number of touches in the given bucket (campaign,channel,etc)

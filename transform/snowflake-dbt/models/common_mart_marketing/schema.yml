@@ -74,14 +74,6 @@ models:
         - name: count_net_new_accepted
           description: Count of touchpoints that occured on or before the `accepted_date` that are also Lead Created.
 
-    - name: mart_crm_touchpoint_combined
-      description: Model containing both Bizible attribution touchpoints and non-attribution touchpoints along with contact, lead, account, and campaign details.
-      columns:
-        - name: dim_crm_touchpoint_id
-          tests:
-              - not_null
-              - unique
-
     - name: mart_crm_person
       description: Model with person and MQL business logic.
       columns:
@@ -97,3 +89,11 @@ models:
 
     - name: mart_marketing_contact_no_pii
       description: Non sensitive version of the mart_marketing_contact model.
+
+    - name: rpt_crm_touchpoint_combined
+      description: Model containing both Bizible attribution touchpoints and non-attribution touchpoints along with contact, lead, account, and campaign details.
+      columns:
+        - name: dim_crm_touchpoint_id
+          tests:
+              - not_null
+              - unique
