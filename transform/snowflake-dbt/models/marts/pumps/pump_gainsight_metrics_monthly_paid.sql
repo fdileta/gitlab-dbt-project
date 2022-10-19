@@ -542,7 +542,6 @@
         [
           'snapshot_month',
           'dim_subscription_id_original',
-          'delivery_type',
           'uuid',
           'hostname',
           'dim_namespace_id'

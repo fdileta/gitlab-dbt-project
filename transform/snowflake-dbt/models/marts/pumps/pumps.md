@@ -30,7 +30,6 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 **Data Grain:**
 - Subscription (`dim_subscription_id_original`)
 - Month (`snapshot_month`)
-- Delivery Type (`delivery_type`)
 - Installation/Namespace (For Self-Managed, `uuid`-`hostname`; for SaaS, `namespace_id`)
 
 **Filters:**
