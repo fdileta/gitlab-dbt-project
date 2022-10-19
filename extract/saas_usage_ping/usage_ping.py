@@ -346,18 +346,16 @@ class UsagePing(object):
 
         payload_source = 'redis'
         redis_metrics = self.keep_valid_metric_definitions(redis_metrics, payload_source, metric_definitions)
-        return redis_metrics
 
-        '''
         redis_data_to_upload = pd.DataFrame(
             columns=["jsontext", "ping_date", "run_id"] + self.dataframe_api_columns
         )
 
         redis_data_to_upload.loc[0] = [
-            json.dumps(json_data),
+            json.dumps(redis_metrics),
             self.end_date,
             self._get_md5(datetime.datetime.utcnow().timestamp()),
-        ] + self._get_dataframe_api_values(json_data)
+        ] + self._get_dataframe_api_values(redis_metrics)
 
         dataframe_uploader(
             redis_data_to_upload,
@@ -365,7 +363,7 @@ class UsagePing(object):
             "instance_redis_metrics",
             "saas_usage_ping",
         )
-        '''
+        return redis_metrics
 
     def upload_combined_metrics(self, combined_metrics, saas_queries):
         df_to_upload = pd.DataFrame(
@@ -420,6 +418,7 @@ class UsagePing(object):
         saas_queries = self._get_instance_queries()
 
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(metric_definitions, saas_queries)
+        self.upload_combined_metrics(sql_metrics, saas_queries)
         redis_metrics = self.saas_instance_redis_metrics(metric_definitions)
 
         # do not switch order: if duplicate key, sql_metrics k:v will take priority
