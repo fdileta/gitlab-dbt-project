@@ -126,7 +126,7 @@
         ELSE '0'
       END AS count_inquiry,
       CASE
-        WHEN true_inquiry_date >= bizible_touchpoint_date_normalized THEN '1'
+        WHEN rpt_crm_person_with_opp.true_inquiry_date >= bizible_touchpoint_date_normalized THEN '1'
         ELSE '0'
       END AS count_true_inquiry,
       CASE
@@ -162,7 +162,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@rkohnke",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2022-01-25",
-    updated_date="2022-09-06"
+    updated_date="2022-10-11"
 ) }}

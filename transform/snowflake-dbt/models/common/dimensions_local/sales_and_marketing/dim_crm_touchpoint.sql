@@ -46,7 +46,8 @@ WITH campaign_details AS (
       --ids
       touchpoint_id                 AS dim_crm_touchpoint_id,
       -- touchpoint info
-      bizible_touchpoint_date,
+      bizible_touchpoint_date::DATE AS bizible_touchpoint_date,
+      DATE_TRUNC('month', bizible_touchpoint_date) AS bizible_touchpoint_month,
       bizible_touchpoint_position,
       bizible_touchpoint_source,
       bizible_touchpoint_source_type,
@@ -77,7 +78,8 @@ WITH campaign_details AS (
       --ids
       touchpoint_id                 AS dim_crm_touchpoint_id,
       -- touchpoint info
-      bizible_touchpoint_date,
+      bizible_touchpoint_date::DATE AS bizible_touchpoint_date,
+      DATE_TRUNC('month', bizible_touchpoint_date) AS bizible_touchpoint_month,
       bizible_touchpoint_position,
       bizible_touchpoint_source,
       bizible_touchpoint_source_type,
@@ -90,7 +92,11 @@ WITH campaign_details AS (
       bizible_landing_page,
       bizible_landing_page_raw,
       bizible_marketing_channel,
-      bizible_marketing_channel_path,
+      CASE
+        WHEN dim_parent_campaign_id = '7014M000001dn8MQAQ' THEN 'Paid Social.LinkedIn Lead Gen'
+        WHEN bizible_ad_campaign_name = '20201013_ActualTechMedia_DeepMonitoringCI' THEN 'Sponsorship'
+        ELSE bizible_marketing_channel_path
+      END AS bizible_marketing_channel_path,
       bizible_medium,
       bizible_referrer_page,
       bizible_referrer_page_raw,
@@ -107,6 +113,7 @@ WITH campaign_details AS (
     SELECT
       combined_touchpoints.dim_crm_touchpoint_id,
       combined_touchpoints.bizible_touchpoint_date,
+      combined_touchpoints.bizible_touchpoint_month,
       combined_touchpoints.bizible_touchpoint_position,
       combined_touchpoints.bizible_touchpoint_source,
       combined_touchpoints.bizible_touchpoint_source_type,
@@ -162,7 +169,17 @@ WITH campaign_details AS (
         WHEN combined_touchpoints.bizible_marketing_channel_path IN ('Sponsorship')
           THEN 'Paid Sponsorship'
         ELSE 'Unknown'
-      END AS pipe_name
+      END AS pipe_name,
+      CASE
+        WHEN touchpoint_segment = 'Demand Gen' THEN 1
+        ELSE 0
+      END AS is_dg_influenced,
+      CASE
+        WHEN combined_touchpoints.bizible_touchpoint_position LIKE '%FT%' 
+          AND is_dg_influenced = 1
+          THEN 1
+        ELSE 0
+      END AS is_dg_sourced
     FROM combined_touchpoints
     LEFT JOIN bizible_campaign_grouping
       ON combined_touchpoints.dim_crm_touchpoint_id = bizible_campaign_grouping.dim_crm_touchpoint_id
@@ -171,7 +188,7 @@ WITH campaign_details AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2021-01-21",
-    updated_date="2021-12-16"
+    updated_date="2022-10-05"
 ) }}
