@@ -44,6 +44,11 @@ The focus area for the Analytics Engineer are the `DBT` models including the app
     * [ ] Link to all resulting issues and MRs in slack in **#analytics-pipelines**
     * [ ] Use the AE issue template to resolve the dbt-test failure.
 * [ ] Review all dbt-test warnings and [create an issue](https://gitlab.com/gitlab-data/analytics/issues/new?issuable_template=Triage%20Errors%20AE) if needed
+* [ ] Investigate and respond to each **active** failure and alert in **#analytics-pipelines** by:
+    * [ ] Updating the [Monte Carlo](https://getmontecarlo.com/monitors) status via Slack according to the defined action
+    * [ ] [Creating an issue](https://gitlab.com/gitlab-data/analytics/issues/new?issuable_template=Triage%20Errors%20DE) for each failure or relevant alert or reference the failure or alert in a related DBT Model Run failure issue. Use the AE issue template to resolve the Monte Carlo failure and alert. 
+    * [ ] [Opening an incident issue](https://gitlab.com/gitlab-data/analytics/-/issues/new?issuable_template=incident&issue[issue_type]=incident) when the failure requires [immediate action](https://about.gitlab.com/handbook/business-technology/data-team/how-we-work/#incidents) in order to avoid or rememdy a data outage.
+        * [ ] Link to all resulting incidents/issues and MRs in Slack
 
 *Occaisionally you we encounter connection errors, in which case [re-running the Airflow task](https://airflow.apache.org/docs/apache-airflow/1.10.15/dag-run.html#re-run-tasks) may be more appropriate than creating an issue. If the connection error persists then create an issue and escalate to the triage Data Engineer.*
 
@@ -97,7 +102,7 @@ The focus area for the Data Engineer are the Data Pipelines and Data Infrastruct
     * [ ] Updating the [Monte Carlo](https://getmontecarlo.com/monitors) status via Slack according to the defined action
     * [ ] [Creating an issue](https://gitlab.com/gitlab-data/analytics/issues/new?issuable_template=Triage%20Errors%20DE) for each failure or relevant alert.
     * [ ] [Opening an incident issue](https://gitlab.com/gitlab-data/analytics/-/issues/new?issuable_template=incident&issue[issue_type]=incident) when the failure requires [immediate action](https://about.gitlab.com/handbook/business-technology/data-team/how-we-work/#incidents) in order to avoid or rememdy a data outage.
-        * [ ] Link to all resulting incidents/issues and MRs in slack      
+        * [ ] Link to all resulting incidents/issues and MRs in Slack
 * [ ] Notify Data Customers of [data refresh SLO](https://about.gitlab.com/handbook/business-ops/data-team/platform/#extract-and-load) breach by posting a message to the `#data` Slack channel using the appropriate Data Notification Template
 * [ ] [Investigate](https://gitlab.com/gitlab-org/gitlab/-/merge_requests?scope=all&state=all&label_name[]=Data%20Warehouse%3A%3AImpact%20Check&draft=no&approved_by_usernames[]=Any) all relevant merge requests to the gitlab.com database schema, create an issue for each MR in the analytics project that impacts the GitLab.com extraction. Link each issue created to this issue. A detailed explanation of how to act if there is some impact is described on the page [#gitlabcom-db-structure-changes](https://about.gitlab.com/handbook/business-technology/data-team/how-we-work/triage/#gitlabcom-db-structure-changes)
 
@@ -117,16 +122,7 @@ Post notices to #data and cross-post to #whats-happening-at-gitlab
 
 #### GitLab.com
 
-We have identified a delay in the `GitLab.com` data refresh and this problem potentially also delays data for GitLab KPIs (e.g. MR Rate, TMAU) or SiSense dashboards. We are actively working on a resolution and will provide an update once the KPIs and SiSense dashboards have been brought up-to-date.
-
-The `GitLab.com` data in the warehouse and downstream models is accurate as of `YYYY-MM-DD HH:MM UTC (HH:MM PST)`.
-
-The DRI for this incident is `@username`.
-
-The link to the Data Team Incident issue is <link>
-
-`CC @Justin Farris , @meks, @leif, @Wayne,  @Steve Loyd, @lily, @kwiebers, @Sam Awezec, @product-analysts @datateam `
-
+Follow the [runbook](https://gitlab.com/gitlab-data/runbooks/-/blob/main/Gitlab_dotcom/Gitlab_DB_recreation_failure.md) for the communication around GitLab.com data incidents.
 
 #### Salesforce
 

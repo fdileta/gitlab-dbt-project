@@ -1,6 +1,22 @@
 version: 2
 
 models:
+  - name: dim_behavior_browser
+    description: Dimension for the analysis of browsers in Snowplow.
+    columns: 
+      - name: dim_behavior_browser_sk
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_behavior_operating_system
+    description: Dimension for the analysis of operating systems in Snowplow.
+    columns: 
+      - name: dim_behavior_operating_system_sk
+        tests:
+          - not_null
+          - unique
+
   - name: dim_behavior_website_page
     description: Dimension for the analysis of webpages used according to the page_urlpath in Snowplow.
     columns:
@@ -9,38 +25,6 @@ models:
           - not_null
           - unique
 
-  - name: fct_behavior_structured_event
-    description: Atomic fact of [Snowplow structured events](https://docs.gitlab.com/ee/development/snowplow/#structured-event-taxonomy).
-    columns: 
-      - name: behavior_structured_event_pk
-        tests:
-          - not_null
-          - unique
-
-  - name: fct_behavior_structured_event_experiment
-    description: Snowplow structured events filtered related to experiments, enriched with attributes of the experiment.
-    columns: 
-      - name: behavior_structured_event_pk
-        tests:
-          - not_null
-          - unique
-
-  - name: fct_behavior_structured_event_without_assignment
-    description: Snowplow structured events filtered to remove assignment events for performance improvements.
-    columns: 
-      - name: behavior_structured_event_pk
-        tests:
-          - not_null
-          - unique
-
-  - name: fct_behavior_structured_event_redis_hll_counters
-    description: Snowplow structured events filtered to Redis metrics.
-    columns: 
-      - name: behavior_structured_event_pk
-        tests:
-          - not_null
-          - unique
-          
   - name: fct_behavior_website_page_view
     description: TBD
     columns:

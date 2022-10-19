@@ -235,7 +235,7 @@ subscription_accounts AS (
     AND dim_namespace_id IS NOT NULL
     AND snapshot_month <= DATE_TRUNC('month', CURRENT_DATE())
   QUALIFY MAX(snapshot_month) OVER (PARTITION BY dim_namespace_id) = snapshot_month
-    AND ROW_NUMBER() OVER (PARTITION BY dim_namespace_id ORDER BY order_start_date DESC) = 1
+    AND ROW_NUMBER() OVER (PARTITION BY dim_namespace_id, snapshot_month ORDER BY order_start_date DESC) = 1
 ),
 
 direct_company_account AS (

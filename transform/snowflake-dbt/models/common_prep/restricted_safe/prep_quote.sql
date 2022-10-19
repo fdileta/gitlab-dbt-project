@@ -7,11 +7,12 @@ WITH sfdc_zqu_quote_source AS (
 ), final AS (
 
     SELECT
-      quote_id                                      AS dim_quote_id,
+      zqu_quote_id                                  AS dim_quote_id,
       zqu__number                                   AS quote_number,
       zqu_quote_name                                AS quote_name,
       zqu__status                                   AS quote_status,
       zqu__primary                                  AS is_primary_quote,
+      quote_entity,
       zqu__start_date                               AS quote_start_date
     FROM sfdc_zqu_quote_source
 
@@ -20,7 +21,7 @@ WITH sfdc_zqu_quote_source AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@snalamaru",
-    updated_by="@snalamaru",
+    updated_by="@chrissharp",
     created_date="2021-01-07",
-    updated_date="2021-01-07"
+    updated_date="2022-10-04"
 ) }}

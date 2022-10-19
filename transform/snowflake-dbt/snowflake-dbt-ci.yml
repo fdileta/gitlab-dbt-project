@@ -51,7 +51,7 @@
   - python3 macro_name_check.py
   - dbt deps $CI_PROFILE_TARGET
   - dbt seed --full-refresh $CI_PROFILE_TARGET #seed data from csv
-  - dbt --warn-error --partial-parse run-operation tag_validation --profiles-dir profile --target ci
+  - dbt --warn-error run-operation tag_validation --profiles-dir profile --target ci
 
 .l_warehouse: &l_warehouse
   - export SNOWFLAKE_TRANSFORM_WAREHOUSE=$SNOWFLAKE_MR_L_WAREHOUSE
@@ -70,8 +70,8 @@
   script:
     - *deps_and_seed
     - echo $DBT_MODELS
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
-    - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
+    - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 ➕🦖specify_l_model:
@@ -80,9 +80,9 @@
     - *l_warehouse
     - *deps_and_seed
     - echo $DBT_MODELS
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
     - *xs_warehouse
-    - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
+    - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 ➕specify_dbt_parameters:
@@ -90,8 +90,8 @@
   script:
     - *deps_and_seed
     - echo $DBT_PARAMETERS
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} $DBT_PARAMETERS || FAILED=true
-    - dbt --partial-parse test $CI_PROFILE_TARGET $DBT_PARAMETERS || FAILED=true
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} $DBT_PARAMETERS || FAILED=true
+    - dbt test $CI_PROFILE_TARGET $DBT_PARAMETERS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 ➕🐘specify_xl_model:
@@ -100,9 +100,9 @@
     - *xl_warehouse
     - *deps_and_seed
     - echo $DBT_MODELS
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
     - *xs_warehouse
-    - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
+    - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 ➕🐭🥩specify_raw_model:
@@ -113,7 +113,7 @@
     - *set_snapshot
     - echo $DBT_MODELS
     - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
-    - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
+    - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 ➕🌱specify_csv_seed:
@@ -149,8 +149,8 @@
     - *deps_and_seed
     - CHANGED_FILES=$(git diff --name-only $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD | xargs -n1 basename | grep '\.sql'  | sed "s/^/$ANCESTOR_TYPE/g" | sed "s/.sql/$DEPENDENT_TYPE/g" )
     - echo $CHANGED_FILES
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $CHANGED_FILES || FAILED=true
-    - dbt --partial-parse test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $CHANGED_FILES || FAILED=true
+    - dbt test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 ➕🏗️🛺🦖run_changed_models_sql_l:
@@ -160,8 +160,8 @@
     - *deps_and_seed
     - CHANGED_FILES=$(git diff --name-only $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD | xargs -n1 basename | grep '\.sql'  | sed "s/^/$ANCESTOR_TYPE/g" | sed "s/.sql/$DEPENDENT_TYPE/g" )
     - echo $CHANGED_FILES
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $CHANGED_FILES || FAILED=true
-    - dbt --partial-parse test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $CHANGED_FILES || FAILED=true
+    - dbt test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 ➕🏗️🛺🐘run_changed_models_sql_xl:
@@ -171,8 +171,8 @@
     - *deps_and_seed
     - CHANGED_FILES=$(git diff --name-only $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD | xargs -n1 basename | grep '\.sql'  | sed "s/^/$ANCESTOR_TYPE/g" | sed "s/.sql/$DEPENDENT_TYPE/g" )
     - echo $CHANGED_FILES
-    - dbt --partial-parse run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $CHANGED_FILES || FAILED=true
-    - dbt --partial-parse test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $CHANGED_FILES || FAILED=true
+    - dbt test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
 # ======
@@ -198,25 +198,25 @@
   <<: *dbt_misc_jobs
   script:
     - *deps_and_seed
-    - dbt --partial-parse test $CI_PROFILE_TARGET
+    - dbt test $CI_PROFILE_TARGET
 
 💾data_tests:
   <<: *dbt_misc_jobs
   script:
     - *deps_and_seed
-    - dbt --partial-parse test --data $CI_PROFILE_TARGET
+    - dbt test --data $CI_PROFILE_TARGET
 
 🌻freshness:
   <<: *dbt_misc_jobs
   script:
     - *deps_and_seed
-    - dbt --partial-parse source snapshot-freshness $CI_PROFILE_TARGET
+    - dbt source snapshot-freshness $CI_PROFILE_TARGET
 
 🗂schema_tests:
   <<: *dbt_misc_jobs
   script:
     - *deps_and_seed
-    - dbt --partial-parse test --schema $CI_PROFILE_TARGET
+    - dbt test --schema $CI_PROFILE_TARGET
 
 📸snapshots:
   <<: *dbt_misc_jobs
@@ -231,7 +231,7 @@
   script:
     - *deps_and_seed
     - echo $DBT_MODELS
-    - dbt --partial-parse test $CI_PROFILE_TARGET --models $DBT_MODELS
+    - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS
 
 # ======
 # SAFE Models Check
@@ -274,7 +274,7 @@
   <<: *safe_models_check
   script:
     - dbt deps $CI_PROFILE_TARGET
-    - dbt --partial-parse --quiet ls $CI_PROFILE_TARGET --models tag:mnpi+
+    - dbt --quiet ls $CI_PROFILE_TARGET --models tag:mnpi+
       --exclude
         tag:mnpi_exception
         config.database:$SNOWFLAKE_PREP_DATABASE

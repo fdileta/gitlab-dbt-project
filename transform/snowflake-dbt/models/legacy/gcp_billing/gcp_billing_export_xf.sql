@@ -1,13 +1,15 @@
-{{ config({
-    "materialized": "incremental",
-    "unique_key" : "source_primary_key"
-    })
+{{ config(
+    materialized='incremental',
+    unique_key='source_primary_key',
+    on_schema_change='append_new_columns',
+    full_refresh=only_force_full_refresh()
+    )
 }}
 
 WITH source AS (
 
     SELECT *
-    FROM {{ ref('gcp_billing_export_source') }}
+    FROM {{ ref('summary_gcp_billing_source') }}
     {% if is_incremental() %}
 
     WHERE uploaded_at >= (SELECT MAX(uploaded_at) FROM {{this}})

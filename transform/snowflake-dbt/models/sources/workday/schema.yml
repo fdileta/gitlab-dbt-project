@@ -347,6 +347,37 @@ models:
       - name: unique_filter_key
         tests:
           - unique
+      - name: employee_number
+      - name: employee_id
+      - name: first_name
+      - name: last_name
+      - name: hire_date
+      - name: termination_date
+      - name: first_inactive_date
+      - name: greenhouse_candidate_id
+      - name: cost_center
+      - name: gitlab_username
+      - name: jobtitle_speciality_single_select
+      - name: jobtitle_speciality_multi_select
+      - name: locality
+      - name: nationality
+      - name: gender_dropdown
+      - name: region
+      - name: job_role
+      - name: sales_geo_differential
+      - name: date_of_birth
+      - name: employee_status_date
+      - name: employment_history_status
+      - name: ethnicity
+      - name: gender
+      - name: country
+      - name: age
+      - name: job_grade
+      - name: pay_frequency
+      - name: uploaded_at
+      - name: uploaded_row_number_desc
+      - name: source_system
+
 
   - name: blended_employment_status_source
     columns:
