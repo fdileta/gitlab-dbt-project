@@ -354,6 +354,10 @@ models:
       - name: is_active
         description: A boolean column that flags if the user is active in salesforce, which means that the user can login and use salesforce.
         tags: [ "tdf", "common" ]
+      - name: sdr_sales_segment
+        description: Sales segment of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
+      - name: sdr_region
+        description: Region of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
 
   - name: dim_crm_user_daily_snapshot
     description: '{{ doc("dim_crm_user_daily_snapshot") }}'
@@ -391,6 +395,10 @@ models:
           - not_null
           - unique
         tags: ["tdf", "common"]
+      - name: is_dg_influenced
+        description: Flag indicating a touchpoint is influenced by Demand Gen based on its segment being Demand Gen.
+      - name: is_dg_sourced
+        description: Flag indicating a touchpoint is sourced from Demand Gen based on its segment being Demand Gen as well as its position being first touch.
 
   - name: dim_date
     description: '{{ doc("dim_date") }}'
@@ -1021,6 +1029,27 @@ models:
           - not_null
           - unique
         tags: ["tdf", "common"]
+      - name: opps_per_touchpoint
+        description: Count of opportunities associated with a touchpoint.
+      - name: campaigns_per_opp
+        description: Count of campaigns associated with an opportunity that are also associated with touchpoints.
+      - name: bizible_count_first_touch
+        description: Count of touchpoints that are first touch.
+      - name: bizible_count_lead_creation_touch
+        description: Count of lead creation touchpoints.
+      - name: bizible_attribution_percent_full_path
+        description: Weight of touchpoint in [full path attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#full-path) which tracks the entire lifecycle of the record from `First Touch` through the point of becoming a customer - `Customer Close`.
+      - name: bizible_count_u_shaped
+        description: Weight of touchpoint in [u-shaped attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#u-shaped) which racks every single touchpoint up to the point of lead creation. It emphasizes the importance of two touchpoints -
+          1. the first touch that brought the lead to us (while anonymous) - `First Touch` 
+          2. the touchpoint that converted the lead to a known prospect - `Lead Creation`
+      - name: bizible_count_w_shaped
+        description: Weight of touchpoint in [w-shaped attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#w-shaped) which emphasizes the importance of three touchpoints - 
+          1. the first touch that brought the lead to us (while anonymous) - `First Touch`
+          2. the touchpoint that converted the lead to a known prospect - `Lead Creation`
+          3. the touchpoint that converted that prospect to an opportunity - `Opportunity Creation`
+      - name: bizible_count_custom_model
+        description:  Weight of touchpoint in [custom attribution model](https://about.gitlab.com/handbook/marketing/marketing-operations/bizible/#custom-attribution-based-on-bizible-machine-learning-algorithm) which is based on the Bizible machine learning attribution model uses our touchpoint data to calculate how much attribution weighting should be assigned to each stage. This is determined by how important each stage was in driving deals to close.
 
   - name: fct_crm_touchpoint
     description: '{{ doc("fct_crm_touchpoint") }}'

@@ -7,7 +7,8 @@
     ('dim_bizible_marketing_channel_path','dim_bizible_marketing_channel_path'),
     ('dim_sales_segment','dim_sales_segment'),
     ('fct_crm_person','fct_crm_person'),
-    ('dim_date','dim_date')
+    ('dim_date','dim_date'),
+    ('dim_crm_user', 'dim_crm_user')
 ]) }}
 
 , final AS (
@@ -16,6 +17,7 @@
       fct_crm_person.dim_crm_person_id,
       dim_crm_person.dim_crm_user_id,
       dim_crm_person.dim_crm_account_id,
+      dim_crm_person.sfdc_record_id,
       mql_date_first.date_id                   AS mql_date_first_id,
       mql_date_first.date_day                  AS mql_date_first,
       initial_mql_date_first.date_id           AS initial_mql_date_first_id,
@@ -61,7 +63,7 @@
       contact_created_date.first_day_of_month  AS contact_created_month,
       contact_created_date_pt.first_day_of_month
                                                AS contact_created_month_pt,
-      true_inquiry_date                        AS true_inquiry_date,
+      fct_crm_person.true_inquiry_date         AS true_inquiry_date,
       inquiry_date.date_day                    AS inquiry_date,
       inquiry_date_pt.date_day                 AS inquiry_date_pt,
       inquiry_date.first_day_of_month          AS inquiry_month,
@@ -130,6 +132,8 @@
       dim_bizible_marketing_channel_path.bizible_marketing_channel_path_name,
       dim_sales_segment.sales_segment_name,
       dim_sales_segment.sales_segment_grouped,
+      dim_crm_user.sdr_sales_segment,
+      dim_crm_user.sdr_region,
       dim_crm_person.person_score,
       dim_crm_person.behavior_score,
       dim_crm_person.marketo_last_interesting_moment,
@@ -249,13 +253,15 @@
       ON fct_crm_person.worked_date_id = worked_date.date_id
     LEFT JOIN dim_date AS worked_date_pt
       ON fct_crm_person.worked_date_pt_id = worked_date_pt.date_id
+    LEFT JOIN dim_crm_user 
+      ON fct_crm_person.dim_crm_user_id = dim_crm_user.dim_crm_user_id
 
 )
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2020-12-07",
     updated_date="2022-10-18",
   ) }}  
