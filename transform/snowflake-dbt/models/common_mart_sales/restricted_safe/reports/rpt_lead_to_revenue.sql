@@ -5,7 +5,7 @@
     ('mart_crm_opportunity_stamped_hierarchy_hist','mart_crm_opportunity_stamped_hierarchy_hist'),
     ('rpt_sfdc_bizible_tp_opp_linear_blended','rpt_sfdc_bizible_tp_opp_linear_blended'),
     ('dim_crm_account','dim_crm_account'),
-	('map_custom_lead_demographics','map_custom_lead_demographics')
+	('map_alternative_lead_demographics','map_alternative_lead_demographics')
 ]) }}
 
 , upa_base AS ( --pulls every account and it's UPA
@@ -224,9 +224,9 @@
       person_base.account_demographics_territory,
       dim_crm_person.employee_bucket,
       dim_crm_person.leandata_matched_account_sales_segment,
-      map_custom_lead_demographics.employee_count_segment_custom,
-	  map_custom_lead_demographics.employee_bucket_segment_custom,
-	  map_custom_lead_demographics.geo_custom,
+      map_alternative_lead_demographics.employee_count_segment_custom,
+	  map_alternative_lead_demographics.employee_bucket_segment_custom,
+	  map_alternative_lead_demographics.geo_custom,
       is_first_order_available,
       order_type_final.person_order_type,
       order_type_final.inquiry_order_type_historical,
@@ -396,8 +396,8 @@
       ON upa_base.dim_parent_crm_account_id=opp.dim_parent_crm_account_id
     LEFT JOIN order_type_final
       ON person_base.email_hash=order_type_final.email_hash
-	LEFT JOIN map_custom_lead_demographics
-	  ON person_base.dim_crm_person_id=map_custom_lead_demographics.dim_crm_person_id
+	LEFT JOIN map_alternative_lead_demographics
+	  ON person_base.dim_crm_person_id=map_alternative_lead_demographics.dim_crm_person_id
 
 ), fo_inquiry_with_tp AS (
   
