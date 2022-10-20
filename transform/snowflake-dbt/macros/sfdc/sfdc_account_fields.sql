@@ -137,13 +137,31 @@ WITH map_merged_crm_account AS (
 
 ), pte_scores AS (
 
-    SELECT * 
+    SELECT 
+        DISTINCT sfdc_account.account_id AS account_id,
+        LAST_VALUE(score) RESPECT NULLS OVER (PARTITION BY crm_account_id
+        ORDER BY score_date ASC) AS last_score,
+        LAST_VALUE(decile) RESPECT NULLS OVER (PARTITION BY crm_account_id
+        ORDER BY score_date ASC) AS last_decile,
+        LAST_VALUE(score_group) RESPECT NULLS OVER (PARTITION BY crm_account_id
+        ORDER BY score_date ASC) AS last_score_group
     FROM {{ ref('pte_scores') }}
+    LEFT JOIN sfdc_account
+        ON sfdc_account.account_id = pte_scores.crm_account_id
 
 ), ptc_scores AS (
 
-    SELECT * 
+    SELECT 
+        DISTINCT sfdc_account.account_id AS account_id,
+        LAST_VALUE(score) RESPECT NULLS OVER (PARTITION BY crm_account_id
+        ORDER BY score_date ASC) AS last_score,
+        LAST_VALUE(decile) RESPECT NULLS OVER (PARTITION BY crm_account_id
+        ORDER BY score_date ASC) AS last_decile,
+        LAST_VALUE(score_group) RESPECT NULLS OVER (PARTITION BY crm_account_id
+        ORDER BY score_date ASC) AS last_score_group
     FROM {{ ref('ptc_scores') }}
+    LEFT JOIN sfdc_account
+        ON sfdc_account.account_id = ptc_scores.crm_account_id
 
 ), final AS (
 
@@ -444,12 +462,12 @@ WITH map_merged_crm_account AS (
       {%- endif %}
 
       -- PtC and PtE 
-      pte_scores.score                                                    AS pte_score,
-      pte_scores.decile                                                   AS pte_decile,
-      pte_scores.score_group                                              AS pte_score_group,
-      ptc_scores.score                                                    AS ptc_score,
-      ptc_scores.decile                                                   AS ptc_decile,
-      ptc_scores.score_group                                              AS ptc_score_group,
+      pte_scores.last_score                                               AS pte_score,
+      pte_scores.last_decile                                              AS pte_decile,
+      pte_scores.last_score_group                                         AS pte_score_group,
+      ptc_scores.last_score                                               AS ptc_score,
+      ptc_scores.last_decile                                              AS ptc_decile,
+      ptc_scores.last_score_group                                         AS ptc_score_group,
 
 
       --metadata
@@ -471,9 +489,9 @@ WITH map_merged_crm_account AS (
     LEFT JOIN prep_crm_person
       ON sfdc_account.primary_contact_id = prep_crm_person.sfdc_record_id
     LEFT JOIN pte_scores 
-      ON sfdc_account.account_id = pte_scores.crm_account_id
+      ON sfdc_account.account_id = pte_scores.account_id
     LEFT JOIN ptc_scores
-      ON sfdc_account.account_id = ptc_scores.crm_account_id
+      ON sfdc_account.account_id = ptc_scores.account_id
     {%- if model_type == 'live' %}
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
