@@ -38,16 +38,17 @@ plan_id_by_month AS (
 final AS (
 
   SELECT
-    event_calendar_month                                  AS event_calendar_month,
-    dim_ultimate_parent_namespace_id                      AS dim_ultimate_parent_namespace_id,
-    plan_id_at_event_date                                 AS plan_id_at_event_month,
-    plan_name_at_event_date                               AS plan_name_at_event_month,
-    plan_was_paid_at_event_date                           AS plan_was_paid_at_event_month,
-    namespace_is_internal                                 AS namespace_is_internal,
-    ultimate_parent_namespace_type                        AS ultimate_parent_namespace_type,
-    namespace_creator_is_blocked                          AS namespace_creator_is_blocked,
-    DATEADD('day', -27, LAST_DAY(event_calendar_month))   AS first_day_of_reporting_period,
-    LAST_DAY(event_calendar_month)                        AS last_day_of_reporting_period
+    {{ dbt_utils.surrogate_key(['event_calendar_month', 'dim_ultimate_parent_namespace_id']) }} AS namespace_monthly_pk,
+    event_calendar_month                                                                        AS event_calendar_month,
+    dim_ultimate_parent_namespace_id                                                            AS dim_ultimate_parent_namespace_id,
+    plan_id_at_event_date                                                                       AS plan_id_at_event_month,
+    plan_name_at_event_date                                                                     AS plan_name_at_event_month,
+    plan_was_paid_at_event_date                                                                 AS plan_was_paid_at_event_month,
+    namespace_is_internal                                                                       AS namespace_is_internal,
+    ultimate_parent_namespace_type                                                              AS ultimate_parent_namespace_type,
+    namespace_creator_is_blocked                                                                AS namespace_creator_is_blocked,
+    DATEADD('day', -27, LAST_DAY(event_calendar_month))                                         AS first_day_of_reporting_period,
+    LAST_DAY(event_calendar_month)                                                              AS last_day_of_reporting_period
   FROM plan_id_by_month
 
 )
