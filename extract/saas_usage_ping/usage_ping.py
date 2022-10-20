@@ -32,6 +32,7 @@ from transform_postgres_to_snowflake import (
 
 ENCODING = "utf8"
 SCHEMA_NAME = "saas_usage_ping"
+NAMESPACE_FILE = "usage_ping_namespace_queries.json"
 
 
 class UsagePing:
@@ -54,9 +55,15 @@ class UsagePing:
         self.metrics_backfill = []
 
     def set_metrics_backfill(self, metrics: list):
+        """
+        setter for metrics backfill
+        """
         self.metrics_backfill = metrics
 
     def get_metrics_backfill(self):
+        """
+        getter for metrics backfill
+        """
         return self.metrics_backfill
 
     def _get_instance_queries(self) -> Dict:
@@ -65,8 +72,8 @@ class UsagePing:
         to generate the {ping_name: sql_query} dictionary
         """
         with open(
-                os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE),
-                encoding=ENCODING,
+            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE),
+            encoding=ENCODING,
         ) as file:
             saas_queries = json.load(file)
 
@@ -95,7 +102,7 @@ class UsagePing:
         return dataframe_api_value_list
 
     def _get_md5(
-            self, input_timestamp: float = datetime.datetime.utcnow().timestamp()
+        self, input_timestamp: float = datetime.datetime.utcnow().timestamp()
     ) -> str:
         """
         Convert input datetime into md5 hash.
@@ -196,15 +203,15 @@ class UsagePing:
 
         ping_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
-                    + self.dataframe_api_columns
+            + self.dataframe_api_columns
         )
 
         ping_to_upload.loc[0] = [
-                                    saas_queries,
-                                    json.dumps(results),
-                                    self.end_date,
-                                    self._get_md5(datetime.datetime.utcnow().timestamp()),
-                                ] + self._get_dataframe_api_values(
+            saas_queries,
+            json.dumps(results),
+            self.end_date,
+            self._get_md5(datetime.datetime.utcnow().timestamp()),
+        ] + self._get_dataframe_api_values(
             self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
         )
 
@@ -257,10 +264,10 @@ class UsagePing:
         )
 
         redis_data_to_upload.loc[0] = [
-                                          json.dumps(json_data),
-                                          self.end_date,
-                                          self._get_md5(datetime.datetime.utcnow().timestamp()),
-                                      ] + self._get_dataframe_api_values(json_data)
+            json.dumps(json_data),
+            self.end_date,
+            self._get_md5(datetime.datetime.utcnow().timestamp()),
+        ] + self._get_dataframe_api_values(json_data)
 
         dataframe_uploader(
             redis_data_to_upload,
@@ -269,25 +276,29 @@ class UsagePing:
             "saas_usage_ping",
         )
 
-    def get_prepared_query(self, query: dict) -> tuple:
+    def replace_placeholders(self, sql: str) -> str:
         """
         Replace dates placeholders with proper dates:
         Usage:
         Input: "SELECT 1 FROM TABLE WHERE created_at BETWEEN between_start_date AND between_end_date"
-        Output: "SELECT 1 FROM TABLE WHERE created_at BETWEEN '2022-01-01' AND '2022-01-28"
+        Output: "SELECT 1 FROM TABLE WHERE created_at BETWEEN '2022-01-01' AND '2022-01-28'"
         """
-        sql_text = query.get("counter_query")
-        name = query.get("counter_name", "Missing Name")
-        time_window = query.get("time_window_query", False)
+        res = sql
+        res = res.replace("between_end_date", f"'{str(self.end_date)}'")
+        res = res.replace("between_start_date", f"'{str(self.start_date_28)}'")
 
-        if time_window:
-            sql_text = sql_text.replace(
-                "between_end_date", f"'{str(self.end_date)}'"
-            )
-            sql_text = sql_text.replace(
-                "between_start_date", f"'{str(self.start_date_28)}'"
-            )
-        return name, sql_text
+        return res
+
+    def get_prepared_values(self, query: dict) -> tuple:
+        """
+        Prepare variables for query
+        """
+        sql = str(query.get("counter_query"))
+        prepared_sql = self.replace_placeholders(sql=sql)
+        name = query.get("counter_name", "Missing Name")
+        level = query.get("level")
+
+        return name, prepared_sql, level
 
     def upload_to_snowflake(self, table_name: str, data: pd.DataFrame) -> None:
         """
@@ -300,37 +311,54 @@ class UsagePing:
             schema=SCHEMA_NAME,
         )
 
+    def get_result(self, name: str, level: str, sql: str, conn) -> pd.DataFrame:
+        """
+        Try to execute query and return results
+        """
+        try:
+            # Expecting [id, namespace_ultimate_parent_id, counter_value]
+            res = pd.read_sql(sql=sql, con=conn)
+            error = "Success"
+        except SQLAlchemyError as err:
+            error = str(err.__dict__["orig"])
+            res = pd.DataFrame(
+                columns=["id", "namespace_ultimate_parent_id", "counter_value"]
+            )
+            res.loc[0] = [None, None, None]
+
+        res["ping_name"] = name
+        res["level"] = level
+        res["query_ran"] = sql
+        res["error"] = error
+        res["ping_date"] = self.end_date
+
+        return res
+
     def process_namespace_ping(self, query_dict, connection):
         """
         Upload result of namespace ping to Snowflake
         """
 
-        metric_name, metric_query = self.get_prepared_query(query=query_dict)
+        metric_name, metric_level, metric_query = self.get_prepared_values(
+            query=query_dict
+        )
 
         if "namespace_ultimate_parent_id" not in metric_query:
-            logging.info(f"Skipping ping {metric_name} due to no namespace information.")
+            logging.info(
+                f"Skipping ping {metric_name} due to no namespace information."
+            )
             return
 
-        try:
-            # Expecting [id, namespace_ultimate_parent_id, counter_value]
-            results = pd.read_sql(sql=metric_query, con=connection)
-            error = "Success"
-        except SQLAlchemyError as err:
-            error = str(err.__dict__["orig"])
-            results = pd.DataFrame(
-                columns=["id", "namespace_ultimate_parent_id", "counter_value"]
-            )
-            results.loc[0] = [None, None, None]
-
-        results["ping_name"] = metric_name
-        results["level"] = query_dict.get("level", None)
-        results["query_ran"] = metric_query
-        results["error"] = error
-        results["ping_date"] = self.end_date
+        results = self.get_result(
+            name=metric_name, level=metric_level, sql=metric_query, conn=connection
+        )
 
         self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
 
     def get_namespace_file(self, file: str):
+        """
+        Return namespace json file
+        """
         return self._get_meta_data(self, file_name=file)
 
     def saas_namespace_ping(self, metrics_filter=lambda _: True):
@@ -346,9 +374,7 @@ class UsagePing:
             }
         }
         """
-        saas_queries = self.get_namespace_file(
-            "usage_ping_namespace_queries.json"
-        )
+        saas_queries = self.get_namespace_file(NAMESPACE_FILE)
 
         connection = self.loader_engine.connect()
 
@@ -359,14 +385,15 @@ class UsagePing:
         connection.close()
         self.loader_engine.dispose()
 
-
     def get_backfill_filter(self, namespace):
         """
         Define backfill filter for
         processing a namespace metrics load
         """
 
-        return namespace.get("time_window_query", False) and namespace.get("counter_name") in self.get_metrics_backfill(self)
+        return namespace.get("time_window_query", False) and namespace.get(
+            "counter_name"
+        ) in self.get_metrics_backfill(self)
 
     def namespace_backfill(self):
         """
