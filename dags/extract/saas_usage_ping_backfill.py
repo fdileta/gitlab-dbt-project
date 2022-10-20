@@ -66,7 +66,7 @@ def get_command():
     cmd = f"""
             {clone_repo_cmd} &&
             cd analytics/extract/saas_usage_ping/ &&
-            python3 usage_ping.py backfill --ping_date=$RUN_DATE --metrics_backfill=$METRICS_BACKFILL
+            python3 usage_ping.py namespace_backfill --ping_date=$RUN_DATE --metrics_backfill=$METRICS_BACKFILL
         """
     return cmd
 
