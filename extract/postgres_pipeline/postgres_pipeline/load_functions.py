@@ -55,10 +55,14 @@ def load_incremental(
         #replication_check_query = "select pg_last_xact_replay_timestamp();"
         replication_timestamp_query ="select last_replica_time from public.last_replication_timestamp"
 
-        replication_timestamp = query_executor(source_engine, replication_timestamp_query)[
+        replication_timestamp_value = query_executor(source_engine, replication_timestamp_query)[
             0
         ][0]
-        logging.info(f"Timestamp from the database is : {replication_timestamp}")
+        logging.info(f"Timestamp from the database is : {replication_timestamp_value}")
+        replication_timestamp=datetime.datetime.strptime(
+                replication_timestamp_value, "%Y-%m-%d %H:%M:%S%z"
+            )
+
         last_load_time = get_last_load_time()
 
         hours_looking_back = int(env["HOURS"])
