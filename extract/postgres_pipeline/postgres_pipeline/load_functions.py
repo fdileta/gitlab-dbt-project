@@ -53,7 +53,7 @@ def load_incremental(
     if table_dict["export_schema"] == "gitlab_com":
 
         #replication_check_query = "select pg_last_xact_replay_timestamp();"
-        replication_timestamp_query ="select last_replica_time from public.last_replication_timestamp"
+        replication_timestamp_query ="select last_replica_time::varchar from public.last_replication_timestamp"
 
         replication_timestamp_value = query_executor(source_engine, replication_timestamp_query)[
             0
