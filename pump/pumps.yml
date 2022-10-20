@@ -24,3 +24,8 @@ pumps:
     sensitive: True
     owner: '@paul_armstrong'
     stage: pmg_s3_data_pump
+  - model: pump_daily_ds_scores
+    timestamp_column: updated_at
+    sensitive: True
+    owner: '@rigerta'
+    stage: to_be_defined
