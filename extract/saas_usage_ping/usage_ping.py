@@ -47,6 +47,7 @@ class UsagePing(object):
         self.start_date_28 = self.end_date - datetime.timedelta(28)
         self.dataframe_api_columns = META_API_COLUMNS
         self.missing_definitions = {'sql': [], 'redis': []}
+        self.duplicate_keys = []
 
     def get_metrics_definitions(self):
         config_dict = env.copy()
@@ -409,12 +410,6 @@ class UsagePing(object):
         )
         self.loader_engine.dispose()
 
-    def check_dups_in_combined_metrics(sql_metrics, redis_metrics):
-        sql_flattened = flatten(sql_metrics, reducer=make_reducer(delimiter="."))
-        redis_flattened = flatten(redis_metrics, reducer=make_reducer(delimiter="."))
-        dups = list(set(sql_flattened.keys() & redis_flattened.keys()))
-        return dups
-
     def merge_dicts(self, redis_metrics, sql_metrics, path=None):
         "merges sql_metrics into redis_metrics, https://stackoverflow.com/a/7205107"
         if path is None:
@@ -426,6 +421,7 @@ class UsagePing(object):
                 elif redis_metrics[key] == sql_metrics[key]:
                     pass  # same leaf value
                 else:
+                    self.duplicate_keys.append(f'Conflict at {".".join(path + [str(key)])}, Redis sub-value {redis_metrics} to be overriden by sql sub-value {sql_metrics}')
                     redis_metrics[key] = sql_metrics[key]
                     # raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
             else:
