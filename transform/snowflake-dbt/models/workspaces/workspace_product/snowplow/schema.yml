@@ -28,7 +28,7 @@ models:
   - name: fct_behavior_website_page_view
     description: TBD
     columns:
-      - name: behavior_website_page_view_sk
+      - name: fct_behavior_website_page_view_sk
         tests:
           - not_null
           - unique
