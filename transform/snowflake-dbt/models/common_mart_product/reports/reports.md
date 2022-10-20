@@ -363,3 +363,42 @@
 - [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
 
 {% enddocs %}
+
+{% docs rpt_gainsight_metrics_monthly_paid_saas %}
+
+**Description:** Joins SaaS Namespace Service Pings to a list of paid recurring SaaS subscriptions to limit to paying SaaS customers, and joins in seat/license data to calculate license utilization. The data from this table will be used for customer product insights. Most notably, this data is pumped into Gainsight and aggregated into customer health scores for use by TAMs.
+
+**Data Grain:**
+- Namespace
+- Subscription
+- Month
+
+**Filters:**
+- Only includes Service Ping metrics that have been added via the "wave" process.
+- Only includes pings that have a license associated with them.
+- Only includes recurring paid SaaS subscriptions
+
+**Business Logic in this Model:**
+- Hits Zuora tables related to charges and product rate plans to limit to paid SaaS customers with recurring subscriptions.
+
+{% enddocs %}
+
+{% docs rpt_gainsight_metrics_monthly_paid_self_managed %}
+
+**Description:** Joins Self-Managed Service Pings to a list of paid Self-Managed subscriptions to limit to paying SM customers, joins in seat/license data to calculate license utilization. The data from this table will be used for customer product insights. Most notably, this data is pumped into Gainsight and aggregated into customer health scores for use by TAMs.
+
+**Data Grain:**
+- Installation
+- Subscription
+- Month
+
+**Filters:**
+- Only includes Service Ping metrics that have been added via the "wave" process.
+- Only includes pings that have a license associated with them.
+- Only includes pings that have a paid Self-Managed subscription associated with them.
+
+**Business Logic in this Model:**
+- Resolves a one-to-many relationship between installation and instance types by prioritizing production instances above other instance types
+- Limits down to last ping of the month for each installation-subscription
+
+{% enddocs %}
