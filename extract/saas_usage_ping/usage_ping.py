@@ -34,7 +34,6 @@ ENCODING = "utf8"
 SCHEMA_NAME = "saas_usage_ping"
 NAMESPACE_FILE = "usage_ping_namespace_queries.json"
 
-
 class UsagePing:
     """
     Usage ping class represent as an umbrella
@@ -293,8 +292,8 @@ class UsagePing:
         """
         Prepare variables for query
         """
-        sql = str(query.get("counter_query"))
-        prepared_sql = self.replace_placeholders(self, sql=sql)
+        sql_raw = str(query.get("counter_query"))
+        prepared_sql = self.replace_placeholders(sql_raw)
         name = query.get("counter_name", "Missing Name")
         level = query.get("level")
 
@@ -311,10 +310,12 @@ class UsagePing:
             schema=SCHEMA_NAME,
         )
 
-    def get_result(self, name: str, level: str, sql: str, conn) -> pd.DataFrame:
+    def get_result(self, query_dict: dict, conn) -> pd.DataFrame:
         """
         Try to execute query and return results
         """
+        name, sql, level = self.get_prepared_values(query=query_dict)
+
         try:
             # Expecting [id, namespace_ultimate_parent_id, counter_value]
             res = pd.read_sql(sql=sql, con=conn)
@@ -339,9 +340,7 @@ class UsagePing:
         Upload result of namespace ping to Snowflake
         """
 
-        metric_name, metric_level, metric_query = self.get_prepared_values(
-            query=query_dict
-        )
+        metric_name, _, metric_query = self.get_prepared_values(query=query_dict)
 
         if "namespace_ultimate_parent_id" not in metric_query:
             logging.info(
@@ -349,17 +348,9 @@ class UsagePing:
             )
             return
 
-        results = self.get_result(
-            name=metric_name, level=metric_level, sql=metric_query, conn=connection
-        )
+        results = self.get_result(query_dict=query_dict, conn=connection)
 
         self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
-
-    def get_namespace_file(self, file: str):
-        """
-        Return namespace json file
-        """
-        return self._get_meta_data(self, file_name=file)
 
     def saas_namespace_ping(self, metrics_filter=lambda _: True):
         """
@@ -374,7 +365,7 @@ class UsagePing:
             }
         }
         """
-        saas_queries = self.get_namespace_file(NAMESPACE_FILE)
+        saas_queries = self._get_meta_data(NAMESPACE_FILE)
 
         connection = self.loader_engine.connect()
 
@@ -391,9 +382,10 @@ class UsagePing:
         processing a namespace metrics load
         """
 
-        return namespace.get("time_window_query", False) and namespace.get(
-            "counter_name"
-        ) in self.get_metrics_backfill(self)
+        return (
+            namespace.get("time_window_query", False)
+            and namespace.get("counter_name") in self.get_metrics_backfill()
+        )
 
     def namespace_backfill(self):
         """
@@ -403,8 +395,10 @@ class UsagePing:
 
         # pick up metrics from the parameter list
         # and only if time_window_query == False
-
-        backfill_filter = self.get_backfill_filter()
+        backfill_filter = (
+            lambda x: x.get("time_window_query", False)
+            and x.get("counter_name") in self.get_metrics_backfill()
+        )  # self.get_backfill_filter() # TODO: rbacovic check what is the best way implement this
 
         self.saas_namespace_ping(metrics_filter=backfill_filter)
 

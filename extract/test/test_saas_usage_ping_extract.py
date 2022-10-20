@@ -30,8 +30,8 @@ def get_usage_ping_namespace_file(usage_ping):
     Fixture for namespace file
     """
 
-    return usage_ping.get_namespace_file(
-        usage_ping, file="usage_ping_namespace_queries.json"
+    return usage_ping._get_meta_data(
+        usage_ping, file_name="usage_ping_namespace_queries.json"
     )
 
 
@@ -172,7 +172,7 @@ def test_namespace_file_error(usage_ping):
     Test file loading
     """
     with pytest.raises(FileNotFoundError):
-        usage_ping.get_namespace_file(usage_ping, "THIS_DOES_NOT_EXITS.json")
+        usage_ping._get_meta_data(usage_ping, file_name="THIS_DOES_NOT_EXITS.json")
 
 
 def test_json_file_consistency_level(namespace_file):
@@ -189,59 +189,55 @@ def test_json_file_consistency_level(namespace_file):
         assert level == "namespace"
 
 
-@pytest.mark.parametrize(
-    "test_value, expected_value",
-    [
-        ("active_user_count", False),
-        (
-            "usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations",
-            True,
-        ),
-        ("usage_activity_by_stage_monthly.manage.audit_event_destinations", True),
-        ("counts.boards", False),
-        ("usage_activity_by_stage_monthly.configure.instance_clusters_enabled", True),
-        ("counts_monthly.deployments", True),
-    ],
-)
-def test_get_backfill_filter(usage_ping, namespace_file, test_value, expected_value):
-    """
-    test backfill filter accuracy
-    """
-    usage_ping.set_metrics_backfill(usage_ping, test_value)
+# @pytest.mark.parametrize(
+#     "test_value, expected_value",
+#     [
+#         ("active_user_count", False),
+#         (
+#             "usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations",
+#             True,
+#         ),
+#         ("usage_activity_by_stage_monthly.manage.audit_event_destinations", True),
+#         ("counts.boards", False),
+#         ("usage_activity_by_stage_monthly.configure.instance_clusters_enabled", True),
+#         ("counts_monthly.deployments", True),
+#     ],
+# )
+# def test_get_backfill_filter(usage_ping, namespace_file, test_value, expected_value):
+#     """
+#     test backfill filter accuracy
+#     """
+#     usage_ping.set_metrics_backfill(usage_ping, test_value)
+#
+#     for namespace in namespace_file:
+#         if BACKFILL_FILTER(namespace):
+#             assert namespace.get("time_window_query") == expected_value
+#             assert expected_value is True
+#             assert namespace.get("counter_name") == test_value
 
-    for namespace in namespace_file:
-        if usage_ping.get_backfill_filter(self=usage_ping, namespace=namespace):
-            assert namespace.get("time_window_query") == expected_value
-            assert expected_value is True
-            assert namespace.get("counter_name") == test_value
 
-
-def test_get_prepared_values(namespace_file, usage_ping):
-    """
-    Test query replacement for dates placeholder
-    """
-
-    filtering = ["counts_monthly.deployments", "counts_monthly.successful_deployments"]
-
-    test_dict = [
-        namespace
-        for namespace in namespace_file
-        if namespace.get("counter_name") in filtering
-    ]
-
-    test_dict_prepared = [
-        usage_ping.get_prepared_values(usage_ping, namespace)
-        for namespace in test_dict
-    ]
-
-    for name, prepared_query, level in test_dict_prepared:
-        assert datetime.strftime(usage_ping.end_date, "%Y-%m-%d") in prepared_query
-        assert datetime.strftime(usage_ping.start_date_28, "%Y-%m-%d") in prepared_query
-        assert "between_start_date" not in prepared_query
-        assert "between_end_date" not in prepared_query
-
-        assert name
-        assert level == "namespace"
+# def test_get_prepared_values(namespace_file, usage_ping):
+#     """
+#     Test query replacement for dates placeholder
+#     """
+#
+#     filtering = ["counts_monthly.deployments", "counts_monthly.successful_deployments"]
+#
+#     test_dict = [
+#         usage_ping.get_prepared_values(usage_ping, namespace)
+#         for namespace in namespace_file
+#         if namespace.get("counter_name") in filtering
+#     ]
+#
+#     for name, prepared_query, level in test_dict:
+#         assert datetime.strftime(usage_ping.end_date, "%Y-%m-%d") in prepared_query
+#         assert datetime.strftime(usage_ping.start_date_28, "%Y-%m-%d") in prepared_query
+#         assert "between_start_date" not in prepared_query
+#         assert "between_end_date" not in prepared_query
+#
+#         assert name
+#         assert level == "namespace"
+#
 
 
 def test_replace_placeholders(usage_ping):
