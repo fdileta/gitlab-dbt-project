@@ -3,6 +3,10 @@ import logging
 import os
 import sys
 from typing import Dict, Any, Optional
+import pytz
+
+utc = pytz.UTC
+
 
 from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
@@ -59,9 +63,7 @@ def load_incremental(
             0
         ][0]
         logging.info(f"Timestamp from the database is : {replication_timestamp_value}")
-        replication_timestamp=datetime.datetime.strptime(
-                replication_timestamp_value, "%Y-%m-%d %H:%M:%S%z"
-            )
+        replication_timestamp=utc.localize(replication_timestamp_value)
 
         last_load_time = get_last_load_time()
 
