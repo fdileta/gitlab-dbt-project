@@ -125,7 +125,7 @@ WITH first_contact  AS (
 
     SELECT *
     FROM {{ ref('dim_date') }}
-    WHERE date_actual::DATE >= '2019-10-01'
+    WHERE date_actual::DATE >= '2020-02-01' -- Restricting snapshot model to only have data from this date forward. More information https://gitlab.com/gitlab-data/analytics/-/issues/14418#note_1134521216
       AND date_actual <= CURRENT_DATE
 {%- endif %}
 
