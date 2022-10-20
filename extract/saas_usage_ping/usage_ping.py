@@ -49,7 +49,7 @@ class UsagePing(object):
         self.missing_definitions = {'sql': [], 'redis': []}
         self.duplicate_keys = []
 
-    def get_metrics_definitions(self):
+    def _get_metrics_definitions(self):
         config_dict = env.copy()
         headers = {
             "PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
@@ -165,7 +165,7 @@ class UsagePing(object):
                 return 'valid_source'
 
             else:
-                return 'invalid_source'
+                return 'not_matching_source'
         else:
             return 'missing_definition'
 
@@ -206,7 +206,7 @@ class UsagePing(object):
                 )
                 if data_source_status == 'valid_source':
                     valid_metric_dict[metric_name] = metric_value
-                elif data_source_status == 'invalid_source':
+                elif data_source_status == 'not_matching_source':
                     pass # do nothing, invalid sources are expected
                 elif data_source_status == 'missing_definition':
                     self.missing_definitions[payload_source].append(concat_metric_name)
@@ -410,14 +410,27 @@ class UsagePing(object):
         )
         self.loader_engine.dispose()
 
-    def merge_dicts(self, redis_metrics, sql_metrics, path=None):
+    def run_metric_checks(self):
+        is_error = False
+        if self.missing_definitions['sql'] or self.missing_definitions['redis']:
+            logging.warning(f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}.\n\nThis is a non-critical issue but these missing metrics are being excluded in the extract. Please open up an issue with product intelligence to add definition into the yaml file.")
+            self.missing_definitions = {'sql': [], 'redis': []}
+            is_error = True
+
+        if self.duplicate_keys:
+            logging.warning(f"There is a key collision between the redis and sql payload when merging the 2 payloads together. The redis key with collision is being dropped in favor of the sql one. Full details:\n{self.duplicate_keys}")
+            is_error = True
+        if is_error:
+            raise ValueError("Raising error to trigger Slack alert. Error is non-critical, but there is inconsistency with data. Please check above logs for either 'missing definitions' or 'key collision'.")
+
+    def _merge_dicts(self, redis_metrics, sql_metrics, path=None):
         "merges sql_metrics into redis_metrics, https://stackoverflow.com/a/7205107"
         if path is None:
             path = []
         for key in sql_metrics:
             if key in redis_metrics:
                 if isinstance(redis_metrics[key], dict) and isinstance(sql_metrics[key], dict):
-                    self.merge_dicts(redis_metrics[key], sql_metrics[key], path + [str(key)])
+                    self._merge_dicts(redis_metrics[key], sql_metrics[key], path + [str(key)])
                 elif redis_metrics[key] == sql_metrics[key]:
                     pass  # same leaf value
                 else:
@@ -429,23 +442,26 @@ class UsagePing(object):
         return redis_metrics
 
     def saas_instance_combined_metrics(self):
-        metric_definitions = self.get_metrics_definitions()
+        """
+        1. Main function to download sql/redis payloads
+        2. Compares each metric against metric_definitions file
+            - Drops any non-matching data_source metrics
+        3. Combines the two payloads
+        4. Uploads the combined payload, and any of the sql errors
+        """
+        metric_definitions = self._get_metrics_definitions()
         saas_queries = self._get_instance_queries()
 
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(metric_definitions, saas_queries)
         redis_metrics = self.saas_instance_redis_metrics(metric_definitions)
 
-        combined_metrics = self.merge_dicts(redis_metrics, sql_metrics)
+        combined_metrics = self._merge_dicts(redis_metrics, sql_metrics)
 
         self.upload_combined_metrics(combined_metrics, saas_queries)
         if sql_metric_errors:
             self.upload_sql_metric_errors(sql_metric_errors)
 
-        # TODO need to implement
-        # self.check_missing_definitions()
-        # TODO need to implement
-        # self.check_dups_in_combined_metrics(sql_metrics, redis_metrics)
-        # return combined_metrics
+        self.run_metric_checks()
 
     def _get_namespace_queries(self) -> List[Dict]:
         """

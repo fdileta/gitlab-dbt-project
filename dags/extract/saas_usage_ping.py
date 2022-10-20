@@ -77,7 +77,7 @@ instance_redis_metrics_cmd = f"""
 """
 '''
 
-instance_ping = KubernetesPodOperator(
+instance_combined_metrics_ping = KubernetesPodOperator(
     **gitlab_defaults,
     image=DATA_IMAGE,
     task_id="saas-instance-usage-ping-combined-metrics",
@@ -117,3 +117,5 @@ namespace_ping = KubernetesPodOperator(
     arguments=[namespace_cmd],
     dag=dag,
 )
+
+[instance_combined_metrics_ping, namespace_ping]
