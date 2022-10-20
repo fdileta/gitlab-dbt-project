@@ -294,7 +294,7 @@ class UsagePing:
         Prepare variables for query
         """
         sql = str(query.get("counter_query"))
-        prepared_sql = self.replace_placeholders(sql=sql)
+        prepared_sql = self.replace_placeholders(self, sql=sql)
         name = query.get("counter_name", "Missing Name")
         level = query.get("level")
 
