@@ -8,9 +8,15 @@
     ])
 }},
 
-plan_id_by_month AS ( 
-                                                            
-  SELECT                                                    
+/*
+Look for a namespace's last event within the reporting period (i.e. the last 28 days of the month).
+The plan on the final event will be used to attribute the namespace's usage during the month.
+This is the same logic used in rpt_event_xmau_metric_monthly and rpt_event_plan_monthly.
+*/
+
+plan_id_by_month AS (
+
+  SELECT
     dim_ultimate_parent_namespace_id,
     event_calendar_month,
     plan_id_at_event_date,
@@ -19,13 +25,14 @@ plan_id_by_month AS (
     namespace_is_internal,
     ultimate_parent_namespace_type,
     namespace_creator_is_blocked,
-    event_created_at
+    event_created_at,
+    event_pk
   FROM mart_event_valid
-  WHERE event_date BETWEEN DATEADD('day', -27, LAST_DAY(event_date)) AND LAST_DAY(event_date) --last 28 days of the month (used for reporting)
-    AND event_date < DATE_TRUNC('month', CURRENT_DATE) --exlcude current month
+  WHERE event_date BETWEEN DATEADD('day', -27, LAST_DAY(event_date)) AND LAST_DAY(event_date) --last 28 days of the month
+    AND event_date < DATE_TRUNC('month', CURRENT_DATE) --exclude current month
   QUALIFY ROW_NUMBER() OVER (PARTITION BY dim_ultimate_parent_namespace_id, event_calendar_month
       ORDER BY event_created_at DESC) = 1
-      
+
 ),
 
 final AS (
