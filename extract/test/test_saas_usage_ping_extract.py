@@ -1,17 +1,39 @@
-import pytest
+"""
+The main test routine for Automated Service Ping
+"""
+
 import sys
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+import pytest
 
-# Tweak path as due to script execution way in Airflow, can't touch the original code
-abs_path = os.path.dirname(os.path.realpath(__file__))
-abs_path = abs_path[: abs_path.find("extract")] + "/extract/saas_usage_ping"
-sys.path.append(abs_path)
 
-from extract.saas_usage_ping.usage_ping import UsagePing
+# # Tweak path as due to script execution way in Airflow,
+# # can't touch the original code
+# abs_path = os.path.dirname(os.path.realpath(__file__))
+# abs_path = abs_path[: abs_path.find("extract")] + "/extract/saas_usage_ping"
+# sys.path.append(abs_path)
+
+from extract.saas_usage_ping.usage_ping import UsagePing, SCHEMA_NAME, ENCODING
+
+
+def test_static_variables():
+    """
+    Check static variables
+    """
+    assert SCHEMA_NAME == "saas_usage_ping"
+    assert ENCODING == "utf8"
 
 
 def test_get_md5():
+    """
+    Simple MD5 test.
+    Know testing the private method is not aligned
+    with the best praxis,
+    but found it is sufficient
+    in this implementation.
+    """
+
     usage_ping_test = UsagePing
 
     input_timestamps = [
@@ -23,73 +45,201 @@ def test_get_md5():
         None,
     ]
 
-    """
-    Know testing the private method is not aligned with best praxis, but found it is sufficient
-    in this implementation.
-    """
-    for i, check_time in enumerate(input_timestamps):
-        res = usage_ping_test._get_md5(None, check_time)
+    for check_time in input_timestamps:
+        res = usage_ping_test._get_md5(usage_ping_test, check_time)
         # Check output data type
         assert isinstance(res, str)
         # Check is len 32 as it is expected length
         assert len(res) == 32  # bytes in hex representation
-        # As this is one-way function, can't test it with many things - let see to we have all details with various inputs
+        # As this is one-way function,
+        # can't test it with many things
+        # let see to we have all details with various inputs
         assert res is not None
 
 
-def test_evaluate_saas_queries():
+# def test_evaluate_saas_queries():
+#     """
+#     Run a series of test queries against Snowflake.
+#     The queries are designed to elicit both successful snowflake outputs
+#     and errors.
+#
+#     The test will check that the expected queries have failed and succeeded.
+#     The JSON structure is also being implicitly checked based on the ordering of the two lists (expected vs actual) being compared
+#
+#     Note: The snowflake outputs cannot be compared because they can change over time
+#     """
+#
+#     def get_keys_in_nested_dict(nested_dict, keys=list()):
+#         for key, val in nested_dict.items():
+#             if isinstance(val, dict):
+#                 get_keys_in_nested_dict(val, keys)
+#             if isinstance(key, str):
+#                 keys.append(key)
+#         return keys
+#
+#     usage_ping_test = UsagePing()
+#     connection = usage_ping_test.loader_engine.connect()
+#     saas_queries = {
+#         "active_user_count": "SELECT 'active_user_count' AS counter_name,  COUNT(users.id) AS counter_value, TO_DATE(CURRENT_DATE) AS run_day   FROM prep.gitlab_dotcom.gitlab_dotcom_users_dedupe_source AS users WHERE (users.state IN ('active')) AND (users.user_type IS NULL OR users.user_type IN (6, 4))",
+#         "counts": {
+#             "assignee_lists": "SELECT 'assignee_lists' AS counter_name,  COUNT(lists.id) AS counter_value, TO_DATE(CURRENT_DATE) AS run_day   FROM prep.gitlab_dotcom.gitlab_dotcom_lists_dedupe_source AS lists WHERE lists.list_type = 3",
+#             "test_failure": {"some_key": "SELECT ~"},
+#         },
+#         "ci_triggers": {
+#             "arbitrary_key": {"arbitrary_key2": {"arbitrary_key4": "SELECT ^"}}
+#         },
+#     }
+#
+#     expected_results = {
+#         "active_user_count": 11466893,
+#         "counts": {"assignee_lists": 52316},
+#     }
+#     expected_errors = {
+#         "counts": {
+#             "test_failure": {
+#                 "some_key": "Execution failed on sql 'SELECT ~': 001003 (42000): SQL compilation error:\nsyntax error line 1 at position 8 unexpected '<EOF>'."
+#             }
+#         },
+#         "ci_triggers": {
+#             "arbitrary_key": {
+#                 "arbitrary_key2": {
+#                     "arbitrary_key4": "Execution failed on sql 'SELECT ^': 001003 (42000): SQL compilation error:\nsyntax error line 1 at position 7 unexpected '^'."
+#                 }
+#             }
+#         },
+#     }
+#     results, errors = usage_ping_test.evaluate_saas_queries(connection, saas_queries)
+#
+#     # check that the correct queries have suceeded and errored
+#     assert get_keys_in_nested_dict(results) == get_keys_in_nested_dict(expected_results)
+#     assert get_keys_in_nested_dict(errors) == get_keys_in_nested_dict(expected_errors)
+
+
+@pytest.fixture(name="usage_ping")
+def get_usage_ping():
     """
-    Run a series of test queries against Snowflake.
-    The queries are designed to elicit both successful snowflake outputs
-    and errors.
+    Return UsagePing object
+    """
+    usage_ping = UsagePing
+    usage_ping.end_date = datetime.now()
+    usage_ping.start_date_28 = usage_ping.end_date - timedelta(days=28)
 
-    The test will check that the expected queries have failed and succeeded.
-    The JSON structure is also being implicitly checked based on the ordering of the two lists (expected vs actual) being compared
+    return usage_ping
 
-    Note: The snowflake outputs cannot be compared because they can change over time
+
+@pytest.fixture(name="namespace_file")
+def get_usage_ping_namespace_file(usage_ping):
+    """
+    Fixture for namespace file
     """
 
-    def get_keys_in_nested_dict(nested_dict, keys=list()):
-        for key, val in nested_dict.items():
-            if isinstance(val, dict):
-                get_keys_in_nested_dict(val, keys)
-            if isinstance(key, str):
-                keys.append(key)
-        return keys
+    return usage_ping.get_namespace_file(
+        usage_ping, file="usage_ping_namespace_queries.json"
+    )
 
-    usage_ping_test = UsagePing()
-    connection = usage_ping_test.loader_engine.connect()
-    saas_queries = {
-        "active_user_count": "SELECT 'active_user_count' AS counter_name,  COUNT(users.id) AS counter_value, TO_DATE(CURRENT_DATE) AS run_day   FROM prep.gitlab_dotcom.gitlab_dotcom_users_dedupe_source AS users WHERE (users.state IN ('active')) AND (users.user_type IS NULL OR users.user_type IN (6, 4))",
-        "counts": {
-            "assignee_lists": "SELECT 'assignee_lists' AS counter_name,  COUNT(lists.id) AS counter_value, TO_DATE(CURRENT_DATE) AS run_day   FROM prep.gitlab_dotcom.gitlab_dotcom_lists_dedupe_source AS lists WHERE lists.list_type = 3",
-            "test_failure": {"some_key": "SELECT ~"},
-        },
-        "ci_triggers": {
-            "arbitrary_key": {"arbitrary_key2": {"arbitrary_key4": "SELECT ^"}}
-        },
-    }
 
-    expected_results = {
-        "active_user_count": 11466893,
-        "counts": {"assignee_lists": 52316},
-    }
-    expected_errors = {
-        "counts": {
-            "test_failure": {
-                "some_key": "Execution failed on sql 'SELECT ~': 001003 (42000): SQL compilation error:\nsyntax error line 1 at position 8 unexpected '<EOF>'."
-            }
-        },
-        "ci_triggers": {
-            "arbitrary_key": {
-                "arbitrary_key2": {
-                    "arbitrary_key4": "Execution failed on sql 'SELECT ^': 001003 (42000): SQL compilation error:\nsyntax error line 1 at position 7 unexpected '^'."
-                }
-            }
-        },
-    }
-    results, errors = usage_ping_test.evaluate_saas_queries(connection, saas_queries)
+def test_json_file_consistency_time_window_query(namespace_file):
+    """
+    Test is dictionary is constructed properly in
+    the file usage_ping_namespace_queries.json
 
-    # check that the correct queries have suceeded and errored
-    assert get_keys_in_nested_dict(results) == get_keys_in_nested_dict(expected_results)
-    assert get_keys_in_nested_dict(errors) == get_keys_in_nested_dict(expected_errors)
+    If time_window_query=True,
+    counter_query should contain ["between_start_date","between_end_date"]
+    """
+
+    for metrics in namespace_file:
+        counter_query = metrics.get("counter_query")
+        time_window_query = bool(metrics.get("time_window_query", False))
+
+        time_window_yes = (
+            "between_start_date" in counter_query
+            and "between_end_date" in counter_query
+            and time_window_query is True
+        )
+        time_window_no = (
+            "between_start_date" not in counter_query
+            and "between_end_date" not in counter_query
+            and time_window_query is False
+        )
+
+        assert time_window_yes or time_window_no
+
+
+def test_namespace_file(namespace_file):
+    """
+    Test file loading
+    """
+
+    assert namespace_file
+
+
+def test_namespace_file_error(usage_ping):
+    """
+    Test file loading
+    """
+    with pytest.raises(FileNotFoundError):
+        usage_ping.get_namespace_file(usage_ping, "THIS_DOES_NOT_EXITS.json")
+
+
+def test_json_file_consistency_level(namespace_file):
+    """
+    Test is dictionary is constructed properly in
+    the file usage_ping_namespace_queries.json
+
+    If level=namespace
+    """
+
+    for metrics in namespace_file:
+        level = metrics.get("level")
+
+        assert level == "namespace"
+
+
+@pytest.mark.parametrize(
+    "test_value, expected_value",
+    [
+        ("active_user_count", False),
+        (
+            "usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations",
+            True,
+        ),
+        ("usage_activity_by_stage_monthly.manage.audit_event_destinations", True),
+        ("counts.boards", False),
+        ("usage_activity_by_stage_monthly.configure.instance_clusters_enabled", True),
+        ("counts_monthly.deployments", True),
+    ],
+)
+def test_get_backfill_filter(usage_ping, namespace_file, test_value, expected_value):
+    """
+    test backfill filter accuracy
+    """
+    usage_ping.set_metrics_backfill(usage_ping, test_value)
+
+    for namespace in namespace_file:
+        if usage_ping.get_backfill_filter(self=usage_ping, namespace=namespace):
+            assert namespace.get("time_window_query") == expected_value
+            assert expected_value is True
+            assert namespace.get("counter_name") == test_value
+
+
+def test_get_prepared_query(namespace_file, usage_ping):
+    """
+    Test query replacement for dates placeholder
+    """
+
+    filtering = ["counts_monthly.deployments", "counts_monthly.successful_deployments"]
+
+    test_dict = [
+        namespace
+        for namespace in namespace_file
+        if namespace.get("counter_name") in filtering
+    ]
+
+    test_dict_prepared = [
+        usage_ping.get_prepared_query(usage_ping, namespace)[1]
+        for namespace in test_dict
+    ]
+
+    for prepared_query in test_dict_prepared:
+        assert datetime.strftime(usage_ping.end_date, "%Y-%m-%d") in prepared_query
+        assert datetime.strftime(usage_ping.start_date_28, "%Y-%m-%d") in prepared_query

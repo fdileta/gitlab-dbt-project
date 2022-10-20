@@ -31,6 +31,7 @@ from transform_postgres_to_snowflake import (
 )
 
 ENCODING = "utf8"
+SCHEMA_NAME = "saas_usage_ping"
 
 
 class UsagePing:
@@ -50,6 +51,13 @@ class UsagePing:
 
         self.start_date_28 = self.end_date - datetime.timedelta(28)
         self.dataframe_api_columns = META_API_COLUMNS
+        self.metrics_backfill = []
+
+    def set_metrics_backfill(self, metrics: list):
+        self.metrics_backfill = metrics
+
+    def get_metrics_backfill(self):
+        return self.metrics_backfill
 
     def _get_instance_queries(self) -> Dict:
         """
@@ -57,8 +65,8 @@ class UsagePing:
         to generate the {ping_name: sql_query} dictionary
         """
         with open(
-            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE),
-            encoding=ENCODING,
+                os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE),
+                encoding=ENCODING,
         ) as file:
             saas_queries = json.load(file)
 
@@ -87,7 +95,7 @@ class UsagePing:
         return dataframe_api_value_list
 
     def _get_md5(
-        self, input_timestamp: float = datetime.datetime.utcnow().timestamp()
+            self, input_timestamp: float = datetime.datetime.utcnow().timestamp()
     ) -> str:
         """
         Convert input datetime into md5 hash.
@@ -112,9 +120,9 @@ class UsagePing:
         param file_name: str
         return: dict
         """
-        with open(
-            os.path.join(os.path.dirname(__file__), file_name), encoding=ENCODING
-        ) as file:
+        full_path = os.path.join(os.path.dirname(__file__), file_name)
+
+        with open(full_path, encoding=ENCODING) as file:
             meta_data = json.load(file)
 
         return meta_data
@@ -188,15 +196,15 @@ class UsagePing:
 
         ping_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
-            + self.dataframe_api_columns
+                    + self.dataframe_api_columns
         )
 
         ping_to_upload.loc[0] = [
-            saas_queries,
-            json.dumps(results),
-            self.end_date,
-            self._get_md5(datetime.datetime.utcnow().timestamp()),
-        ] + self._get_dataframe_api_values(
+                                    saas_queries,
+                                    json.dumps(results),
+                                    self.end_date,
+                                    self._get_md5(datetime.datetime.utcnow().timestamp()),
+                                ] + self._get_dataframe_api_values(
             self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
         )
 
@@ -249,10 +257,10 @@ class UsagePing:
         )
 
         redis_data_to_upload.loc[0] = [
-            json.dumps(json_data),
-            self.end_date,
-            self._get_md5(datetime.datetime.utcnow().timestamp()),
-        ] + self._get_dataframe_api_values(json_data)
+                                          json.dumps(json_data),
+                                          self.end_date,
+                                          self._get_md5(datetime.datetime.utcnow().timestamp()),
+                                      ] + self._get_dataframe_api_values(json_data)
 
         dataframe_uploader(
             redis_data_to_upload,
@@ -261,30 +269,51 @@ class UsagePing:
             "saas_usage_ping",
         )
 
-    def process_namespace_ping(self, query_dict, connection):
+    def get_prepared_query(self, query: dict) -> tuple:
         """
-        Process namespace ping and upload to Snowflake
+        Replace dates placeholders with proper dates:
+        Usage:
+        Input: "SELECT 1 FROM TABLE WHERE created_at BETWEEN between_start_date AND between_end_date"
+        Output: "SELECT 1 FROM TABLE WHERE created_at BETWEEN '2022-01-01' AND '2022-01-28"
         """
+        sql_text = query.get("counter_query")
+        name = query.get("counter_name", "Missing Name")
+        time_window = query.get("time_window_query", False)
 
-        base_query = query_dict.get("counter_query")
-        ping_name = query_dict.get("counter_name", "Missing Name")
-        logging.info(f"Running ping {ping_name}...")
-
-        if query_dict.get("time_window_query", False):
-            base_query = base_query.replace(
+        if time_window:
+            sql_text = sql_text.replace(
                 "between_end_date", f"'{str(self.end_date)}'"
             )
-            base_query = base_query.replace(
+            sql_text = sql_text.replace(
                 "between_start_date", f"'{str(self.start_date_28)}'"
             )
+        return name, sql_text
 
-        if "namespace_ultimate_parent_id" not in base_query:
-            logging.info(f"Skipping ping {ping_name} due to no namespace information.")
+    def upload_to_snowflake(self, table_name: str, data: pd.DataFrame) -> None:
+        """
+        Upload dataframe to Snowflake
+        """
+        dataframe_uploader(
+            dataframe=data,
+            engine=self.loader_engine,
+            table_name=table_name,
+            schema=SCHEMA_NAME,
+        )
+
+    def process_namespace_ping(self, query_dict, connection):
+        """
+        Upload result of namespace ping to Snowflake
+        """
+
+        metric_name, metric_query = self.get_prepared_query(query=query_dict)
+
+        if "namespace_ultimate_parent_id" not in metric_query:
+            logging.info(f"Skipping ping {metric_name} due to no namespace information.")
             return
 
         try:
             # Expecting [id, namespace_ultimate_parent_id, counter_value]
-            results = pd.read_sql(sql=base_query, con=connection)
+            results = pd.read_sql(sql=metric_query, con=connection)
             error = "Success"
         except SQLAlchemyError as err:
             error = str(err.__dict__["orig"])
@@ -293,18 +322,16 @@ class UsagePing:
             )
             results.loc[0] = [None, None, None]
 
-        results["ping_name"] = ping_name
+        results["ping_name"] = metric_name
         results["level"] = query_dict.get("level", None)
-        results["query_ran"] = base_query
+        results["query_ran"] = metric_query
         results["error"] = error
         results["ping_date"] = self.end_date
 
-        dataframe_uploader(
-            results,
-            self.loader_engine,
-            "gitlab_dotcom_namespace",
-            "saas_usage_ping",
-        )
+        self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
+
+    def get_namespace_file(self, file: str):
+        return self._get_meta_data(self, file_name=file)
 
     def saas_namespace_ping(self, metrics_filter=lambda _: True):
         """
@@ -319,9 +346,9 @@ class UsagePing:
             }
         }
         """
-        saas_queries = self._get_meta_data(
+        saas_queries = self.get_namespace_file(
             "usage_ping_namespace_queries.json"
-        )  # _get_namespace_queries()
+        )
 
         connection = self.loader_engine.connect()
 
@@ -332,17 +359,27 @@ class UsagePing:
         connection.close()
         self.loader_engine.dispose()
 
-    def backfill(self):
+
+    def get_backfill_filter(self, namespace):
+        """
+        Define backfill filter for
+        processing a namespace metrics load
+        """
+
+        return namespace.get("time_window_query", False) and namespace.get("counter_name") in self.get_metrics_backfill(self)
+
+    def namespace_backfill(self):
         """
         Routine to back-filling
         data for namespace ping
         """
 
-        def filtering():
-            return lambda query_dict: query_dict.get("time_window_query", False)
+        # pick up metrics from the parameter list
+        # and only if time_window_query == False
 
-        backfill_filter = filtering()
-        self.saas_namespace_ping(backfill_filter)
+        backfill_filter = self.get_backfill_filter()
+
+        self.saas_namespace_ping(metrics_filter=backfill_filter)
 
 
 if __name__ == "__main__":
