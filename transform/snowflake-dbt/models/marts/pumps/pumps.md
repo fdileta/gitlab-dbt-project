@@ -22,3 +22,12 @@ The join to `dim_subscription_snapshot_bottom_up` uses a datediff of -1 day so t
 Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
 
 {% enddocs %}
+
+
+{% docs mart_crm_account_id %}
+
+This table contains combined information on PtE and PtC scores per account and score date.
+
+Detailed information on this model can be found on this [issue] (https://gitlab.com/gitlab-data/data-science/-/issues/62).
+
+{% enddocs %}
