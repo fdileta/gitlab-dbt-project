@@ -284,52 +284,6 @@ class UsagePing(object):
 
         return sql_metrics, sql_metric_errors
 
-        '''
-        ping_to_upload = pd.DataFrame(
-            columns=["query_map", "run_results", "ping_date", "run_id"]
-            + self.dataframe_api_columns
-        )
-
-        ping_to_upload.loc[0] = [
-            saas_queries,
-            json.dumps(sql_metrics),
-            self.end_date,
-            self._get_md5(datetime.datetime.utcnow().timestamp()),
-        ] + self._get_dataframe_api_values(
-            self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
-        )
-
-        dataframe_uploader(
-            ping_to_upload,
-            self.loader_engine,
-            "instance_sql_metrics",
-            "saas_usage_ping",
-        )
-
-        """
-        Handling error data part to load data into table: raw.saas_usage_ping.instance_sql_errors
-        """
-        if sql_metric_errors:
-            error_data_to_upload = pd.DataFrame(
-                columns=["run_id", "sql_errors", "ping_date"]
-            )
-
-            error_data_to_upload.loc[0] = [
-                self._get_md5(datetime.datetime.utcnow().timestamp()),
-                json.dumps(sql_metric_errors),
-                self.end_date,
-            ]
-
-            dataframe_uploader(
-                error_data_to_upload,
-                self.loader_engine,
-                "instance_sql_errors",
-                "saas_usage_ping",
-            )
-
-        self.loader_engine.dispose()
-        '''
-
     def saas_instance_redis_metrics(self, metric_definitions):
 
         """
@@ -348,24 +302,6 @@ class UsagePing(object):
         payload_source = 'redis'
         redis_metrics = self.keep_valid_metric_definitions(redis_metrics, payload_source, metric_definitions)
 
-        '''
-        redis_data_to_upload = pd.DataFrame(
-            columns=["jsontext", "ping_date", "run_id"] + self.dataframe_api_columns
-        )
-
-        redis_data_to_upload.loc[0] = [
-            json.dumps(redis_metrics),
-            self.end_date,
-            self._get_md5(datetime.datetime.utcnow().timestamp()),
-        ] + self._get_dataframe_api_values(redis_metrics)
-
-        dataframe_uploader(
-            redis_data_to_upload,
-            self.loader_engine,
-            "instance_redis_metrics",
-            "saas_usage_ping",
-        )
-        '''
         return redis_metrics
 
     def upload_combined_metrics(self, combined_metrics, saas_queries):
@@ -411,17 +347,17 @@ class UsagePing(object):
         self.loader_engine.dispose()
 
     def run_metric_checks(self):
-        is_error = False
+        has_error = False
         if self.missing_definitions['sql'] or self.missing_definitions['redis']:
             logging.warning(f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}.\n\nThis is a non-critical issue but these missing metrics are being excluded in the extract. Please open up an issue with product intelligence to add definition into the yaml file.")
             self.missing_definitions = {'sql': [], 'redis': []}
-            is_error = True
+            has_error = True
 
         if self.duplicate_keys:
             logging.warning(f"There is a key collision between the redis and sql payload when merging the 2 payloads together. The redis key with collision is being dropped in favor of the sql one. Full details:\n{self.duplicate_keys}")
-            is_error = True
-        if is_error:
-            raise ValueError("Raising error to trigger Slack alert. Error is non-critical, but there is inconsistency with data. Please check above logs for either 'missing definitions' or 'key collision'.")
+            has_error = True
+        if has_error:
+            raise ValueError("Raising error to trigger Slack alert. Error is non-critical, but there is inconsistency with data. Please check above logs for either 'missing definitions' or 'key collision' warning.")
 
     def _merge_dicts(self, redis_metrics, sql_metrics, path=None):
         "merges sql_metrics into redis_metrics, https://stackoverflow.com/a/7205107"
