@@ -94,10 +94,6 @@ mart_retention_parent_account_snapshot:
   INCLUDED: true
   TABLE_LIST_BACKUP:
   - MART_RETENTION_PARENT_ACCOUNT_SNAPSHOT
-mart_waterfall_snapshot:
-  INCLUDED: true
-  TABLE_LIST_BACKUP:
-  - MART_WATERFALL_SNAPSHOT
 netsuite_accounting_periods_snapshots:
   INCLUDED: true
   TABLE_LIST_BACKUP:
