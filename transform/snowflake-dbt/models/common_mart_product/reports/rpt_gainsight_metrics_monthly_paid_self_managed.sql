@@ -11,7 +11,7 @@
 {{ simple_cte([
     ('bdg_subscription_product_rate_plan', 'bdg_subscription_product_rate_plan'),
     ('seat_link', 'fct_usage_self_managed_seat_link'),
-    ('ping_instance_wave', 'mart_ping_instance_metric_gainsight_wave_self_managed'),
+    ('ping_instance_wave', 'mart_ping_instance_metric_health_score_self_managed'),
     ('dim_host_instance_type','dim_host_instance_type')
 ]) }}
 
