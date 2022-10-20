@@ -23,7 +23,6 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 
 {% enddocs %}
 
-
 {% docs mart_crm_account_id %}
 
 This table contains combined information on PtE and PtC scores per account and score date.
