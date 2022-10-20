@@ -1,20 +1,38 @@
 """
 The main test routine for Automated Service Ping
 """
-
-import sys
-import os
 from datetime import datetime, timedelta
 import pytest
 
+from extract.saas_usage_ping.usage_ping import (
+    UsagePing,
+    SCHEMA_NAME,
+    ENCODING,
+    NAMESPACE_FILE,
+)
 
-# # Tweak path as due to script execution way in Airflow,
-# # can't touch the original code
-# abs_path = os.path.dirname(os.path.realpath(__file__))
-# abs_path = abs_path[: abs_path.find("extract")] + "/extract/saas_usage_ping"
-# sys.path.append(abs_path)
 
-from extract.saas_usage_ping.usage_ping import UsagePing, SCHEMA_NAME, ENCODING
+@pytest.fixture(name="usage_ping")
+def get_usage_ping():
+    """
+    Return UsagePing object
+    """
+    usage_ping = UsagePing
+    usage_ping.end_date = datetime.now()
+    usage_ping.start_date_28 = usage_ping.end_date - timedelta(days=28)
+
+    return usage_ping
+
+
+@pytest.fixture(name="namespace_file")
+def get_usage_ping_namespace_file(usage_ping):
+    """
+    Fixture for namespace file
+    """
+
+    return usage_ping.get_namespace_file(
+        usage_ping, file="usage_ping_namespace_queries.json"
+    )
 
 
 def test_static_variables():
@@ -23,9 +41,10 @@ def test_static_variables():
     """
     assert SCHEMA_NAME == "saas_usage_ping"
     assert ENCODING == "utf8"
+    assert NAMESPACE_FILE == "usage_ping_namespace_queries.json"
 
 
-def test_get_md5():
+def test_get_md5(usage_ping):
     """
     Simple MD5 test.
     Know testing the private method is not aligned
@@ -33,8 +52,6 @@ def test_get_md5():
     but found it is sufficient
     in this implementation.
     """
-
-    usage_ping_test = UsagePing
 
     input_timestamps = [
         datetime(2021, 9, 1, 23, 10, 21).timestamp(),
@@ -46,7 +63,7 @@ def test_get_md5():
     ]
 
     for check_time in input_timestamps:
-        res = usage_ping_test._get_md5(usage_ping_test, check_time)
+        res = usage_ping._get_md5(usage_ping, check_time)
         # Check output data type
         assert isinstance(res, str)
         # Check is len 32 as it is expected length
@@ -113,29 +130,6 @@ def test_get_md5():
 #     # check that the correct queries have suceeded and errored
 #     assert get_keys_in_nested_dict(results) == get_keys_in_nested_dict(expected_results)
 #     assert get_keys_in_nested_dict(errors) == get_keys_in_nested_dict(expected_errors)
-
-
-@pytest.fixture(name="usage_ping")
-def get_usage_ping():
-    """
-    Return UsagePing object
-    """
-    usage_ping = UsagePing
-    usage_ping.end_date = datetime.now()
-    usage_ping.start_date_28 = usage_ping.end_date - timedelta(days=28)
-
-    return usage_ping
-
-
-@pytest.fixture(name="namespace_file")
-def get_usage_ping_namespace_file(usage_ping):
-    """
-    Fixture for namespace file
-    """
-
-    return usage_ping.get_namespace_file(
-        usage_ping, file="usage_ping_namespace_queries.json"
-    )
 
 
 def test_json_file_consistency_time_window_query(namespace_file):
@@ -222,7 +216,7 @@ def test_get_backfill_filter(usage_ping, namespace_file, test_value, expected_va
             assert namespace.get("counter_name") == test_value
 
 
-def test_get_prepared_query(namespace_file, usage_ping):
+def test_get_prepared_values(namespace_file, usage_ping):
     """
     Test query replacement for dates placeholder
     """
@@ -236,10 +230,30 @@ def test_get_prepared_query(namespace_file, usage_ping):
     ]
 
     test_dict_prepared = [
-        usage_ping.get_prepared_query(usage_ping, namespace)[1]
+        usage_ping.get_prepared_values(usage_ping, namespace)
         for namespace in test_dict
     ]
 
-    for prepared_query in test_dict_prepared:
+    for name, prepared_query, level in test_dict_prepared:
         assert datetime.strftime(usage_ping.end_date, "%Y-%m-%d") in prepared_query
         assert datetime.strftime(usage_ping.start_date_28, "%Y-%m-%d") in prepared_query
+        assert "between_start_date" not in prepared_query
+        assert "between_end_date" not in prepared_query
+
+        assert name
+        assert level == "namespace"
+
+
+def test_replace_placeholders(usage_ping):
+    """
+    Test string replace for query
+    """
+    sql = "SELECT 1 FROM TABLE WHERE created_at BETWEEN between_start_date AND between_end_date"
+
+    actual = usage_ping.replace_placeholders(usage_ping, sql=sql)
+
+    assert "between_start_date" not in actual
+    assert "between_end_date" not in actual
+
+    assert datetime.strftime(usage_ping.end_date, "%Y-%m-%d") in actual
+    assert datetime.strftime(usage_ping.start_date_28, "%Y-%m-%d") in actual
