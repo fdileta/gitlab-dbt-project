@@ -101,6 +101,7 @@ WITH map_merged_crm_account AS (
       billing_country,
       billing_country_code,
       df_industry,
+      industry,
       tsp_territory,
       tsp_region,
       tsp_area,
@@ -176,6 +177,7 @@ WITH map_merged_crm_account AS (
         ELSE 'Non - Focus Account'
       END                                                                 AS parent_crm_account_focus_account,
       ultimate_parent_account.tsp_max_family_employees                    AS parent_crm_account_tsp_max_family_employees,
+      ultimate_parent_account.tsp_account_employees                       AS parent_crm_account_tsp_account_employees,
       CASE
          WHEN ultimate_parent_account.tsp_max_family_employees > 2000 THEN 'Employees > 2K'
          WHEN ultimate_parent_account.tsp_max_family_employees <= 2000 AND ultimate_parent_account.tsp_max_family_employees > 1500 THEN 'Employees > 1.5K'
@@ -217,6 +219,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.billing_country                                        AS crm_account_billing_country,
       sfdc_account.billing_country_code                                   AS crm_account_billing_country_code,
       sfdc_account.account_type                                           AS crm_account_type,
+      sfdc_account.industry                                               AS crm_account_industry,
       sfdc_account.account_owner                                          AS crm_account_owner,
       sfdc_account.tsp_territory                                          AS crm_account_sales_territory,
       sfdc_account.tsp_region                                             AS crm_account_tsp_region,
@@ -228,6 +231,7 @@ WITH map_merged_crm_account AS (
          WHEN sfdc_account.tsp_max_family_employees <= 1500 AND sfdc_account.tsp_max_family_employees > 1000  THEN 'Employees > 1K'
          ELSE 'Employees < 1K'
       END                                                                 AS crm_account_employee_count_band,
+      sfdc_account.tsp_account_employees,
       sfdc_account.tsp_max_family_employees,
       sfdc_account.partner_vat_tax_id,
       sfdc_account.account_manager,
