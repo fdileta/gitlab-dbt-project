@@ -34,6 +34,19 @@ ENCODING = "utf8"
 SCHEMA_NAME = "saas_usage_ping"
 NAMESPACE_FILE = "usage_ping_namespace_queries.json"
 
+
+def get_backfill_filter(filter_list: list):
+    """
+    Define backfill filter for
+    processing a namespace metrics load
+    """
+
+    return (
+        lambda namespace: namespace.get("time_window_query", False)
+        and namespace.get("counter_name") in filter_list
+    )
+
+
 class UsagePing:
     """
     Usage ping class represent as an umbrella
@@ -53,15 +66,15 @@ class UsagePing:
         self.dataframe_api_columns = META_API_COLUMNS
         self.metrics_backfill = []
 
-    def set_metrics_backfill(self, metrics: list):
+    def set_metrics_filter(self, metrics: list):
         """
-        setter for metrics backfill
+        setter for metrics filter
         """
         self.metrics_backfill = metrics
 
-    def get_metrics_backfill(self):
+    def get_metrics_filter(self):
         """
-        getter for metrics backfill
+        getter for metrics filter
         """
         return self.metrics_backfill
 
@@ -376,17 +389,6 @@ class UsagePing:
         connection.close()
         self.loader_engine.dispose()
 
-    def get_backfill_filter(self, namespace):
-        """
-        Define backfill filter for
-        processing a namespace metrics load
-        """
-
-        return (
-            namespace.get("time_window_query", False)
-            and namespace.get("counter_name") in self.get_metrics_backfill()
-        )
-
     def namespace_backfill(self):
         """
         Routine to back-filling
@@ -395,10 +397,7 @@ class UsagePing:
 
         # pick up metrics from the parameter list
         # and only if time_window_query == False
-        backfill_filter = (
-            lambda x: x.get("time_window_query", False)
-            and x.get("counter_name") in self.get_metrics_backfill()
-        )  # self.get_backfill_filter() # TODO: rbacovic check what is the best way implement this
+        backfill_filter = get_backfill_filter(self.get_metrics_filter())
 
         self.saas_namespace_ping(metrics_filter=backfill_filter)
 

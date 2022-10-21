@@ -9,6 +9,7 @@ from extract.saas_usage_ping.usage_ping import (
     SCHEMA_NAME,
     ENCODING,
     NAMESPACE_FILE,
+    get_backfill_filter,
 )
 
 
@@ -189,31 +190,43 @@ def test_json_file_consistency_level(namespace_file):
         assert level == "namespace"
 
 
-# @pytest.mark.parametrize(
-#     "test_value, expected_value",
-#     [
-#         ("active_user_count", False),
-#         (
-#             "usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations",
-#             True,
-#         ),
-#         ("usage_activity_by_stage_monthly.manage.audit_event_destinations", True),
-#         ("counts.boards", False),
-#         ("usage_activity_by_stage_monthly.configure.instance_clusters_enabled", True),
-#         ("counts_monthly.deployments", True),
-#     ],
-# )
-# def test_get_backfill_filter(usage_ping, namespace_file, test_value, expected_value):
-#     """
-#     test backfill filter accuracy
-#     """
-#     usage_ping.set_metrics_backfill(usage_ping, test_value)
-#
-#     for namespace in namespace_file:
-#         if BACKFILL_FILTER(namespace):
-#             assert namespace.get("time_window_query") == expected_value
-#             assert expected_value is True
-#             assert namespace.get("counter_name") == test_value
+@pytest.mark.parametrize(
+    "test_value, expected_value",
+    [
+        ("active_user_count", False),
+        (
+            "usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations",
+            True,
+        ),
+        ("usage_activity_by_stage_monthly.manage.audit_event_destinations", True),
+        ("counts.boards", False),
+        ("usage_activity_by_stage_monthly.configure.instance_clusters_enabled", True),
+        ("counts_monthly.deployments", True),
+    ],
+)
+def test_get_backfill_filter(namespace_file, test_value, expected_value):
+    """
+    test backfill filter accuracy with
+    lambda as a return statement
+    """
+
+    metrics_filter = get_backfill_filter([test_value])
+
+    for namespace in namespace_file:
+        if metrics_filter(namespace):
+            assert namespace.get("time_window_query") == expected_value
+            assert expected_value is True
+            assert namespace.get("counter_name") == test_value
+
+
+def test_set_metrics_filter(usage_ping):
+    """
+    Test setter
+    """
+    actual = ["test_list"]
+    usage_ping.set_metrics_filter(usage_ping, actual)
+
+    assert usage_ping.get_metrics_filter(usage_ping) == actual
 
 
 # def test_get_prepared_values(namespace_file, usage_ping):
