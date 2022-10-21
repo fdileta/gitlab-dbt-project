@@ -349,8 +349,7 @@ class UsagePing(object):
             self._get_md5(datetime.datetime.utcnow().timestamp()),
         ] + self._get_dataframe_api_values(
             self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
-          + ['combined']
-        )
+        ) + ['combined']
 
         dataframe_uploader(
             df_to_upload,
