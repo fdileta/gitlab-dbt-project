@@ -8,7 +8,7 @@
   })
 }}
 
-{% set gainsight_wave_metrics = dbt_utils.get_column_values(table=ref ('gainsight_wave_metrics'), column='metric_name', max_records=1000, default=['']) %}
+{% set gainsight_wave_metrics = dbt_utils.get_column_values(table=ref ('health_score_metrics'), column='metric_name', max_records=1000, default=['']) %}
 
 {{ simple_cte([
     ('prep_saas_usage_ping_namespace','prep_saas_usage_ping_namespace'),
