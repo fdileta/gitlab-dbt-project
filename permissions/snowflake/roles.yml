@@ -1077,9 +1077,6 @@ roles:
         warehouses:
             - dev_xs
             - loading
-        member_of:
-            - analyst_sales
-            - restricted_safe
         owns:
             schemas:
                 - raw.sales_analytics
@@ -4605,6 +4602,9 @@ users:
             - sysadmin
             - transformer
             - data_science_loader
+            - sales_analytics
+            - restricted_safe
+            - reporter
 
     - alpcohen:
         can_login: yes
