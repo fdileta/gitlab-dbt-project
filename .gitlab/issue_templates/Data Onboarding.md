@@ -211,18 +211,18 @@ Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credential
 
 ### Airflow
 
-#### Setting up ./kube/config 
+#### Setting up ~/.kube/config 
 
 **Ensure you have your service credentials configured, and the ${GOOGLE_APPLICATION_CREDENTIALS} variable is set locally as instructed above**
 
-- [ ] Run `gcloud container clusters get-credentials data-ops --zone us-west1-a --project gitlab-analysis` to connect to the Airflow kubernetes cluster, and configure your `./.kube/config` file
-- [ ] Navigate to `./.kube/config`. 
-- [ ] Copy and paste the file, rename the copied file to `./.kube/config_docker`
+These instructions will assume that your kubectl configuration was saved at the default location `~/.kube/config`:
+- [ ] Run `gcloud container clusters get-credentials data-ops --zone us-west1-a --project gitlab-analysis` to connect to the Airflow kubernetes cluster, and configure your `~/.kube/config` file
+- [ ] Create a duplicate of this file called `config_docker` by running this command (from any directory in your terminal): `cp ~/.kube/config ~/.kube/config_docker`
 - [ ] Open the copied file in a text editor. 
-- [ ] Find the line with `cmd-path: /Users/{your username}/google-cloud-sdk/bin/gcloud`
-- [ ] Replace this line with `cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud`
+- [ ] Find the line with `cmd-path: /Users/{your username}/google-cloud-sdk/bin/gcloud` and *replace* it with `cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud`
 
-This file will then be used each time you test locally via Airflow, and is passed to the containers in the ./analytics/docker-compose.yml file.
+There are two config files because the `config` file will be used for running kubectl commands locally. 
+And the `config_docker` file will be used by the docker containers when you are running Airflow locally. The latter file is passed to the containers via the analytics/docker-compose.yml file.
 
 - [ ] Install [Rancher Desktop](https://rancherdesktop.io/) using the UI install specified for your system
   - [ ] Make sure to download Rancher Desktop version `1.4.1` - you can find the correct version for your system here https://github.com/rancher-sandbox/rancher-desktop/releases/tag/v1.4.1
