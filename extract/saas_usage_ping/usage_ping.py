@@ -380,7 +380,7 @@ class UsagePing(object):
         has_error = False
         if self.missing_definitions[SQL_KEY] or self.missing_definitions[REDIS_KEY]:
             logging.warning(
-                f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}.\n\nThis is a non-critical issue but these missing metrics are being excluded in the extract. Please open up an issue with product intelligence to add definition into the yaml file."
+                f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}. Please open up an issue with product intelligence to add missing definition into the yaml file."
             )
             has_error = True
 
@@ -389,9 +389,11 @@ class UsagePing(object):
                 f"There is a key collision between the redis and sql payload when merging the 2 payloads together. The redis key with collision is being dropped in favor of the sql one. Full details:\n{self.duplicate_keys}"
             )
             has_error = True
+
+        # only raise error after BOTH errors have been checked for
         if has_error:
             raise ValueError(
-                "Raising error to trigger Slack alert. Error is non-critical, but there is inconsistency with data. Please check above logs for either 'missing definitions' or 'key collision' warning."
+                "Raising error to trigger Slack alert. Error is non-critical, but there is inconsistency with source data. Please check above logs for 'missing definitions' and/or 'key collision' warning."
             )
 
     def _merge_dicts(

@@ -8,7 +8,7 @@ abs_path = os.path.dirname(os.path.realpath(__file__))
 abs_path = abs_path[: abs_path.find("extract")] + "/extract/saas_usage_ping"
 sys.path.append(abs_path)
 
-from extract.saas_usage_ping.usage_ping import UsagePing
+from extract.saas_usage_ping.usage_ping import UsagePing, SQL_KEY, REDIS_KEY
 
 
 def test_get_md5():
@@ -93,3 +93,116 @@ def test_evaluate_saas_queries():
     # check that the correct queries have suceeded and errored
     assert get_keys_in_nested_dict(results) == get_keys_in_nested_dict(expected_results)
     assert get_keys_in_nested_dict(errors) == get_keys_in_nested_dict(expected_errors)
+
+
+def test_check_data_source():
+    """
+    Test the following:
+        1. Metric definitions are being returned from endpoint
+        2. Valid matching source is returned for the current metric, and the parent metric
+        3. Non-matching sources are returned correctly
+        4. Missing definitions are returned correctly
+    """
+    usage_ping_test = UsagePing()
+    metric_definitions_dict = usage_ping_test._get_metrics_definition_dict()
+
+    # matching redis concat_metric_name
+    payload_source = REDIS_KEY
+    concat_metric_name = 'counts.productivity_analytics_views'
+    prev_concat_metric_name = 'counts'
+    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    assert res == 'valid_source'
+
+    # matching sql concat_metric_name
+    payload_source = SQL_KEY
+    concat_metric_name = 'usage_activity_by_stage.secure.user_preferences_group_overview_security_dashboard'
+    prev_concat_metric_name = 'usage_activity_by_stage.secure'
+    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    assert res == 'valid_source'
+
+    # matching sql prev_concat_metric_name
+    payload_source = SQL_KEY
+    concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider.two-factor'
+    prev_concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider'
+    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    assert res == 'valid_source'
+
+    # NON-MATCHING redis prev_concat_metric_name
+    payload_source = REDIS_KEY # should be sql
+    concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider.two-factor'
+    prev_concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider'
+    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    assert res == 'not_matching_source'
+
+    # misisng definition
+    payload_source = REDIS_KEY # should be sql
+    concat_metric_name = 'some_missing_key.some_missing_key2'
+    prev_concat_metric_name = 'some_missing_key'
+    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    assert res == 'missing_definition'
+
+
+def test_keep_valid_metric_definitions():
+    """
+    Test that the payload only keeps the correct metrics as defined by the metric_definitions yaml file
+    """
+    usage_ping_test = UsagePing()
+    payload = {"recorded_at": "2022-10-13T20:23:45.242Z", "active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))", "counts": {"assignee_lists": -3, "ci_builds": -3, "ci_internal_pipelines": -1, "package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0}}
+
+    payload_source = REDIS_KEY
+    metric_definitions_dict = usage_ping_test._get_metrics_definition_dict()
+    valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(payload, payload_source, metric_definitions_dict)
+    expected_results = {"recorded_at": "2022-10-13T20:23:45.242Z", "counts": {"package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0}}
+    assert valid_metric_dict == expected_results
+
+
+def test_run_metric_checks():
+    """
+    Test that errors are thrown when there are:
+        - missing metric definitions
+        - key conflicts whe combining the redis & sql payloads
+    """
+    usage_ping_test = UsagePing()
+    usage_ping_test.run_metric_checks() # nothing should happen
+
+    # ensure that an error is raised if there's a missing definition
+    usage_ping_test.missing_definitions[SQL_KEY].append('some_missing_definition')
+    with pytest.raises(ValueError, match='Raising error to.*'):
+        usage_ping_test.run_metric_checks()
+
+    usage_ping_test.missing_definitions[SQL_KEY] = [] # reset
+    usage_ping_test.run_metric_checks() # nothing should happen
+
+    # ensure that an error is raised if there's a dup key
+    usage_ping_test.duplicate_keys.append('some duplicate key')
+    with pytest.raises(ValueError, match='Raising error to.*'):
+        usage_ping_test.run_metric_checks()
+
+
+def test_merge_dicts():
+    """
+    Check that when merging the redis & sql payloads, that the results are expected
+    """
+    usage_ping_test = UsagePing()
+
+    # share matching key, non-matching value is a non-dict (30 vs 40), will cause a conflict
+    redis_metrics = {'counts': {'events': 40}}
+    sql_metrics = {'counts': {'events': 30}}
+    res = usage_ping_test._merge_dicts(redis_metrics, sql_metrics)
+    assert res == {'counts': {'events': 30}}
+    assert len(usage_ping_test.duplicate_keys) == 1
+
+    # share conflicting key (events), value is a dictionary, the values are merged successfully
+    redis_metrics = {'counts': {'events': {'xmau': 40, 'package': 60}}}
+    sql_metrics = {'counts': {'events': {'license': 30, 'projects': 90}}}
+    res = usage_ping_test._merge_dicts(redis_metrics, sql_metrics)
+    assert res == {'counts': {'events': {'xmau': 40, 'package': 60, 'license': 30, 'projects': 90}}}
+
+    # duplicate k:v (events: 20) become one k:v, and distinct snippets/packages are merged
+    redis_metrics = {'counts': {'events': 20, 'snippets': -3}}
+    sql_metrics = {'counts': {'events': 20, 'packages': -5}}
+    res = usage_ping_test._merge_dicts(redis_metrics, sql_metrics)
+    assert res == {'counts': {'events': 20, 'snippets': -3, 'packages': -5}}
+
+    # still only one dup key from first assert
+    assert len(usage_ping_test.duplicate_keys) == 1
