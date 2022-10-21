@@ -392,7 +392,7 @@ class UsagePing(object):
 
         if self.duplicate_keys:
             logging.warning(
-                f"There is a key collision between the redis and sql payload when merging the 2 payloads together. The redis key with collision is being dropped in favor of the sql one. Full details:\n{self.duplicate_keys}"
+                f"There is a key collision(s) between the redis and sql payload when merging the 2 payloads together. The redis key with collision is being dropped in favor of the sql one. Full details:\n{self.duplicate_keys}"
             )
             has_error = True
 

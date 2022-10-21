@@ -127,14 +127,14 @@ def test_check_data_source():
     res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
     assert res == 'valid_source'
 
-    # NON-MATCHING redis prev_concat_metric_name
-    payload_source = REDIS_KEY # should be sql
+    # NON-MATCHING data source: redis payload, but metric definition shows data source as sql
+    payload_source = REDIS_KEY
     concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider.two-factor'
     prev_concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider'
     res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
     assert res == 'not_matching_source'
 
-    # misisng definition
+    # metric in payload is missing in metric_definition yaml file
     payload_source = REDIS_KEY # should be sql
     concat_metric_name = 'some_missing_key.some_missing_key2'
     prev_concat_metric_name = 'some_missing_key'
@@ -144,7 +144,7 @@ def test_check_data_source():
 
 def test_keep_valid_metric_definitions():
     """
-    Test that the payload only keeps the correct metrics as defined by the metric_definitions yaml file
+    Test that only the correct metrics as defined by the metric_definitions yaml file are preserved within the payload
     """
     usage_ping_test = UsagePing()
     payload = {"recorded_at": "2022-10-13T20:23:45.242Z", "active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))", "counts": {"assignee_lists": -3, "ci_builds": -3, "ci_internal_pipelines": -1, "package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0}}
@@ -185,20 +185,20 @@ def test_merge_dicts():
     """
     usage_ping_test = UsagePing()
 
-    # share matching key, non-matching value is a non-dict (30 vs 40), will cause a conflict
+    # share matching key (counts), non-matching value is a non-dict (30 vs 40), will cause a conflict
     redis_metrics = {'counts': {'events': 40}}
     sql_metrics = {'counts': {'events': 30}}
     res = usage_ping_test._merge_dicts(redis_metrics, sql_metrics)
     assert res == {'counts': {'events': 30}}
     assert len(usage_ping_test.duplicate_keys) == 1
 
-    # share conflicting key (events), value is a dictionary, the values are merged successfully
+    # share matching key (events), value is a dictionary, the values are merged successfully
     redis_metrics = {'counts': {'events': {'xmau': 40, 'package': 60}}}
     sql_metrics = {'counts': {'events': {'license': 30, 'projects': 90}}}
     res = usage_ping_test._merge_dicts(redis_metrics, sql_metrics)
     assert res == {'counts': {'events': {'xmau': 40, 'package': 60, 'license': 30, 'projects': 90}}}
 
-    # duplicate k:v (events: 20) become one k:v, and distinct snippets/packages are merged
+    # duplicate k:v's (events: 20) become one k:v, and distinct snippets/packages k:v's are merged
     redis_metrics = {'counts': {'events': 20, 'snippets': -3}}
     sql_metrics = {'counts': {'events': 20, 'packages': -5}}
     res = usage_ping_test._merge_dicts(redis_metrics, sql_metrics)
