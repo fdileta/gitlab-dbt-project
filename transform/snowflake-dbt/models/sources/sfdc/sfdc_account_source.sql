@@ -48,6 +48,7 @@ renamed AS (
       ), 0, 15)) AS ultimate_parent_account_id,
     type AS account_type,
     dfox_industry__c AS df_industry,
+    parent_lam_industry_acct_heirarchy__c AS industry,
     parent_lam_industry_acct_heirarchy__c AS parent_account_industry_hierarchy,
     account_tier__c AS account_tier,
     customer_since__c::DATE AS customer_since_date,
