@@ -67,6 +67,7 @@ WITH final AS (
       prep_crm_account.crm_account_industry,
       prep_crm_account.crm_account_sub_industry,
       prep_crm_account.crm_account_sales_territory,
+      prep_crm_account.tsp_max_hierarchy_sales_segment,
       prep_crm_account.crm_account_employee_count_band,
       prep_crm_account.partner_vat_tax_id,
       prep_crm_account.account_manager,

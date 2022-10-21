@@ -154,6 +154,7 @@ renamed AS (
     -- sales segment fields
     account_demographics_sales_segment__c AS ultimate_parent_sales_segment,
     sales_segmentation_new__c AS division_sales_segment,
+    account_demographics_sales_segment__c AS tsp_max_hierarchy_sales_segment,
     account_owner_user_segment__c AS account_owner_user_segment,
     -- ************************************
     -- sales segmentation deprecated fields - 2020-09-03
