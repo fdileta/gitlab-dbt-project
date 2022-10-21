@@ -339,7 +339,7 @@ class UsagePing(object):
     ) -> None:
         df_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
-            + self.dataframe_api_columns
+            + self.dataframe_api_columns + ['source']
         )
 
         df_to_upload.loc[0] = [
@@ -349,6 +349,7 @@ class UsagePing(object):
             self._get_md5(datetime.datetime.utcnow().timestamp()),
         ] + self._get_dataframe_api_values(
             self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
+          + ['combined']
         )
 
         dataframe_uploader(
