@@ -14,7 +14,7 @@
     ('prep_saas_usage_ping_namespace','prep_saas_usage_ping_namespace'),
     ('dim_date','dim_date'),
     ('bdg_namespace_subscription','bdg_namespace_order_subscription_monthly'),
-    ('gainsight_wave_metrics','gainsight_wave_metrics'),
+    ('gainsight_wave_metrics','health_score_metrics'),
     ('instance_types', 'dim_host_instance_type'),
     ('dim_subscription', 'dim_subscription')
 ]) }}
