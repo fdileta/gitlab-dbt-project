@@ -84,6 +84,13 @@ init-airflow:
 	@sleep 5
 	@"$(DOCKER_RUN)" airflow_scheduler airflow db init
 	@"$(DOCKER_RUN)" airflow_scheduler airflow users create --role Admin -u admin -p admin -e datateam@gitlab.com -f admin -l admin
+## Add Airflow Pool for Gitlab DB, Gitlab Ops and Customer DB 	
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set gitlab-ops-pool 2 "Airflow pool for ops database incremental extract"
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set gitlab-ops-db-full-extract 2 "Airflow pool for ops database full extract"
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set customers-db-full-extract-pool 4 "Airflow pool for customer database full extract"
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set gitlab-com-ci-db-full-extract 6 "Airflow pool for gitab CI  database full extract"
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set gitlab-com-main-db-full-extract-pool 8 "Airflow pool for gitlab main database full extract"
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set gitlab-com-pool 16 "Airflow pool for gitlab and gitlab main database incrmental extract"
 	@"$(DOCKER_DOWN)"
 
 ########################################################################################################################

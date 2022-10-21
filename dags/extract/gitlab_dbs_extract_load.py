@@ -64,9 +64,9 @@ standard_secrets = [
 
 # Dictionary containing the configuration values for the various Postgres DBs
 config_dict = {
-    "el_customers_scd_db": {
+    "el_customers_db_full_extract": {
         "cloudsql_instance_name": None,
-        "dag_name": "el_customers_scd",
+        "dag_name": "el_customers_db_full_extract",
         "env_vars": {"DAYS": "1"},
         "extract_schedule_interval": "0 1 */1 * *",
         "secrets": [
@@ -76,14 +76,14 @@ config_dict = {
             CUSTOMERS_DB_NAME,
         ],
         "start_date": datetime(2019, 5, 30),
-        "task_name": "customers",
-        "description": "This DAG does full extract & load of customer database(Postgres) to snowflake",
+        "task_name": "customers-db-full-extract",
+        "description": "This DAG does full extract & load of customer database from Postgres to snowflake",
     },
     "el_gitlab_com": {
         "cloudsql_instance_name": None,
         "dag_name": "el_gitlab_com",
         "env_vars": {"HOURS": "96"},
-        "extract_schedule_interval": "0 */6 * * *",
+        "extract_schedule_interval": "30 1,6,13,18 * * *",
         "incremental_backfill_interval": "0 2 * * *",
         "secrets": [
             GITLAB_COM_DB_USER,
@@ -101,7 +101,7 @@ config_dict = {
         "cloudsql_instance_name": None,
         "dag_name": "el_gitlab_com_ci",
         "env_vars": {"HOURS": "96"},
-        "extract_schedule_interval": "0 */6 * * *",
+        "extract_schedule_interval": "30 1,6,13,18 * * *",
         "incremental_backfill_interval": "0 2 * * *",
         "secrets": [
             GITLAB_COM_CI_DB_NAME,
@@ -115,11 +115,11 @@ config_dict = {
         "description": "This DAG does Incremental extract & load of gitlab.com CI* database(Postgres) to snowflake",
         "description_incremental": "This DAG does backfill of incremental table extract & load of gitlab.com CI* database(Postgres) to snowflake",
     },
-    "el_gitlab_com_scd": {
+    "el_gitlab_com_main_db_full_extract": {
         "cloudsql_instance_name": None,
-        "dag_name": "el_gitlab_com_scd",
+        "dag_name": "el_gitlab_com_main_db_full_extract",
         "env_vars": {},
-        "extract_schedule_interval": "0 1 */1 * *",
+        "extract_schedule_interval": "15 2,14 * * *",
         "secrets": [
             GITLAB_COM_DB_USER,
             GITLAB_COM_DB_PASS,
@@ -128,14 +128,14 @@ config_dict = {
             GITLAB_COM_SCD_PG_PORT,
         ],
         "start_date": datetime(2019, 5, 30),
-        "task_name": "gitlab-com-scd",
-        "description": "This DAG does Full extract & load of gitlab.com database(Postgres) to snowflake",
+        "task_name": "gitlab-com-main-db-full-extract",
+        "description": "This DAG does Full extract & load of tables in the DAG from gitlab.com database(Postgres) to snowflake",
     },
-    "el_gitlab_com_ci_scd": {
+    "el_gitlab_com_ci_db_full_extract": {
         "cloudsql_instance_name": None,
-        "dag_name": "el_gitlab_com_ci_scd",
+        "dag_name": "el_gitlab_com_ci_db_full_extract",
         "env_vars": {},
-        "extract_schedule_interval": "0 3 */1 * *",
+        "extract_schedule_interval": "15 2,14 * * *",
         "secrets": [
             GITLAB_COM_CI_DB_NAME,
             GITLAB_COM_CI_DB_HOST,
@@ -144,7 +144,7 @@ config_dict = {
             GITLAB_COM_CI_DB_USER,
         ],
         "start_date": datetime(2019, 5, 30),
-        "task_name": "gitlab-com-scd",
+        "task_name": "gitlab-com-ci-db-full-extract",
         "description": "This DAG does Full extract & load of gitlab.com database CI* (Postgres) to snowflake",
     },
     "el_gitlab_ops": {
@@ -164,11 +164,11 @@ config_dict = {
         "start_date": datetime(2019, 5, 30),
         "task_name": "gitlab-ops",
         "description": "This DAG does Incremental extract & load of Operational database (Postgres) to snowflake",
-        "description_incremental": "This DAG does backfill of incrmental table extract & load of Operational database(Postgres) to snowflake",
+        "description_incremental": "This DAG does backfill of incremental table extract & load of Operational database(Postgres) to snowflake",
     },
-    "el_gitlab_ops_scd": {
+    "el_gitlab_ops_db_full_extract": {
         "cloudsql_instance_name": "ops-db-restore",
-        "dag_name": "el_gitlab_ops_scd",
+        "dag_name": "el_gitlab_ops_db_full_extract",
         "env_vars": {"HOURS": "13"},
         "extract_schedule_interval": "0 2 */1 * *",
         "secrets": [
@@ -180,7 +180,7 @@ config_dict = {
             GITLAB_OPS_DB_NAME,
         ],
         "start_date": datetime(2019, 5, 30),
-        "task_name": "gitlab-ops",
+        "task_name": "gitlab-ops-db-full-extract",
         "description": "This DAG does Full extract & load of Operational database (Postgres) to snowflake",
     },
 }
@@ -192,7 +192,7 @@ def get_task_pool(task_name) -> string:
 
 
 def is_incremental(raw_query):
-    """Determine if the extraction is incremental or full extract i.e. SCD"""
+    """Determine if the extraction is incremental or full extract"""
     return "{EXECUTION_DATE}" in raw_query or "{BEGIN_TIMESTAMP}" in raw_query
 
 
@@ -254,7 +254,7 @@ incremental_backfill_dag_args = {
     "trigger_rule": "all_success",
 }
 
-scd_dag_args = {
+full_extract_dag_args = {
     "catchup": False,
     "depends_on_past": False,
     "on_failure_callback": slack_failed_task,
@@ -280,7 +280,7 @@ extract_dag_args = {
 }
 # Loop through each config_dict and generate a DAG
 for source_name, config in config_dict.items():
-    if "scd" not in source_name:
+    if "full_extract" not in source_name:
         extract_dag_args["start_date"] = config["start_date"]
         incremental_backfill_dag_args["start_date"] = config["start_date"]
 
@@ -382,10 +382,10 @@ for source_name, config in config_dict.items():
             f"{config['dag_name']}_db_incremental_backfill"
         ] = incremental_backfill_dag
     else:
-        scd_dag_args["start_date"] = config["start_date"]
+        full_extract_dag_args["start_date"] = config["start_date"]
         sync_dag = DAG(
             f"{config['dag_name']}_db_sync",
-            default_args=scd_dag_args,
+            default_args=full_extract_dag_args,
             schedule_interval=config["extract_schedule_interval"],
             concurrency=6,
             description=config["description"],
@@ -404,14 +404,14 @@ for source_name, config in config_dict.items():
                         f"el-{config['task_name']}-{table.replace('_','-')}-{TASK_TYPE}"
                     )
 
-                    # SCD Task
-                    scd_cmd = generate_cmd(
+                    # Full Extract Task
+                    full_extract_cmd = generate_cmd(
                         config["dag_name"],
                         f"--load_type scd --load_only_table {table}",
                         config["cloudsql_instance_name"],
                     )
 
-                    scd_extract = KubernetesPodOperator(
+                    full_extract = KubernetesPodOperator(
                         **gitlab_defaults,
                         image=DATA_IMAGE,
                         task_id=task_identifier,
@@ -424,7 +424,7 @@ for source_name, config in config_dict.items():
                             "TASK_INSTANCE": "{{ task_instance_key_str }}",
                             "task_id": task_identifier,
                         },
-                        arguments=[scd_cmd],
+                        arguments=[full_extract_cmd],
                         affinity=get_affinity(True),
                         tolerations=get_toleration(True),
                         do_xcom_push=True,
