@@ -168,6 +168,7 @@ class UsagePing(object):
         )
 
         if metric_definition or parent_metric_definition:
+            # check if redis or sql payload has the correct corresponding data source in the yaml file
             if is_match_defined_source[payload_source](
                 metric_definition.get("data_source")
             ) or is_match_defined_source[payload_source](
@@ -339,17 +340,22 @@ class UsagePing(object):
     ) -> None:
         df_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
-            + self.dataframe_api_columns + ['source']
+            + self.dataframe_api_columns
+            + ["source"]
         )
 
-        df_to_upload.loc[0] = [
-            saas_queries,
-            json.dumps(combined_metrics),
-            self.end_date,
-            self._get_md5(datetime.datetime.utcnow().timestamp()),
-        ] + self._get_dataframe_api_values(
-            self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
-        ) + ['combined']
+        df_to_upload.loc[0] = (
+            [
+                saas_queries,
+                json.dumps(combined_metrics),
+                self.end_date,
+                self._get_md5(datetime.datetime.utcnow().timestamp()),
+            ]
+            + self._get_dataframe_api_values(
+                self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
+            )
+            + ["combined"]
+        )
 
         dataframe_uploader(
             df_to_upload,
