@@ -86,6 +86,7 @@ renamed AS (
     -- territory success planning fields
     atam_approved_next_owner__c AS tsp_approved_next_owner,
     atam_next_owner_role__c AS tsp_next_owner_role,
+    account_demographics_employee_count__c AS tsp_account_employees,
     account_demographic_max_family_employees__c AS tsp_max_family_employees,
     account_demographics_region__c AS tsp_region,
     account_demographics_area__c  AS tsp_area,
