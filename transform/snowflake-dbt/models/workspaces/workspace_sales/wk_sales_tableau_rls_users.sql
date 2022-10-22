@@ -3,7 +3,8 @@
 WITH source AS (
 
     SELECT *
-    FROM {{ source('sheetload', 'sales_analytics_tableau_rls_users') }}
+    --FROM {{ source('sheetload', 'sales_analytics_tableau_rls_users') }}
+    FROM {{ ref('sheetload_sales_analytics_tableau_rls_users_source') }}
 
 )
 
