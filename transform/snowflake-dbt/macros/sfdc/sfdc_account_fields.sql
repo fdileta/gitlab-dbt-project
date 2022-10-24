@@ -102,11 +102,8 @@ WITH map_merged_crm_account AS (
       billing_country_code,
       df_industry,
       industry,
-      sub_industry,
-      account_owner_team,
       tsp_territory,
       tsp_region,
-      tsp_sub_region,
       tsp_area,
       gtm_strategy,
       tsp_account_employees,
@@ -165,24 +162,22 @@ WITH map_merged_crm_account AS (
 
       ----ultimate parent crm account info
       ultimate_parent_account.account_name                                AS parent_crm_account_name,
-      sfdc_account.account_demographics_sales_segment                     AS parent_crm_account_sales_segment,
-      sfdc_account.account_demographics_upa_country                       AS parent_crm_account_billing_country,
+      {{ sales_segment_cleaning('sfdc_account.ultimate_parent_sales_segment') }}
+                                                                          AS parent_crm_account_sales_segment,
+      ultimate_parent_account.billing_country                             AS parent_crm_account_billing_country,
       ultimate_parent_account.billing_country_code                        AS parent_crm_account_billing_country_code,
       ultimate_parent_account.industry                                    AS parent_crm_account_industry,
-      ultimate_parent_account.sub_industry                                AS parent_crm_account_sub_industry,
       sfdc_account.parent_account_industry_hierarchy                      AS parent_crm_account_industry_hierarchy,
-      ultimate_parent_account.account_owner_team                          AS parent_crm_account_owner_team,
-      sfdc_account.account_demographics_territory                         AS parent_crm_account_sales_territory,
-      sfdc_account.account_demographics_region                            AS parent_crm_account_tsp_region,
-      ultimate_parent_account.tsp_sub_region                              AS parent_crm_account_tsp_sub_region,
-      sfdc_account.account_demographics_area                              AS parent_crm_account_tsp_area,
+      ultimate_parent_account.tsp_territory                               AS parent_crm_account_sales_territory,
+      ultimate_parent_account.tsp_region                                  AS parent_crm_account_tsp_region,
+      ultimate_parent_account.tsp_area                                    AS parent_crm_account_tsp_area,
       ultimate_parent_account.gtm_strategy                                AS parent_crm_account_gtm_strategy,
       CASE
         WHEN LOWER(ultimate_parent_account.gtm_strategy) IN ('account centric', 'account based - net new', 'account based - expand') THEN 'Focus Account'
         ELSE 'Non - Focus Account'
       END                                                                 AS parent_crm_account_focus_account,
+      ultimate_parent_account.tsp_max_family_employees                    AS parent_crm_account_tsp_max_family_employees,
       ultimate_parent_account.tsp_account_employees                       AS parent_crm_account_tsp_account_employees,
-      sfdc_account.account_demographics_max_family_employee               AS parent_crm_account_tsp_max_family_employees,
       CASE
          WHEN ultimate_parent_account.tsp_max_family_employees > 2000 THEN 'Employees > 2K'
          WHEN ultimate_parent_account.tsp_max_family_employees <= 2000 AND ultimate_parent_account.tsp_max_family_employees > 1500 THEN 'Employees > 1.5K'
@@ -201,7 +196,13 @@ WITH map_merged_crm_account AS (
 
       --descriptive attributes
       sfdc_account.account_name                                           AS crm_account_name,
+      sfdc_account.account_demographics_sales_segment                     AS parent_crm_account_demographics_sales_segment,
       sfdc_account.account_demographics_geo                               AS parent_crm_account_demographics_geo,
+      sfdc_account.account_demographics_region                            AS parent_crm_account_demographics_region,
+      sfdc_account.account_demographics_area                              AS parent_crm_account_demographics_area,
+      sfdc_account.account_demographics_territory                         AS parent_crm_account_demographics_territory,
+      sfdc_account.account_demographics_max_family_employee               AS parent_crm_account_demographics_max_family_employee,
+      sfdc_account.account_demographics_upa_country                       AS parent_crm_account_demographics_upa_country,
       sfdc_account.account_demographics_upa_state                         AS parent_crm_account_demographics_upa_state,
       sfdc_account.account_demographics_upa_city                          AS parent_crm_account_demographics_upa_city,
       sfdc_account.account_demographics_upa_street                        AS parent_crm_account_demographics_upa_street,
@@ -219,12 +220,9 @@ WITH map_merged_crm_account AS (
       sfdc_account.billing_country_code                                   AS crm_account_billing_country_code,
       sfdc_account.account_type                                           AS crm_account_type,
       sfdc_account.industry                                               AS crm_account_industry,
-      sfdc_account.sub_industry                                           AS crm_account_sub_industry,
       sfdc_account.account_owner                                          AS crm_account_owner,
-      sfdc_account.account_owner_team                                     AS crm_account_owner_team,
       sfdc_account.tsp_territory                                          AS crm_account_sales_territory,
       sfdc_account.tsp_region                                             AS crm_account_tsp_region,
-      sfdc_account.tsp_sub_region                                         AS crm_account_tsp_sub_region,
       sfdc_account.tsp_area                                               AS crm_account_tsp_area,
       sfdc_account.tsp_max_hierarchy_sales_segment                        AS tsp_max_hierarchy_sales_segment,
       CASE
@@ -267,12 +265,9 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_company_state_province,
       sfdc_account.zoom_info_company_country,
       sfdc_account.abm_tier,
-      sfdc_account.health_score,
       sfdc_account.health_number,
       sfdc_account.health_score_color,
       sfdc_account.partner_account_iban_number,
-      sfdc_account.federal_account                                        AS federal_account,
-      sfdc_account.fy22_new_logo_target_list,
       sfdc_account.gitlab_com_user,
       sfdc_account.zi_technologies                                        AS crm_account_zi_technologies,
       sfdc_account.zoom_info_website                                      AS crm_account_zoom_info_website,
@@ -410,7 +405,6 @@ WITH map_merged_crm_account AS (
       sfdc_account.count_active_ce_users,
       sfdc_account.count_open_opportunities,
       sfdc_account.count_using_ce,
-      sfdc_account.potential_arr_lam,
       sfdc_account.carr_this_account,
       sfdc_account.carr_account_family,
       sfdc_account.potential_users,
