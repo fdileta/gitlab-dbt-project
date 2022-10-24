@@ -249,7 +249,6 @@ And the `config_docker` file will be used by the docker containers when you are 
 ### Optional Steps
 
 - Set up environment to build the handbook locally. [Instructions](https://about.gitlab.com/handbook/git-page-update/) 
-- Install [Python 3.8.6](https://www.python.org/downloads/release/python-386/) manually
 - Consider downloading and installing [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) - You can submit for reimbursement for the full version
 - Install Data Grip (from JetBrains) for interfacing with databases
     - Follow [this process](https://about.gitlab.com/handbook/tools-and-tips/other-apps/#jetbrains) for requesting a license for Data Grip.  Until you have a license, you can easily use Data Grip on a trial basis for 30 days
