@@ -1733,6 +1733,22 @@ tables:
       FROM saml_group_links
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
+  security_orchestration_policy_configurations:
+    export_schema: "gitlab_com"
+    export_table:   security_orchestration_policy_configurations
+    export_table_primary_key: id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT id
+      , project_id
+      , security_policy_management_project_id
+      , created_at
+      , updated_at
+      , configured_at
+      , namespace_id
+      FROM security_orchestration_policy_configurations
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
   security_scans:
     export_schema: "gitlab_com"
     export_table: security_scans
