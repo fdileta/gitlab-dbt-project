@@ -84,13 +84,6 @@ class UsagePing(object):
         ) as f:
             saas_queries = json.load(f)
 
-        # exclude metrics we do not want to track
-        saas_queries = {
-            metrics_name: metrics_sql
-            for metrics_name, metrics_sql in saas_queries.items()
-            if not metrics_name.lower() in METRICS_EXCEPTION
-        }
-
         return saas_queries
 
     def _get_dataframe_api_values(self, input_json: dict) -> list:
@@ -215,6 +208,8 @@ class UsagePing(object):
                     valid_metric_dict[metric_name] = return_dict
             # elif isinstance(metric_value, str) or isinstance(metric_value, int):
             else:
+                if concat_metric_name.lower() in METRICS_EXCEPTION:
+                    pass # exclude metric by doing nothing
                 data_source_status = self.check_data_source(
                     payload_source,
                     metric_definition_dict,

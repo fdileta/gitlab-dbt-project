@@ -11,6 +11,10 @@ sys.path.append(abs_path)
 from extract.saas_usage_ping.usage_ping import UsagePing, SQL_KEY, REDIS_KEY
 
 
+def get_metrics_definition_test_dict():
+    return {"counts.productivity_analytics_views": {"data_source": "redis", "instrumentation_class": "RedisMetric"}, "usage_activity_by_stage.secure.user_preferences_group_overview_security_dashboard": {"data_source": "database", "milestone": "<13.9"}, "usage_activity_by_stage.manage.user_auth_by_provider": {"data_source": "database", "value_json_schema": "config/metrics/objects_schemas/user_auth_by_provider.json"}, "recorded_at": {"data_source": "system", "performance_indicator_type": []}, "active_user_count": {"data_source": "database", "performance_indicator_type": []}, "counts.assignee_lists": {"data_source": "database", "milestone": "<13.9"}, "counts.ci_builds": {"data_source": "database", "milestone": "<13.9"}, "counts.ci_internal_pipelines": {"data_source": "database", "milestone": "<13.9"}, "counts.package_events_i_package_delete_package_by_deploy_token": {"data_source": "redis", "milestone": "<13.9"}, "counts.service_usage_data_download_payload_click": {"data_source": "redis", "milestone": "14.9"}, "counts.clusters_platforms_eks": {"data_source": "database", "milestone": "<13.9"}}
+
+
 def test_get_md5():
     usage_ping_test = UsagePing
 
@@ -104,7 +108,7 @@ def test_check_data_source():
         4. Missing definitions are returned correctly
     """
     usage_ping_test = UsagePing()
-    metric_definitions_dict = usage_ping_test._get_metrics_definition_dict()
+    metric_definitions_dict = get_metrics_definition_test_dict()
 
     # matching redis concat_metric_name
     payload_source = REDIS_KEY
@@ -144,13 +148,15 @@ def test_check_data_source():
 
 def test_keep_valid_metric_definitions():
     """
-    Test that only the correct metrics as defined by the metric_definitions yaml file are preserved within the payload
+    Test that only the correct metrics as defined by the metric_definitions yaml file are preserved within the payload.
+
+    Also tests that metrics defined in list(METRICS_EXCEPTION) are removed.
     """
     usage_ping_test = UsagePing()
-    payload = {"recorded_at": "2022-10-13T20:23:45.242Z", "active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))", "counts": {"assignee_lists": -3, "ci_builds": -3, "ci_internal_pipelines": -1, "package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0}}
+    payload = {"recorded_at": "2022-10-13T20:23:45.242Z", "active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))", "counts": {"assignee_lists": -3, "ci_builds": -3, "ci_internal_pipelines": -1, "package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0, "clusters_platforms_eks": 0}}
 
     payload_source = REDIS_KEY
-    metric_definitions_dict = usage_ping_test._get_metrics_definition_dict()
+    metric_definitions_dict = get_metrics_definition_test_dict()
     valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(payload, payload_source, metric_definitions_dict)
     expected_results = {"recorded_at": "2022-10-13T20:23:45.242Z", "counts": {"package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0}}
     assert valid_metric_dict == expected_results
