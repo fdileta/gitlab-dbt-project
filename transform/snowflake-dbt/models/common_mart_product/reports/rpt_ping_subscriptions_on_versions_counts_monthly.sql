@@ -24,7 +24,8 @@ latest_subscriptions_by_metric AS (
     metric_versions.metrics_path                    AS metrics_path
   FROM latest_subscriptions
   INNER JOIN metric_versions
-    ON latest_subscriptions.major_minor_version_id BETWEEN metric_versions.first_major_minor_version_id_with_counter AND metric_versions.last_major_minor_version_id_with_counter
+    ON latest_subscriptions.major_minor_version_id 
+      BETWEEN metric_versions.first_major_minor_version_id_with_counter AND metric_versions.last_major_minor_version_id_with_counter
       AND latest_subscriptions.version_is_prerelease = metric_versions.version_is_prerelease
   {{ dbt_utils.group_by(n=6) }}
 
