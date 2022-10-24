@@ -206,22 +206,20 @@ class UsagePing(object):
                 )
                 if return_dict:
                     valid_metric_dict[metric_name] = return_dict
-            # elif isinstance(metric_value, str) or isinstance(metric_value, int):
             else:
-                if concat_metric_name.lower() in METRICS_EXCEPTION:
-                    pass # exclude metric by doing nothing
-                data_source_status = self.check_data_source(
-                    payload_source,
-                    metric_definition_dict,
-                    concat_metric_name,
-                    prev_concat_metric_name,
-                )
-                if data_source_status == "valid_source":
-                    valid_metric_dict[metric_name] = metric_value
-                elif data_source_status == "not_matching_source":
-                    pass  # do nothing, invalid sources are expected
-                elif data_source_status == "missing_definition":
-                    self.missing_definitions[payload_source].append(concat_metric_name)
+                if concat_metric_name.lower() not in METRICS_EXCEPTION:
+                    data_source_status = self.check_data_source(
+                        payload_source,
+                        metric_definition_dict,
+                        concat_metric_name,
+                        prev_concat_metric_name,
+                    )
+                    if data_source_status == "valid_source":
+                        valid_metric_dict[metric_name] = metric_value
+                    elif data_source_status == "not_matching_source":
+                        pass  # do nothing, invalid sources are expected
+                    elif data_source_status == "missing_definition":
+                        self.missing_definitions[payload_source].append(concat_metric_name)
 
         return valid_metric_dict
 

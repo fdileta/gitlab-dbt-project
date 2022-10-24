@@ -149,7 +149,6 @@ def test_keep_valid_metric_definitions():
     """
     Test that only the correct metrics as defined by the metric_definitions yaml file are preserved within the payload.
 
-    Also tests that metrics defined in list(METRICS_EXCEPTION) are removed.
     """
     usage_ping_test = UsagePing()
     payload = {"recorded_at": "2022-10-13T20:23:45.242Z", "active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))", "counts": {"assignee_lists": -3, "ci_builds": -3, "ci_internal_pipelines": -1, "package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0, "clusters_platforms_eks": 0}}
@@ -158,6 +157,20 @@ def test_keep_valid_metric_definitions():
     metric_definitions_dict = get_metrics_definition_test_dict()
     valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(payload, payload_source, metric_definitions_dict)
     expected_results = {"recorded_at": "2022-10-13T20:23:45.242Z", "counts": {"package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0}}
+    assert valid_metric_dict == expected_results
+
+
+def test_metric_exceptions():
+    """
+    Tests that metrics defined in list(METRICS_EXCEPTION) are removed.
+    """
+    usage_ping_test = UsagePing()
+    payload = {"active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))", "counts": {"clusters_platforms_eks": 0}}
+
+    payload_source = SQL_KEY
+    metric_definitions_dict = get_metrics_definition_test_dict()
+    valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(payload, payload_source, metric_definitions_dict)
+    expected_results = {"active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))"}
     assert valid_metric_dict == expected_results
 
 
