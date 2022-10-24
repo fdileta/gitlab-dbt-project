@@ -102,10 +102,9 @@ def test_evaluate_saas_queries():
 def test_check_data_source():
     """
     Test the following:
-        1. Metric definitions are being returned from endpoint
-        2. Valid matching source is returned for the current metric, and the parent metric
-        3. Non-matching sources are returned correctly
-        4. Missing definitions are returned correctly
+        1. Valid matching source is returned for the current metric, and the parent metric
+        2. Non-matching sources are returned correctly
+        3. Missing definitions are returned correctly
     """
     usage_ping_test = UsagePing()
     metric_definitions_dict = get_metrics_definition_test_dict()
