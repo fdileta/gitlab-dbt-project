@@ -196,3 +196,4 @@ WITH final AS (
     updated_date="2022-10-12"
 ) }}
 
+
