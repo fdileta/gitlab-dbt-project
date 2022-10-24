@@ -91,6 +91,9 @@ WITH biz_person AS (
       NULL                                          AS matched_account_sdr_assigned,
       NULL                                          AS matched_account_type,
       NULL                                          AS matched_account_gtm_strategy,
+      is_first_order_initial_mql,
+      is_first_order_mql,
+      is_first_order_person,
       last_utm_content,
       last_utm_campaign,
       sequence_step_type,
@@ -140,6 +143,10 @@ WITH biz_person AS (
       zoominfo_company_city,
       zoominfo_company_state,
       zoominfo_company_country,
+      zoominfo_phone_number, 
+      zoominfo_mobile_phone_number,
+      zoominfo_do_not_call_direct_phone,
+      zoominfo_do_not_call_mobile_phone,
       NULL                                           AS zoominfo_company_employee_count
 
 
@@ -194,6 +201,9 @@ WITH biz_person AS (
       matched_account_sdr_assigned,
       matched_account_type,
       matched_account_gtm_strategy,
+      is_first_order_initial_mql,
+      is_first_order_mql,
+      is_first_order_person,
       last_utm_content,
       last_utm_campaign,
       sequence_step_type,
@@ -243,6 +253,10 @@ WITH biz_person AS (
       zoominfo_company_city,
       zoominfo_company_state,
       zoominfo_company_country,
+      zoominfo_phone_number, 
+      zoominfo_mobile_phone_number,
+      zoominfo_do_not_call_direct_phone,
+      zoominfo_do_not_call_mobile_phone,
       zoominfo_company_employee_count
 
     FROM sfdc_leads
@@ -275,5 +289,5 @@ WITH biz_person AS (
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-09-14"
+    updated_date="2022-09-30"
 ) }}

@@ -81,7 +81,7 @@
 
 ), prep AS (
 
-     SELECT   
+     SELECT DISTINCT
       marketing_contact.dim_marketing_contact_id,
       marketing_contact_role.marketing_contact_role,
       marketing_contact.email_address, 
@@ -90,6 +90,7 @@
                saas_customer.dim_namespace_id, 
                saas_billing_account.dim_namespace_id)                                         AS dim_namespace_id,
       gitlab_namespaces.namespace_path,
+      namespace_lineage.namespace_is_ultimate_parent                                          AS is_ultimate_parent_namespace,
       CASE 
         WHEN namespace_lineage.namespace_type = 'User' 
           THEN 1 
@@ -179,20 +180,20 @@
           OR saas_customer.order_is_trial = TRUE 
           THEN 1 
         ELSE 0 
-      END                                                                                     AS is_saas_trial,    
-      CURRENT_DATE - CAST(saas_namespace.saas_trial_expired_on AS DATE)                       AS days_since_saas_trial_ended,
-      {{ days_buckets('days_since_saas_trial_ended') }}                                      AS days_since_saas_trial_ended_bucket,
+      END                                                                                     AS is_saas_trial,
       CASE 
         WHEN saas_customer.order_is_trial 
           THEN CAST(saas_customer.order_end_date AS DATE)
         WHEN saas_namespace.product_tier_name_with_trial = 'SaaS - Trial: Ultimate'
           THEN CAST(COALESCE(saas_namespace.saas_trial_expired_on, saas_namespace.order_end_date) AS DATE)
-      END                                                                                     AS trial_end_date,
+      END                                                                                     AS trial_end_date,    
+      IFF(trial_end_date < CURRENT_DATE, CURRENT_DATE - trial_end_date, NULL)                 AS days_since_saas_trial_ended,
+      {{ days_buckets('days_since_saas_trial_ended') }}                                       AS days_since_saas_trial_ended_bucket,
       CASE 
         WHEN trial_end_date IS NOT NULL AND CURRENT_DATE <= trial_end_date
           THEN trial_end_date - CURRENT_DATE
       END                                                                                     AS days_until_saas_trial_ends,
-      {{ days_buckets('days_until_saas_trial_ends') }}                                       AS days_until_saas_trial_ends_bucket,
+      {{ days_buckets('days_until_saas_trial_ends') }}                                        AS days_until_saas_trial_ends_bucket,
       CASE 
         WHEN saas_product_tier = 'SaaS - Free' 
           THEN 1
@@ -293,5 +294,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-04",
-    updated_date="2022-08-31"
+    updated_date="2022-10-17"
 ) }}

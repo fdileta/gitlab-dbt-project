@@ -164,9 +164,9 @@ databases:
     - nfiguera_prep:
         shared: no
 
-    - ngalang_prod:
+    - nhervas_prod:
         shared: no
-    - ngalang_prep:
+    - nhervas_prep:
         shared: no
 
     - nraisinghani_prod:
@@ -476,7 +476,6 @@ roles:
             - google_ads
             - google_analytics_360
             - netsuite
-            - keyhole_twitter
             - mailgun
             - marketo
             - pmg
@@ -753,7 +752,6 @@ roles:
                 - raw.prometheus
                 - raw.pto
                 - raw.rspec
-                - raw.keyhole_twitter
                 - raw.snowplow
                 - raw.snowflake_imports
                 - raw.tap_postgres
@@ -763,10 +761,8 @@ roles:
                 - raw.bamboohr.*
                 - raw.demandbase.*
                 - raw.engineering_extracts.*
-                - raw.gcp_billing.*
                 - raw.gitlab_data_yaml.*
                 - raw.gitter.*
-                - raw.keyhole_twitter.*
                 - raw.pmg.*
                 - raw.prometheus.*
                 - raw.pto.*
@@ -1063,6 +1059,7 @@ roles:
                     - prep.*
                     - prod.*
                     - raw.snapshots
+                    - raw.gcp_billing
             tables:
                 read:
                     - raw.*.*
@@ -1071,6 +1068,33 @@ roles:
                     - prep.*.*
                     - prod.*.*
                     - raw.snapshots.*
+                    - raw.gcp_billing.*
+
+    - sales_analytics:
+        warehouses:
+            - dev_xs
+            - loading
+        owns:
+            schemas:
+                - raw.sales_analytics
+        privileges:
+            databases:
+                read:
+                    - raw
+                write:
+                    - raw
+            schemas:
+                read:
+                    - raw.sales_analytics
+                write:
+                    - raw.sales_analytics
+            tables:
+                read:
+                    - raw.sales_analytics.*
+                write:
+                    - raw.sales_analytics.*
+
+
 
 # ==========================================
 # Object Roles
@@ -1826,21 +1850,6 @@ roles:
                     - prep.license_db.*
                     - raw.license_db.*
 
-    - keyhole_twitter:
-        privileges:
-            databases:
-                read:
-                    - prep
-                    - raw
-            schemas:
-                read:
-                    - prep.keyhole_twitter
-                    - raw.keyhole_twitter
-            tables:
-                read:
-                    - prep.keyhole_twitter.*
-                    - raw.keyhole_twitter.*
-
     - maxmind:
         privileges:
             databases:
@@ -2022,6 +2031,7 @@ roles:
                     - prod.restricted_safe_legacy
                     - prod.restricted_safe_common_prep
                     - prod.restricted_safe_workspace_finance
+                    - prod.restricted_safe_workspace_marketing
                     - prod.restricted_safe_workspace_sales
                     - prod.restricted_safe_common_mart_product
                     - prod.workspace_data_science
@@ -2035,6 +2045,7 @@ roles:
                     - prod.restricted_safe_legacy.*
                     - prod.restricted_safe_common_prep.*
                     - prod.restricted_safe_workspace_finance.*
+                    - prod.restricted_safe_workspace_marketing.*
                     - prod.restricted_safe_workspace_sales.*
                     - prod.restricted_safe_common_mart_product.*
                     - prod.workspace_data_science.*
@@ -2484,6 +2495,13 @@ roles:
         warehouses:
             - dev_xs
 
+    - ashaikh:
+        member_of:
+            - data_team_analyst
+            - analyst_core
+        warehouses:
+            - dev_xs
+
     - bbutterfield:
         member_of:
             - reporter
@@ -2491,6 +2509,13 @@ roles:
             - bi_tool_eval_read
         warehouses:
             - reporting
+
+    - bnguyen:
+        member_of:
+            - analyst_finance
+            - bamboohr_analytics
+        warehouses:
+            - dev_xs
 
     - cbraza:
         member_of:
@@ -2988,6 +3013,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - sales_analytics
         warehouses:
             - dev_xs
         owns:
@@ -3477,6 +3503,7 @@ roles:
             - reporter
             - marketo
             - analyst_marketing
+            - customers_db
         warehouses:
             - dev_xs
 
@@ -3621,6 +3648,7 @@ roles:
             - analyst_growth
             - customers_db
             - restricted_safe
+            - mailgun
         warehouses:
             - dev_xs
         owns:
@@ -3791,6 +3819,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - sales_analytics
         warehouses:
             - dev_xs
         owns:
@@ -3826,7 +3855,7 @@ roles:
                     - nfiguera_prep.*.*
                     - nfiguera_prod.*.*
 
-    - ngalang:
+    - nhervas:
         member_of:
             - analyst_growth
             - restricted_safe
@@ -3835,36 +3864,36 @@ roles:
             - dev_xs
         owns:
             databases:
-                - ngalang_prep
-                - ngalang_prod
+                - nhervas_prep
+                - nhervas_prod
             schemas:
-                - ngalang_prep.*
-                - ngalang_prod.*
+                - nhervas_prep.*
+                - nhervas_prod.*
             tables:
-                - ngalang_prep.*.*
-                - ngalang_prod.*.*
+                - nhervas_prep.*.*
+                - nhervas_prod.*.*
         privileges:
             databases:
                 read:
-                    - ngalang_prep
-                    - ngalang_prod
+                    - nhervas_prep
+                    - nhervas_prod
                 write:
-                    - ngalang_prep
-                    - ngalang_prod
+                    - nhervas_prep
+                    - nhervas_prod
             schemas:
                 read:
-                    - ngalang_prep.*
-                    - ngalang_prod.*
+                    - nhervas_prep.*
+                    - nhervas_prod.*
                 write:
-                    - ngalang_prep.*
-                    - ngalang_prod.*
+                    - nhervas_prep.*
+                    - nhervas_prod.*
             tables:
                 read:
-                    - ngalang_prep.*.*
-                    - ngalang_prod.*.*
+                    - nhervas_prep.*.*
+                    - nhervas_prod.*.*
                 write:
-                    - ngalang_prep.*.*
-                    - ngalang_prod.*.*
+                    - nhervas_prep.*.*
+                    - nhervas_prod.*.*
 
     - nkhanna:
         member_of:
@@ -4458,6 +4487,13 @@ roles:
                     - tnguyen_prep.*.*
                     - tnguyen_prod.*.*
 
+    - tscott:
+        member_of:
+            - data_team_analyst
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - vagrawal:
         member_of:
             - adaptive
@@ -4548,6 +4584,9 @@ users:
             - sysadmin
             - transformer
             - data_science_loader
+            - sales_analytics
+            - restricted_safe
+            - reporter
 
     - alpcohen:
         can_login: yes
@@ -4569,6 +4608,11 @@ users:
         member_of:
             - aperez
 
+    - ashaikh:
+        can_login: yes
+        member_of:
+            - ashaikh
+
     - bi_tool_eval:
         can_login: yes
         member_of:
@@ -4578,6 +4622,11 @@ users:
         can_login: yes
         member_of:
             - bbutterfield
+
+    - bnguyen:
+        can_login: yes
+        member_of:
+            - bnguyen
 
     - cbraza:
         can_login: yes
@@ -4837,10 +4886,10 @@ users:
         member_of:
             - nfiguera
 
-    - ngalang:
+    - nhervas:
         can_login: yes
         member_of:
-            - ngalang
+            - nhervas
 
     - nkhanna:
         can_login: yes
@@ -4909,7 +4958,7 @@ users:
             - accountadmin
 
     - rrendon:
-        can_login: yes 
+        can_login: yes
         member_of:
             - rrendon
 
@@ -4978,6 +5027,11 @@ users:
         can_login: yes
         member_of:
             - tnguyen
+
+    - tscott:
+        can_login: yes 
+        member_of:
+            - tscott
 
     - vagrawal:
         can_login: yes

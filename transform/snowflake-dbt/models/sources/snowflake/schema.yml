@@ -9,4 +9,6 @@ models:
     description: Source layer for all snapshots of users and the roles they've been granted.
   - name: snowflake_grants_to_user_source
     description: Source layer for all snapshots of users and the roles they've been granted.
+  - name: snowflake_query_history_source
+    description: Source layer for all query history.  Column documentation can be found at https://docs.snowflake.com/en/sql-reference/account-usage/query_history.html#columns
 

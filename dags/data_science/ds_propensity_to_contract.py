@@ -35,8 +35,8 @@ default_args = {
     "depends_on_past": False,
     "on_failure_callback": slack_failed_task,
     "owner": "airflow",
-    "retries": 0,
-    "retry_delay": timedelta(minutes=1),
+    "retries": 2,
+    "retry_delay": timedelta(minutes=10),
     "start_date": datetime(2022, 8, 9),
     "dagrun_timeout": timedelta(hours=2),
 }
@@ -66,7 +66,9 @@ clone_data_science_ptc_repo_cmd = f"""
 # Create the DAG
 # Run on the 9th of every month
 dag = DAG(
-    "ds_propensity_to_contract", default_args=default_args, schedule_interval="0 4 9 * *"
+    "ds_propensity_to_contract",
+    default_args=default_args,
+    schedule_interval="0 4 9 * *",
 )
 
 # Task 1

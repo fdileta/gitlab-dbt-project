@@ -25,7 +25,6 @@ gitlab_ops,Relates to GitLab ops database
 license_db,Relates to License DB
 industry, Related to companies industry data
 invoice,Related to zuora invoice data
-keyhole_twitter,Relates to Twitter data provided by Keyhole
 mart,For data marts
 mnpi, source models with MNPI data
 mnpi_exception, models that reference mnpi models but do not contain MNPI data

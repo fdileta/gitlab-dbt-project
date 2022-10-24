@@ -678,4 +678,24 @@ models:
         - not_null
     - name: ip_type
       description: Indicates if the original ip was in ipv4 or ipv6 format.
-
+- name: sheetload_sales_analytics_tableau_rls_users_source
+  description: Users for SS&A Tableau row-level-security
+  columns:
+    - name: email
+      tests:
+        - not_null
+    - name: username
+      tests:
+        - not_null
+    - name: role
+      tests:
+        - not_null
+- name: sheetload_sales_analytics_tableau_rls_roles_source
+  description: User roles for SS&A Tableau row-level-security
+  columns:
+    - name: role
+      tests:
+        - not_null
+    - name: key_segment_geo
+      tests:
+        - not_null

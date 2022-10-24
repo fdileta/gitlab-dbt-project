@@ -63,6 +63,10 @@ renamed AS (
     zi_contact_city__c AS zoominfo_contact_city,
     zi_company_city__c AS zoominfo_company_city,
     zi_industry__c AS zoominfo_company_industry,
+    zi_phone_number__c AS zoominfo_phone_number, 
+    zi_mobile_phone_number__c AS zoominfo_mobile_phone_number, 
+    zi_do_not_call_direct_phone__c AS zoominfo_do_not_call_direct_phone,
+    zi_do_not_call_mobile_phone__c AS zoominfo_do_not_call_mobile_phone,
     buying_process_for_procuring_gitlab__c AS buying_process,
     core_check_in_notes__c AS core_check_in_notes,
     industry AS industry,
@@ -108,6 +112,11 @@ renamed AS (
     actively_being_sequenced__c::BOOLEAN AS is_actively_being_sequenced,
     gaclientid__c AS ga_client_id,
     employee_buckets__c AS employee_bucket,
+    fo_initial_mql__c AS is_first_order_initial_mql,
+    fo_mql__c AS is_first_order_mql,
+    is_first_order_person__c AS is_first_order_person,
+    true_initial_mql_date__c AS true_initial_mql_date,
+    true_mql_date__c AS true_mql_date,
 
 
     {{ sfdc_source_buckets('leadsource') }}

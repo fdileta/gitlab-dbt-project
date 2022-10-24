@@ -21,7 +21,8 @@ Welcome to the GitLab Data Program -- we're excited to have you! The goal of thi
    - [ ] [Data Team](https://about.gitlab.com/handbook/business-ops/data-team/)
    - [ ] [Data Direction page](https://about.gitlab.com/handbook/business-technology/data-team/direction/) to get a sense of what our short and longer-term roadmap.
    - [ ] [Data Catalog](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/)
-- [ ] Watch @tlapiana's [talk at DataEngConf](https://www.youtube.com/watch?v=eu623QBwakc) that gives a phenomenal overview of how the team works.
+- [ ] Watch @rbacovic [talk at Data Science Conference](https://www.youtube.com/watch?v=x74Koq-cNqM&list=PLQyyxph2CGupNGhGLZ1ofCxqJe_RzM7ME&index=5) that gives a phenomenal overview of how the team works.
+   - Optional: Watch former GitLab Team Member Thomas La Piana [talk at DataEngConf](https://www.youtube.com/watch?v=eu623QBwakc) that gives a phenomenal overview of how the team worked back in 2018.
 - [ ] Watch [this great talk](https://www.youtube.com/watch?v=prcz0ubTAAg) on what Analytics is.
 - [ ] Browse a few of the [Data Team videos in GitLab Unfiltered](https://www.youtube.com/playlist?list=PL05JrBw4t0KrRVTZY33WEHv8SjlA_-keI)
 - [ ] Watch [Data Team quick architecture overview](https://www.youtube.com/watch?v=0vlJdzYShpU)
@@ -210,18 +211,18 @@ Data team uses GCP (Google Cloud Platform) as our cloud provider. GCP credential
 
 ### Airflow
 
-#### Setting up ./kube/config 
+#### Setting up ~/.kube/config 
 
 **Ensure you have your service credentials configured, and the ${GOOGLE_APPLICATION_CREDENTIALS} variable is set locally as instructed above**
 
-- [ ] Run `gcloud container clusters get-credentials data-ops --zone us-west1-a --project gitlab-analysis` to connect to the Airflow kubernetes cluster, and configure your `./.kube/config` file
-- [ ] Navigate to `./.kube/config`. 
-- [ ] Copy and paste the file, rename the copied file to `./.kube/config_docker`
+These instructions will assume that your kubectl configuration was saved at the default location `~/.kube/config`:
+- [ ] Run `gcloud container clusters get-credentials data-ops --zone us-west1-a --project gitlab-analysis` to connect to the Airflow kubernetes cluster, and configure your `~/.kube/config` file
+- [ ] Create a duplicate of this file called `config_docker` by running this command (from any directory in your terminal): `cp ~/.kube/config ~/.kube/config_docker`
 - [ ] Open the copied file in a text editor. 
-- [ ] Find the line with `cmd-path: /Users/{your username}/google-cloud-sdk/bin/gcloud`
-- [ ] Replace this line with `cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud`
+- [ ] Find the line with `cmd-path: /Users/{your username}/google-cloud-sdk/bin/gcloud` and *replace* it with `cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud`
 
-This file will then be used each time you test locally via Airflow, and is passed to the containers in the ./analytics/docker-compose.yml file.
+There are two config files because the `config` file will be used for running kubectl commands locally. 
+And the `config_docker` file will be used by the docker containers when you are running Airflow locally. The latter file is passed to the containers via the analytics/docker-compose.yml file.
 
 - [ ] Install [Rancher Desktop](https://rancherdesktop.io/) using the UI install specified for your system
   - [ ] Make sure to download Rancher Desktop version `1.4.1` - you can find the correct version for your system here https://github.com/rancher-sandbox/rancher-desktop/releases/tag/v1.4.1
@@ -248,7 +249,6 @@ This file will then be used each time you test locally via Airflow, and is passe
 ### Optional Steps
 
 - Set up environment to build the handbook locally. [Instructions](https://about.gitlab.com/handbook/git-page-update/) 
-- Install [Python 3.8.6](https://www.python.org/downloads/release/python-386/) manually
 - Consider downloading and installing [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) - You can submit for reimbursement for the full version
 - Install Data Grip (from JetBrains) for interfacing with databases
     - Follow [this process](https://about.gitlab.com/handbook/tools-and-tips/other-apps/#jetbrains) for requesting a license for Data Grip.  Until you have a license, you can easily use Data Grip on a trial basis for 30 days

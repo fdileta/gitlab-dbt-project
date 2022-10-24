@@ -51,14 +51,15 @@
   - Keep Events where User Id = NULL.  These do not point to a particular User, ie. 'milestones' 
   - Remove Events from blocked users
 - Rolling 24mos of Data
-- Include rows where the Event_Date is within 28 days of the Last Day of the Month  
+- Include rows where the Event_Date is within 28 days of the Last Day of the Month to Count Events  
 
 **Business Logic in this Model:** 
 - Valid events where the Event Create DateTime is >= User Create DateTime
 - Events from blocked users are excluded
-- Aggregated Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
+- Aggregated Event, Namespace and User Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
   - Events that are 29,30 or 31 days prior to the Last Day of the Month will Not be included in these totals
-  - This is intended to match the instance-level service ping metrics by getting a 28-day count
+  - This is intended to match the instance-level month over month service ping metrics by getting a 28-day count
+- Latest Plan ID is the last plan ID in the Month for a Namespace.  This value is derived from the 28-day events as well.  
 
 **Other Comments:**
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
@@ -360,5 +361,44 @@
 - Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
 - The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
 - [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+
+{% enddocs %}
+
+{% docs rpt_gainsight_metrics_monthly_paid_saas %}
+
+**Description:** Joins SaaS Namespace Service Pings to a list of paid recurring SaaS subscriptions to limit to paying SaaS customers, and joins in seat/license data to calculate license utilization. The data from this table will be used for customer product insights. Most notably, this data is pumped into Gainsight and aggregated into customer health scores for use by TAMs.
+
+**Data Grain:**
+- Namespace
+- Subscription
+- Month
+
+**Filters:**
+- Only includes Service Ping metrics that have been added via the "wave" process.
+- Only includes pings that have a license associated with them.
+- Only includes recurring paid SaaS subscriptions
+
+**Business Logic in this Model:**
+- Hits Zuora tables related to charges and product rate plans to limit to paid SaaS customers with recurring subscriptions.
+
+{% enddocs %}
+
+{% docs rpt_gainsight_metrics_monthly_paid_self_managed %}
+
+**Description:** Joins Self-Managed Service Pings to a list of paid Self-Managed subscriptions to limit to paying SM customers, joins in seat/license data to calculate license utilization. The data from this table will be used for customer product insights. Most notably, this data is pumped into Gainsight and aggregated into customer health scores for use by TAMs.
+
+**Data Grain:**
+- Installation
+- Subscription
+- Month
+
+**Filters:**
+- Only includes Service Ping metrics that have been added via the "wave" process.
+- Only includes pings that have a license associated with them.
+- Only includes pings that have a paid Self-Managed subscription associated with them.
+
+**Business Logic in this Model:**
+- Resolves a one-to-many relationship between installation and instance types by prioritizing production instances above other instance types
+- Limits down to last ping of the month for each installation-subscription
 
 {% enddocs %}

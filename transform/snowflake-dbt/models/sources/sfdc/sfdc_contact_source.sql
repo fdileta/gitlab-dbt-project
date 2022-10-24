@@ -63,6 +63,10 @@ renamed AS (
     zi_contact_state__c AS zoominfo_contact_state,
     zi_company_country__c AS zoominfo_company_country,
     zi_contact_country__c AS zoominfo_contact_country,
+    zi_phone_number__c AS zoominfo_phone_number, 
+    zi_mobile_phone_number__c AS zoominfo_mobile_phone_number,
+    zi_do_not_call_direct_phone__c AS zoominfo_do_not_call_direct_phone,
+    zi_do_not_call_mobile_phone__c AS zoominfo_do_not_call_mobile_phone,
     using_ce__c AS using_ce,
     ee_trial_start_date__c AS ee_trial_start_date,
     ee_trial_end_date__c AS ee_trial_end_date,
@@ -104,6 +108,11 @@ renamed AS (
     sequence_task_due_date__c::DATE AS sequence_task_due_date,
     sequence_status__c AS sequence_status,
     actively_being_sequenced__c::BOOLEAN AS is_actively_being_sequenced,
+    fo_initial_mql__c AS is_first_order_initial_mql,
+    fo_mql__c AS is_first_order_mql,
+    is_first_order_person__c AS is_first_order_person,
+    true_initial_mql_date__c AS true_initial_mql_date,
+    true_mql_date__c AS true_mql_date,
     {{ sfdc_source_buckets('leadsource') }}
 
 

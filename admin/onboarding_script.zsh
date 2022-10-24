@@ -1,9 +1,34 @@
-## Install homebrew 
+echo "Downloading python 3.10.3"
+curl https://www.python.org/ftp/python/3.10.3/python-3.10.3-macos11.pkg >> python-3.10.3-macos11.pkg
+
+echo "Installing python 3.10.3"
+sudo installer -pkg python-3.10.3-macos11.pkg -target /
+
+echo "Setting up SSL links for your new version of python"
+ln -s /etc/ssl/* /Library/Frameworks/Python.framework/Versions/3.10/etc/openssl
+
+echo "Setting up path links for your new version of python"
+export PATH="$HOME/Library/Python/3.10/bin":"$PATH" >> ~/.zshrc
+# If you come from bash you might have to change your $PATH.
+export PATH=$HOME/bin:/usr/local/bin:$PATH >> ~/.zshrc
+export PATH="$HOME/.poetry/bin:$PATH" >> ~/.zshrc
+
+rm python-3.10.3-macos11.pkg
+echo "Python succesfully installed"
+
+## Install homebrew
 ## Check if exists
-command -v brew >/dev/null 2>&1 || { echo "Installing Homebrew.."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-  } >&2;
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 echo "Homebrew successfully installed"
+
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+echo "Adding homebrew link for m1 macs"
+echo "export PATH=$PATH:/opt/homebrew/bin" >> ~/.zshrc
+
+echo "Adding path fix to zshrc"
+echo "export if ! [[ ""$PATH"" =~ ""$HOME/.local/bin:$HOME/bin:"" ]] then PATH=""$HOME/.local/bin:$HOME/bin:$PATH"" fi export PATH" >> ~/.zshrc
 
 ## install git
 echo "Installing git.."
@@ -55,6 +80,7 @@ echo "VS Code successfully installed"
 echo "Installing miniforge.."
 brew install miniforge
 echo "export PATH=/usr/local/mambaforge/bin:"$PATH"" >> ~/.bash_profile
+echo "export PATH=/usr/local/mambaforge/bin:"$PATH"" >> ~/.zshrc
 echo "miniforge installed succesfully"
 
 ## Set up the computer to contribute to the handbook
@@ -83,7 +109,7 @@ cd ~/Downloads
 mkdir -p ${HOME}/iterm2-colors
 cd ${HOME}/iterm2-colors
 curl -L https://github.com/mbadolato/iTerm2-Color-Schemes/zipball/master > iterm2-colors.zip
-unzip iterm2-colors.zip
+yes | unzip iterm2-colors.zip
 rm iterm2-colors.zip
 echo "iTerm2 + Colors installed"
 

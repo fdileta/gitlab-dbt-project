@@ -264,6 +264,8 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_company_city,
       sfdc_account.zoom_info_company_state_province,
       sfdc_account.zoom_info_company_country,
+      sfdc_account.account_phone,
+      sfdc_account.zoominfo_account_phone,
       sfdc_account.abm_tier,
       sfdc_account.health_number,
       sfdc_account.health_score_color,
@@ -279,6 +281,8 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_ultimate_parent_company_name                 AS crm_account_zoom_info_ultimate_parent_company_name,
       sfdc_account.zoom_info_number_of_developers                         AS crm_account_zoom_info_number_of_developers,
       sfdc_account.forbes_2000_rank,
+      sfdc_account.parent_account_industry_hierarchy,
+      sfdc_account.sales_development_rep,      
 
       --degenerative dimensions
       sfdc_account.is_sdr_target_account,
@@ -410,6 +414,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.potential_users,
       sfdc_account.number_of_licenses_this_account,
       sfdc_account.decision_maker_count_linkedin,
+      sfdc_account.number_of_employees,
       {%- if model_type == 'live' %}
       sfdc_account.lam                                                    AS parent_crm_account_lam,
       sfdc_account.lam_dev_count                                          AS parent_crm_account_lam_dev_count,
