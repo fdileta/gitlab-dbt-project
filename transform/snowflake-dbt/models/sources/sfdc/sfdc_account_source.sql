@@ -33,9 +33,11 @@ renamed AS (
 
 
     -- key people GL side
+    federal_account__c AS federal_account,
     gitlab_com_user__c AS gitlab_com_user,
     account_manager__c AS account_manager,
     account_owner_calc__c AS account_owner,
+    account_owner_team__c AS account_owner_team,
     business_development_rep__c AS business_development_rep,
     dedicated_service_engineer__c AS dedicated_service_engineer,
     sdr_assigned__c AS sales_development_rep,
@@ -49,6 +51,7 @@ renamed AS (
     type AS account_type,
     dfox_industry__c AS df_industry,
     parent_lam_industry_acct_heirarchy__c AS industry,
+    sub_industry__c AS sub_industry,
     parent_lam_industry_acct_heirarchy__c AS parent_account_industry_hierarchy,
     account_tier__c AS account_tier,
     customer_since__c::DATE AS customer_since_date,
@@ -56,6 +59,7 @@ renamed AS (
     carr_acct_family__c AS carr_account_family,
     next_renewal_date__c AS next_renewal_date,
     license_utilization__c AS license_utilization,
+    support_level__c AS support_level,
     named_account__c AS named_account,
     account_demographics_upa_country__c AS billing_country,
     billingcountrycode AS billing_country_code,
@@ -63,11 +67,13 @@ renamed AS (
     sdr_target_account__c::BOOLEAN AS is_sdr_target_account,
     lam_tier__c AS lam,
     lam_dev_count__c AS lam_dev_count,
+    potential_arr_lam__c AS potential_arr_lam,
     jihu_account__c::BOOLEAN AS is_jihu_account,
     partners_signed_contract_date__c AS partners_signed_contract_date,
     partner_account_iban_number__c AS partner_account_iban_number,
     partners_partner_type__c AS partner_type,
     partners_partner_status__c AS partner_status,
+    fy22_new_logo_target_list__c::BOOLEAN AS fy22_new_logo_target_list,
     first_order_available__c::BOOLEAN AS is_first_order_available,
     REPLACE(
       zi_technologies__c,
@@ -84,13 +90,12 @@ renamed AS (
     phone AS account_phone,
     zi_phone__c AS zoominfo_account_phone,
 
-
     -- territory success planning fields
     atam_approved_next_owner__c AS tsp_approved_next_owner,
     atam_next_owner_role__c AS tsp_next_owner_role,
-    account_demographics_employee_count__c AS tsp_account_employees,
+    account_demographics_employee_count__c AS tsp_account_employees,    
     account_demographic_max_family_employees__c AS tsp_max_family_employees,
-    account_demographics_region__c AS tsp_region,
+    account_demographics_region__c AS tsp_region,    TRIM(SPLIT_PART(atam_sub_region__c, '-', 1)) AS tsp_sub_region,
     account_demographics_area__c  AS tsp_area,
     account_demographics_territory__c AS tsp_territory,
     atam_address_country__c AS tsp_address_country,
@@ -98,8 +103,6 @@ renamed AS (
     atam_address_city__c AS tsp_address_city,
     atam_address_street__c AS tsp_address_street,
     atam_address_postal_code__c AS tsp_address_postal_code,
-
-    
 
     -- account demographics fields
     account_demographics_sales_segment__c AS account_demographics_sales_segment,
@@ -116,6 +119,7 @@ renamed AS (
     account_demographics_upa_postal_code__c AS account_demographics_upa_postal_code,
 
     -- present state info
+    health__c AS health_score,
     gs_health_score__c AS health_number,
     gs_health_score_color__c AS health_score_color,
 
@@ -133,7 +137,7 @@ renamed AS (
     ce_instances__c AS count_ce_instances,
     active_ce_users__c AS count_active_ce_users,
     number_of_open_opportunities__c AS count_open_opportunities,
-    using_ce__c AS using_ce,
+    using_ce__c AS count_using_ce,
 
     --account based marketing fields
     abm_tier__c AS abm_tier,
