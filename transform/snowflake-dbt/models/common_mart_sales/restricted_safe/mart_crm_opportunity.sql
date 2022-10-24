@@ -165,6 +165,7 @@
       dim_crm_account.parent_crm_account_demographics_territory AS account_demographics_territory,
       dim_crm_account.parent_crm_account_gtm_strategy,
       dim_crm_account.parent_crm_account_focus_account,
+      dim_crm_account.parent_crm_account_sales_segment,
       dim_crm_account.parent_crm_account_zi_technologies,
       dim_crm_account.parent_crm_account_demographics_sales_segment,
       dim_crm_account.parent_crm_account_demographics_geo,
