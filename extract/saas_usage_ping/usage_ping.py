@@ -207,7 +207,7 @@ class UsagePing(object):
                 if return_dict:
                     valid_metric_dict[metric_name] = return_dict
             else:
-                if concat_metric_name.lower() not in METRICS_EXCEPTION:
+                if (concat_metric_name.lower() not in METRICS_EXCEPTION or payload_source != 'sql'):
                     data_source_status = self.check_data_source(
                         payload_source,
                         metric_definition_dict,
