@@ -83,10 +83,10 @@ joined_counts AS (
     rpt_ping_subscriptions_reported_counts_monthly.total_subscription_count - reported_subscription_count        AS not_reporting_subscription_count, -- not on version with metric
     rpt_ping_subscriptions_reported_counts_monthly.total_licensed_users - reported_seat_count                    AS not_reporting_seat_count -- not on version with metric
   FROM reported_actuals
-  LEFT JOIN rpt_ping_subscriptions_on_versions_counts_monthly --model with subscriptions and seats on version
+  JOIN rpt_ping_subscriptions_on_versions_counts_monthly --model with subscriptions and seats on version
     ON reported_actuals.ping_created_date_month = rpt_ping_subscriptions_on_versions_counts_monthly.ping_created_date_month
       AND reported_actuals.metrics_path = rpt_ping_subscriptions_on_versions_counts_monthly.metrics_path
-  LEFT JOIN rpt_ping_subscriptions_reported_counts_monthly --model with overall total subscriptions and seats
+  JOIN rpt_ping_subscriptions_reported_counts_monthly --model with overall total subscriptions and seats
     ON reported_actuals.ping_created_date_month = rpt_ping_subscriptions_reported_counts_monthly.ping_created_date_month
       AND reported_actuals.metrics_path = rpt_ping_subscriptions_reported_counts_monthly.metrics_path
       AND rpt_ping_subscriptions_on_versions_counts_monthly.ping_edition = rpt_ping_subscriptions_reported_counts_monthly.ping_edition
