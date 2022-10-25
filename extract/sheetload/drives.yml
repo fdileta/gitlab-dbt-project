@@ -59,3 +59,8 @@ folders:
     folder_name: zuora_revenue_revenue_waterfall_report
     table_name: zuora_revenue_revenue_waterfall_report
     table_replace_append: 1
+  - name: marketing_press_sov
+    owner: '@chrissharp'
+    folder_name: marketing_press_sov
+    table_name: marketing_press_sov
+    table_replace_append: 0
