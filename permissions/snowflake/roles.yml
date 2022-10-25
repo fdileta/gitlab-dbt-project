@@ -1501,7 +1501,7 @@ roles:
                     - prod.restricted_safe_common_mart_sales
                     - prod.restricted_safe_common_mart_product
                     - prod.workspace_customer_success
-                    - prod.pumps.pump_gainsight_metrics_monthly_paid
+                    - prod.pumps
                 write:
                     - prod.common_mart_product
             tables:
