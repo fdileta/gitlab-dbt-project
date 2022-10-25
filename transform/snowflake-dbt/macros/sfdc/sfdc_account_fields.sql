@@ -176,8 +176,8 @@ WITH map_merged_crm_account AS (
         WHEN LOWER(ultimate_parent_account.gtm_strategy) IN ('account centric', 'account based - net new', 'account based - expand') THEN 'Focus Account'
         ELSE 'Non - Focus Account'
       END                                                                 AS parent_crm_account_focus_account,
-      ultimate_parent_account.tsp_max_family_employees                    AS parent_crm_account_tsp_max_family_employees,
       ultimate_parent_account.tsp_account_employees                       AS parent_crm_account_tsp_account_employees,
+      ultimate_parent_account.tsp_max_family_employees                    AS parent_crm_account_tsp_max_family_employees,
       CASE
          WHEN ultimate_parent_account.tsp_max_family_employees > 2000 THEN 'Employees > 2K'
          WHEN ultimate_parent_account.tsp_max_family_employees <= 2000 AND ultimate_parent_account.tsp_max_family_employees > 1500 THEN 'Employees > 1.5K'
