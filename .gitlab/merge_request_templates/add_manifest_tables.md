@@ -18,3 +18,7 @@ Closes
 #### PGP Test CI job passed?
 
 * [ ] List
+
+#### Red data
+
+* [ ] Confirm no [red data](https://about.gitlab.com/handbook/business-technology/data-team/how-we-work/new-data-source/#red-data) is loaded into Snowflake or the data is masked.

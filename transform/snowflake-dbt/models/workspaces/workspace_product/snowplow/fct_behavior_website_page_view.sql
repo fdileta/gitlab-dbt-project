@@ -1,6 +1,6 @@
 {{ config(
         materialized = "incremental",
-        unique_key = "behavior_website_page_view_pk"
+        unique_key = "fct_behavior_website_page_view_sk"
 ) }}
 
 {{ 
@@ -49,7 +49,7 @@
 
     SELECT
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['event_id','page_view_end_at']) }}                AS behavior_website_page_view_pk,
+      {{ dbt_utils.surrogate_key(['event_id','page_view_end_at']) }}                AS fct_behavior_website_page_view_sk,
 
       -- Foreign Keys
       dim_behavior_website_page_sk,

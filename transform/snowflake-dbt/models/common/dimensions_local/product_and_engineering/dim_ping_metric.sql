@@ -38,7 +38,8 @@ WITH source AS (
       IFNULL(is_paid_gmau, FALSE)                                             AS is_paid_gmau,
       IFNULL(is_umau, FALSE)                                                  AS is_umau,
       snapshot_date                                                           AS snapshot_date,
-      uploaded_at                                                             AS uploaded_at
+      uploaded_at                                                             AS uploaded_at,
+      data_by_row
     FROM source
       QUALIFY MAX(uploaded_at) OVER() = uploaded_at
 

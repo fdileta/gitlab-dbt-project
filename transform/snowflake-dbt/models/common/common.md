@@ -1161,6 +1161,8 @@ This new table will include all flattened target values for each metric for each
 
 {% docs fct_ping_instance_metric_rolling_13_months %}
 
+**Note** This model is set to never full refresh.  This means that new data will update daily but changes to past events will not be updated.
+
 **Description:** Atomic Level Instance Service Ping Metric data For All Metrics by Ping
 - The data includes a single row per Ping and Metric.  The basic Id's for Subscription, Product and Location are included.
 

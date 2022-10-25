@@ -51,6 +51,7 @@ WITH final AS (
       prep_crm_account.number_of_licenses_this_account,
       prep_crm_account.crm_account_zoom_info_number_of_developers,
       prep_crm_account.decision_maker_count_linkedin,
+      prep_crm_account.number_of_employees,
 
       --metadata
       prep_crm_account.created_by_id,
@@ -67,5 +68,5 @@ WITH final AS (
     created_by="@michellecooper",
     updated_by="@j_kim",
     created_date="2022-08-10",
-    updated_date="2022-08-31"
+    updated_date="2022-10-12"
 ) }}
