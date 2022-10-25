@@ -229,30 +229,6 @@ def test_set_metrics_filter(usage_ping):
     assert usage_ping.get_metrics_filter(usage_ping) == actual
 
 
-# def test_get_prepared_values(namespace_file, usage_ping):
-#     """
-#     Test query replacement for dates placeholder
-#     """
-#
-#     filtering = ["counts_monthly.deployments", "counts_monthly.successful_deployments"]
-#
-#     test_dict = [
-#         usage_ping.get_prepared_values(usage_ping, namespace)
-#         for namespace in namespace_file
-#         if namespace.get("counter_name") in filtering
-#     ]
-#
-#     for name, prepared_query, level in test_dict:
-#         assert datetime.strftime(usage_ping.end_date, "%Y-%m-%d") in prepared_query
-#         assert datetime.strftime(usage_ping.start_date_28, "%Y-%m-%d") in prepared_query
-#         assert "between_start_date" not in prepared_query
-#         assert "between_end_date" not in prepared_query
-#
-#         assert name
-#         assert level == "namespace"
-#
-
-
 def test_replace_placeholders(usage_ping):
     """
     Test string replace for query

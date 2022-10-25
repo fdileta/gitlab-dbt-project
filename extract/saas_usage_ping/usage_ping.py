@@ -53,7 +53,7 @@ class UsagePing:
     to sort out service ping data import
     """
 
-    def __init__(self, ping_date=None):
+    def __init__(self, ping_date=None, namespace_metrics_filter=None):
         self.config_vars = env.copy()
         self.loader_engine = snowflake_engine_factory(self.config_vars, "LOADER")
 
@@ -62,9 +62,11 @@ class UsagePing:
         else:
             self.end_date = datetime.datetime.now().date()
 
+        if namespace_metrics_filter is not None:
+            self.metrics_backfill = namespace_metrics_filter
+
         self.start_date_28 = self.end_date - datetime.timedelta(28)
         self.dataframe_api_columns = META_API_COLUMNS
-        self.metrics_backfill = []
 
     def set_metrics_filter(self, metrics: list):
         """
@@ -360,10 +362,11 @@ class UsagePing:
                 f"Skipping ping {metric_name} due to no namespace information."
             )
             return
+        logging.info(F"metric_name: {metric_name}")
 
-        results = self.get_result(query_dict=query_dict, conn=connection)
-
-        self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
+        # results = self.get_result(query_dict=query_dict, conn=connection)
+        #
+        # self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
 
     def saas_namespace_ping(self, metrics_filter=lambda _: True):
         """
@@ -398,6 +401,8 @@ class UsagePing:
         # pick up metrics from the parameter list
         # and only if time_window_query == False
         backfill_filter = get_backfill_filter(self.get_metrics_filter())
+
+        logging.info(F"backfill_filter: {backfill_filter}")
 
         self.saas_namespace_ping(metrics_filter=backfill_filter)
 
