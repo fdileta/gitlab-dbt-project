@@ -32,7 +32,6 @@ intermediate AS (
     pay_frequency,
     sales_geo_differential,
     region,
-    country,
     DATE_TRUNC('day', uploaded_at) AS effective_date,
     {{ dbt_utils.surrogate_key(['employee_id', 'job_role', 'job_grade', 
                                 'cost_center', 'jobtitle_speciality', 
