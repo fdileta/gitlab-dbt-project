@@ -19,10 +19,6 @@ api_key = env.get("MAILGUN_API_KEY")
 domains = ["mg.gitlab.com"]
 
 
-def chunker(seq, size):
-    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
-
-
 def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
     """
     Small convenience wrapper function for mailgun event requests,
@@ -109,6 +105,8 @@ def load_event_logs(event: str, full_refresh: bool = False):
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
+    file_name = f"{event}.json"
+
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
     else:
@@ -118,21 +116,15 @@ def load_event_logs(event: str, full_refresh: bool = False):
 
     info(f"Results length: {len(results)}")
 
-    # Stay under snowflakes max column size.
-    file_count = 0
-    for group in chunker(results, 100000):
-        file_name = f"{event}_{file_count}.json"
-        file_count = file_count + 1
+    with open(file_name, "w") as outfile:
+        json.dump(results, outfile)
 
-        with open(file_name, "w") as outfile:
-            json.dump(group, outfile)
-
-        snowflake_stage_load_copy_remove(
-            file_name,
-            f"mailgun.mailgun_load_{event}",
-            "mailgun.mailgun_events",
-            snowflake_engine,
-        )
+    snowflake_stage_load_copy_remove(
+        file_name,
+        f"mailgun.mailgun_load_{event}",
+        "mailgun.mailgun_events",
+        snowflake_engine,
+    )
 
 
 if __name__ == "__main__":
