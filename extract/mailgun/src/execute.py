@@ -63,7 +63,8 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
 
                 items = data.get("items")
 
-                info(f"Data retrieved length: {len(items)}")
+                if items is None:
+                    break
 
                 if len(items) == 0:
                     break
@@ -86,7 +87,9 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
                     break
 
                 items = data.get("items")
-                info(f"Data retrieved length: {len(items)}")
+
+                if items is None:
+                    break
 
                 if len(items) == 0:
                     break
