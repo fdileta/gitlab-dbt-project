@@ -46,15 +46,15 @@ class DbtModelClone:
         """
         logging.info("Creating schema if it does not exist")
 
-        query = f"""CREATE SCHEMA IF NOT EXISTS {schema_name};"""
+        query = f"""CREATE SCHEMA IF NOT EXISTS "{schema_name}";"""
         query_executor(self.engine, query)
 
         logging.info("Granting rights on stage to TRANSFORMER")
-        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
+        grants_query = f"""GRANT ALL ON SCHEMA "{schema_name}" TO TRANSFORMER;"""
         query_executor(self.engine, grants_query)
 
         logging.info("Granting rights on stage to GITLAB_CI")
-        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
+        grants_query = f"""GRANT ALL ON SCHEMA "{schema_name}" TO GITLAB_CI"""
         query_executor(self.engine, grants_query)
 
         return True
