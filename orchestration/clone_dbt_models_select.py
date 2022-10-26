@@ -192,7 +192,7 @@ class DbtModelClone:
             if table_or_view == "VIEW":
                 logging.info("Cloning view")
 
-                query = f"""SELECT GET_DDL('VIEW', {full_name}, TRUE)"""
+                query = f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
                 res = query_executor(self.engine, query)
 
                 base_dll = res[0][0]
