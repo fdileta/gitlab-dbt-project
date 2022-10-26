@@ -13,6 +13,7 @@ WITH RECURSIVE employee_directory AS (
     hire_date,
     rehire_date,
     region_modified,
+    country,
     termination_date,
     first_inactive_date,
     hire_location_factor,
