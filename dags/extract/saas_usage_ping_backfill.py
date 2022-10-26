@@ -169,7 +169,7 @@ end_date = get_date(param="end_date")
 
 metrics_backfill = backfill_param.get("metrics_backfill")
 
-dag = DAG(DAG_NAME, default_args=default_args, schedule_interval=None)
+dag = DAG(DAG_NAME, default_args=default_args, schedule_interval=None, concurrency=2)
 
 for run in get_date_range(start=start_date, end=end_date):
     generate_task(run_date=run, metrics=metrics_backfill)

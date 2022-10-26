@@ -362,7 +362,7 @@ class UsagePing:
                 f"Skipping ping {metric_name} due to no namespace information."
             )
             return
-        logging.info(F"metric_name: {metric_name}")
+        logging.info(f"metric_name: {metric_name}")
 
         # results = self.get_result(query_dict=query_dict, conn=connection)
         #
@@ -402,7 +402,7 @@ class UsagePing:
         # and only if time_window_query == False
         backfill_filter = get_backfill_filter(self.get_metrics_filter())
 
-        logging.info(F"backfill_filter: {backfill_filter}")
+        logging.info(f"backfill_filter: {backfill_filter}")
 
         self.saas_namespace_ping(metrics_filter=backfill_filter)
 
