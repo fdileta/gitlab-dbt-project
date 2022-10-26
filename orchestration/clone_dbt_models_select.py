@@ -46,15 +46,15 @@ class DbtModelClone:
         """
         logging.info("Creating schema if it does not exist")
 
-        query = f"""CREATE SCHEMA IF NOT EXISTS "{schema_name}";"""
+        query = f"""CREATE SCHEMA IF NOT EXISTS {schema_name};"""
         query_executor(self.engine, query)
 
         logging.info("Granting rights on stage to TRANSFORMER")
-        grants_query = f"""GRANT ALL ON SCHEMA "{schema_name}" TO TRANSFORMER;"""
+        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
         query_executor(self.engine, grants_query)
 
         logging.info("Granting rights on stage to GITLAB_CI")
-        grants_query = f"""GRANT ALL ON SCHEMA "{schema_name}" TO GITLAB_CI"""
+        grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
         query_executor(self.engine, grants_query)
 
         return True
@@ -171,7 +171,7 @@ class DbtModelClone:
             if alias:
                 table_name = alias.upper()
 
-            full_name = f"{database_name}.{schema_name}.{table_name}"
+            full_name = f""" "{database_name}"."{schema_name}"."{table_name}" """
 
             output_table_name = f"{self.branch_name}_{full_name}"
             output_schema_name = output_table_name.replace(f".{table_name}", "")
