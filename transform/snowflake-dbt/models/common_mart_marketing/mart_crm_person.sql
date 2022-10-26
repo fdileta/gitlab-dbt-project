@@ -170,6 +170,9 @@
       dim_crm_person.zoominfo_do_not_call_direct_phone,
       dim_crm_person.zoominfo_do_not_call_mobile_phone,
       dim_crm_person.zoominfo_company_employee_count,
+	  fct_crm_person.last_transfer_date_time,
+	  fct_crm_person.time_from_last_transfer_to_sequence,
+	  fct_crm_person.time_from_mql_to_last_transfer,
       fct_crm_person.is_mql,
       fct_crm_person.is_inquiry,
       CASE
