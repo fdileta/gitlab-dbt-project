@@ -138,30 +138,32 @@ WITH map_merged_crm_account AS (
 ), pte_scores AS (
 
     SELECT 
-        DISTINCT sfdc_account.account_id AS account_id,
-        LAST_VALUE(score) RESPECT NULLS OVER (PARTITION BY crm_account_id
-        ORDER BY score_date ASC) AS last_score,
-        LAST_VALUE(decile) RESPECT NULLS OVER (PARTITION BY crm_account_id
-        ORDER BY score_date ASC) AS last_decile,
-        LAST_VALUE(score_group) RESPECT NULLS OVER (PARTITION BY crm_account_id
-        ORDER BY score_date ASC) AS last_score_group
+        crm_account_id                  AS account_id,
+        score,
+        decile,
+        score_group,
+        MIN(score_date)                 AS valid_from,
+        MAX(score_date)                 AS valid_to,
+        CASE
+            WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_to DESC) = 1
+            THEN 1 ELSE 0 END           AS is_current
     FROM {{ ref('pte_scores') }}
-    LEFT JOIN sfdc_account
-        ON sfdc_account.account_id = pte_scores.crm_account_id
+    {{ dbt_utils.group_by(n=4)}}
 
 ), ptc_scores AS (
 
     SELECT 
-        DISTINCT sfdc_account.account_id AS account_id,
-        LAST_VALUE(score) RESPECT NULLS OVER (PARTITION BY crm_account_id
-        ORDER BY score_date ASC) AS last_score,
-        LAST_VALUE(decile) RESPECT NULLS OVER (PARTITION BY crm_account_id
-        ORDER BY score_date ASC) AS last_decile,
-        LAST_VALUE(score_group) RESPECT NULLS OVER (PARTITION BY crm_account_id
-        ORDER BY score_date ASC) AS last_score_group
+        crm_account_id                  AS account_id,
+        score,
+        decile,
+        score_group,
+        MIN(score_date)                 AS valid_from,
+        MAX(score_date)                 AS valid_to,
+        CASE
+            WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_to DESC) = 1
+            THEN 1 ELSE 0 END           AS is_current
     FROM {{ ref('ptc_scores') }}
-    LEFT JOIN sfdc_account
-        ON sfdc_account.account_id = ptc_scores.crm_account_id
+    {{ dbt_utils.group_by(n=4)}}
 
 ), final AS (
 
