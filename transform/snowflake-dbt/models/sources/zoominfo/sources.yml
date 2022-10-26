@@ -17,7 +17,7 @@ sources:
         description: International table, data ingested from Zoominfo inbound share.
      
       - name: techs
-        identifier: reference_techs         
+        identifier: zi_reference_techs_20210901         
         description: Technograph table,  data ingested from Zoominfo inbound share.
            
       - name: contact_enhance
