@@ -1,7 +1,7 @@
 WITH source AS (
 
   SELECT * 
-  FROM {{ source('driveload','marketing_press_sov') }}
+  FROM {{ source('driveload', 'marketing_press_sov') }}
 
 ), renamed AS (
 
@@ -27,8 +27,7 @@ WITH source AS (
       "Tags"::VARCHAR                    AS tags, 
       "Country"::VARCHAR                 AS country, 
       "State"::VARCHAR                   AS state, 
-      "City"::VARCHAR                    AS city, 
-      _UPDATED_AT
+      "City"::VARCHAR                    AS city
     FROM source
 
 )

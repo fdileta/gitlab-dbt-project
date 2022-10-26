@@ -47,4 +47,4 @@ models:
 - name: driveload_lam_corrections_source
   description: Snapshot LAM values correction file.
 - name: driveload_marketing_press_sov
-  description: Marketing's FY23 success metric for the Awareness stage of the journey
+  description: Marketing's FY23 success metric for the awareness stage of the journey
