@@ -20,7 +20,7 @@ domains = ["mg.gitlab.com"]
 
 
 def chunker(seq, size):
-    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
 def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
