@@ -171,10 +171,10 @@ class DbtModelClone:
             if alias:
                 table_name = alias.upper()
 
-            full_name = f"{database_name}.{schema_name}.{table_name}"
+            full_name = f""""{database_name}"."{schema_name}"."{table_name}" """.strip()
 
-            output_table_name = f"{self.branch_name}_{full_name}"
-            output_schema_name = output_table_name.replace(f".{table_name}", "")
+            output_table_name = f""""{self.branch_name}_{full_name[1:]}"""
+            output_schema_name = output_table_name.replace(f'."{table_name}"', "")
 
             query = f"""
                 SELECT
@@ -192,7 +192,7 @@ class DbtModelClone:
             if table_or_view == "VIEW":
                 logging.info("Cloning view")
 
-                query = f"""SELECT GET_DDL('VIEW', '{full_name}', TRUE)"""
+                query = f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
                 res = query_executor(self.engine, query)
 
                 base_dll = res[0][0]
