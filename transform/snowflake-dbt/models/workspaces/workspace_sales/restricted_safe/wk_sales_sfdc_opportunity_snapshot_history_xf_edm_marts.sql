@@ -339,25 +339,27 @@ WITH date_details AS (
       edm_snapshot_opty.open_3plus_deal_count,
       edm_snapshot_opty.open_4plus_deal_count,
       edm_snapshot_opty.booked_deal_count,
-      edm_snapshot_opty.churned_contraction_deal_count,
-      edm_snapshot_opty.open_1plus_net_arr,
-      edm_snapshot_opty.open_3plus_net_arr,
-      edm_snapshot_opty.open_4plus_net_arr,
+      -- JK 2022-10-25 they are being calculated in a CTE later for now
+      -- edm_snapshot_opty.churned_contraction_deal_count,
+      -- edm_snapshot_opty.open_1plus_net_arr,
+      -- edm_snapshot_opty.open_3plus_net_arr,
+      -- edm_snapshot_opty.open_4plus_net_arr,
+      -- edm_snapshot_opty.churned_contraction_net_arr,
       edm_snapshot_opty.booked_net_arr,
-      edm_snapshot_opty.churned_contraction_net_arr,
       edm_snapshot_opty.is_excluded_from_pipeline_created       AS is_excluded_flag,
 
       --------------------------------
 
       edm_snapshot_opty.opportunity_owner_manager,
       edm_snapshot_opty.is_edu_oss,
-      edm_snapshot_opty.sales_qualified_source_name             AS sales_qualified_source,
+      --edm_snapshot_opty.sales_qualified_source_name             AS sales_qualified_source,
       edm_snapshot_opty.dim_crm_account_id                      AS account_id,
       edm_snapshot_opty.opportunity_category,
 
       edm_snapshot_opty.account_owner_team_stamped,
       edm_snapshot_opty.account_owner_team_stamped_cro_level,
 
+      -- JK 2022-10-25: for now we leverage the live opp model for the following keys
       --edm_snapshot_opty.opportunity_owner_user_segment,
       --edm_snapshot_opty.opportunity_owner_user_region,
       --edm_snapshot_opty.opportunity_owner_user_area,
@@ -476,6 +478,8 @@ WITH date_details AS (
       sfdc_opportunity_xf.key_segment_geo_region_area_ot,
       sfdc_opportunity_xf.key_segment_geo_area,
 
+      sfdc_opportunity_xf.sales_qualified_source,
+
       ------------------------------------------------------------------------------------------------------
       ------------------------------------------------------------------------------------------------------
 
@@ -559,7 +563,54 @@ WITH date_details AS (
         ON vision_opps.opportunity_id = opp_snapshot.opportunity_id
         AND vision_opps.snapshot_fiscal_quarter_date = opp_snapshot.snapshot_fiscal_quarter_date
 
+
+-- JK 2022-10-25: temporarily calculating open_nplus_net_arrs & churn_contraction fields 
+-- in wk sales model instead of using the fields directly from edm marts
+), temp_calculations AS (
+
+    SELECT
+      *,
+      CASE 
+        WHEN is_eligible_open_pipeline_flag = 1
+          THEN net_arr
+        ELSE 0                                                                                              
+      END                                                 AS open_1plus_net_arr,
+
+      CASE 
+        WHEN is_eligible_open_pipeline_flag = 1
+          AND is_stage_3_plus = 1   
+            THEN net_arr
+        ELSE 0
+      END                                                 AS open_3plus_net_arr,
+  
+      CASE 
+        WHEN is_eligible_open_pipeline_flag = 1  
+          AND is_stage_4_plus = 1
+            THEN net_arr
+        ELSE 0
+      END                                                 AS open_4plus_net_arr,
+
+      CASE
+        WHEN ((is_renewal = 1
+            AND is_lost = 1)
+            OR is_won = 1 )
+            AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
+        THEN calculated_deal_count
+        ELSE 0
+      END                                                 AS churned_contraction_deal_count,
+
+      CASE
+        WHEN ((is_renewal = 1
+            AND is_lost = 1)
+            OR is_won = 1 )
+            AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
+        THEN net_arr
+        ELSE 0
+      END                                                 AS churned_contraction_net_arr
+    
+    FROM add_compound_metrics
+
 )
 
 SELECT *
-FROM add_compound_metrics
+FROM temp_calculations
