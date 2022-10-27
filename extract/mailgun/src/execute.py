@@ -123,7 +123,7 @@ def load_event_logs(event: str, full_refresh: bool = False):
 
     # Stay under snowflakes max column size.
     file_count = 0
-    for group in chunker(results, 100000):
+    for group in chunker(results, 10000):
         file_count = file_count + 1
         file_name = f"{event}_{file_count}.json"
 
