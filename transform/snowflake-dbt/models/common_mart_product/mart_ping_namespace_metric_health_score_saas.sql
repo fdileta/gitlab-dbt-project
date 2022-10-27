@@ -13,7 +13,6 @@
 {{ simple_cte([
     ('prep_saas_usage_ping_namespace','prep_saas_usage_ping_namespace'),
     ('dim_date','dim_date'),
-    ('bdg_namespace_subscription','bdg_namespace_order_subscription_monthly'),
     ('gainsight_wave_metrics','health_score_metrics'),
     ('instance_types', 'dim_host_instance_type'),
     ('dim_subscription', 'dim_subscription')
@@ -39,7 +38,7 @@
       prep_saas_usage_ping_namespace.ping_name,
       prep_saas_usage_ping_namespace.counter_value,
       dim_date.first_day_of_month                           AS reporting_month, 
-      bdg_namespace_subscription.dim_subscription_id,
+      dim_subscription.dim_subscription_id,
       dim_subscription.dim_subscription_id_original,
       instance_types_ordering.instance_type
     FROM prep_saas_usage_ping_namespace
@@ -47,14 +46,10 @@
       ON prep_saas_usage_ping_namespace.dim_namespace_id = instance_types_ordering.namespace_id
     INNER JOIN dim_date
       ON prep_saas_usage_ping_namespace.ping_date = dim_date.date_day
-    INNER JOIN bdg_namespace_subscription
-      ON prep_saas_usage_ping_namespace.dim_namespace_id = bdg_namespace_subscription.dim_namespace_id
-      AND dim_date.first_day_of_month = bdg_namespace_subscription.snapshot_month
-      AND namespace_order_subscription_match_status = 'Paid All Matching'
     INNER JOIN gainsight_wave_metrics
       ON prep_saas_usage_ping_namespace.ping_name = gainsight_wave_metrics.metric_name
     INNER JOIN dim_subscription
-      ON bdg_namespace_subscription.dim_subscription_id = dim_subscription.dim_subscription_id
+      ON prep_saas_usage_ping_namespace.dim_namespace_id = dim_subscription.namespace_id
     QUALIFY ROW_NUMBER() OVER (
       PARTITION BY 
         dim_date.first_day_of_month,
