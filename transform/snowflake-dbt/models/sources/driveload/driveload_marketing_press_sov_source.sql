@@ -16,7 +16,7 @@ WITH source AS (
       "Sentiment"::VARCHAR                                      AS sentiment,
       "Circulation"::VARCHAR                                    AS circulation,
       REPLACE("Desktop_Readership", ',')::NUMBER                AS desktop_readership,
-      TRIM(replace("Mobile_Readership", ','), '$')::NUMBER      AS mobile_readership, 
+      TRIM(REPLACE("Mobile_Readership", ','), '$')::NUMBER      AS mobile_readership, 
       REPLACE("Total_Readership", ',')::NUMBER                  AS total_readership, 
       REPLACE("Local_Viewership", ',')::VARCHAR                 AS local_viewership, 
       REPLACE("National_Viewership", ',')::NUMBER               AS national_viewership, 
