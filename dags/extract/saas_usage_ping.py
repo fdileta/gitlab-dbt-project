@@ -1,5 +1,10 @@
+"""
+saas_usage_ping.py is responsible for orchestrating:
+- usage ping combined metrics (sql + redis)
+- usage ping namespace
+"""
+
 import logging
-import os
 from datetime import datetime, timedelta
 
 from airflow import DAG
@@ -20,9 +25,6 @@ from kube_secrets import (
     SNOWFLAKE_USER,
     GITLAB_ANALYTICS_PRIVATE_TOKEN,
 )
-
-# Load the env vars into a dict and set env vars
-env = os.environ.copy()
 
 # tomorrow_ds -  the day after the execution date as YYYY-MM-DD
 # ds - the execution date as YYYY-MM-DD

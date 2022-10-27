@@ -1,7 +1,8 @@
-import pytest
+""" Test module for saas service ping """
 import sys
 import os
 from datetime import datetime
+import pytest
 
 # Tweak path as due to script execution way in Airflow, can't touch the original code
 abs_path = os.path.dirname(os.path.realpath(__file__))
@@ -13,6 +14,10 @@ from extract.saas_usage_ping.usage_ping import UsagePing, SQL_KEY, REDIS_KEY
 
 @pytest.fixture
 def get_metrics_definition_test_dict():
+    """
+    Returns a test metric_definitions dict...
+    as it's not possible to access API token during CI/CD job
+    """
     return {"counts.productivity_analytics_views": {"data_source": "redis", "instrumentation_class": "RedisMetric"}, "usage_activity_by_stage.secure.user_preferences_group_overview_security_dashboard": {"data_source": "database", "milestone": "<13.9"}, "usage_activity_by_stage.manage.user_auth_by_provider": {"data_source": "database", "value_json_schema": "config/metrics/objects_schemas/user_auth_by_provider.json"}, "recorded_at": {"data_source": "system", "performance_indicator_type": []}, "active_user_count": {"data_source": "database", "performance_indicator_type": []}, "counts.assignee_lists": {"data_source": "database", "milestone": "<13.9"}, "counts.ci_builds": {"data_source": "database", "milestone": "<13.9"}, "counts.ci_internal_pipelines": {"data_source": "database", "milestone": "<13.9"}, "counts.package_events_i_package_delete_package_by_deploy_token": {"data_source": "redis", "milestone": "<13.9"}, "counts.service_usage_data_download_payload_click": {"data_source": "redis", "milestone": "14.9"}, "counts.clusters_platforms_eks": {"data_source": "database", "milestone": "<13.9"}}
 
 
@@ -27,12 +32,11 @@ def test_get_md5():
         "",
         None,
     ]
-
     """
     Know testing the private method is not aligned with best praxis, but found it is sufficient
     in this implementation.
     """
-    for i, check_time in enumerate(input_timestamps):
+    for check_time in input_timestamps:
         res = usage_ping_test._get_md5(None, check_time)
         # Check output data type
         assert isinstance(res, str)
@@ -54,7 +58,7 @@ def test_evaluate_saas_queries():
     Note: The snowflake outputs cannot be compared because they can change over time
     """
 
-    def get_keys_in_nested_dict(nested_dict, keys=list()):
+    def get_keys_in_nested_dict(nested_dict, keys=[]):
         for key, val in nested_dict.items():
             if isinstance(val, dict):
                 get_keys_in_nested_dict(val, keys)

@@ -1,3 +1,8 @@
+"""
+usage_ping.py is responsible for uploading the following into Snowflake:
+- usage ping combined metrics (sql + redis)
+- usage ping namespace
+"""
 from os import environ as env
 from typing import Dict, List, Any, Tuple
 from hashlib import md5
@@ -30,7 +35,7 @@ REDIS_KEY = "redis"
 SQL_KEY = "sql"
 
 
-class UsagePing(object):
+class UsagePing():
     """
     Usage ping class represent as an umbrella
     to sort out service ping data import
@@ -55,13 +60,14 @@ class UsagePing(object):
         Calls api endpoint to get metric_definitions yaml file
         Loads file as list and converts it to a dictionary
         """
+        METRIC_DEFINITON_ENDPOINT = "http://gitlab.com/api/v4/usage_data/metric_definitions"
         config_dict = env.copy()
         headers = {
             "PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
         }
 
         response = requests.get(
-            "http://gitlab.com/api/v4/usage_data/metric_definitions", headers=headers
+            METRIC_DEFINITON_ENDPOINT, headers=headers
         )
         if response.status_code == 200:
             metric_definitions = yaml.safe_load(response.text)
@@ -80,7 +86,7 @@ class UsagePing(object):
         to generate the {ping_name: sql_query} dictionary
         """
         with open(
-            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE)
+            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE), encoding="utf-8"
         ) as f:
             saas_queries = json.load(f)
 
@@ -127,7 +133,7 @@ class UsagePing(object):
         param file_name: str
         return: dict
         """
-        with open(os.path.join(os.path.dirname(__file__), file_name)) as f:
+        with open(os.path.join(os.path.dirname(__file__), file_name), encoding="utf-8") as f:
             meta_data = json.load(f)
 
         return meta_data
@@ -155,7 +161,9 @@ class UsagePing(object):
             SQL_KEY: lambda defined_data_source: defined_data_source == "database",
         }
         metric_definition = metric_definition_dict.get(concat_metric_name, {})
-        # need to check parent_metric_definition too, because some metrics only have the parent defined, i.e `usage_activity_by_stage.manage.user_auth_by_provider.*`
+        ''' Need to check parent_metric_definition too
+        because some metrics only have the parent defined,
+        i.e `usage_activity_by_stage.manage.user_auth_by_provider.*` '''
         parent_metric_definition = metric_definition_dict.get(
             prev_concat_metric_name, {}
         )
@@ -169,10 +177,9 @@ class UsagePing(object):
             ):
                 return "valid_source"
 
-            else:
-                return "not_matching_source"
-        else:
-            return "missing_definition"
+            return "not_matching_source"
+
+        return "missing_definition"
 
     def keep_valid_metric_definitions(
         self,
@@ -190,7 +197,7 @@ class UsagePing(object):
         Do this recursively to keep the structure of the original payload
         """
 
-        valid_metric_dict: Dict[Any, Any] = dict()
+        valid_metric_dict: Dict[Any, Any] = {}
         for metric_name, metric_value in payload.items():
             if prev_concat_metric_name:
                 concat_metric_name = prev_concat_metric_name + "." + metric_name
@@ -236,8 +243,8 @@ class UsagePing(object):
         The dict vals are updated recursively to preserve its nested structure
 
         """
-        results: Dict[Any, Any] = dict()
-        errors: Dict[Any, Any] = dict()
+        results: Dict[Any, Any] = {}
+        errors: Dict[Any, Any] = {}
 
         for key, query in saas_queries.items():
             # if the 'query' is a dictionary, then recursively call
@@ -307,13 +314,14 @@ class UsagePing(object):
         """
         Call the Non SQL Metrics API and store the results in Snowflake RAW database
         """
+        REDIS_ENDPOINT = "https://gitlab.com/api/v4/usage_data/non_sql_metrics"
         config_dict = env.copy()
         headers = {
             "PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
         }
 
         response = requests.get(
-            "https://gitlab.com/api/v4/usage_data/non_sql_metrics", headers=headers
+            REDIS_ENDPOINT, headers=headers
         )
         if response.status_code == 200:
             redis_metrics = json.loads(response.text)
@@ -331,6 +339,7 @@ class UsagePing(object):
     def upload_combined_metrics(
         self, combined_metrics: Dict, saas_queries: Dict
     ) -> None:
+        """ Uploads combined_metrics dictionary to Snowflake """
         df_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
             + self.dataframe_api_columns
@@ -359,6 +368,7 @@ class UsagePing(object):
         self.loader_engine.dispose()
 
     def upload_sql_metric_errors(self, sql_metric_errors: Dict) -> None:
+        """ Uploads sql_metric_errors dictionary to Snowflake """
         df_to_upload = pd.DataFrame(columns=["run_id", "sql_errors", "ping_date"])
 
         df_to_upload.loc[0] = [
@@ -376,6 +386,11 @@ class UsagePing(object):
         self.loader_engine.dispose()
 
     def run_metric_checks(self) -> None:
+        """ Checks the following:
+        - All payload metrics appear in the metric_definitions yaml file
+        - The Redis & SQL metrics dont share the same key
+            - unlikely unless the duplicate keys are missing from definition file
+        """
         has_error = False
         if self.missing_definitions[SQL_KEY] or self.missing_definitions[REDIS_KEY]:
             logging.warning(
@@ -396,7 +411,7 @@ class UsagePing(object):
             )
 
     def _merge_dicts(
-        self, redis_metrics: Dict, sql_metrics: Dict, path: List = list()
+        self, redis_metrics: Dict, sql_metrics: Dict, path: List = []
     ) -> Dict:
         """
         Logic from https://stackoverflow.com/a/7205107
@@ -460,13 +475,14 @@ class UsagePing(object):
         }
         """
         with open(
-            os.path.join(os.path.dirname(__file__), "usage_ping_namespace_queries.json")
+            os.path.join(os.path.dirname(__file__), "usage_ping_namespace_queries.json"), encoding="utf-8"
         ) as namespace_file:
             saas_queries = json.load(namespace_file)
 
         return saas_queries
 
     def process_namespace_ping(self, query_dict, connection):
+        """ Runs a series of 'namespace' queries and uploads the results """
         base_query = query_dict.get("counter_query")
         ping_name = query_dict.get("counter_name", "Missing Name")
         logging.info(f"Running ping {ping_name}...")
