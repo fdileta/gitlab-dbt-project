@@ -1,31 +1,35 @@
 {{ simple_cte([
     ('dim_crm_person','dim_crm_person')
+]) }},
 
-]) }}
+crm_person AS (
 
-, crm_person AS (
-
-	SELECT
-		dim_crm_person_id,
-		leandata_matched_account_sales_segment,
-		employee_bucket,
-		COALESCE(dim_crm_person.account_demographics_employee_count,dim_crm_person.zoominfo_company_employee_count,dim_crm_person.cognism_employee_count) 
-		                                                                                    AS employee_count,
-        LOWER(COALESCE(dim_crm_person.zoominfo_company_country,dim_crm_person.zoominfo_contact_country,dim_crm_person.cognism_company_office_country,dim_crm_person.cognism_country)) 
-                                                                                            AS first_country
-	FROM dim_crm_person
+  SELECT
+    dim_crm_person_id,
+    leandata_matched_account_sales_segment,
+    employee_bucket,
+    COALESCE(
+      account_demographics_employee_count,
+      zoominfo_company_employee_count,
+      cognism_employee_count) AS employee_count,
+    LOWER(COALESCE(
+      zoominfo_company_country,
+      zoominfo_contact_country,
+      cognism_company_office_country,
+      cognism_country)) AS first_country
+  FROM dim_crm_person
 )
 
 SELECT
-dim_crm_person_id,
-CASE
+  dim_crm_person_id,
+  CASE
     WHEN LOWER(leandata_matched_account_sales_segment) = 'pubsec' THEN 'PubSec'
-    WHEN employee_count >=1 AND employee_count < 100 THEN 'SMB'
-    WHEN employee_count >=100 AND employee_count < 2000 THEN 'MM'
-    WHEN employee_count >=2000  THEN 'Large'
+    WHEN employee_count >= 1 AND employee_count < 100 THEN 'SMB'
+    WHEN employee_count >= 100 AND employee_count < 2000 THEN 'MM'
+    WHEN employee_count >= 2000 THEN 'Large'
     ELSE 'Unknown'
-  END                                                                                       AS employee_count_segment_custom,
-  CASE 
+  END AS employee_count_segment_custom,
+  CASE
     WHEN LOWER(leandata_matched_account_sales_segment) = 'pubsec' THEN 'PubSec'
     WHEN employee_bucket = '1-99' THEN 'SMB'
     WHEN employee_bucket = '100-499' THEN 'MM'
@@ -33,7 +37,7 @@ CASE
     WHEN employee_bucket = '2,000-9,999' THEN 'Large'
     WHEN employee_bucket = '10,000+' THEN 'Large'
     ELSE 'Unknown'
-  END                                                                                       AS employee_bucket_segment_custom,
+  END AS employee_bucket_segment_custom,
   CASE
     WHEN first_country = 'afghanistan' THEN 'emea'
     WHEN first_country = 'aland islands' THEN 'emea'
@@ -121,7 +125,7 @@ CASE
     WHEN first_country = 'grenada' THEN 'amer'
     WHEN first_country = 'guadeloupe' THEN 'amer'
     WHEN first_country = 'guatemala' THEN 'amer'
-    when first_country = 'guernsey' THEN 'emea'
+    WHEN first_country = 'guernsey' THEN 'emea'
     WHEN first_country = 'guinea' THEN 'emea'
     WHEN first_country = 'guinea-bissau' THEN 'emea'
     WHEN first_country = 'guyana' THEN 'amer'
@@ -275,6 +279,6 @@ CASE
     WHEN first_country = 'macedonia, the former yugoslav republic of' THEN 'emea'
     WHEN first_country = 'moldova, republic of' THEN 'emea'
     WHEN first_country = 'russian federation' THEN 'emea'
-    WHEN first_country = 'viet nam' THEN 'apac' 
+    WHEN first_country = 'viet nam' THEN 'apac'
   END AS geo_custom
-  FROM crm_person
+FROM crm_person
