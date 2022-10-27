@@ -138,31 +138,38 @@ WITH map_merged_crm_account AS (
 ), pte_scores AS (
 
     SELECT 
-        crm_account_id                  AS account_id,
-        score,
-        decile,
-        score_group,
-        MIN(score_date)                 AS valid_from,
-        MAX(score_date)                 AS valid_to,
-        CASE
-            WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_to DESC) = 1
-            THEN 1 ELSE 0 END           AS is_current
-    FROM {{ ref('pte_scores') }}
+      crm_account_id                                                                                           AS account_id,
+      score                                                                                                    AS score,
+      decile                                                                                                   AS decile,
+      score_group                                                                                              AS score_group,
+      MIN(score_date)                                                                                          AS valid_from,
+      COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), CURRENT_DATE())        AS valid_to,
+      CASE 
+        WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_from DESC) = 1 
+          THEN 1
+        ELSE 0
+      END                                                                                                      AS is_current
+    FROM {{ ref('pte_scores') }}    
+    ORDER BY valid_from, valid_to
     {{ dbt_utils.group_by(n=4)}}
+    
 
 ), ptc_scores AS (
 
     SELECT 
-        crm_account_id                  AS account_id,
-        score,
-        decile,
-        score_group,
-        MIN(score_date)                 AS valid_from,
-        MAX(score_date)                 AS valid_to,
-        CASE
-            WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_to DESC) = 1
-            THEN 1 ELSE 0 END           AS is_current
-    FROM {{ ref('ptc_scores') }}
+      crm_account_id                                                                                           AS account_id,
+      score                                                                                                    AS score,
+      decile                                                                                                   AS decile,
+      score_group                                                                                              AS score_group,
+      MIN(score_date)                                                                                          AS valid_from,
+      COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), CURRENT_DATE())        AS valid_to,
+      CASE 
+        WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_from DESC) = 1 
+          THEN 1
+        ELSE 0
+      END                                                                                                      AS is_current
+    FROM {{ ref('ptc_scores') }}    
+    ORDER BY valid_from, valid_to
     {{ dbt_utils.group_by(n=4)}}
 
 ), final AS (
@@ -464,12 +471,12 @@ WITH map_merged_crm_account AS (
       {%- endif %}
 
       -- PtC and PtE 
-      pte_scores.last_score                                               AS pte_score,
-      pte_scores.last_decile                                              AS pte_decile,
-      pte_scores.last_score_group                                         AS pte_score_group,
-      ptc_scores.last_score                                               AS ptc_score,
-      ptc_scores.last_decile                                              AS ptc_decile,
-      ptc_scores.last_score_group                                         AS ptc_score_group,
+      pte_scores.score                                               AS pte_score,
+      pte_scores.decile                                              AS pte_decile,
+      pte_scores.score_group                                         AS pte_score_group,
+      ptc_scores.score                                               AS ptc_score,
+      ptc_scores.decile                                              AS ptc_decile,
+      ptc_scores.score_group                                         AS ptc_score_group,
 
 
       --metadata
@@ -490,11 +497,13 @@ WITH map_merged_crm_account AS (
       ON sfdc_account.record_type_id = sfdc_record_type.record_type_id
     LEFT JOIN prep_crm_person
       ON sfdc_account.primary_contact_id = prep_crm_person.sfdc_record_id
-    LEFT JOIN pte_scores 
-      ON sfdc_account.account_id = pte_scores.account_id
-    LEFT JOIN ptc_scores
-      ON sfdc_account.account_id = ptc_scores.account_id
     {%- if model_type == 'live' %}
+    LEFT JOIN pte_scores 
+      ON sfdc_account.account_id = pte_scores.account_id 
+        AND pte_scores.is_current = 1
+    LEFT JOIN ptc_scores
+      ON sfdc_account.account_id = ptc_scores.account_id 
+        AND ptc_scores.is_current = 1
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
     LEFT OUTER JOIN sfdc_users AS technical_account_manager
@@ -525,6 +534,12 @@ WITH map_merged_crm_account AS (
     LEFT JOIN sfdc_users AS last_modified_by
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
         AND sfdc_account.snapshot_id = last_modified_by.snapshot_id
+    INNER JOIN dim_date
+      ON ptc_score.valid_from <= dim_date.date_actual
+      AND ptc_score.valid_to > dim_date.date_actual
+    INNER JOIN dim_date
+      ON pte_score.valid_from <= dim_date.date_actual
+      AND pte_score.valid_to > dim_date.date_actual
     {%- endif %}
 
 )
