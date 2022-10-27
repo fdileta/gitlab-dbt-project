@@ -21,7 +21,7 @@ WITH source AS (
       REPLACE("Local_Viewership", ',')::VARCHAR                 AS local_viewership, 
       REPLACE("National_Viewership", ',')::NUMBER               AS national_viewership, 
       REPLACE("Shares", ',')::NUMBER                            AS shares, 
-      TRIM(REPLACE("Ad_Equivalency", ','), '$')::DECIMAL(10,2)  AS ad_equivalency, 
+      TRIM(REPLACE("Ad_Equivalency", ','), '$')::DECIMAL(10,2)  AS ad_equivalency_usd, 
       "Article_Impact"::VARCHAR                                 AS article_impact, 
       "SEO_Impact"::NUMBER                                      AS seo_impact, 
       "Tags"::VARCHAR                                           AS tags, 
