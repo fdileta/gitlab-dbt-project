@@ -1,8 +1,9 @@
-{{ config({
-        "materialized": "view",
-    })
-}}
-WITH dim_crm_person AS (
+{{ simple_cte([
+    ('dim_crm_person','dim_crm_person')
+
+]) }}
+
+, crm_person AS (
 
 	SELECT
 		dim_crm_person_id,
@@ -12,7 +13,7 @@ WITH dim_crm_person AS (
 		                                                                                    AS employee_count,
         LOWER(COALESCE(dim_crm_person.zoominfo_company_country,dim_crm_person.zoominfo_contact_country,dim_crm_person.cognism_company_office_country,dim_crm_person.cognism_country)) 
                                                                                             AS first_country
-	FROM {{ref('dim_crm_person')}}
+	FROM dim_crm_person
 )
 
 SELECT
@@ -276,4 +277,4 @@ CASE
     WHEN first_country = 'russian federation' THEN 'emea'
     WHEN first_country = 'viet nam' THEN 'apac' 
   END AS geo_custom
-  FROM dim_crm_person
+  FROM crm_person
