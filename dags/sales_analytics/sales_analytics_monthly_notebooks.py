@@ -53,8 +53,8 @@ dag = DAG(
 )
 
 
-MONTHLY_NOTEBOOKS_PATH = f'{SALES_ANALYTICS_NOTEBOOKS_PATH}/monthly/'
-notebooks = get_sales_analytics_notebooks(frequency='monthly')
+MONTHLY_NOTEBOOKS_PATH = f"{SALES_ANALYTICS_NOTEBOOKS_PATH}/monthly/"
+notebooks = get_sales_analytics_notebooks(frequency="monthly")
 
 # Task 1
 start = DummyOperator(task_id="Start", dag=dag)

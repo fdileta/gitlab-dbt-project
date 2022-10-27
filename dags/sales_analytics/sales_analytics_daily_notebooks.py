@@ -52,8 +52,8 @@ dag = DAG(
     concurrency=1,
 )
 
-DAILY_NOTEBOOKS_PATH = f'{SALES_ANALYTICS_NOTEBOOKS_PATH}/daily/'
-notebooks = get_sales_analytics_notebooks(frequency='daily')
+DAILY_NOTEBOOKS_PATH = f"{SALES_ANALYTICS_NOTEBOOKS_PATH}/daily/"
+notebooks = get_sales_analytics_notebooks(frequency="daily")
 
 # Task 1
 start = DummyOperator(task_id="Start", dag=dag)
