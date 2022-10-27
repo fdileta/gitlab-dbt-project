@@ -46,8 +46,7 @@ WITH prep_amendment AS (
     WHERE namespace_subscription_bridge.product_tier_name_subscription IN (
         'SaaS - Bronze', 
         'SaaS - Ultimate', 
-        'SaaS - Premium',
-        'SaaS - Other'
+        'SaaS - Premium'
     )
     QUALIFY ROW_NUMBER() OVER (PARTITION BY namespace_subscription_bridge.dim_namespace_id ORDER BY subscription.subscription_version DESC) = 1
     
