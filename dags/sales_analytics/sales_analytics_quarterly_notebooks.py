@@ -64,7 +64,7 @@ for notebook, task_name in notebooks.items():
     container_cmd_load = f"""
         {clone_repo_cmd} &&
         cd {QUARTERLY_NOTEBOOKS_PATH} &&
-        papermill {notebook} -p is_local_development True
+        papermill {notebook} -p is_local_development False
         """
     task_identifier = f"{task_name}"
     # Task 2
