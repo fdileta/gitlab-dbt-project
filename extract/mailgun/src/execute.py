@@ -115,7 +115,7 @@ def load_event_logs(event: str, full_refresh: bool = False):
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
     else:
-        start_date = datetime.datetime.now() - datetime.timedelta(hours=8)
+        start_date = datetime.datetime.now() - datetime.timedelta(hours=4)
 
     results = extract_logs(event, start_date)
 
@@ -124,8 +124,8 @@ def load_event_logs(event: str, full_refresh: bool = False):
     # Stay under snowflakes max column size.
     file_count = 0
     for group in chunker(results, 100000):
-        file_name = f"{event}_{file_count}.json"
         file_count = file_count + 1
+        file_name = f"{event}_{file_count}.json"
 
         with open(file_name, "w") as outfile:
             json.dump(group, outfile)
