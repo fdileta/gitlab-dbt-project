@@ -79,7 +79,7 @@ WITH prep_amendment AS (
     subscription.dim_subscription_id_previous,
     subscription.subscription_name_slugify,
     subscription.subscription_status,
-    COALESCE(subscription.namespace_id, most_recent_subscription_per_namespace.dim_namespace_id) AS dim_namespace_id,
+    COALESCE(subscription.namespace_id, most_recent_subscription_per_namespace.dim_namespace_id) AS namespace_id,
     subscription.namespace_name,
     subscription.zuora_renewal_subscription_name,
     subscription.zuora_renewal_subscription_name_slugify,
