@@ -11,6 +11,7 @@ sys.path.append(abs_path)
 from extract.saas_usage_ping.usage_ping import UsagePing, SQL_KEY, REDIS_KEY
 
 
+@pytest.fixture
 def get_metrics_definition_test_dict():
     return {"counts.productivity_analytics_views": {"data_source": "redis", "instrumentation_class": "RedisMetric"}, "usage_activity_by_stage.secure.user_preferences_group_overview_security_dashboard": {"data_source": "database", "milestone": "<13.9"}, "usage_activity_by_stage.manage.user_auth_by_provider": {"data_source": "database", "value_json_schema": "config/metrics/objects_schemas/user_auth_by_provider.json"}, "recorded_at": {"data_source": "system", "performance_indicator_type": []}, "active_user_count": {"data_source": "database", "performance_indicator_type": []}, "counts.assignee_lists": {"data_source": "database", "milestone": "<13.9"}, "counts.ci_builds": {"data_source": "database", "milestone": "<13.9"}, "counts.ci_internal_pipelines": {"data_source": "database", "milestone": "<13.9"}, "counts.package_events_i_package_delete_package_by_deploy_token": {"data_source": "redis", "milestone": "<13.9"}, "counts.service_usage_data_download_payload_click": {"data_source": "redis", "milestone": "14.9"}, "counts.clusters_platforms_eks": {"data_source": "database", "milestone": "<13.9"}}
 
@@ -99,7 +100,7 @@ def test_evaluate_saas_queries():
     assert get_keys_in_nested_dict(errors) == get_keys_in_nested_dict(expected_errors)
 
 
-def test_check_data_source():
+def test_check_data_source(get_metrics_definition_test_dict):
     """
     Test the following:
         1. Valid matching source is returned for the current metric, and the parent metric
@@ -107,45 +108,44 @@ def test_check_data_source():
         3. Missing definitions are returned correctly
     """
     usage_ping_test = UsagePing()
-    metric_definitions_dict = get_metrics_definition_test_dict()
 
     # matching redis concat_metric_name
     payload_source = REDIS_KEY
     concat_metric_name = 'counts.productivity_analytics_views'
     prev_concat_metric_name = 'counts'
-    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    res = usage_ping_test.check_data_source(payload_source, get_metrics_definition_test_dict, concat_metric_name, prev_concat_metric_name)
     assert res == 'valid_source'
 
     # matching sql concat_metric_name
     payload_source = SQL_KEY
     concat_metric_name = 'usage_activity_by_stage.secure.user_preferences_group_overview_security_dashboard'
     prev_concat_metric_name = 'usage_activity_by_stage.secure'
-    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    res = usage_ping_test.check_data_source(payload_source, get_metrics_definition_test_dict, concat_metric_name, prev_concat_metric_name)
     assert res == 'valid_source'
 
     # matching sql prev_concat_metric_name
     payload_source = SQL_KEY
     concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider.two-factor'
     prev_concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider'
-    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    res = usage_ping_test.check_data_source(payload_source, get_metrics_definition_test_dict, concat_metric_name, prev_concat_metric_name)
     assert res == 'valid_source'
 
     # NON-MATCHING data source: redis payload, but metric definition shows data source as sql
     payload_source = REDIS_KEY
     concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider.two-factor'
     prev_concat_metric_name = 'usage_activity_by_stage.manage.user_auth_by_provider'
-    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    res = usage_ping_test.check_data_source(payload_source, get_metrics_definition_test_dict, concat_metric_name, prev_concat_metric_name)
     assert res == 'not_matching_source'
 
     # metric in payload is missing in metric_definition yaml file
     payload_source = REDIS_KEY # should be sql
     concat_metric_name = 'some_missing_key.some_missing_key2'
     prev_concat_metric_name = 'some_missing_key'
-    res = usage_ping_test.check_data_source(payload_source, metric_definitions_dict, concat_metric_name, prev_concat_metric_name)
+    res = usage_ping_test.check_data_source(payload_source, get_metrics_definition_test_dict, concat_metric_name, prev_concat_metric_name)
     assert res == 'missing_definition'
 
 
-def test_keep_valid_metric_definitions():
+def test_keep_valid_metric_definitions(get_metrics_definition_test_dict):
     """
     Test that only the correct metrics as defined by the metric_definitions yaml file are preserved within the payload.
 
@@ -154,13 +154,12 @@ def test_keep_valid_metric_definitions():
     payload = {"recorded_at": "2022-10-13T20:23:45.242Z", "active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))", "counts": {"assignee_lists": -3, "ci_builds": -3, "ci_internal_pipelines": -1, "package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0, "clusters_platforms_eks": 0}}
 
     payload_source = REDIS_KEY
-    metric_definitions_dict = get_metrics_definition_test_dict()
-    valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(payload, payload_source, metric_definitions_dict)
+    valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(payload, payload_source, get_metrics_definition_test_dict)
     expected_results = {"recorded_at": "2022-10-13T20:23:45.242Z", "counts": {"package_events_i_package_delete_package_by_deploy_token": 0, "service_usage_data_download_payload_click": 0}}
     assert valid_metric_dict == expected_results
 
 
-def test_metric_exceptions():
+def test_metric_exceptions(get_metrics_definition_test_dict):
     """
     Tests that metrics defined in list(METRICS_EXCEPTION) are removed.
     """
@@ -168,8 +167,7 @@ def test_metric_exceptions():
     payload = {"active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))", "counts": {"clusters_platforms_eks": 0}}
 
     payload_source = SQL_KEY
-    metric_definitions_dict = get_metrics_definition_test_dict()
-    valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(payload, payload_source, metric_definitions_dict)
+    valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(payload, payload_source, get_metrics_definition_test_dict)
     expected_results = {"active_user_count": "SELECT COUNT(\"users\".\"id\") FROM \"users\" WHERE (\"users\".\"state\" IN ('active')) AND (\"users\".\"user_type\" IS NULL OR \"users\".\"user_type\" IN (6, 4))"}
     assert valid_metric_dict == expected_results
 
