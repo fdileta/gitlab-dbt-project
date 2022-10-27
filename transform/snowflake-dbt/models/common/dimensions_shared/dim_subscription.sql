@@ -29,6 +29,28 @@ WITH prep_amendment AS (
       subscription_cohort_year
     FROM {{ ref('map_subscription_lineage') }}
 
+), namespace_subscription_bridge AS (
+    
+    SELECT
+      *
+    FROM {{ ref('bdg_namespace_order_subscription') }}
+
+), most_recent_subscription_per_namespace AS (
+    
+    SELECT
+      namespace_subscription_bridge.dim_subscription_id AS dim_latest_subscription_id,
+      namespace_subscription_bridge.dim_namespace_id
+    FROM namespace_subscription_bridge
+    JOIN subscription
+      ON subscription.dim_subscription_id = namespace_subscription_bridge.dim_subscription_id
+    WHERE namespace_subscription_bridge.product_tier_name_subscription IN (
+        'SaaS - Bronze', 
+        'SaaS - Ultimate', 
+        'SaaS - Premium',
+        'SaaS - Other'
+    )
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY namespace_subscription_bridge.dim_namespace_id ORDER BY subscription.subscription_version DESC) = 1
+    
 ), final AS (
 
   SELECT
@@ -58,7 +80,7 @@ WITH prep_amendment AS (
     subscription.dim_subscription_id_previous,
     subscription.subscription_name_slugify,
     subscription.subscription_status,
-    subscription.namespace_id,
+    COALESCE(subscription.namespace_id, most_recent_subscription_per_namespace.dim_namespace_id) AS dim_namespace_id,
     subscription.namespace_name,
     subscription.zuora_renewal_subscription_name,
     subscription.zuora_renewal_subscription_name_slugify,
@@ -113,6 +135,8 @@ WITH prep_amendment AS (
     ON subscription.dim_amendment_id_subscription = prep_amendment.dim_amendment_id
   LEFT JOIN subscription_opportunity_mapping
     ON subscription.dim_subscription_id = subscription_opportunity_mapping.dim_subscription_id
+  LEFT JOIN most_recent_subscription_per_namespace
+    ON subscription.dim_subscription_id = most_recent_subscription_per_namespace.dim_latest_subscription_id
 
 )
 
@@ -121,5 +145,5 @@ WITH prep_amendment AS (
     created_by="@snalamaru",
     updated_by="@michellecooper",
     created_date="2020-12-16",
-    updated_date="2022-07-07"
+    updated_date="2022-10-27"
 ) }}
