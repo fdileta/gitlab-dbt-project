@@ -1,22 +1,34 @@
 """ Extracts data from the MailGun API event stream """
 import datetime
 import json
-import requests
 import sys
 from email import utils
+from logging import info, basicConfig, getLogger, error
+from os import environ as env
+from typing import Dict, List
+
+import requests
 from fire import Fire
+
 from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
     snowflake_stage_load_copy_remove,
 )
-from logging import info, basicConfig, getLogger, error
-from os import environ as env
-from typing import Dict, List
 
 config_dict = env.copy()
 
 api_key = env.get("MAILGUN_API_KEY")
 domains = ["mg.gitlab.com"]
+
+
+def chunker(seq: List, size: int):
+    """
+
+    :param seq:
+    :param size:
+    :return:
+    """
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
 def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
@@ -59,7 +71,8 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
 
                 items = data.get("items")
 
-                info(f"Data retrieved length: {len(items)}")
+                if items is None:
+                    break
 
                 if len(items) == 0:
                     break
@@ -82,7 +95,9 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
                     break
 
                 items = data.get("items")
-                info(f"Data retrieved length: {len(items)}")
+
+                if items is None:
+                    break
 
                 if len(items) == 0:
                     break
@@ -105,26 +120,31 @@ def load_event_logs(event: str, full_refresh: bool = False):
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    file_name = f"{event}.json"
-
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
     else:
-        start_date = datetime.datetime.now() - datetime.timedelta(hours=16)
+        start_date = datetime.datetime.now() - datetime.timedelta(minutes=30)
 
     results = extract_logs(event, start_date)
 
     info(f"Results length: {len(results)}")
 
-    with open(file_name, "w") as outfile:
-        json.dump(results, outfile)
+    # Stay under snowflakes max column size.
+    file_count = 0
+    for group in chunker(results, 10000):
+        file_count = file_count + 1
+        file_name = f"{event}_{file_count}.json"
 
-    snowflake_stage_load_copy_remove(
-        file_name,
-        f"mailgun.mailgun_load_{event}",
-        "mailgun.mailgun_events",
-        snowflake_engine,
-    )
+        with open(file_name, "w", encoding="utf-8") as outfile:
+            json.dump(group, outfile)
+
+        snowflake_stage_load_copy_remove(
+            file_name,
+            f"mailgun.mailgun_load_{event}",
+            "mailgun.mailgun_events",
+            snowflake_engine,
+            on_error="ABORT_STATEMENT",
+        )
 
 
 if __name__ == "__main__":
