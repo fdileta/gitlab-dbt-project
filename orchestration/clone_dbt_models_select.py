@@ -118,28 +118,21 @@ class DbtModelClone:
         )
         query_executor(self.engine, grants_query)
 
-    def clean_view_dll(self, dll_input: str) -> str:
+    def clean_view_dll(self, table_name: str, dll_input: str) -> str:
         """
         Essentially, this code is finding and replacing the DB name in only the first line for recreating
         views. This is because we have a database & schema named PREP, which creates a special case in the
         rest of the views they are replaced completely.
 
+        :param table_name:
         :param dll_input:
         :return:
         """
         split_file = dll_input.splitlines()
 
         first_line = split_file[0]
-        find_db_name = (
-            first_line[dll_input.find("view") :]
-            .split(".")[0]
-            .replace("PREP.", f"{self.prep_database}.")
-            .replace("PROD.", f"{self.prod_database}.")
-        )
 
-        find_db_name = f"{find_db_name.split(' ')[0]} \"{find_db_name.split(' ')[1]}\""
-
-        new_first_line = f"{first_line[:dll_input.find('view')]}{find_db_name}{first_line[dll_input.find('.'):]}"
+        new_first_line = f"{first_line[:dll_input.find('view')]}{table_name}{first_line[dll_input.find('.'):]}"
         replaced_file = [
             f.replace("PREP.", f"{self.prep_database}.").replace("PROD.", f"{self.prod_database}.")
             for f in split_file
@@ -199,7 +192,7 @@ class DbtModelClone:
 
                 base_dll = res[0][0]
 
-                output_query = self.clean_view_dll(base_dll)
+                output_query = self.clean_view_dll(output_table_name, base_dll)
                 query_executor(self.engine, output_query)
                 logging.info(f"View {full_name} successfully created. ")
 
