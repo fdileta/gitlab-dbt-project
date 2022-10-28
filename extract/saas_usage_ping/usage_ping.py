@@ -35,7 +35,7 @@ REDIS_KEY = "redis"
 SQL_KEY = "sql"
 
 
-class UsagePing():
+class UsagePing:
     """
     Usage ping class represent as an umbrella
     to sort out service ping data import
@@ -60,15 +60,15 @@ class UsagePing():
         Calls api endpoint to get metric_definitions yaml file
         Loads file as list and converts it to a dictionary
         """
-        METRIC_DEFINITON_ENDPOINT = "http://gitlab.com/api/v4/usage_data/metric_definitions"
+        METRIC_DEFINITON_ENDPOINT = (
+            "http://gitlab.com/api/v4/usage_data/metric_definitions"
+        )
         config_dict = env.copy()
         headers = {
             "PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
         }
 
-        response = requests.get(
-            METRIC_DEFINITON_ENDPOINT, headers=headers
-        )
+        response = requests.get(METRIC_DEFINITON_ENDPOINT, headers=headers)
         if response.status_code == 200:
             metric_definitions = yaml.safe_load(response.text)
         else:
@@ -86,7 +86,8 @@ class UsagePing():
         to generate the {ping_name: sql_query} dictionary
         """
         with open(
-            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE), encoding="utf-8"
+            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE),
+            encoding="utf-8",
         ) as f:
             saas_queries = json.load(f)
 
@@ -133,10 +134,30 @@ class UsagePing():
         param file_name: str
         return: dict
         """
-        with open(os.path.join(os.path.dirname(__file__), file_name), encoding="utf-8") as f:
+        with open(
+            os.path.join(os.path.dirname(__file__), file_name), encoding="utf-8"
+        ) as f:
             meta_data = json.load(f)
 
         return meta_data
+
+    def does_source_match_definition(
+        self, payload_source, metric_definition_source
+    ) -> dict:
+        """
+        Determines if payload data source matches the defined data source.
+
+        A metric from the redis payload is valid if the data_source != database
+        Conversely, a metric from sql payload is valid if data_source == database
+        """
+        SQL_DATA_SOURCE_VAL = "database"
+        if payload_source == REDIS_KEY:
+            return (
+                metric_definition_source
+                and metric_definition_source != SQL_DATA_SOURCE_VAL,
+            )
+        elif payload_source == SQL_KEY:
+            return (metric_definition_source == SQL_DATA_SOURCE_VAL,)
 
     def check_data_source(
         self,
@@ -146,34 +167,28 @@ class UsagePing():
         prev_concat_metric_name: str,
     ) -> str:
         """
-        Determines if payload data source matches the defined data source.
-
-        A metric from the redis payload is valid if the data_source != database
-        Conversely, a metric from sql payload is valid if data_source == database
+        Check if an individual metric from the payload matches source
+        as defined in the definition yaml file.
 
         Both the concatted metric name, i.e key1.key2.key3
         and the previous metric name, i.e key1.key2
         need to be checked because some metrics are only defined by their parent name
+        i.e `usage_activity_by_stage.manage.user_auth_by_provider.*`
         """
-        is_match_defined_source = {
-            REDIS_KEY: lambda defined_data_source: defined_data_source
-            and defined_data_source != "database",
-            SQL_KEY: lambda defined_data_source: defined_data_source == "database",
-        }
+        METRIC_DEFINITION_DATA_SOURCE_KEY = "data_source"
         metric_definition = metric_definition_dict.get(concat_metric_name, {})
-        ''' Need to check parent_metric_definition too
-        because some metrics only have the parent defined,
-        i.e `usage_activity_by_stage.manage.user_auth_by_provider.*` '''
+
         parent_metric_definition = metric_definition_dict.get(
             prev_concat_metric_name, {}
         )
 
         if metric_definition or parent_metric_definition:
             # check if redis or sql payload has the correct corresponding data source in the yaml file
-            if is_match_defined_source[payload_source](
-                metric_definition.get("data_source")
-            ) or is_match_defined_source[payload_source](
-                parent_metric_definition.get("data_source")
+            if self.does_source_match_definition(
+                payload_source, metric_definition.get(METRIC_DEFINITION_DATA_SOURCE_KEY)
+            ) or self.does_source_match_definition(
+                payload_source,
+                parent_metric_definition.get(METRIC_DEFINITION_DATA_SOURCE_KEY),
             ):
                 return "valid_source"
 
@@ -214,7 +229,10 @@ class UsagePing():
                 if return_dict:
                     valid_metric_dict[metric_name] = return_dict
             else:
-                if (concat_metric_name.lower() not in METRICS_EXCEPTION or payload_source != 'sql'):
+                if (
+                    concat_metric_name.lower() not in METRICS_EXCEPTION
+                    or payload_source != "sql"
+                ):
                     data_source_status = self.check_data_source(
                         payload_source,
                         metric_definition_dict,
@@ -226,7 +244,9 @@ class UsagePing():
                     elif data_source_status == "not_matching_source":
                         pass  # do nothing, invalid sources are expected
                     elif data_source_status == "missing_definition":
-                        self.missing_definitions[payload_source].append(concat_metric_name)
+                        self.missing_definitions[payload_source].append(
+                            concat_metric_name
+                        )
 
         return valid_metric_dict
 
@@ -320,9 +340,7 @@ class UsagePing():
             "PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
         }
 
-        response = requests.get(
-            REDIS_ENDPOINT, headers=headers
-        )
+        response = requests.get(REDIS_ENDPOINT, headers=headers)
         if response.status_code == 200:
             redis_metrics = json.loads(response.text)
         else:
@@ -339,7 +357,7 @@ class UsagePing():
     def upload_combined_metrics(
         self, combined_metrics: Dict, saas_queries: Dict
     ) -> None:
-        """ Uploads combined_metrics dictionary to Snowflake """
+        """Uploads combined_metrics dictionary to Snowflake"""
         df_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
             + self.dataframe_api_columns
@@ -368,7 +386,7 @@ class UsagePing():
         self.loader_engine.dispose()
 
     def upload_sql_metric_errors(self, sql_metric_errors: Dict) -> None:
-        """ Uploads sql_metric_errors dictionary to Snowflake """
+        """Uploads sql_metric_errors dictionary to Snowflake"""
         df_to_upload = pd.DataFrame(columns=["run_id", "sql_errors", "ping_date"])
 
         df_to_upload.loc[0] = [
@@ -386,7 +404,7 @@ class UsagePing():
         self.loader_engine.dispose()
 
     def run_metric_checks(self) -> None:
-        """ Checks the following:
+        """Checks the following:
         - All payload metrics appear in the metric_definitions yaml file
         - The Redis & SQL metrics dont share the same key
             - unlikely unless the duplicate keys are missing from definition file
@@ -475,14 +493,17 @@ class UsagePing():
         }
         """
         with open(
-            os.path.join(os.path.dirname(__file__), "usage_ping_namespace_queries.json"), encoding="utf-8"
+            os.path.join(
+                os.path.dirname(__file__), "usage_ping_namespace_queries.json"
+            ),
+            encoding="utf-8",
         ) as namespace_file:
             saas_queries = json.load(namespace_file)
 
         return saas_queries
 
     def process_namespace_ping(self, query_dict, connection):
-        """ Runs a series of 'namespace' queries and uploads the results """
+        """Runs a series of 'namespace' queries and uploads the results"""
         base_query = query_dict.get("counter_query")
         ping_name = query_dict.get("counter_name", "Missing Name")
         logging.info(f"Running ping {ping_name}...")
