@@ -150,9 +150,9 @@ WITH map_merged_crm_account AS (
         ELSE 0
       END                                                                                                      AS is_current
     FROM {{ ref('pte_scores_source') }}    
-    ORDER BY valid_from, valid_to
     {{ dbt_utils.group_by(n=4)}}
-    
+    ORDER BY valid_from, valid_to
+
 
 ), ptc_scores AS (
 
@@ -169,8 +169,8 @@ WITH map_merged_crm_account AS (
         ELSE 0
       END                                                                                                      AS is_current
     FROM {{ ref('ptc_scores_source') }}    
-    ORDER BY valid_from, valid_to
     {{ dbt_utils.group_by(n=4)}}
+    ORDER BY valid_from, valid_to
 
 ), final AS (
 
