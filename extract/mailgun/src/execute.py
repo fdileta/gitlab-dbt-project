@@ -5,7 +5,7 @@ import sys
 from email import utils
 from logging import info, basicConfig, getLogger, error
 from os import environ as env
-from typing import Dict, List, Generator
+from typing import Dict, List, Generator, Any
 
 import requests
 from fire import Fire
