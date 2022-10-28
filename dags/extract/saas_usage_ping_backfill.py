@@ -68,7 +68,7 @@ def get_command():
             cd analytics/extract/saas_usage_ping/ &&
             python3 usage_ping.py namespace_backfill --ping_date=$RUN_DATE --metrics_backfill=$METRICS_BACKFILL
         """
-    return "echo \"TEST\"" #  cmd
+    return cmd
 
 
 def date_to_str(input_date: date):
@@ -131,15 +131,18 @@ def generate_task(run_date: date, metrics: list) -> None:
     Generate tasks for back-filling DAG start from Monday,
     as the original pipeline run on Monday
     """
-
+    task_id = get_task_name(start=run_date)
+    task_name = get_task_name(start=run_date)
+    env_vars = get_pod_env_var(start=run_date, metrics=metrics)
+    command = get_command()
     return KubernetesPodOperator(
         **gitlab_defaults,
         image=DATA_IMAGE,
-        task_id=get_task_name(start=run_date),
-        name=get_task_name(start=run_date),
+        task_id=task_id,
+        name=task_name,
         secrets=secrets,
-        env_vars=get_pod_env_var(start=run_date, metrics=metrics),
-        arguments=[get_command],
+        env_vars=env_vars,
+        arguments=[command],
         dag=dag,
     )
 
@@ -167,7 +170,7 @@ start_date = get_monday(day=start_date)
 
 end_date = get_date(param="end_date")
 
-metrics_backfill = backfill_param.get("metrics_backfill")
+metrics_backfill = 'xxx' # backfill_param.get("metrics_backfill")
 
 dag = DAG(DAG_NAME, default_args=default_args, schedule_interval=None, concurrency=2)
 
