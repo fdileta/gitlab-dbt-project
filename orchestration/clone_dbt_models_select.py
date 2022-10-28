@@ -194,8 +194,7 @@ class DbtModelClone:
 
                 output_query = self.clean_view_dll(output_table_name, base_dll)
 
-                logging.info(output_query)
-                # query_executor(self.engine, output_query)
+                query_executor(self.engine, output_query)
                 logging.info(f"View {full_name} successfully created. ")
 
                 self.grant_table_view_rights("view", output_table_name)
