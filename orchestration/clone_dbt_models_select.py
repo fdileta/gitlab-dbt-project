@@ -141,7 +141,7 @@ class DbtModelClone:
 
         new_first_line = f"{first_line[:dll_input.find('view')]}{find_db_name}{first_line[dll_input.find('.'):]}"
         replaced_file = [
-            f.replace("PREP", f"\"{self.prep_database}\"").replace("PROD", f"\"{self.prod_database}\"")
+            f.replace("PREP", self.prep_database).replace("PROD", self.prod_database)
             for f in split_file
         ]
         joined_lines = "\n".join(replaced_file[1:])
