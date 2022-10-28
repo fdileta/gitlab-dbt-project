@@ -393,7 +393,7 @@ class UsagePing:
         connection.close()
         self.loader_engine.dispose()
 
-    def saas_namespace_backfill(self):
+    def backfill(self):
         """
         Routine to back-filling
         data for namespace ping
