@@ -3,8 +3,6 @@ import logging
 import sys
 import json
 import argparse
-import re
-
 from os import environ as env
 from typing import Dict, List
 
@@ -132,14 +130,18 @@ class DbtModelClone:
         split_file = dll_input.splitlines()
 
         first_line = split_file[0]
-        find_db_name = re.sub("\bPROD\b", self.prod_database,re.sub("\bPREP\b", self.prep_database,(first_line[
-                                                                                                    dll_input.find("view") :].split(".")[0])))
+        find_db_name = (
+            first_line[dll_input.find("view") :]
+            .split(".")[0]
+            .replace("PREP.", f"{self.prep_database}.")
+            .replace("PROD.", f"{self.prod_database}.")
+        )
 
         find_db_name = f"{find_db_name.split(' ')[0]} \"{find_db_name.split(' ')[1]}\""
 
         new_first_line = f"{first_line[:dll_input.find('view')]}{find_db_name}{first_line[dll_input.find('.'):]}"
         replaced_file = [
-            re.sub("\bPROD\b", self.prod_database, re.sub("\bPREP\b", self.prep_database, f))
+            f.replace("PREP.", f"{self.prep_database}.").replace("PROD.", f"{self.prod_database}.")
             for f in split_file
         ]
         joined_lines = "\n".join(replaced_file[1:])
