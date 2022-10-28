@@ -5,8 +5,8 @@
 
 {{ 
     simple_cte([
-    ('page_views', 'snowplow_page_views_all'),
-    ('dim_website_page', 'dim_behavior_website_page')
+    ('page_views', 'prep_snowplow_page_views_all'),
+    ('dim_behavior_website_page', 'dim_behavior_website_page')
     ])
 }}
 
@@ -36,7 +36,8 @@
       time_engaged_in_s                                                             AS engaged_seconds,
       total_time_in_ms                                                              AS page_load_time_in_ms,
       page_view_index,
-      page_view_in_session_index
+      page_view_in_session_index,
+      referer_url,
     FROM page_views
 
     {% if is_incremental() %}
@@ -52,41 +53,43 @@
       {{ dbt_utils.surrogate_key(['event_id','page_view_end_at']) }}                AS fct_behavior_website_page_view_sk,
 
       -- Foreign Keys
-      dim_behavior_website_page_sk,
-      dim_namespace_id,
-      dim_project_id,
+      dim_behavior_website_page.dim_behavior_website_page_sk,
+      referrer_website_page.dim_behavior_website_page_sk AS dim_behavior_website_page_sk_referrer,
+      page_views_w_clean_url.gsc_project_id AS dim_namespace_id,
+      page_views_w_clean_url.gsc_project_id AS dim_project_id,
 
       --Time Attributes
-      page_view_start_at,
-      page_view_end_at,
-      page_view_start_at                                                            AS behavior_at,
+      page_views_w_clean_url.page_view_start_at,
+      page_views_w_clean_url.page_view_end_at,
+      page_views_w_clean_url.page_view_start_at                                     AS behavior_at,
 
       -- Natural Keys
-      session_id,
-      event_id,
-      user_snowplow_domain_id,
+      page_views_w_clean_url.session_id,
+      page_views_w_clean_url.event_id,
+      page_views_w_clean_url.user_snowplow_domain_id,
 
-      -- Google Keys
-      gsc_environment,
-      gsc_extra,
-      gsc_google_analytics_client_id,
-      gsc_namespace_id,
-      gsc_plan,
-      gsc_project_id,
-      gsc_pseudonymized_user_id,
-      gsc_source,
+      -- GitLab Standard Context
+      page_views_w_clean_url.gsc_environment,
+      page_views_w_clean_url.gsc_extra,
+      page_views_w_clean_url.gsc_google_analytics_client_id,
+      page_views_w_clean_url.gsc_plan,
+      page_views_w_clean_url.gsc_pseudonymized_user_id,
+      page_views_w_clean_url.gsc_source,
 
       -- Attributes
-      page_url_path,
-      event_name,
+      dim_behavior_website_page.page_url_path,
+      referrer_website_page.page_url_path AS referrer_url_path,
+      page_views_w_clean_url.event_name,
       NULL                                                                          AS sf_formid,
-      engaged_seconds,
-      page_load_time_in_ms,
-      page_view_index,
-      page_view_in_session_index
+      page_views_w_clean_url.engaged_seconds,
+      page_views_w_clean_url.page_load_time_in_ms,
+      page_views_w_clean_url.page_view_index,
+      page_views_w_clean_url.page_view_in_session_index
     FROM page_views_w_clean_url
-    LEFT JOIN dim_website_page 
-      ON page_views_w_clean_url.page_url = dim_website_page.page_url
+    LEFT JOIN dim_behavior_website_page 
+      ON page_views_w_clean_url.page_url = dim_behavior_website_page.page_url
+    LEFT JOIN dim_behavior_website_page AS referrer_website_page
+      ON page_views_w_clean_url.referer_url = dim_behavior_website_page.page_url
 
 )
 
@@ -95,5 +98,5 @@
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-10-17"
+    updated_date="2022-10-28"
 ) }}
