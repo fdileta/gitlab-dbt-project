@@ -90,8 +90,12 @@ def get_pod_env_var(start: date, metrics: list) -> dict:
     """
     Get pod environment variables
     """
+    run_date = date(year=2022, month=1, day=1)
+
+    run_date_formatted = run_date.isoformat()
+    
     pod_env_vars = {
-        "RUN_DATE": start,
+        "RUN_DATE": run_date_formatted,
         "METRICS_BACKFILL": metrics,
         "SNOWFLAKE_SYSADMIN_ROLE": "TRANSFORMER",
         "SNOWFLAKE_LOAD_WAREHOUSE": "USAGE_PING",
@@ -135,6 +139,7 @@ def generate_task(run_date: date, metrics: list) -> None:
     task_name = get_task_name(start=run_date)
     env_vars = get_pod_env_var(start=run_date, metrics=metrics)
     command = get_command()
+
     return KubernetesPodOperator(
         **gitlab_defaults,
         image=DATA_IMAGE,
