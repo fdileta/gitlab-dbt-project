@@ -8,13 +8,13 @@
   })
 }}
 
-{% set gainsight_wave_metrics = dbt_utils.get_column_values(table=ref ('gainsight_wave_2_3_metrics'), column='metric_name', max_records=1000, default=['']) %}
+{% set gainsight_wave_metrics = dbt_utils.get_column_values(table=ref ('health_score_metrics'), column='metric_name', max_records=1000, default=['']) %}
 
 {{ simple_cte([
     ('prep_saas_usage_ping_namespace','prep_saas_usage_ping_namespace'),
     ('dim_date','dim_date'),
     ('bdg_namespace_order','bdg_namespace_order_subscription_monthly'),
-    ('gainsight_wave_2_3_metrics','gainsight_wave_2_3_metrics')
+    ('gainsight_wave_2_3_metrics','health_score_metrics')
 ]) }}
 
 , free_namespaces AS (
@@ -68,7 +68,7 @@
 {{ dbt_audit(
     cte_ref="pivoted",
     created_by="@ischweickartDD",
-    updated_by="@ischweickartDD",
+    updated_by="@mdrussell",
     created_date="2021-06-04",
-    updated_date="2021-06-04"
+    updated_date="2022-10-21"
 ) }}

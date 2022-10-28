@@ -28,7 +28,7 @@ WITH mapping as (
     SELECT
       employee_id,
       LAST_VALUE(cost_center) RESPECT NULLS
-          OVER ( PARTITION BY employee_id ORDER BY effective_date) AS last_cost_center  
+          OVER ( PARTITION BY employee_id ORDER BY effective_date) AS last_cost_center
     FROM {{ ref ('bamboohr_job_role') }}
 
 ), location_factor as (
@@ -65,6 +65,7 @@ WITH mapping as (
       mapping.last_name,
       mapping.first_name || ' ' || mapping.last_name                            AS full_name,
       mapping.region_modified                                                   AS region_modified,
+      mapping.country                                                           AS country,
       bamboohr_directory.work_email                                             AS last_work_email,
       IFF(rehire.is_rehire = 'True', initial_hire.hire_date, mapping.hire_date) AS hire_date,
       rehire.rehire_date,

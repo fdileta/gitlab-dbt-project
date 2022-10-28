@@ -3,7 +3,8 @@
 ) }}
 
 {{ simple_cte([
-    ('mart_crm_attribution_touchpoint','mart_crm_attribution_touchpoint')
+    ('mart_crm_attribution_touchpoint','mart_crm_attribution_touchpoint'),
+    ('mart_crm_opportunity', 'mart_crm_opportunity')
 ]) }}
 
 , linear_base AS ( --the number of touches a given opp has in total
@@ -76,8 +77,8 @@
       mart_crm_attribution_touchpoint.is_sao,
       mart_crm_attribution_touchpoint.deal_path_name,
       mart_crm_attribution_touchpoint.order_type,
-      mart_crm_attribution_touchpoint.crm_user_sales_segment,
-      mart_crm_attribution_touchpoint.crm_user_region,
+      mart_crm_opportunity.crm_user_sales_segment,
+      mart_crm_opportunity.crm_user_region,
       DATE_TRUNC('month',mart_crm_attribution_touchpoint.bizible_touchpoint_date)::date AS bizible_touchpoint_date_month_yr,
       mart_crm_attribution_touchpoint.bizible_touchpoint_date::date AS bizible_touchpoint_date_normalized,
       mart_crm_attribution_touchpoint.type AS campaign_type,
@@ -93,13 +94,13 @@
       SUM(mart_crm_attribution_touchpoint.bizible_attribution_percent_full_path) AS full_weight,
       SUM(mart_crm_attribution_touchpoint.bizible_count_custom_model) AS custom_weight,
       COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) AS l_touches,
-      (l_touches / count_touches) AS l_weight,
+      (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / linear_base.count_touches) AS l_weight,
       (mart_crm_attribution_touchpoint.net_arr * first_weight) AS first_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * w_weight) AS w_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * u_weight) AS u_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * full_weight) AS full_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * custom_weight) AS custom_net_arr,
-      (mart_crm_attribution_touchpoint.net_arr * l_weight) AS linear_net_arr
+      (mart_crm_attribution_touchpoint.net_arr * (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / linear_base.count_touches)) AS linear_net_arr
     FROM
     mart_crm_attribution_touchpoint
     LEFT JOIN linear_base ON
@@ -113,7 +114,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@rkohnke",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2022-01-25",
-    updated_date="2022-09-30"
+    updated_date="2022-10-11"
 ) }}

@@ -1,13 +1,13 @@
 {{
   config(
     materialized='table',
-    tags=["mnpi_exception"]
+    tags=["product", "mnpi_exception"]
   )
 }}
 
 {{ simple_cte([
-    ('monthly_saas_metrics','wk_fct_saas_gainsight_metrics_monthly'),
-    ('monthly_sm_metrics','wk_fct_ping_instance_metric_gainsight_wave_monthly'),
+    ('monthly_saas_metrics','rpt_gainsight_metrics_monthly_paid_saas'),
+    ('monthly_sm_metrics','rpt_gainsight_metrics_monthly_paid_self_managed'),
     ('billing_accounts','dim_billing_account'),
     ('location_country', 'dim_location_country'),
     ('subscriptions', 'dim_subscription'),
@@ -542,7 +542,6 @@
         [
           'snapshot_month',
           'dim_subscription_id_original',
-          'delivery_type',
           'uuid',
           'hostname',
           'dim_namespace_id'
@@ -556,6 +555,6 @@
     cte_ref="final",
     created_by="@mdrussell",
     updated_by="@mdrussell",
-    created_date="2022-09-09",
-    updated_date="2022-09-09"
+    created_date="2022-10-12",
+    updated_date="2022-10-12"
 ) }}

@@ -1,5 +1,5 @@
 {{ config(
-    tags=["mnpi_exception"]
+    tags=["product", "mnpi_exception"]
 ) }}
 
 {{
@@ -9,7 +9,7 @@
 }}
 
 {{ simple_cte([
-    ('saas_usage_ping', 'wk_fct_saas_usage_ping_subscription_mapped_gainsight_metrics'),
+    ('saas_usage_ping', 'mart_ping_namespace_metric_health_score_saas'),
     ('bdg_subscription_product_rate_plan', 'bdg_subscription_product_rate_plan'),
     ('gitlab_subscriptions', 'gitlab_dotcom_gitlab_subscriptions_snapshots_namespace_id_base'),
     ('dates', 'dim_date'),
@@ -267,6 +267,6 @@
     cte_ref="joined",
     created_by="@mdrussell",
     updated_by="@mdrussell",
-    created_date="2022-09-08",
-    updated_date="2022-09-08"
+    created_date="2022-10-12",
+    updated_date="2022-10-12"
 ) }}

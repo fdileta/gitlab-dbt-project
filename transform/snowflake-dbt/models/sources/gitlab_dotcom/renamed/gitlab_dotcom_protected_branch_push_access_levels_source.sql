@@ -8,7 +8,7 @@ WITH source AS (
 renamed AS (
 
 SELECT 
-    id::NUMBER                        AS protected_branch_merge_access_levels_id,
+    id::NUMBER                        AS protected_branch_push_access_levels_id,
     protected_branch_id::NUMBER       AS protected_branch_id,
     access_level::NUMBER              AS access_level,
     created_at::TIMESTAMP             AS created_at,
