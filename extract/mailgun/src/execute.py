@@ -21,7 +21,7 @@ api_key = env.get("MAILGUN_API_KEY")
 domains = ["mg.gitlab.com"]
 
 
-def chunker(seq: List, size: int) -> List:
+def chunker(seq: List, size: int) -> Generator[List[Any]]:
     """
 
     :param seq:
