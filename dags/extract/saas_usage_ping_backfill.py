@@ -93,10 +93,11 @@ def get_pod_env_var(start: date, metrics: list) -> dict:
     run_date = date(year=2022, month=1, day=1)
 
     run_date_formatted = run_date.isoformat()
-    
+    metrics_formatted = ["usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations","counts.boards"]
+
     pod_env_vars = {
         "RUN_DATE": run_date_formatted,
-        "METRICS_BACKFILL": metrics,
+        "METRICS_BACKFILL": metrics_formatted,
         "SNOWFLAKE_SYSADMIN_ROLE": "TRANSFORMER",
         "SNOWFLAKE_LOAD_WAREHOUSE": "USAGE_PING",
     }
