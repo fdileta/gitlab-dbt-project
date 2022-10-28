@@ -132,7 +132,7 @@ class DbtModelClone:
 
         first_line = split_file[0]
 
-        new_first_line = f"{first_line[:dll_input.find('view')]}{table_name}{first_line[dll_input.find('.'):]}"
+        new_first_line = f"{first_line[:dll_input.find('view')]} view {table_name} "
         replaced_file = [
             f.replace("PREP.", f"{self.prep_database}.").replace("PROD.", f"{self.prod_database}.")
             for f in split_file
