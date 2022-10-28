@@ -20,6 +20,7 @@ logging.basicConfig(stream=sys.stdout, level=20)
 
 class DbtModelClone:
     """"""
+
     def __init__(self, config_vars: Dict):
         self.engine = create_engine(
             URL(
@@ -36,7 +37,7 @@ class DbtModelClone:
         self.branch_name = config_vars["BRANCH_NAME"].upper()
         self.prep_database = f"{self.branch_name}_PREP"
         self.prod_database = f"{self.branch_name}_PROD"
-        self.raw_database =  f"{self.branch_name}_RAW"
+        self.raw_database = f"{self.branch_name}_RAW"
 
     def create_schema(self, schema_name: str):
         """
@@ -134,7 +135,9 @@ class DbtModelClone:
 
         new_first_line = f"{first_line[:dll_input.find('view')]}view {table_name} ("
         replaced_file = [
-            f.replace("\"PREP\".", f"\"{self.prep_database}\".").replace("\"PROD\".", f"\"{self.prod_database}\".")
+            f.replace('"PREP".', f'"{self.prep_database}".').replace(
+                '"PROD".', f'"{self.prod_database}".'
+            )
             for f in split_file
         ]
         joined_lines = "\n".join(replaced_file[1:])
@@ -156,10 +159,10 @@ class DbtModelClone:
             database_name = i.get("database").upper()
             schema_name = i.get("schema").upper()
             table_name = i.get("name").upper()
-            config = i.get('config')
+            config = i.get("config")
 
             if config:
-                alias = config.get('alias')
+                alias = config.get("alias")
             else:
                 alias = None
 
@@ -187,7 +190,9 @@ class DbtModelClone:
             if table_or_view == "VIEW":
                 logging.info("Cloning view")
 
-                query = f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
+                query = (
+                    f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
+                )
                 res = query_executor(self.engine, query)
 
                 base_dll = res[0][0]
