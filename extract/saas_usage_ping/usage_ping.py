@@ -387,7 +387,8 @@ class UsagePing:
 
         for query_dict in saas_queries:
             if metrics_filter(query_dict):
-                self.process_namespace_ping(query_dict, connection)
+                logging.info(f"query_dict: {query_dict}")
+                # self.process_namespace_ping(query_dict, connection)
 
         connection.close()
         self.loader_engine.dispose()
