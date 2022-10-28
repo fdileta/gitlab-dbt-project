@@ -2135,6 +2135,23 @@ roles:
                 read:
                     - snowflake.*.*
 
+    - snowflake_account_usage:
+        warehouses:
+            - reporting
+        privileges:
+            databases:
+                read:
+                    - snowflake
+            schemas:
+                read:
+                    - snowflake.account_usage
+
+            tables:
+                read:
+                    - snowflake.account_usage.warehouse_metering_history
+                    - snowflake.account_usage.storage_usage
+                    - snowflake.account_usage.query_history
+
     - snowplow:
         privileges:
             databases:
@@ -4378,6 +4395,7 @@ roles:
         member_of:
             - reporter
             - restricted_safe
+            - snowflake_account_usage
         warehouses:
             - reporting
 
