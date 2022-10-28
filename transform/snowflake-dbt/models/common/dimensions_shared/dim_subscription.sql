@@ -2,7 +2,6 @@
     "tags": ["mnpi_exception"],
     "alias": "dim_subscription"
 }) }}
---
 WITH prep_amendment AS (
 
   SELECT *
