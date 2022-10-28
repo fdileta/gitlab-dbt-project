@@ -5,7 +5,7 @@ import sys
 from email import utils
 from logging import info, basicConfig, getLogger, error
 from os import environ as env
-from typing import Dict, List, Generator, Any
+from typing import Dict, List
 
 import requests
 from fire import Fire
@@ -21,7 +21,7 @@ api_key = env.get("MAILGUN_API_KEY")
 domains = ["mg.gitlab.com"]
 
 
-def chunker(seq: List, size: int) -> Generator[List[Any]]:
+def chunker(seq: List, size: int):
     """
 
     :param seq:
