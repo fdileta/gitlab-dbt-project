@@ -28,7 +28,7 @@ def chunker(seq: List, size: int):
     :param size:
     :return:
     """
-    return (seq[pos: pos + size] for pos in range(0, len(seq), size))
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
 def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
@@ -40,9 +40,9 @@ def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
     :return:
     """
     return requests.get(
-            f"https://api.mailgun.net/v3/{domain}/events",
-            auth=("api", api_key),
-            params={"begin": formatted_date, "ascending": "yes", "event": event},
+        f"https://api.mailgun.net/v3/{domain}/events",
+        auth=("api", api_key),
+        params={"begin": formatted_date, "ascending": "yes", "event": event},
     )
 
 
@@ -79,7 +79,7 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
 
                 first_timestamp = items[0].get("timestamp")
                 str_stamp = datetime.datetime.fromtimestamp(first_timestamp).strftime(
-                        "%d-%m-%Y %H:%M:%S.%f"
+                    "%d-%m-%Y %H:%M:%S.%f"
                 )
                 info(f"Processed data starting on {str_stamp}")
 
@@ -139,11 +139,11 @@ def load_event_logs(event: str, full_refresh: bool = False):
             json.dump(group, outfile)
 
         snowflake_stage_load_copy_remove(
-                file_name,
-                f"mailgun.mailgun_load_{event}",
-                "mailgun.mailgun_events",
-                snowflake_engine,
-                on_error="ABORT_STATEMENT",
+            file_name,
+            f"mailgun.mailgun_load_{event}",
+            "mailgun.mailgun_events",
+            snowflake_engine,
+            on_error="ABORT_STATEMENT",
         )
 
 
