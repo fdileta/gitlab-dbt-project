@@ -1836,7 +1836,7 @@ tables:
       , updated_at
       , start_date
       , due_date
-      , project_id AS NULL
+      , NULL AS project_id
       , group_id
       , iid
       , cached_markdown_version
