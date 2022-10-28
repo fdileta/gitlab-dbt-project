@@ -478,7 +478,7 @@ class UsagePing:
         if sql_metric_errors:
             self.upload_sql_metric_errors(sql_metric_errors)
 
-        self.run_metric_checks()
+        # self.run_metric_checks()
 
     def _get_namespace_queries(self) -> List[Dict]:
         """
