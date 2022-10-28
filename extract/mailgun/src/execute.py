@@ -123,7 +123,7 @@ def load_event_logs(event: str, full_refresh: bool = False):
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
     else:
-        start_date = datetime.datetime.now() - datetime.timedelta(hours=16)
+        start_date = datetime.datetime.now() - datetime.timedelta(minutes=30)
 
     results = extract_logs(event, start_date)
 
