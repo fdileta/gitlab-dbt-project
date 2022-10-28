@@ -136,6 +136,9 @@ class DbtModelClone:
             .replace("PREP", self.prep_database)
             .replace("PROD", self.prod_database)
         )
+
+        find_db_name = f"{find_db_name.split(' ')[0]} \"{find_db_name.split(' ')[1]}\""
+
         new_first_line = f"{first_line[:dll_input.find('view')]}\"{find_db_name}\"{first_line[dll_input.find('.'):]}"
         replaced_file = [
             f.replace("PREP", self.prep_database).replace("PROD", self.prod_database)
