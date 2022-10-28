@@ -135,7 +135,7 @@ def load_event_logs(event: str, full_refresh: bool = False):
             f"mailgun.mailgun_load_{event}",
             "mailgun.mailgun_events",
             snowflake_engine,
-            on_error='ABORT_STATEMENT'
+            on_error="ABORT_STATEMENT",
         )
 
 
