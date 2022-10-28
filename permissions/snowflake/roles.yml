@@ -476,7 +476,6 @@ roles:
             - google_ads
             - google_analytics_360
             - netsuite
-            - keyhole_twitter
             - mailgun
             - marketo
             - pmg
@@ -753,7 +752,6 @@ roles:
                 - raw.prometheus
                 - raw.pto
                 - raw.rspec
-                - raw.keyhole_twitter
                 - raw.snowplow
                 - raw.snowflake_imports
                 - raw.tap_postgres
@@ -765,7 +763,6 @@ roles:
                 - raw.engineering_extracts.*
                 - raw.gitlab_data_yaml.*
                 - raw.gitter.*
-                - raw.keyhole_twitter.*
                 - raw.pmg.*
                 - raw.prometheus.*
                 - raw.pto.*
@@ -1072,6 +1069,31 @@ roles:
                     - prod.*.*
                     - raw.snapshots.*
                     - raw.gcp_billing.*
+
+    - sales_analytics:
+        warehouses:
+            - dev_xs
+            - loading
+        owns:
+            schemas:
+                - raw.sales_analytics
+        privileges:
+            databases:
+                read:
+                    - raw
+                write:
+                    - raw
+            schemas:
+                read:
+                    - raw.sales_analytics
+                write:
+                    - raw.sales_analytics
+            tables:
+                read:
+                    - raw.sales_analytics.*
+                write:
+                    - raw.sales_analytics.*
+
 
 
 # ==========================================
@@ -1479,6 +1501,7 @@ roles:
                     - prod.restricted_safe_common_mart_sales
                     - prod.restricted_safe_common_mart_product
                     - prod.workspace_customer_success
+                    - prod.pumps
                 write:
                     - prod.common_mart_product
             tables:
@@ -1493,6 +1516,7 @@ roles:
                     - prod.restricted_safe_common_mart_product.rpt_user_request_crm_account_issue_epic
                     - prod.restricted_safe_common_mart_product.rpt_user_request_issue_epic
                     - prod.workspace_customer_success.mart_product_usage_paid_user_metrics_monthly_workspace
+                    - prod.pumps.pump_gainsight_metrics_monthly_paid
 
     - gainsight:
         warehouses:
@@ -1827,21 +1851,6 @@ roles:
                 read:
                     - prep.license_db.*
                     - raw.license_db.*
-
-    - keyhole_twitter:
-        privileges:
-            databases:
-                read:
-                    - prep
-                    - raw
-            schemas:
-                read:
-                    - prep.keyhole_twitter
-                    - raw.keyhole_twitter
-            tables:
-                read:
-                    - prep.keyhole_twitter.*
-                    - raw.keyhole_twitter.*
 
     - maxmind:
         privileges:
@@ -3006,6 +3015,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - sales_analytics
         warehouses:
             - dev_xs
         owns:
@@ -3811,6 +3821,7 @@ roles:
             - data_team_analyst
             - bi_tool_eval_read
             - xactly
+            - sales_analytics
         warehouses:
             - dev_xs
         owns:
@@ -4478,6 +4489,13 @@ roles:
                     - tnguyen_prep.*.*
                     - tnguyen_prod.*.*
 
+    - tscott:
+        member_of:
+            - data_team_analyst
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - vagrawal:
         member_of:
             - adaptive
@@ -4568,6 +4586,9 @@ users:
             - sysadmin
             - transformer
             - data_science_loader
+            - sales_analytics
+            - restricted_safe
+            - reporter
 
     - alpcohen:
         can_login: yes
@@ -4939,7 +4960,7 @@ users:
             - accountadmin
 
     - rrendon:
-        can_login: yes 
+        can_login: yes
         member_of:
             - rrendon
 
@@ -5008,6 +5029,11 @@ users:
         can_login: yes
         member_of:
             - tnguyen
+
+    - tscott:
+        can_login: yes 
+        member_of:
+            - tscott
 
     - vagrawal:
         can_login: yes

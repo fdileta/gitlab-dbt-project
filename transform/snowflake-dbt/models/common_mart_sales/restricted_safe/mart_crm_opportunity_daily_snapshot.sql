@@ -17,7 +17,7 @@ final AS (
     fct_crm_opportunity.snapshot_id,
     fct_crm_opportunity.dim_crm_opportunity_id,
     dim_crm_account.dim_parent_crm_account_id,
-    dim_crm_account.dim_crm_account_id,
+    fct_crm_opportunity.dim_crm_account_id,
     fct_crm_opportunity.dim_crm_user_id,
     fct_crm_opportunity.duplicate_opportunity_id,
     fct_crm_opportunity.merged_opportunity_id,
@@ -536,7 +536,7 @@ final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@jpeguero",
     created_date="2022-05-05",
-    updated_date="2022-09-06"
+    updated_date="2022-10-20"
   ) }}

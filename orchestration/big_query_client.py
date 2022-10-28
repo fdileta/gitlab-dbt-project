@@ -78,7 +78,6 @@ class BigQueryClient:
         :return: Pandas dataframe
         """
 
-        return (
-            self.bq_client.query(sql_statement, job_config=job_config, project=project)
-            .result()
-        )
+        return self.bq_client.query(
+            sql_statement, job_config=job_config, project=project
+        ).result()

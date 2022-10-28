@@ -1,25 +1,37 @@
-{{ config({
-    "materialized": "table"
-    })
+{{ config(
+        materialized = "incremental",
+        unique_key = "dim_behavior_operating_system_sk"
+    )
 }}
+
 WITH device_information AS (
 
-  SELECT DISTINCT
-    {{ dbt_utils.surrogate_key(['prep_snowplow_structured_event_all_source.os_name', 'prep_snowplow_structured_event_all_source.os_timezone']) }} AS dim_behavior_operating_system_sk,
-    prep_snowplow_structured_event_all_source.os,
-    prep_snowplow_structured_event_all_source.os_name,
-    prep_snowplow_structured_event_all_source.os_manufacturer,
-    prep_snowplow_structured_event_all_source.os_timezone,
-    prep_snowplow_structured_event_all_source.device_type,
-    prep_snowplow_structured_event_all_source.device_is_mobile AS is_device_mobile
-  FROM {{ ref('prep_snowplow_structured_event_all_source') }}
+  SELECT
+    {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}   AS dim_behavior_operating_system_sk,
+    os_family::VARCHAR                                          AS os,
+    os_name::VARCHAR                                            AS os_name,
+    os_manufacturer::VARCHAR                                    AS os_manufacturer,
+    os_timezone::VARCHAR                                        AS os_timezone,
+    dvce_type::VARCHAR                                          AS device_type,
+    dvce_ismobile::BOOLEAN                                      AS is_device_mobile,
+    MAX(derived_tstamp)                                         AS max_timestamp
+  FROM {{ ref('prep_snowplow_unnested_events_all') }}
+  WHERE true
+
+  {% if is_incremental() %}
+    
+  AND derived_tstamp > (SELECT MAX(max_timestamp) FROM {{this}})
+    
+  {% endif %}
+
+  {{ dbt_utils.group_by(n=7) }}
 
 )
 
 {{ dbt_audit(
     cte_ref="device_information",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@chrissharp",
     created_date="2022-09-20",
-    updated_date="2022-09-20"
+    updated_date="2022-10-14"
 ) }}
