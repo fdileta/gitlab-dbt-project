@@ -152,12 +152,10 @@ class UsagePing:
         """
         SQL_DATA_SOURCE_VAL = "database"
         if payload_source == REDIS_KEY:
-            return (
-                metric_definition_source
-                and metric_definition_source != SQL_DATA_SOURCE_VAL,
-            )
+            return metric_definition_source and metric_definition_source != SQL_DATA_SOURCE_VAL
+
         elif payload_source == SQL_KEY:
-            return (metric_definition_source == SQL_DATA_SOURCE_VAL,)
+            return metric_definition_source == SQL_DATA_SOURCE_VAL
 
     def check_data_source(
         self,
