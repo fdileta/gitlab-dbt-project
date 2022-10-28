@@ -68,7 +68,7 @@ def get_command():
             cd analytics/extract/saas_usage_ping/ &&
             python3 usage_ping.py namespace_backfill --ping_date=$RUN_DATE --metrics_backfill=$METRICS_BACKFILL
         """
-    return cmd
+    return "echo \"TEST\"" #  cmd
 
 
 def date_to_str(input_date: date):
