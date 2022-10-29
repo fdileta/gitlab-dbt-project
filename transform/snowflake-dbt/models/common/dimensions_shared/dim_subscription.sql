@@ -41,7 +41,7 @@ WITH prep_amendment AS (
       namespace_subscription_bridge.dim_subscription_id AS dim_latest_subscription_id,
       namespace_subscription_bridge.dim_namespace_id
     FROM namespace_subscription_bridge
-    JOIN subscription
+    INNER JOIN subscription
       ON subscription.dim_subscription_id = namespace_subscription_bridge.dim_subscription_id
     WHERE namespace_subscription_bridge.product_tier_name_subscription IN (
         'SaaS - Bronze', 
@@ -142,7 +142,7 @@ WITH prep_amendment AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@snalamaru",
-    updated_by="@michellecooper",
+    updated_by="@mdrussell",
     created_date="2020-12-16",
-    updated_date="2022-10-27"
+    updated_date="2022-10-28"
 ) }}

@@ -34,7 +34,7 @@ joined AS (
       subscriptions.namespace_id AS dim_namespace_id,
       subscriptions.subscription_version
     FROM subscriptions
-    JOIN months
+    INNER JOIN months
       ON (months.date_month >= subscriptions.term_start_month 
         AND months.date_month < subscriptions.term_end_month)
 
@@ -53,4 +53,10 @@ final AS (
 
 )
 
-SELECT * FROM final
+{{ dbt_audit(
+    cte_ref="final",
+    created_by="@mdrussell",
+    updated_by="@mdrussell",
+    created_date="2022-10-28",
+    updated_date="2022-10-28"
+) }}
