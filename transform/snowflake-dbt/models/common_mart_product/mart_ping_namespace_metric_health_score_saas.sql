@@ -15,7 +15,7 @@
     ('dim_date','dim_date'),
     ('gainsight_wave_metrics','health_score_metrics'),
     ('instance_types', 'dim_host_instance_type'),
-    ('dim_subscription', 'dim_subscription')
+    ('map_subscription_namespace_month', 'map_latest_subscription_namespace_monthly')
 ]) }}
 
 , instance_types_ordering AS (
@@ -38,8 +38,8 @@
       prep_saas_usage_ping_namespace.ping_name,
       prep_saas_usage_ping_namespace.counter_value,
       dim_date.first_day_of_month                           AS reporting_month, 
-      dim_subscription.dim_subscription_id,
-      dim_subscription.dim_subscription_id_original,
+      map_subscription_namespace_month.dim_subscription_id,
+      map_subscription_namespace_month.dim_subscription_id_original,
       instance_types_ordering.instance_type
     FROM prep_saas_usage_ping_namespace
     LEFT JOIN instance_types_ordering
@@ -48,18 +48,18 @@
       ON prep_saas_usage_ping_namespace.ping_date = dim_date.date_day
     INNER JOIN gainsight_wave_metrics
       ON prep_saas_usage_ping_namespace.ping_name = gainsight_wave_metrics.metric_name
-    INNER JOIN dim_subscription
-      ON prep_saas_usage_ping_namespace.dim_namespace_id = dim_subscription.namespace_id
+    INNER JOIN map_subscription_namespace_month
+      ON prep_saas_usage_ping_namespace.dim_namespace_id = map_subscription_namespace_month.dim_namespace_id
+        AND dim_date.first_day_of_month = map_subscription_namespace_month.date_month
     QUALIFY ROW_NUMBER() OVER (
       PARTITION BY 
         dim_date.first_day_of_month,
-        dim_subscription.dim_subscription_id_original,
+        map_subscription_namespace_month.dim_subscription_id_original,
         prep_saas_usage_ping_namespace.dim_namespace_id,
         prep_saas_usage_ping_namespace.ping_name
       ORDER BY 
         prep_saas_usage_ping_namespace.ping_date DESC,
-        instance_types_ordering.ordering_field ASC, --prioritizing Production instances
-        dim_subscription.subscription_version DESC
+        instance_types_ordering.ordering_field ASC --prioritizing Production instances
 
     ) = 1
 
