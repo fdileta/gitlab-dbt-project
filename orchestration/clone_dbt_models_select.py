@@ -15,7 +15,7 @@ from simple_dependency_resolver.simple_dependency_resolver import DependencyReso
 
 
 # Set logging defaults
-logging.basicConfig(stream=sys.stdout, level=20)
+logging.basicConfig(stream=sys.stdout)
 
 
 class DbtModelClone:
