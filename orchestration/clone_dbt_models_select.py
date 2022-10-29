@@ -31,6 +31,7 @@ class DbtModelClone:
                 warehouse=config_vars["SNOWFLAKE_LOAD_WAREHOUSE"],
             ), echo=False
         )
+        logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
 
         # Snowflake database name should be in CAPS
         # see https://gitlab.com/meltano/analytics/issues/491
