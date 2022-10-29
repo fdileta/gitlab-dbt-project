@@ -38,7 +38,7 @@ joined AS (
   FROM subscriptions
   INNER JOIN months
     ON (months.date_month >= subscriptions.term_start_month
-        AND months.date_month < subscriptions.term_end_month)
+        AND months.date_month =< subscriptions.term_end_month)
 
 ),
 
