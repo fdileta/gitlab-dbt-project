@@ -185,6 +185,7 @@
     - *deps_and_seed
     - export SNOWFLAKE_PREP_DATABASE="PREP"
     - export SNOWFLAKE_PROD_DATABASE="PROD"
+    - export LOGURU_COLORIZE="true"
     - pip install loguru
     - CHANGED_FILES=$(git diff --name-only $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD | xargs -n1 basename | grep '\.sql'  | sed "s/^/$ANCESTOR_TYPE/g" | sed "s/.sql/$DEPENDENT_TYPE/g" )
     - echo $CHANGED_FILES
