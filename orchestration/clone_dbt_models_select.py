@@ -17,6 +17,18 @@ from simple_dependency_resolver.simple_dependency_resolver import DependencyReso
 # Set logging defaults
 logging.basicConfig(stream=sys.stdout, level=20)
 
+def new_query_executor(engine: Engine, query: str) -> List[Tuple[Any]]:
+    """
+    Execute DB queries safely.
+    """
+
+    try:
+        connection = engine.connect()
+        results = connection.execute(query, echo=False).fetchall()
+    finally:
+        connection.close()
+        engine.dispose()
+    return results
 
 class DbtModelClone:
     """"""
@@ -50,15 +62,15 @@ class DbtModelClone:
         logging.info("Creating schema if it does not exist")
 
         query = f"""CREATE SCHEMA IF NOT EXISTS {schema_name};"""
-        query_executor(self.engine, query)
+        new_query_executor(self.engine, query)
 
         logging.info("Granting rights on stage to TRANSFORMER")
         grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
-        query_executor(self.engine, grants_query)
+        new_query_executor(self.engine, grants_query)
 
         logging.info("Granting rights on stage to GITLAB_CI")
         grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
-        query_executor(self.engine, grants_query)
+        new_query_executor(self.engine, grants_query)
 
         return True
 
@@ -113,13 +125,13 @@ class DbtModelClone:
         grants_query = f"""
             GRANT OWNERSHIP ON {object_type.upper()} {object_name.upper()} TO TRANSFORMER REVOKE CURRENT GRANTS
             """
-        query_executor(self.engine, grants_query)
+        new_query_executor(self.engine, grants_query)
 
         logging.info(f"Granting rights on {object_type} to GITLAB_CI")
         grants_query = (
             f"""GRANT ALL ON {object_type.upper()} {object_name.upper()} TO GITLAB_CI"""
         )
-        query_executor(self.engine, grants_query)
+        new_query_executor(self.engine, grants_query)
 
     def clean_view_dll(self, table_name: str, dll_input: str) -> str:
         """
@@ -184,7 +196,7 @@ class DbtModelClone:
                 WHERE TABLE_SCHEMA = UPPER('{schema_name}')
                 AND TABLE_NAME = UPPER('{table_name}')
             """
-            res = query_executor(self.engine, query)
+            res = new_query_executor(self.engine, query)
 
             self.create_schema(output_schema_name)
 
@@ -195,13 +207,13 @@ class DbtModelClone:
                 query = (
                     f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
                 )
-                res = query_executor(self.engine, query)
+                res = new_query_executor(self.engine, query)
 
                 base_dll = res[0][0]
 
                 output_query = self.clean_view_dll(output_table_name, base_dll)
 
-                query_executor(self.engine, output_query)
+                new_query_executor(self.engine, output_query)
                 logging.info(f"View {full_name} successfully created. ")
 
                 self.grant_table_view_rights("view", output_table_name)
@@ -211,7 +223,7 @@ class DbtModelClone:
             transient_table = res[0][1]
 
             clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
-            query_executor(self.engine, clone_statement)
+            new_query_executor(self.engine, clone_statement)
             logging.info(f"{clone_statement} successfully run. ")
 
             self.grant_table_view_rights("table", output_table_name)
