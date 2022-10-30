@@ -9,7 +9,9 @@ from typing import Dict, List
 from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
+from sqlalchemy.exc import ProgrammingError
 from typing import Any, Dict, List, Tuple
+
 
 from gitlabdata.orchestration_utils import query_executor
 
@@ -203,22 +205,26 @@ class DbtModelClone:
                 base_dll = res[0][0]
 
                 output_query = self.clean_view_dll(output_table_name, base_dll)
-
-                query_executor(self.engine, output_query)
-                self.grant_table_view_rights("view", output_table_name)
-
-                logging.info(f"{output_table_name} successfully created. ")
-
+                try:
+                    query_executor(self.engine, output_query)
+                    self.grant_table_view_rights("view", output_table_name)
+                    logging.info(f"{output_table_name} successfully created. ")
+                except ProgrammingError:
+                    logging.warning(f"Problem processing {output_table_name}")
                 continue
 
             transient_table = res[0][1]
 
-            clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
-            query_executor(self.engine, clone_statement)
-            logging.info(f"{output_table_name} successfully created. ")
+            try:
 
-            self.grant_table_view_rights("table", output_table_name)
+                clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
 
+                query_executor(self.engine, clone_statement)
+                self.grant_table_view_rights("table", output_table_name)
+                logging.info(f"{output_table_name} successfully created. ")
+            except ProgrammingError:
+                logging.warning(f"Problem processing {output_table_name}")
+                continue
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
