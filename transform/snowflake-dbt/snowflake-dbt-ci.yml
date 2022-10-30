@@ -198,6 +198,7 @@
     - *deps_and_seed
     - export SNOWFLAKE_PREP_DATABASE="PREP"
     - export SNOWFLAKE_PROD_DATABASE="PROD"
+    - pip install loguru
     - echo $DBT_MODELS
     - INPUT=$(dbt --quiet ls --models $DBT_MODELS --output json --output-keys "database schema name depends_on unique_id config" --profiles-dir profile --target prod)
     - /builds/gitlab-data/analytics/orchestration/clone_dbt_models_select.py $INPUT
