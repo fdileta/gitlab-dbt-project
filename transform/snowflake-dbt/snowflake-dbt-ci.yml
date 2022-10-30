@@ -25,7 +25,7 @@
   after_script:
     - cd $CI_PROJECT_DIR/transform/snowflake-dbt/
     - mkdir -p $CI_PROJECT_DIR/public/dbt/
-    - cp -r target $CI_PROJECT_DIR/public/dbt/ 
+    - cp -r target $CI_PROJECT_DIR/public/dbt/
   tags:
     - analytics
   only:
@@ -45,7 +45,7 @@
 
 .set_snapshot: &set_snapshot
   - export SNOWFLAKE_SNAPSHOT_DATABASE="${CI_COMMIT_REF_NAME^^}_RAW" # Must write to clone of RAW since this does real work
-  - echo $SNOWFLAKE_SNAPSHOT_DATABASE 
+  - echo $SNOWFLAKE_SNAPSHOT_DATABASE
 
 .deps_and_seed: &deps_and_seed
   - python3 macro_name_check.py
@@ -109,7 +109,7 @@
   <<: *snowflake_dbt_jobs
   script:
     - *deps_and_seed
-    - *clone_raw # Reads from raw clone 
+    - *clone_raw # Reads from raw clone
     - *set_snapshot
     - echo $DBT_MODELS
     - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
@@ -123,7 +123,7 @@
     - dbt deps $CI_PROFILE_TARGET
     - echo $DBT_MODELS
     - dbt seed --full-refresh $CI_PROFILE_TARGET --select $DBT_MODELS
-    
+
 ➕📸🥩specify_snapshot:
   <<: *snowflake_dbt_jobs
   script:
@@ -237,7 +237,7 @@
     - echo $SNOWFLAKE_SNAPSHOT_DATABASE
     - *deps_and_seed
     - dbt snapshot $CI_PROFILE_TARGET
-    
+
 📝specify_tests:
   <<: *dbt_misc_jobs
   script:

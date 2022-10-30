@@ -8,6 +8,8 @@ from typing import Dict, List
 
 from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
+from sqlalchemy.engine.base import Engine
+from typing import Any, Dict, List, Tuple
 
 from gitlabdata.orchestration_utils import query_executor
 
@@ -16,6 +18,9 @@ from simple_dependency_resolver.simple_dependency_resolver import DependencyReso
 
 # Set logging defaults
 logging.basicConfig(stream=sys.stdout, level=20)
+# Remove the messy logs
+logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
+logging.getLogger('snowflake').setLevel(logging.ERROR)
 
 
 class DbtModelClone:
@@ -45,16 +50,12 @@ class DbtModelClone:
         :param schema_name:
         :return:
         """
-        logging.info("Creating schema if it does not exist")
-
         query = f"""CREATE SCHEMA IF NOT EXISTS {schema_name};"""
         query_executor(self.engine, query)
 
-        logging.info("Granting rights on stage to TRANSFORMER")
         grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
         query_executor(self.engine, grants_query)
 
-        logging.info("Granting rights on stage to GITLAB_CI")
         grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
         query_executor(self.engine, grants_query)
 
@@ -107,13 +108,11 @@ class DbtModelClone:
         :return:
         """
 
-        logging.info(f"Granting rights on {object_type} to TRANSFORMER")
         grants_query = f"""
             GRANT OWNERSHIP ON {object_type.upper()} {object_name.upper()} TO TRANSFORMER REVOKE CURRENT GRANTS
             """
         query_executor(self.engine, grants_query)
 
-        logging.info(f"Granting rights on {object_type} to GITLAB_CI")
         grants_query = (
             f"""GRANT ALL ON {object_type.upper()} {object_name.upper()} TO GITLAB_CI"""
         )
@@ -174,6 +173,8 @@ class DbtModelClone:
             output_table_name = f""""{self.branch_name}_{full_name[1:]}"""
             output_schema_name = output_table_name.replace(f'."{table_name}"', "")
 
+            logging.info(f"Processing {output_table_name}")
+
             query = f"""
                 SELECT
                     TABLE_TYPE,
@@ -183,12 +184,16 @@ class DbtModelClone:
                 AND TABLE_NAME = UPPER('{table_name}')
             """
             res = query_executor(self.engine, query)
+            try:
+                table_or_view = res[0][0]
+            except IndexError:
+                logging.warning(f"Table/view {output_table_name} does not exist in PROD yet and must be created with "
+                                f"regular dbt")
+                continue
 
             self.create_schema(output_schema_name)
 
-            table_or_view = res[0][0]
             if table_or_view == "VIEW":
-                logging.info("Cloning view")
 
                 query = (
                     f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
@@ -200,9 +205,9 @@ class DbtModelClone:
                 output_query = self.clean_view_dll(output_table_name, base_dll)
 
                 query_executor(self.engine, output_query)
-                logging.info(f"View {full_name} successfully created. ")
-
                 self.grant_table_view_rights("view", output_table_name)
+
+                logging.info(f"{output_table_name} successfully created. ")
 
                 continue
 
@@ -210,7 +215,7 @@ class DbtModelClone:
 
             clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
             query_executor(self.engine, clone_statement)
-            logging.info(f"{clone_statement} successfully run. ")
+            logging.info(f"{output_table_name} successfully created. ")
 
             self.grant_table_view_rights("table", output_table_name)
 
