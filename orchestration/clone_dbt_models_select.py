@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import ProgrammingError
 from typing import Any, Dict, List, Tuple
-
+from custom_log_formatter import CustomLogFormatter
 
 from gitlabdata.orchestration_utils import query_executor
 
@@ -24,6 +24,10 @@ logging.basicConfig(stream=sys.stdout, level=20)
 logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
 logging.getLogger('snowflake').setLevel(logging.ERROR)
 
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+
+ch.setFormatter(CustomLogFormatter())
 
 class DbtModelClone:
     """"""
@@ -211,6 +215,7 @@ class DbtModelClone:
                     logging.info(f"{output_table_name} successfully created. ")
                 except ProgrammingError:
                     logging.warning(f"Problem processing {output_table_name}")
+
                 continue
 
             transient_table = res[0][1]
