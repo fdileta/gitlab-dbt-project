@@ -15,7 +15,7 @@ from simple_dependency_resolver.simple_dependency_resolver import DependencyReso
 
 
 # Set logging defaults
-logging.basicConfig(stream=sys.stdout)
+logging.basicConfig(stream=sys.stdout, level=20)
 
 
 class DbtModelClone:
@@ -31,7 +31,8 @@ class DbtModelClone:
                 warehouse=config_vars["SNOWFLAKE_LOAD_WAREHOUSE"],
             ), echo=False
         )
-        logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
+        # logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
+        logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
 
         # Snowflake database name should be in CAPS
         # see https://gitlab.com/meltano/analytics/issues/491
