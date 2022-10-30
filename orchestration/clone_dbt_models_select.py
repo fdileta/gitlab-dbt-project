@@ -18,19 +18,10 @@ from simple_dependency_resolver.simple_dependency_resolver import DependencyReso
 
 # Set logging defaults
 logging.basicConfig(stream=sys.stdout, level=20)
+# Remove the messy logs
+logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
+logging.getLogger('snowflake').setLevel(logging.ERROR)
 
-def new_query_executor(engine: Engine, query: str) -> List[Tuple[Any]]:
-    """
-    Execute DB queries safely.
-    """
-
-    try:
-        connection = engine.connect()
-        results = connection.execute(query, echo=False).fetchall()
-    finally:
-        connection.close()
-        engine.dispose()
-    return results
 
 class DbtModelClone:
     """"""
