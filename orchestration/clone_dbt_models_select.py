@@ -11,7 +11,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import ProgrammingError
 from typing import Any, Dict, List, Tuple
-from custom_log_formatter import CustomLogFormatter
 from loguru import logger
 from gitlabdata.orchestration_utils import query_executor
 
@@ -215,8 +214,9 @@ class DbtModelClone:
                     query_executor(self.engine, output_query)
                     self.grant_table_view_rights("view", output_table_name)
                     logger.info(f"{output_table_name} successfully created. ")
-                except ProgrammingError:
+                except ProgrammingError as p:
                     logger.warning(f"Problem processing {output_table_name}")
+                    logger.warning(str(p))
 
                 continue
 
@@ -229,8 +229,9 @@ class DbtModelClone:
                 query_executor(self.engine, clone_statement)
                 self.grant_table_view_rights("table", output_table_name)
                 logger.info(f"{output_table_name} successfully created. ")
-            except ProgrammingError:
+            except ProgrammingError as p:
                 logger.warning(f"Problem processing {output_table_name}")
+                logger.warning(str(p))
                 continue
 
 if __name__ == "__main__":
