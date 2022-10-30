@@ -181,6 +181,8 @@
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
+  variables:
+    LOGURU_COLORIZE: "true"
   script:
     - *deps_and_seed
     - export SNOWFLAKE_PREP_DATABASE="PREP"
@@ -193,6 +195,8 @@
 
 ➕🔆⚡️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
+  variables:
+    LOGURU_COLORIZE: "true"
   script:
     - *deps_and_seed
     - export SNOWFLAKE_PREP_DATABASE="PREP"

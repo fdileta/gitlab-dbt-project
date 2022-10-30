@@ -9,19 +9,26 @@ from typing import Dict, List
 from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
+from sqlalchemy.exc import ProgrammingError
 from typing import Any, Dict, List, Tuple
-
+from loguru import logger
 from gitlabdata.orchestration_utils import query_executor
 
 from simple_dependency_resolver.simple_dependency_resolver import DependencyResolver
 
 
 # Set logging defaults
-logging.basicConfig(stream=sys.stdout, level=20)
+# logging.basicConfig(stream=sys.stdout, level=20)
 # Remove the messy logs
-logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
-logging.getLogger('snowflake').setLevel(logging.ERROR)
-
+# logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
+# logging.getLogger('snowflake').setLevel(logging.ERROR)
+#
+# logger = logging.getLogger(__name__)
+# ch = logging.StreamHandler()
+# ch.setLevel(logging.DEBUG)
+#
+# ch.setFormatter(CustomLogFormatter())
+# logger.addHandler(ch)
 
 class DbtModelClone:
     """"""
@@ -173,7 +180,7 @@ class DbtModelClone:
             output_table_name = f""""{self.branch_name}_{full_name[1:]}"""
             output_schema_name = output_table_name.replace(f'."{table_name}"', "")
 
-            logging.info(f"Processing {output_table_name}")
+            logger.info(f"Processing {output_table_name}")
 
             query = f"""
                 SELECT
@@ -187,7 +194,7 @@ class DbtModelClone:
             try:
                 table_or_view = res[0][0]
             except IndexError:
-                logging.warning(f"Table/view {output_table_name} does not exist in PROD yet and must be created with "
+                logger.warning(f"Table/view {output_table_name} does not exist in PROD yet and must be created with "
                                 f"regular dbt")
                 continue
 
@@ -203,22 +210,27 @@ class DbtModelClone:
                 base_dll = res[0][0]
 
                 output_query = self.clean_view_dll(output_table_name, base_dll)
-
-                query_executor(self.engine, output_query)
-                self.grant_table_view_rights("view", output_table_name)
-
-                logging.info(f"{output_table_name} successfully created. ")
+                try:
+                    query_executor(self.engine, output_query)
+                    self.grant_table_view_rights("view", output_table_name)
+                    logger.info(f"{output_table_name} successfully created. ")
+                except ProgrammingError:
+                    logger.warning(f"Problem processing {output_table_name}")
 
                 continue
 
             transient_table = res[0][1]
 
-            clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
-            query_executor(self.engine, clone_statement)
-            logging.info(f"{output_table_name} successfully created. ")
+            try:
 
-            self.grant_table_view_rights("table", output_table_name)
+                clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
 
+                query_executor(self.engine, clone_statement)
+                self.grant_table_view_rights("table", output_table_name)
+                logger.info(f"{output_table_name} successfully created. ")
+            except ProgrammingError:
+                logger.warning(f"Problem processing {output_table_name}")
+                continue
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
