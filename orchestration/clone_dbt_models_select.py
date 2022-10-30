@@ -8,6 +8,7 @@ from typing import Dict, List
 
 from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
+from sqlalchemy.engine.base import Engine
 
 from gitlabdata.orchestration_utils import query_executor
 
