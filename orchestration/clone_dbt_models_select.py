@@ -184,12 +184,16 @@ class DbtModelClone:
                 AND TABLE_NAME = UPPER('{table_name}')
             """
             res = query_executor(self.engine, query)
+            try:
+                table_or_view = res[0][0]
+            except IndexError:
+                logging.warning(f"Table/view {output_table_name} does not exist in PROD yet and must be created with "
+                                f"regular dbt")
+                continue
 
             self.create_schema(output_schema_name)
 
-            table_or_view = res[0][0]
             if table_or_view == "VIEW":
-                logging.info("Cloning view")
 
                 query = (
                     f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
