@@ -50,7 +50,7 @@ events = [
 ]
 
 
-start_date = datetime.now() - timedelta(days=31)
+start_date = datetime.now().date() - timedelta(days=31)
 end_date = datetime.now()
 
 delta = timedelta(hours=12)
