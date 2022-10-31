@@ -411,7 +411,7 @@ class UsagePing:
         namespace_filter = self.get_metrics_filter()
         logging.info(f"backfilling namespace metrics: {namespace_filter} type: {type(namespace_filter)}")
 
-        for n in namespace_filter.split(","):
+        for n in namespace_filter:
             logging.info(f"M: {n}")
 
         backfill_filter = get_backfill_filter(namespace_filter)
