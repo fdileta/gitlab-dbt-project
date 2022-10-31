@@ -58,6 +58,10 @@ def extract_logs(event: str, sdt: datetime.datetime, edt: datetime.datetime) -> 
 
     formatted_start_date = utils.format_datetime(sdt)
     formatted_end_date = utils.format_datetime(edt)
+    info("SDT")
+    info(sdt)
+    info("formatted_start_date")
+    info(formatted_start_date)
     for domain in domains:
         first_timestamp = formatted_start_date
 
