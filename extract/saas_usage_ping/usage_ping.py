@@ -401,7 +401,12 @@ class UsagePing:
 
         # pick up metrics from the parameter list
         # and only if time_window_query == False
-        backfill_filter = get_backfill_filter(self.get_metrics_filter())
+
+        namespace_filter = self.get_metrics_filter()
+
+        logging.info(f"namespace_filter: {namespace_filter}")
+
+        backfill_filter = get_backfill_filter(namespace_filter)
 
         logging.info(f"backfill_filter: {backfill_filter}")
 
