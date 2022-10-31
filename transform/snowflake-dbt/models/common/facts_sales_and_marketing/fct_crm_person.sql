@@ -27,9 +27,9 @@ WITH account_dims_mapping AS (
       sequence_task_due_date,
       sequence_status,
       last_activity_date,
-	  last_transfer_date_time,
-	  time_from_last_transfer_to_sequence,
-	  time_from_mql_to_last_transfer
+      last_transfer_date_time,
+      time_from_last_transfer_to_sequence,
+      time_from_mql_to_last_transfer
       
 
     FROM {{ref('prep_crm_person')}}
