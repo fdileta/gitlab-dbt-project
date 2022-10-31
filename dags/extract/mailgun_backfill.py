@@ -48,8 +48,8 @@ events = [
 ]
 
 
-start_date = datetime.datetime.now() - timedelta(days=31)
-end_date = datetime.datetime.now()
+start_date = datetime.now() - timedelta(days=31)
+end_date = datetime.now()
 
 delta = timedelta(hours=12)
 
