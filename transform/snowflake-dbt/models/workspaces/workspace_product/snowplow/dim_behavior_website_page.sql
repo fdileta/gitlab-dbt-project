@@ -40,7 +40,7 @@
 
     SELECT DISTINCT
       -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['page_url']) }}               AS dim_behavior_website_page_sk,
+      {{ dbt_utils.surrogate_key(['page_url', 'app_id']) }}               AS dim_behavior_website_page_sk,
 
       -- Natural Keys
       page_url,
@@ -220,5 +220,5 @@
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-10-14"
+    updated_date="2022-10-28"
 ) }}
