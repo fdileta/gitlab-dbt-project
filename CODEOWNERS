@@ -107,8 +107,8 @@ docker-compose.yml  @jjstark @paul_armstrong @vedprakash2021
 /transform/snowflake-dbt/models/sources/license/            @rbacovic @jjstark @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @iweeks
 /transform/snowflake-dbt/models/legacy/license/             @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @iweeks
 
-/transform/snowflake-dbt/models/sources/netsuite/           @jjstark @paul_armstrong @iweeks
-/transform/snowflake-dbt/models/legacy/netsuite/            @iweeks
+/transform/snowflake-dbt/models/sources/netsuite/           @jjstark @paul_armstrong @iweeks @chrissharp @michellecooper
+/transform/snowflake-dbt/models/legacy/netsuite/            @iweeks @chrissharp @michellecooper
 
 /transform/snowflake-dbt/models/sources/pmg                 @jjstark @paul_armstrong @michellecooper @jeanpeguero @iweeks
 /transform/snowflake-dbt/models/legacy/pmg                  @michellecooper @jeanpeguero @iweeks
