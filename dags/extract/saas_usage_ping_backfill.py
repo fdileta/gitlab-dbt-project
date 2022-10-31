@@ -86,14 +86,14 @@ def get_task_name(start: date) -> str:
     return f"namespace-{start_monday}"
 
 
-def get_pod_env_var(start: date, metrics: list) -> dict:
+def get_pod_env_var(start: date, metrics: str) -> dict:
     """
     Get pod environment variables
     """
     run_date = date(year=2022, month=1, day=1)
 
     run_date_formatted = run_date.isoformat()
-    metrics_formatted = "usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations"
+    metrics_formatted = metrics
 
     pod_env_vars = {
         "RUN_DATE": run_date_formatted,
