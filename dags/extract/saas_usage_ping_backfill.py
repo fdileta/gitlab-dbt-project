@@ -37,7 +37,7 @@ env = os.environ.copy()
 DAG_NAME = "saas_usage_ping_backfill"
 GIT_BRANCH = env["GIT_BRANCH"]
 
-backfill_param = Variable.get("NAMESPACE_BACKFILL_VAR", deserialize_json=True)
+BACKFILL_PARAMETERS = Variable.get("NAMESPACE_BACKFILL_VAR", deserialize_json=True)
 
 secrets = [
     SNOWFLAKE_ACCOUNT,
@@ -157,7 +157,7 @@ def get_param_value(param: str) -> str:
     """
     Return value from the parameter
     """
-    res = backfill_param.get(param)
+    res = BACKFILL_PARAMETERS.get(param)
 
     return res
 

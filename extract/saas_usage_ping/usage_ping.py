@@ -69,7 +69,7 @@ class UsagePing:
             self.end_date = datetime.datetime.now().date()
 
         if namespace_metrics_filter is not None:
-            self.metrics_backfill = list(namespace_metrics_filter.split(","))
+            self.metrics_backfill = namespace_metrics_filter
 
         self.start_date_28 = self.end_date - datetime.timedelta(28)
         self.dataframe_api_columns = META_API_COLUMNS
