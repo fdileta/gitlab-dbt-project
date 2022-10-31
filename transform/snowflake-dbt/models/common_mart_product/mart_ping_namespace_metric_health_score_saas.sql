@@ -65,14 +65,18 @@
       ON prep_saas_usage_ping_namespace.dim_namespace_id = instance_types_ordering.namespace_id
     INNER JOIN dim_date
       ON prep_saas_usage_ping_namespace.ping_date = dim_date.date_day
-    INNER JOIN namespace_subscription_monthly_distinct
+    LEFT JOIN namespace_subscription_monthly_distinct
       ON prep_saas_usage_ping_namespace.dim_namespace_id = namespace_subscription_monthly_distinct.dim_namespace_id
       AND dim_date.first_day_of_month = namespace_subscription_monthly_distinct.snapshot_month
     INNER JOIN gainsight_wave_metrics
       ON prep_saas_usage_ping_namespace.ping_name = gainsight_wave_metrics.metric_name
-    INNER JOIN map_subscription_namespace_month
+    LEFT JOIN map_subscription_namespace_month
       ON prep_saas_usage_ping_namespace.dim_namespace_id = map_subscription_namespace_month.dim_namespace_id
-        AND dim_date.first_day_of_month = map_subscription_namespace_month.date_month
+      AND dim_date.first_day_of_month = map_subscription_namespace_month.date_month
+    WHERE COALESCE(
+        map_subscription_namespace_month.dim_subscription_id, 
+        namespace_subscription_monthly_distinct.dim_subscription_id
+      ) IS NOT NULL
     QUALIFY ROW_NUMBER() OVER (
       PARTITION BY 
         dim_date.first_day_of_month,
