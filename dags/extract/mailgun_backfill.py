@@ -44,13 +44,7 @@ dag = DAG(
 )
 
 events = [
-    "rejected",
     "delivered",
-    "failed",
-    "opened",
-    "clicked",
-    "unsubscribed",
-    "complained",
 ]
 
 for e in events:
@@ -64,8 +58,8 @@ for e in events:
     mailgun_operator = KubernetesPodOperator(
         **gitlab_defaults,
         image=DATA_IMAGE,
-        task_id=f"mailgun-extract-{e}",
-        name=f"mailgun-extract-{e}",
+        task_id=f"mailgun-backfill-extract-{e}",
+        name=f"mailgun-backfill-extract-{e}",
         secrets=[
             SNOWFLAKE_ACCOUNT,
             SNOWFLAKE_LOAD_ROLE,
