@@ -68,10 +68,10 @@ models:
         description: Boolean flag which is set to True if the ultimate parent namespace's plan was paid on the final event in the calendar month. Defaults to False if a value is not available.
       - name: plan_id_count
         description: The distinct count of plan IDs associated with the ultimate parent namespace during the calendar month.
-      - name: plan_id_array
-        description: Array of plan IDs associated with the ultimate parent namespace during the calendar month.
-      - name: plan_name_array
-        description: Array of plan names associated with the ultimate parent namespace during the calendar month.
+      - name: plan_id_list
+        description: Comma-separated list of plan IDs associated with the ultimate parent namespace during the calendar month.
+      - name: plan_name_list
+        description: Comma-separated list of plan names associated with the ultimate parent namespace during the calendar month.
       - name: namespace_is_internal
         description: '{{ doc("namespace_is_internal") }}'
       - name: ultimate_parent_namespace_type

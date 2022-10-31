@@ -39,17 +39,21 @@ plan_id_by_month AS (
 ),
 
 /*
-Count and create an array of all plans that a namespace had during the calendar month
+Count and create a list of all plans that a namespace had during the calendar month
 */
 
 plan_arrays AS (
 
   SELECT
-    dim_ultimate_parent_namespace_id                                                              AS ultimate_parent_namespace_id,
-    event_calendar_month                                                                          AS event_month,
-    COUNT(DISTINCT plan_id_at_event_date)                                                         AS plan_id_count,
-    ARRAY_AGG(DISTINCT plan_id_at_event_date) WITHIN GROUP (ORDER BY plan_id_at_event_date)       AS plan_id_array,
-    ARRAY_AGG(DISTINCT plan_name_at_event_date) WITHIN GROUP (ORDER BY plan_name_at_event_date)   AS plan_name_array
+    dim_ultimate_parent_namespace_id             AS ultimate_parent_namespace_id,
+    event_calendar_month                         AS event_month,
+    COUNT(DISTINCT plan_id_at_event_date)        AS plan_id_count,
+    ARRAY_TO_STRING(
+      ARRAY_AGG(DISTINCT plan_id_at_event_date) WITHIN GROUP (ORDER BY plan_id_at_event_date),
+      ',')                                       AS plan_id_list,
+    ARRAY_TO_STRING(
+      ARRAY_AGG(DISTINCT plan_name_at_event_date) WITHIN GROUP (ORDER BY plan_name_at_event_date),
+      ',')                                       AS plan_name_list
   FROM mart_event_valid
   WHERE event_date < DATE_TRUNC('month', CURRENT_DATE) --exclude current month
   {{ dbt_utils.group_by(n=2) }}
@@ -74,8 +78,8 @@ final AS (
     plan_name_at_event_date                                                                             AS plan_name_at_event_month,
     plan_was_paid_at_event_date                                                                         AS plan_was_paid_at_event_month,
     plan_id_count                                                                                       AS plan_id_count,
-    plan_id_array                                                                                       AS plan_id_array,
-    plan_name_array                                                                                     AS plan_name_array,
+    plan_id_list                                                                                        AS plan_id_list,
+    plan_name_list                                                                                      AS plan_name_list,
     namespace_is_internal                                                                               AS namespace_is_internal,
     ultimate_parent_namespace_type                                                                      AS ultimate_parent_namespace_type,
     namespace_creator_is_blocked                                                                        AS namespace_creator_is_blocked,
