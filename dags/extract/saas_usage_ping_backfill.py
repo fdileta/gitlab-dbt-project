@@ -153,9 +153,9 @@ def generate_task(run_date: date, metrics: list) -> None:
     )
 
 
-def get_date_from_param(param: str) -> str:
+def get_param_value(param: str) -> str:
     """
-    Return start_date for DAG
+    Return value from the parameter
     """
     res = backfill_param.get(param)
 
@@ -166,7 +166,7 @@ def get_date(param: str) -> datetime:
     """
     Get starting date (Monday in this case)
     """
-    res = get_date_from_param(param=param)
+    res = get_param_value(param=param)
 
     return datetime.strptime(res, "%Y-%m-%d")
 
@@ -176,7 +176,7 @@ start_date = get_monday(day=start_date)
 
 end_date = get_date(param="end_date")
 
-metrics_backfill = backfill_param.get("metrics_backfill")
+metrics_backfill = get_param_value(param="metrics_backfill")
 
 dag = DAG(DAG_NAME, default_args=default_args, schedule_interval=None, concurrency=2)
 
