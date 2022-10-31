@@ -86,8 +86,7 @@
     INNER JOIN dim_event 
       ON unstruct_event.event_name = dim_event.event_name
     INNER JOIN dim_page 
-      ON unstruct_event.clean_url_path = dim_page.clean_url_path 
-        AND unstruct_event.page_url_host = dim_page.page_url_host
+      ON unstruct_event.page_url = dim_page.page_url
         AND unstruct_event.app_id = dim_page.app_id
     LEFT JOIN dim_behavior_browser
       ON unstruct_event.browser_name = dim_behavior_browser.browser_name
@@ -97,13 +96,12 @@
     LEFT JOIN dim_behavior_operating_system
       ON unstruct_event.os_name = dim_behavior_operating_system.os_name
         AND unstruct_event.os_timezone = dim_behavior_operating_system.os_timezone
-      
 )
 
 {{ dbt_audit(
     cte_ref="unstruct_event_with_dims",
     created_by="@chrissharp",
-    updated_by="@chrissharp",
+    updated_by="@michellecooper",
     created_date="2022-09-27",
-    updated_date="2022-09-27"
+    updated_date="2022-10-31"
 ) }}
