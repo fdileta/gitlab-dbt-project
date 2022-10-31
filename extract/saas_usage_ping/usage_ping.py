@@ -84,7 +84,7 @@ class UsagePing:
         """
         getter for metrics filter
         """
-        return self.metrics_backfill # list(self.metrics_backfill.split(",")) if self.metrics_backfill else []
+        return self.metrics_backfill.split(",") if self.metrics_backfill else []
 
     def _get_instance_queries(self) -> Dict:
         """
@@ -409,7 +409,10 @@ class UsagePing:
         # and only if time_window_query == False
 
         namespace_filter = self.get_metrics_filter()
-        logging.info(f"backfilling namespace metrics: {namespace_filter}")
+        logging.info(f"backfilling namespace metrics: {namespace_filter} type: {type(namespace_filter)}")
+
+        for n in namespace_filter.split(","):
+            logging.info(f"M: {n}")
 
         backfill_filter = get_backfill_filter(namespace_filter)
 
