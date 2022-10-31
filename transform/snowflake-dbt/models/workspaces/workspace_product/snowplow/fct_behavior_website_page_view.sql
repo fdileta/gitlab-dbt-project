@@ -92,7 +92,7 @@
         AND page_views_w_clean_url.app_id = dim_behavior_website_page.app_id
     LEFT JOIN dim_behavior_website_page AS referrer_website_page
       ON page_views_w_clean_url.referer_url = referrer_website_page.page_url
-        AND page_views_with_clean_url.app_id = referrer_website_page.app_id
+        AND page_views_w_clean_url.app_id = referrer_website_page.app_id
 
 )
 
