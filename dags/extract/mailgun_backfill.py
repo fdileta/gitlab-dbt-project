@@ -47,7 +47,12 @@ events = [
     "delivered",
 ]
 
+
+start_date = datetime.datetime.now() - timedelta(days=31)
+end_date = datetime.datetime.now()
+
 delta = timedelta(hours=12)
+
 
 while start_date <= end_date:
 
@@ -82,3 +87,4 @@ while start_date <= end_date:
             arguments=[mailgun_extract_command],
             dag=dag,
         )
+        start_date += delta
