@@ -44,6 +44,7 @@
 
       -- Natural Keys
       page_url,
+      app_id,
 
       -- Attributes
       page_url_path,
@@ -55,7 +56,6 @@
       page_type,
       page_sub_type,
       referrer_medium,
-      app_id,
       min_event_timestamp,
       max_event_timestamp,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1) AS url_namespace_id,
