@@ -59,8 +59,6 @@ class UsagePing:
 
         self.config_vars = env.copy()
 
-        logging.info(f"namespace_filter: {namespace_metrics_filter}")
-        logging.info(f"self.config_vars: {str(self.config_vars)}")
 
         self.loader_engine = snowflake_engine_factory(self.config_vars, "LOADER")
 
@@ -81,11 +79,11 @@ class UsagePing:
         """
         self.metrics_backfill = metrics
 
-    def get_metrics_filter(self):
+    def get_metrics_filter(self) -> list:
         """
         getter for metrics filter
         """
-        return self.metrics_backfill
+        return self.metrics_backfill.split(",")
 
     def _get_instance_queries(self) -> Dict:
         """
@@ -409,7 +407,8 @@ class UsagePing:
         # pick up metrics from the parameter list
         # and only if time_window_query == False
 
-        namespace_filter = "xxxxxx" # self.get_metrics_filter()
+        namespace_filter = self.get_metrics_filter()
+        logging.info(f"namespace_filter: {namespace_filter}")
 
         backfill_filter = get_backfill_filter(namespace_filter)
 
