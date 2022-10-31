@@ -67,8 +67,8 @@ while start_date <= end_date:
         mailgun_operator = KubernetesPodOperator(
             **gitlab_defaults,
             image=DATA_IMAGE,
-            task_id=f"mailgun-backfill-extract-{e}-{str(start_date)}",
-            name=f"mailgun-backfill-extract-{e}-{str(start_date)}",
+            task_id=f"mailgun-backfill-extract-{e}-{str(start_date).replace(':', '-').replace(' ', '-')}",
+            name=f"mailgun-backfill-extract-{e}-{str(start_date).replace(':', '-').replace(' ', '-')}",
             secrets=[
                 SNOWFLAKE_ACCOUNT,
                 SNOWFLAKE_LOAD_ROLE,
