@@ -46,7 +46,7 @@ def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
     )
 
 
-def extract_logs(event: str, start_date: datetime.datetime, end_date: datetime.datetime) -> List[Dict]:
+def extract_logs(event: str, sdt: datetime.datetime, edt: datetime.datetime) -> List[Dict]:
     """
     Requests and retrieves the event logs for a particular event.
     :param start_date:
@@ -56,8 +56,8 @@ def extract_logs(event: str, start_date: datetime.datetime, end_date: datetime.d
     page_token = None
     all_results: List[Dict] = []
 
-    formatted_start_date = utils.format_datetime(start_date)
-    formatted_end_date = utils.format_datetime(end_date)
+    formatted_start_date = utils.format_datetime(sdt)
+    formatted_end_date = utils.format_datetime(edt)
     for domain in domains:
         first_timestamp = formatted_start_date
 
