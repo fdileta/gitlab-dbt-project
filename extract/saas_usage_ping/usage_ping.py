@@ -54,7 +54,14 @@ class UsagePing:
     """
 
     def __init__(self, ping_date=None, namespace_metrics_filter=None):
+
+
+
         self.config_vars = env.copy()
+
+        logging.info(f"namespace_filter: {namespace_metrics_filter}")
+        logging.info(f"self.config_vars: {str(self.config_vars)}")
+        
         self.loader_engine = snowflake_engine_factory(self.config_vars, "LOADER")
 
         if ping_date is not None:
@@ -402,10 +409,8 @@ class UsagePing:
         # pick up metrics from the parameter list
         # and only if time_window_query == False
 
-        namespace_filter = self.namespace_filter # self.get_metrics_filter()
-        logging.info(f"metrics_backfill: {self.metrics_backfill}")
-        logging.info(f"namespace_filter: {namespace_filter}")
-        logging.info(f"self.config_vars: {str(self.config_vars)}")
+        namespace_filter = "xxxxxx" # self.get_metrics_filter()
+
         backfill_filter = get_backfill_filter(namespace_filter)
 
         logging.info(f"backfill_filter: {backfill_filter}")
