@@ -205,6 +205,6 @@ models:
     description: '{{ doc("map_latest_subscription_namespace_monthly") }}'
     tests:
       - dbt_utils.unique_combination_of_columns:
-        combination_of_columns:
-          - dim_namespace_id
-          - date_month
+          combination_of_columns:
+            - dim_namespace_id
+            - date_month
