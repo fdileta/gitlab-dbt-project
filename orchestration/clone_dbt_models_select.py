@@ -17,19 +17,6 @@ from gitlabdata.orchestration_utils import query_executor
 from simple_dependency_resolver.simple_dependency_resolver import DependencyResolver
 
 
-# Set logging defaults
-# logging.basicConfig(stream=sys.stdout, level=20)
-# Remove the messy logs
-# logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
-# logging.getLogger('snowflake').setLevel(logging.ERROR)
-#
-# logger = logging.getLogger(__name__)
-# ch = logging.StreamHandler()
-# ch.setLevel(logging.DEBUG)
-#
-# ch.setFormatter(CustomLogFormatter())
-# logger.addHandler(ch)
-
 class DbtModelClone:
     """"""
 
