@@ -63,8 +63,8 @@ while start_date <= end_date:
         mailgun_extract_command = (
             f"{clone_and_setup_extraction_cmd} && "
             f"python mailgun/src/execute_backfill.py load_event_logs --event {e} --start_date "
-            f"{start_date.strftime('%Y-%m-%d %H:%M:%S')} --end_date "
-            f"{(start_date + delta).strftime('%Y-%m-%d %H:%M:%S')}"
+            f"{datetime.timestamp(start_date)} --end_date "
+            f"{datetime.timestamp(start_date + delta)}"
         )
 
 
