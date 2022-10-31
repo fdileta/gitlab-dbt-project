@@ -113,7 +113,7 @@ def extract_logs(event: str, start_date: datetime.datetime, end_date: datetime.d
     return all_results
 
 
-def load_event_logs(event: str, start_date: datetime.datetime, end_date: datetime.datetime):
+def load_event_logs(event: str, start_date, end_date):
     """
     CLI main function, starting point for setting up engine and processing data.
     :param event:
@@ -121,12 +121,12 @@ def load_event_logs(event: str, start_date: datetime.datetime, end_date: datetim
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    info(start_date)
-    info(type(start_date))
+    real_start_date = datetime.utcfromtimestamp(start_date)
+    real_end_date = datetime.utcfromtimestamp(end_date)
 
-    info(f"Running {event} for {(start_date)} to {(end_date)}")
+    info(f"Running {event} for {(real_start_date)} to {(real_end_date)}")
 
-    results = extract_logs(event, start_date, end_date)
+    results = extract_logs(event, real_start_date, real_end_date)
 
     info(f"Results length: {len(results)}")
 
