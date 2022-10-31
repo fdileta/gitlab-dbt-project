@@ -86,18 +86,19 @@ def get_task_name(start: date) -> str:
     return f"namespace-{start_monday}"
 
 
-def get_pod_env_var(start: date, metrics: str) -> dict:
+def get_pod_env_var(start: date) -> dict:
     """
     Get pod environment variables
     """
     run_date = date(year=2022, month=1, day=1)
 
     run_date_formatted = run_date.isoformat()
-    metrics_formatted = metrics
+
+    metrics = get_param_value(param="metrics_backfill")
 
     pod_env_vars = {
         "RUN_DATE": run_date_formatted,
-        "METRICS_BACKFILL": metrics_formatted,
+        "METRICS_BACKFILL": metrics,
         "SNOWFLAKE_SYSADMIN_ROLE": "TRANSFORMER",
         "SNOWFLAKE_LOAD_WAREHOUSE": "USAGE_PING",
     }
@@ -138,7 +139,9 @@ def generate_task(run_date: date, metrics: list) -> None:
     """
 
     task_id = task_name = get_task_name(start=run_date)
-    env_vars = get_pod_env_var(start=run_date, metrics=metrics)
+
+    env_vars = get_pod_env_var(start=run_date)
+
     command = get_command()
 
     return KubernetesPodOperator(
@@ -176,9 +179,7 @@ start_date = get_monday(day=start_date)
 
 end_date = get_date(param="end_date")
 
-metrics_backfill = get_param_value(param="metrics_backfill")
-
 dag = DAG(DAG_NAME, default_args=default_args, schedule_interval=None, concurrency=2)
 
 for run in get_date_range(start=start_date, end=end_date):
-    generate_task(run_date=run, metrics=metrics_backfill)
+    generate_task(run_date=run)
