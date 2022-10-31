@@ -147,7 +147,9 @@ WITH biz_person AS (
       zoominfo_mobile_phone_number,
       zoominfo_do_not_call_direct_phone,
       zoominfo_do_not_call_mobile_phone,
-      zoominfo_contact_id,
+	  last_transfer_date_time,
+	  time_from_last_transfer_to_sequence,
+	  time_from_mql_to_last_transfer,
       NULL                                           AS zoominfo_company_employee_count
 
 
@@ -258,7 +260,9 @@ WITH biz_person AS (
       zoominfo_mobile_phone_number,
       zoominfo_do_not_call_direct_phone,
       zoominfo_do_not_call_mobile_phone,
-      null AS zoominfo_contact_id,
+	  last_transfer_date_time,
+	  time_from_last_transfer_to_sequence,
+	  time_from_mql_to_last_transfer,
       zoominfo_company_employee_count
 
     FROM sfdc_leads
@@ -291,5 +295,5 @@ WITH biz_person AS (
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-10-18"
+    updated_date="2022-10-26"
 ) }}

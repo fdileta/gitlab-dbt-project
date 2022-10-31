@@ -3,6 +3,10 @@ import logging
 import os
 import sys
 from typing import Dict, Any, Optional
+import pytz
+
+utc = pytz.UTC
+
 
 from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
@@ -52,11 +56,25 @@ def load_incremental(
     """
     if table_dict["export_schema"] == "gitlab_com":
 
-        replication_check_query = "select pg_last_xact_replay_timestamp();"
+        # Just fetch and print the last pg_last_xact_replay_timestamp in present in system database or not.
 
-        replication_timestamp = query_executor(source_engine, replication_check_query)[
-            0
-        ][0]
+        last_replication_check_query = "select pg_last_xact_replay_timestamp();"
+        replication_timestamp_query = (
+            "select last_replica_time from public.last_replication_timestamp"
+        )
+        pg_replication_timestamp = query_executor(
+            source_engine, last_replication_check_query
+        )[0][0]
+
+        replication_timestamp_value = query_executor(
+            source_engine, replication_timestamp_query
+        )[0][0]
+        logging.info(
+            f"Timestamp value from pg_last_xact_replay_timestamp:{pg_replication_timestamp}"
+        )
+        logging.info(f"Timestamp from the database is : {replication_timestamp_value}")
+
+        replication_timestamp = utc.localize(replication_timestamp_value)
 
         last_load_time = get_last_load_time()
 

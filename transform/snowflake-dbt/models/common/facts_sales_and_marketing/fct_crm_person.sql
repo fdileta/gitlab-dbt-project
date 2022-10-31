@@ -27,7 +27,9 @@ WITH account_dims_mapping AS (
       sequence_task_due_date,
       sequence_status,
       last_activity_date,
-      zoominfo_contact_id
+	  last_transfer_date_time,
+	  time_from_last_transfer_to_sequence,
+	  time_from_mql_to_last_transfer
       
 
     FROM {{ref('prep_crm_person')}}
@@ -270,6 +272,9 @@ marketo_qualified_lead_date::timestamp
       crm_person.last_activity_date,
       crm_person.last_utm_content,
       crm_person.last_utm_campaign,
+	  crm_person.last_transfer_date_time,
+	  crm_person.time_from_last_transfer_to_sequence,
+	  crm_person.time_from_mql_to_last_transfer,
 
      -- additive fields
 

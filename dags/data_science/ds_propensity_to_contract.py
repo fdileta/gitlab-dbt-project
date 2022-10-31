@@ -69,7 +69,6 @@ dag = DAG(
     "ds_propensity_to_contract",
     default_args=default_args,
     schedule_interval="0 4 9 * *",
-    
 )
 
 # Task 1

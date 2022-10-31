@@ -785,6 +785,8 @@
       -- Propensity to purchase trials fields
       IFF(ptpt_scores_by_user.namespace_id IS NOT NULL, TRUE, FALSE)
                                                   AS is_ptpt_contact,
+      IFF(is_ptpt_contact = TRUE OR (is_ptpt_contact = FALSE AND marketing_contact.is_ptpt_contact_marketo = TRUE), TRUE, FALSE)
+                                                  AS is_ptpt_contact_change,
       ptpt_scores_by_user.namespace_id            AS ptpt_namespace_id,
       ptpt_scores_by_user.score_group             AS ptpt_score_group,
       ptpt_scores_by_user.insights                AS ptpt_insights,
@@ -948,7 +950,16 @@
       'is_pql',
       'is_paid_tier',
       'is_pql_change',
-      'is_paid_tier_change'
+      'is_paid_tier_change',
+      'is_ptpt_contact',
+      'is_ptpt_contact_change',
+      'ptpt_namespace_id',
+      'ptpt_score_group',
+      'ptpt_insights',
+      'ptpt_score_date',
+      'ptpt_past_score_group',
+      'is_member_of_public_ultimate_parent_namespace',
+      'is_member_of_private_ultimate_parent_namespace'
       ]
 ) }}
 
@@ -957,5 +968,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-09",
-    updated_date="2022-10-17"
+    updated_date="2022-10-24"
 ) }}
