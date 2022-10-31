@@ -121,7 +121,10 @@ def load_event_logs(event: str, start_date: datetime.datetime, end_date: datetim
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    info(f"Running {event} for {str(start_date)} to {str(end_date)}")
+    info(start_date)
+    info(type(start_date))
+
+    info(f"Running {event} for {(start_date)} to {(end_date)}")
 
     results = extract_logs(event, start_date, end_date)
 
