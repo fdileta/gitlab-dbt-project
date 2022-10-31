@@ -393,7 +393,7 @@ class UsagePing:
 
         for query_dict in saas_queries:
             if metrics_filter(query_dict):
-                logging.info(f"    Start backfilling metrics: {query_dict}")
+                logging.info(f"    Start backfilling metrics: {query_dict.get('counter_name')}")
                 # self.process_namespace_ping(query_dict, connection)
 
         connection.close()
