@@ -5,7 +5,8 @@ Name: NAMESPACE_BACKFILL_VAR
 Content:
 {"start_date": "2022-10-01",
  "end_date": "2022-10-25",
- "metrics_backfill": "metric_x_last_28_days","metric_x_all_time"}
+ "metrics_backfill": ['metric_x_last_28_days','some_other_metrics','3rd.metrics'] # this is passed as a list of metrics
+}
 """
 
 import os

@@ -224,9 +224,9 @@ def test_get_backfill_filter(namespace_file, test_value, expected_value):
     [
         (None, []),
         ("", []),
-        (" ", [" "]),
-        ("list1", ["list1"]),
-        ("list1,list2", ["list1", "list2"]),
+         ([" "], [" "]),
+        (["list1"], ["list1"]),
+        (["list1", "list2"], ["list1", "list2"]),
     ],
 )
 def test_set_metrics_filter(usage_ping, test_value, expected_value):

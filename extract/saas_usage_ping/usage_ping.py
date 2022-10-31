@@ -409,10 +409,10 @@ class UsagePing:
         # and only if time_window_query == False
 
         namespace_filter = self.get_metrics_filter()
-        logging.info(f"backfilling namespace metrics: {namespace_filter} type: {type(namespace_filter)}")
-
-        for n in namespace_filter:
-            logging.info(f"M: {n}")
+        # logging.info(f"backfilling namespace metrics: {namespace_filter} type: {type(namespace_filter)}")
+        #
+        # for n in namespace_filter:
+        #     logging.info(f"M: {n}")
 
         backfill_filter = get_backfill_filter(namespace_filter)
 
