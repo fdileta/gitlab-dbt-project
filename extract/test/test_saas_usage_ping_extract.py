@@ -224,7 +224,7 @@ def test_get_backfill_filter(namespace_file, test_value, expected_value):
     [
         (None, []),
         ("", []),
-         ([" "], [" "]),
+        ([" "], [" "]),
         (["list1"], ["list1"]),
         (["list1", "list2"], ["list1", "list2"]),
     ],

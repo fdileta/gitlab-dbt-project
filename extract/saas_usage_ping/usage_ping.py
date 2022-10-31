@@ -55,13 +55,9 @@ class UsagePing:
 
     def __init__(self, ping_date=None, namespace_metrics_filter=None):
 
-
-
         self.config_vars = env.copy()
 
-
         self.loader_engine = snowflake_engine_factory(self.config_vars, "LOADER")
-
 
         if ping_date is not None:
             self.end_date = datetime.datetime.strptime(ping_date, "%Y-%m-%d").date()
@@ -393,7 +389,9 @@ class UsagePing:
 
         for query_dict in saas_queries:
             if metrics_filter(query_dict):
-                logging.info(f"    Start backfilling metrics: {query_dict.get('counter_name')}")
+                logging.info(
+                    f"    Start backfilling metrics: {query_dict.get('counter_name')}"
+                )
                 # self.process_namespace_ping(query_dict, connection)
 
         connection.close()
@@ -415,7 +413,6 @@ class UsagePing:
         #     logging.info(f"M: {n}")
 
         backfill_filter = get_backfill_filter(namespace_filter)
-
 
         self.saas_namespace_ping(metrics_filter=backfill_filter)
 
