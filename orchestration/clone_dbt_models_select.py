@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import logging
-import sys
 import json
 import argparse
 from os import environ as env
@@ -8,9 +6,7 @@ from typing import Dict, List
 
 from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
-from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import ProgrammingError
-from typing import Any, Dict, List, Tuple
 from loguru import logger
 from gitlabdata.orchestration_utils import query_executor
 
