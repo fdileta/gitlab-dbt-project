@@ -62,9 +62,11 @@ while start_date <= end_date:
         # don't add a newline at the end of this because it gets added to in the K8sPodOperator arguments
         mailgun_extract_command = (
             f"{clone_and_setup_extraction_cmd} && "
-            f"python mailgun/src/execute_backfill.py load_event_logs --event {e} --start_date {start_date} --end_date "
-            f"{start_date + delta}"
+            f"python mailgun/src/execute_backfill.py load_event_logs --event {e} --start_date "
+            f"{start_date.strftime('%Y-%m-%d %H:%M:%S')} --end_date "
+            f"{(start_date + delta).strftime('%Y-%m-%d %H:%M:%S')}"
         )
+
 
         mailgun_operator = KubernetesPodOperator(
             **gitlab_defaults,
