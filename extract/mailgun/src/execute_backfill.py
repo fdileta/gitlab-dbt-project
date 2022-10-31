@@ -121,8 +121,8 @@ def load_event_logs(event: str, start_date, end_date):
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    real_start_date = datetime.utcfromtimestamp(start_date)
-    real_end_date = datetime.utcfromtimestamp(end_date)
+    real_start_date = datetime.datetime.utcfromtimestamp(start_date)
+    real_end_date = datetime.datetime.utcfromtimestamp(end_date)
 
     info(f"Running {event} for {(real_start_date)} to {(real_end_date)}")
 
