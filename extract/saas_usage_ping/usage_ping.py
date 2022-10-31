@@ -370,9 +370,9 @@ class UsagePing:
             return
         logging.info(f"metric_name: {metric_name}")
 
-        # results = self.get_result(query_dict=query_dict, conn=connection)
-        #
-        # self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
+        results = self.get_result(query_dict=query_dict, conn=connection)
+
+        self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
 
     def saas_namespace_ping(self, metrics_filter=lambda _: True):
         """
