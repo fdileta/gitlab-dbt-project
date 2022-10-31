@@ -47,34 +47,38 @@ events = [
     "delivered",
 ]
 
-for e in events:
-    # don't add a newline at the end of this because it gets added to in the K8sPodOperator arguments
-    mailgun_extract_command = (
-        f"{clone_and_setup_extraction_cmd} && "
-        f"python mailgun/src/execute_backfill.py load_event_logs --event {e} --start_date $START_TIME --end_date "
-        f"$END_TIME"
-    )
+delta = timedelta(hours=12)
 
-    mailgun_operator = KubernetesPodOperator(
-        **gitlab_defaults,
-        image=DATA_IMAGE,
-        task_id=f"mailgun-backfill-extract-{e}",
-        name=f"mailgun-backfill-extract-{e}",
-        secrets=[
-            SNOWFLAKE_ACCOUNT,
-            SNOWFLAKE_LOAD_ROLE,
-            SNOWFLAKE_LOAD_USER,
-            SNOWFLAKE_LOAD_WAREHOUSE,
-            SNOWFLAKE_LOAD_PASSWORD,
-            MAILGUN_API_KEY,
-        ],
-        env_vars={
-            **pod_env_vars,
-            "START_TIME": "{{ execution_date.isoformat() }}",
-            "END_TIME": "{{ yesterday_ds }}",
-        },
-        affinity=get_affinity(False),
-        tolerations=get_toleration(False),
-        arguments=[mailgun_extract_command],
-        dag=dag,
-    )
+while start_date <= end_date:
+
+    for e in events:
+        # don't add a newline at the end of this because it gets added to in the K8sPodOperator arguments
+        mailgun_extract_command = (
+            f"{clone_and_setup_extraction_cmd} && "
+            f"python mailgun/src/execute_backfill.py load_event_logs --event {e} --start_date {start_date} --end_date "
+            f"{end_date}"
+        )
+
+        mailgun_operator = KubernetesPodOperator(
+            **gitlab_defaults,
+            image=DATA_IMAGE,
+            task_id=f"mailgun-backfill-extract-{e}-{str(start_date)}",
+            name=f"mailgun-backfill-extract-{e}-{str(start_date)}",
+            secrets=[
+                SNOWFLAKE_ACCOUNT,
+                SNOWFLAKE_LOAD_ROLE,
+                SNOWFLAKE_LOAD_USER,
+                SNOWFLAKE_LOAD_WAREHOUSE,
+                SNOWFLAKE_LOAD_PASSWORD,
+                MAILGUN_API_KEY,
+            ],
+            env_vars={
+                **pod_env_vars,
+                "START_TIME": "{{ execution_date.isoformat() }}",
+                "END_TIME": "{{ yesterday_ds }}",
+            },
+            affinity=get_affinity(False),
+            tolerations=get_toleration(False),
+            arguments=[mailgun_extract_command],
+            dag=dag,
+        )
