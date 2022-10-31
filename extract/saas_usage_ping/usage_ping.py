@@ -83,7 +83,7 @@ class UsagePing:
         """
         getter for metrics filter
         """
-        return self.metrics_backfill.split(",")
+        return list(self.metrics_backfill.split(","))
 
     def _get_instance_queries(self) -> Dict:
         """
