@@ -35,12 +35,14 @@ default_args = {
     "sla": timedelta(hours=24),
     "sla_miss_callback": slack_failed_task,
     "start_date": datetime(2020, 1, 1),
+
 }
 
 dag = DAG(
     "mailgun_extract_backfill",
     default_args=default_args,
     schedule_interval="0 */12 * * *",
+    concurrency=1
 )
 
 events = [
