@@ -63,7 +63,7 @@ while start_date <= end_date:
         mailgun_extract_command = (
             f"{clone_and_setup_extraction_cmd} && "
             f"python mailgun/src/execute_backfill.py load_event_logs --event {e} --start_date {start_date} --end_date "
-            f"{end_date}"
+            f"{start_date + delta}"
         )
 
         mailgun_operator = KubernetesPodOperator(
