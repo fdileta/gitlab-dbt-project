@@ -62,13 +62,14 @@ class UsagePing:
 
         self.loader_engine = snowflake_engine_factory(self.config_vars, "LOADER")
 
+
         if ping_date is not None:
             self.end_date = datetime.datetime.strptime(ping_date, "%Y-%m-%d").date()
         else:
             self.end_date = datetime.datetime.now().date()
 
         if namespace_metrics_filter is not None:
-            self.metrics_backfill = namespace_metrics_filter
+            self.metrics_backfill = list(namespace_metrics_filter.split(","))
 
         self.start_date_28 = self.end_date - datetime.timedelta(28)
         self.dataframe_api_columns = META_API_COLUMNS
@@ -83,7 +84,7 @@ class UsagePing:
         """
         getter for metrics filter
         """
-        return list(self.metrics_backfill.split(",")) if self.metrics_backfill else []
+        return self.metrics_backfill # list(self.metrics_backfill.split(",")) if self.metrics_backfill else []
 
     def _get_instance_queries(self) -> Dict:
         """
@@ -408,11 +409,10 @@ class UsagePing:
         # and only if time_window_query == False
 
         namespace_filter = self.get_metrics_filter()
-        logging.info(f"namespace_filter: {namespace_filter}")
+        logging.info(f"backfilling namespace metrics: {namespace_filter}")
 
         backfill_filter = get_backfill_filter(namespace_filter)
 
-        logging.info(f"backfill_filter: {backfill_filter}")
 
         self.saas_namespace_ping(metrics_filter=backfill_filter)
 

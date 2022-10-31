@@ -5,7 +5,7 @@ Name: NAMESPACE_BACKFILL_VAR
 Content:
 {"start_date": "2022-10-01",
  "end_date": "2022-10-25",
- "metrics_backfill": ["metric_x_last_28_days", "metric_x_all_time"]}
+ "metrics_backfill": "metric_x_last_28_days","metric_x_all_time"}
 """
 
 import os
@@ -90,14 +90,11 @@ def get_pod_env_var(start: date) -> dict:
     """
     Get pod environment variables
     """
-    run_date = date(year=2022, month=1, day=1)
-
-    run_date_formatted = run_date.isoformat()
 
     metrics = get_param_value(param="metrics_backfill")
 
     pod_env_vars = {
-        "RUN_DATE": run_date_formatted,
+        "RUN_DATE": start.isoformat(),
         "METRICS_BACKFILL": metrics,
         "SNOWFLAKE_SYSADMIN_ROLE": "TRANSFORMER",
         "SNOWFLAKE_LOAD_WAREHOUSE": "USAGE_PING",
@@ -108,7 +105,7 @@ def get_pod_env_var(start: date) -> dict:
     return pod_env_vars
 
 
-def get_date_range(start: datetime, end: datetime) -> list:
+def get_date_range(start: date, end: date) -> list:
     """
     Generate date range for loop to create tasks
     """
@@ -116,7 +113,7 @@ def get_date_range(start: datetime, end: datetime) -> list:
     curr_date = start
 
     while curr_date < end:
-        res.append(curr_date)
+        res.append(curr_date.date())
 
         curr_date += timedelta(days=7)
 
@@ -132,7 +129,7 @@ def get_monday(day: datetime):
     return res
 
 
-def generate_task(run_date: date, metrics: list) -> None:
+def generate_task(run_date: date) -> None:
     """
     Generate tasks for back-filling DAG start from Monday,
     as the original pipeline run on Monday
