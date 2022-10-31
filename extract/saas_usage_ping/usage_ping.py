@@ -84,7 +84,7 @@ class UsagePing:
         """
         getter for metrics filter
         """
-        return self.metrics_backfill.split(",") if self.metrics_backfill else []
+        return self.metrics_backfill if self.metrics_backfill else []
 
     def _get_instance_queries(self) -> Dict:
         """
@@ -393,7 +393,7 @@ class UsagePing:
 
         for query_dict in saas_queries:
             if metrics_filter(query_dict):
-                logging.info(f"query_dict: {query_dict}")
+                logging.info(f"    Start backfilling metrics: {query_dict}")
                 # self.process_namespace_ping(query_dict, connection)
 
         connection.close()
