@@ -352,7 +352,7 @@ class UsagePing:
 
         return res
 
-    def process_namespace_ping(self, query_dict, connection):
+    def process_namespace_ping(self, query_dict, connection) -> None:
         """
         Upload result of namespace ping to Snowflake
         """
@@ -364,11 +364,12 @@ class UsagePing:
                 f"Skipping ping {metric_name} due to no namespace information."
             )
             return
-        logging.info(f"metric_name: {metric_name}")
 
         results = self.get_result(query_dict=query_dict, conn=connection)
 
         self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
+
+        logging.info(f"metric_name loaded: {metric_name}")
 
     def saas_namespace_ping(self, metrics_filter=lambda _: True):
         """
@@ -383,16 +384,18 @@ class UsagePing:
             }
         }
         """
-        saas_queries = self._get_meta_data(NAMESPACE_FILE)
-
         connection = self.loader_engine.connect()
 
-        for query_dict in saas_queries:
-            if metrics_filter(query_dict):
+        namespace_queries = self._get_meta_data(file_name=NAMESPACE_FILE)
+
+        for namespace_query in namespace_queries:
+            if metrics_filter(namespace_query):
                 logging.info(
-                    f"    Start backfilling metrics: {query_dict.get('counter_name')}"
+                    f"Start loading metrics: {namespace_query.get('counter_name')}"
                 )
-                self.process_namespace_ping(query_dict, connection)
+                self.process_namespace_ping(
+                    query_dict=namespace_query, connection=connection
+                )
 
         connection.close()
         self.loader_engine.dispose()
@@ -405,11 +408,11 @@ class UsagePing:
 
         # pick up metrics from the parameter list
         # and only if time_window_query == False
-        namespace_filter = self.get_metrics_filter()
+        namespace_filter_list = self.get_metrics_filter()
 
-        backfill_filter = get_backfill_filter(namespace_filter)
+        namespace_filter = get_backfill_filter(filter_list=namespace_filter_list)
 
-        self.saas_namespace_ping(metrics_filter=backfill_filter)
+        self.saas_namespace_ping(metrics_filter=namespace_filter)
 
 
 if __name__ == "__main__":

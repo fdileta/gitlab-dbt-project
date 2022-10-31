@@ -36,7 +36,6 @@ from kube_secrets import (
 env = os.environ.copy()
 
 DAG_NAME = "saas_usage_ping_backfill"
-GIT_BRANCH = env["GIT_BRANCH"]
 
 BACKFILL_PARAMETERS = Variable.get("NAMESPACE_BACKFILL_VAR", deserialize_json=True)
 
@@ -177,7 +176,13 @@ start_date = get_monday(day=start_date)
 
 end_date = get_date(param="end_date")
 
-dag = DAG(DAG_NAME, default_args=default_args, schedule_interval=None, concurrency=2)
+dag = DAG(
+    DAG_NAME,
+    default_args=default_args,
+    schedule_interval=None,
+    concurrency=2,
+    description="This DAG runs on demand to do a backfill for namespace metrics. In order to have this DAG run properly, the variable NAMESPACE_BACKFILL_VAR should be filled",
+)
 
 for run in get_date_range(start=start_date, end=end_date):
     generate_task(run_date=run)
