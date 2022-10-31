@@ -199,9 +199,9 @@ class DbtModelClone:
                     query_executor(self.engine, output_query)
                     self.grant_table_view_rights("view", output_table_name)
                     logger.info(f"{output_table_name} successfully created. ")
-                except ProgrammingError as p:
+                except ProgrammingError as error:
                     logger.warning(f"Problem processing {output_table_name}")
-                    logger.warning(str(p))
+                    logger.warning(str(error))
 
                 continue
 
@@ -214,9 +214,9 @@ class DbtModelClone:
                 query_executor(self.engine, clone_statement)
                 self.grant_table_view_rights("table", output_table_name)
                 logger.info(f"{output_table_name} successfully created. ")
-            except ProgrammingError as p:
+            except ProgrammingError as error:
                 logger.warning(f"Problem processing {output_table_name}")
-                logger.warning(str(p))
+                logger.warning(str(error))
                 continue
 
 
