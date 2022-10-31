@@ -219,14 +219,28 @@ def test_get_backfill_filter(namespace_file, test_value, expected_value):
             assert namespace.get("counter_name") == test_value
 
 
-def test_set_metrics_filter(usage_ping):
+@pytest.mark.parametrize(
+    "test_value, expected_value",
+    [
+        (None, []),
+        ("", []),
+        (" ", [" "]),
+        ("list1", ["list1"]),
+        ("list1,list2", ["list1", "list2"]),
+    ],
+)
+def test_set_metrics_filter(usage_ping, test_value, expected_value):
     """
     Test setter
     """
-    actual = ["test_list"]
-    usage_ping.set_metrics_filter(usage_ping, actual)
 
-    assert usage_ping.get_metrics_filter(usage_ping) == actual
+    usage_ping.set_metrics_filter(usage_ping, test_value)
+
+    actual = usage_ping.get_metrics_filter(usage_ping)
+
+    assert actual == expected_value
+
+    assert isinstance(actual, list)
 
 
 def test_replace_placeholders(usage_ping):
