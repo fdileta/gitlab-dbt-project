@@ -37,7 +37,8 @@
       total_time_in_ms                                                              AS page_load_time_in_ms,
       page_view_index,
       page_view_in_session_index,
-      referer_url
+      referer_url,
+      page_url
     FROM page_views
 
     {% if is_incremental() %}
