@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import logging
-import sys
 import json
 import argparse
 from os import environ as env
@@ -8,18 +6,16 @@ from typing import Dict, List
 
 from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
-
+from sqlalchemy.exc import ProgrammingError
+from loguru import logger
 from gitlabdata.orchestration_utils import query_executor
 
 from simple_dependency_resolver.simple_dependency_resolver import DependencyResolver
 
 
-# Set logging defaults
-logging.basicConfig(stream=sys.stdout, level=20)
-
-
 class DbtModelClone:
     """"""
+
     def __init__(self, config_vars: Dict):
         self.engine = create_engine(
             URL(
@@ -36,7 +32,7 @@ class DbtModelClone:
         self.branch_name = config_vars["BRANCH_NAME"].upper()
         self.prep_database = f"{self.branch_name}_PREP"
         self.prod_database = f"{self.branch_name}_PROD"
-        self.raw_database =  f"{self.branch_name}_RAW"
+        self.raw_database = f"{self.branch_name}_RAW"
 
     def create_schema(self, schema_name: str):
         """
@@ -44,16 +40,12 @@ class DbtModelClone:
         :param schema_name:
         :return:
         """
-        logging.info("Creating schema if it does not exist")
-
         query = f"""CREATE SCHEMA IF NOT EXISTS {schema_name};"""
         query_executor(self.engine, query)
 
-        logging.info("Granting rights on stage to TRANSFORMER")
         grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO TRANSFORMER;"""
         query_executor(self.engine, grants_query)
 
-        logging.info("Granting rights on stage to GITLAB_CI")
         grants_query = f"""GRANT ALL ON SCHEMA {schema_name} TO GITLAB_CI"""
         query_executor(self.engine, grants_query)
 
@@ -106,40 +98,35 @@ class DbtModelClone:
         :return:
         """
 
-        logging.info(f"Granting rights on {object_type} to TRANSFORMER")
         grants_query = f"""
             GRANT OWNERSHIP ON {object_type.upper()} {object_name.upper()} TO TRANSFORMER REVOKE CURRENT GRANTS
             """
         query_executor(self.engine, grants_query)
 
-        logging.info(f"Granting rights on {object_type} to GITLAB_CI")
         grants_query = (
             f"""GRANT ALL ON {object_type.upper()} {object_name.upper()} TO GITLAB_CI"""
         )
         query_executor(self.engine, grants_query)
 
-    def clean_view_dll(self, dll_input: str) -> str:
+    def clean_view_dll(self, table_name: str, dll_input: str) -> str:
         """
         Essentially, this code is finding and replacing the DB name in only the first line for recreating
         views. This is because we have a database & schema named PREP, which creates a special case in the
         rest of the views they are replaced completely.
 
+        :param table_name:
         :param dll_input:
         :return:
         """
         split_file = dll_input.splitlines()
 
         first_line = split_file[0]
-        find_db_name = (
-            first_line[dll_input.find("view") :]
-            .split(".")[0]
-            .replace("PREP", self.prep_database)
-            .replace("PROD", self.prod_database)
-        )
-        new_first_line = f"{first_line[:dll_input.find('view')]}{find_db_name}{first_line[dll_input.find('.'):]}"
 
+        new_first_line = f"{first_line[:dll_input.find('view')]}view {table_name} ("
         replaced_file = [
-            f.replace("PREP", self.prep_database).replace("PROD", self.prod_database)
+            f.replace('"PREP".', f'"{self.prep_database}".').replace(
+                '"PROD".', f'"{self.prod_database}".'
+            )
             for f in split_file
         ]
         joined_lines = "\n".join(replaced_file[1:])
@@ -161,10 +148,10 @@ class DbtModelClone:
             database_name = i.get("database").upper()
             schema_name = i.get("schema").upper()
             table_name = i.get("name").upper()
-            config = i.get('config')
+            config = i.get("config")
 
             if config:
-                alias = config.get('alias')
+                alias = config.get("alias")
             else:
                 alias = None
 
@@ -176,6 +163,8 @@ class DbtModelClone:
             output_table_name = f""""{self.branch_name}_{full_name[1:]}"""
             output_schema_name = output_table_name.replace(f'."{table_name}"', "")
 
+            logger.info(f"Processing {output_table_name}")
+
             query = f"""
                 SELECT
                     TABLE_TYPE,
@@ -185,33 +174,50 @@ class DbtModelClone:
                 AND TABLE_NAME = UPPER('{table_name}')
             """
             res = query_executor(self.engine, query)
+            try:
+                table_or_view = res[0][0]
+            except IndexError:
+                logger.warning(
+                    f"Table/view {output_table_name} does not exist in PROD yet and must be created with "
+                    f"regular dbt"
+                )
+                continue
 
             self.create_schema(output_schema_name)
 
-            table_or_view = res[0][0]
             if table_or_view == "VIEW":
-                logging.info("Cloning view")
 
-                query = f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
+                query = (
+                    f"""SELECT GET_DDL('VIEW', '{full_name.replace('"', '')}', TRUE)"""
+                )
                 res = query_executor(self.engine, query)
 
                 base_dll = res[0][0]
 
-                output_query = self.clean_view_dll(base_dll)
-                query_executor(self.engine, output_query)
-                logging.info(f"View {full_name} successfully created. ")
-
-                self.grant_table_view_rights("view", output_table_name)
+                output_query = self.clean_view_dll(output_table_name, base_dll)
+                try:
+                    query_executor(self.engine, output_query)
+                    self.grant_table_view_rights("view", output_table_name)
+                    logger.info(f"{output_table_name} successfully created. ")
+                except ProgrammingError as error:
+                    logger.warning(f"Problem processing {output_table_name}")
+                    logger.warning(str(error))
 
                 continue
 
             transient_table = res[0][1]
 
-            clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
-            query_executor(self.engine, clone_statement)
-            logging.info(f"{clone_statement} successfully run. ")
+            try:
 
-            self.grant_table_view_rights("table", output_table_name)
+                clone_statement = f"CREATE OR REPLACE {'TRANSIENT' if transient_table == 'YES' else ''} TABLE {output_table_name} CLONE {full_name} COPY GRANTS;"
+
+                query_executor(self.engine, clone_statement)
+                self.grant_table_view_rights("table", output_table_name)
+                logger.info(f"{output_table_name} successfully created. ")
+            except ProgrammingError as error:
+                logger.warning(f"Problem processing {output_table_name}")
+                logger.warning(str(error))
+                continue
 
 
 if __name__ == "__main__":

@@ -84,7 +84,7 @@ config_dict = {
         "dag_name": "el_gitlab_com",
         "env_vars": {"HOURS": "96"},
         "extract_schedule_interval": "30 2,14 */1 * *",
-        "incremental_backfill_interval": "0 2 * * *",
+        "incremental_backfill_interval": "30 2 * * *",
         "secrets": [
             GITLAB_COM_DB_USER,
             GITLAB_COM_DB_PASS,
@@ -102,7 +102,7 @@ config_dict = {
         "dag_name": "el_gitlab_com_ci",
         "env_vars": {"HOURS": "96"},
         "extract_schedule_interval": "30 2,14 */1 * *",
-        "incremental_backfill_interval": "0 2 * * *",
+        "incremental_backfill_interval": "30 2 * * *",
         "secrets": [
             GITLAB_COM_CI_DB_NAME,
             GITLAB_COM_CI_DB_HOST,

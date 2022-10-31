@@ -78,7 +78,7 @@ config_dict = {
         "dag_name": "t_gitlab_com_db_dbt",
         "dbt_name": "gitlab_dotcom",
         "start_date": datetime(2022, 9, 12),
-        "dbt_schedule_interval": "0 7 * * *",
+        "dbt_schedule_interval": "0 7,19 * * *",
         "task_name": "t_gitlab_dotcom",
         "description": "This DAG does Incremental Refresh gitlab.com source table,run snapshot on source table and DBT test ",
     },
