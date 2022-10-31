@@ -1,5 +1,5 @@
 .snowflake_dbt_jobs: &snowflake_dbt_jobs
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.11
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.14
   stage: ⚙️ dbt Run
   before_script:
     - cd transform/snowflake-dbt/
@@ -187,7 +187,6 @@
     - *deps_and_seed
     - export SNOWFLAKE_PREP_DATABASE="PREP"
     - export SNOWFLAKE_PROD_DATABASE="PROD"
-    - pip install loguru
     - CHANGED_FILES=$(git diff --name-only $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD | xargs -n1 basename | grep '\.sql'  | sed "s/^/$ANCESTOR_TYPE/g" | sed "s/.sql/$DEPENDENT_TYPE/g" )
     - echo $CHANGED_FILES
     - INPUT=$(dbt --quiet ls --models $CHANGED_FILES --output json --output-keys "database schema name depends_on unique_id config" --profiles-dir profile --target prod)
@@ -202,7 +201,6 @@
     - *deps_and_seed
     - export SNOWFLAKE_PREP_DATABASE="PREP"
     - export SNOWFLAKE_PROD_DATABASE="PROD"
-    - pip install loguru
     - echo $DBT_MODELS
     - INPUT=$(dbt --quiet ls --models $DBT_MODELS --output json --output-keys "database schema name depends_on unique_id config" --profiles-dir profile --target prod)
     - /builds/gitlab-data/analytics/orchestration/clone_dbt_models_select.py $INPUT
@@ -257,7 +255,7 @@
 
 .safe_models_check: &safe_models_check
   stage: 🛠 dbt Misc
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.11
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.14
   before_script:
     - cd transform/snowflake-dbt/
     - echo $BRANCH_NAME
@@ -339,7 +337,7 @@
 # ======
 .dbt_sql_lint: &dbt_sql_lint
   stage: 🛠 dbt Misc
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.11
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.14
   before_script:
     - cd transform/snowflake-dbt/
     - echo $BRANCH_NAME
