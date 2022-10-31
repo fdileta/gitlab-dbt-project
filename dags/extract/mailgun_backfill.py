@@ -50,7 +50,7 @@ events = [
 ]
 
 
-start_date = datetime.datetime(2022, 9, 30)
+start_date = datetime(2022, 9, 30)
 end_date = datetime.now()
 
 delta = timedelta(hours=12)
