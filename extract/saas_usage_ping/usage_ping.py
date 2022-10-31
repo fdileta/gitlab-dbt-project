@@ -392,7 +392,7 @@ class UsagePing:
                 logging.info(
                     f"    Start backfilling metrics: {query_dict.get('counter_name')}"
                 )
-                # self.process_namespace_ping(query_dict, connection)
+                self.process_namespace_ping(query_dict, connection)
 
         connection.close()
         self.loader_engine.dispose()
@@ -405,12 +405,7 @@ class UsagePing:
 
         # pick up metrics from the parameter list
         # and only if time_window_query == False
-
         namespace_filter = self.get_metrics_filter()
-        # logging.info(f"backfilling namespace metrics: {namespace_filter} type: {type(namespace_filter)}")
-        #
-        # for n in namespace_filter:
-        #     logging.info(f"M: {n}")
 
         backfill_filter = get_backfill_filter(namespace_filter)
 
