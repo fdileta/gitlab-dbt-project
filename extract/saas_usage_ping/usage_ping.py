@@ -403,9 +403,9 @@ class UsagePing:
         # and only if time_window_query == False
 
         namespace_filter = self.get_metrics_filter()
-
+        logging.info(f"metrics_backfill: {self.metrics_backfill}")
         logging.info(f"namespace_filter: {namespace_filter}")
-
+        logging.info(f"self.config_vars: {str(self.config_vars)}")
         backfill_filter = get_backfill_filter(namespace_filter)
 
         logging.info(f"backfill_filter: {backfill_filter}")

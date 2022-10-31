@@ -136,8 +136,8 @@ def generate_task(run_date: date, metrics: list) -> None:
     Generate tasks for back-filling DAG start from Monday,
     as the original pipeline run on Monday
     """
-    task_id = get_task_name(start=run_date)
-    task_name = get_task_name(start=run_date)
+
+    task_id = task_name = get_task_name(start=run_date)
     env_vars = get_pod_env_var(start=run_date, metrics=metrics)
     command = get_command()
 
