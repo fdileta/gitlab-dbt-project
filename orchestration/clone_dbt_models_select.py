@@ -181,8 +181,10 @@ class DbtModelClone:
             try:
                 table_or_view = res[0][0]
             except IndexError:
-                logger.warning(f"Table/view {output_table_name} does not exist in PROD yet and must be created with "
-                                f"regular dbt")
+                logger.warning(
+                    f"Table/view {output_table_name} does not exist in PROD yet and must be created with "
+                    f"regular dbt"
+                )
                 continue
 
             self.create_schema(output_schema_name)
@@ -220,6 +222,7 @@ class DbtModelClone:
                 logger.warning(f"Problem processing {output_table_name}")
                 logger.warning(str(p))
                 continue
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
