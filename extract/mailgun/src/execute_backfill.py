@@ -97,6 +97,8 @@ def extract_logs(event: str, sdt: datetime.datetime, edt: datetime.datetime) -> 
                     break
 
                 items = data.get("items")
+                first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
+                info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
                 # first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
                 # info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
 
