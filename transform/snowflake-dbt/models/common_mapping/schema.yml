@@ -201,7 +201,7 @@ models:
       - name: gitlab_username
       - name: notification_email
 
-  - name: map_latest_subscrition_namespace_monthly
+  - name: map_latest_subscription_namespace_monthly
     description: '{{ doc("map_latest_subscription_namespace_monthly") }}'
     tests:
       - dbt_utils.unique_combination_of_columns:
