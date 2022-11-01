@@ -41,6 +41,21 @@
       dim_behavior_operating_system.os_timezone
     FROM {{ ref('dim_behavior_operating_system') }}
 
+), dim_behavior_event AS (
+
+    SELECT
+      dim_behavior_event_sk,
+      event,
+      event_name,
+      platform,
+      environment,
+      event_category,
+      event_action,
+      event_label,
+      event_property
+    FROM {{ ref('dim_behavior_event') }}
+    WHERE event = 'struct'
+
 ), structured_events_w_clean_url AS (
 
     SELECT 
@@ -61,17 +76,13 @@
       dim_behavior_operating_system.dim_behavior_operating_system_sk,
       structured_events_w_clean_url.gsc_namespace_id AS dim_namespace_id,
       structured_events_w_clean_url.gsc_project_id AS dim_project_id,
+      dim_behavior_event.dim_behavior_event_sk,
 
       -- Time Attributes
       structured_events_w_clean_url.dvce_created_tstamp,
       structured_events_w_clean_url.derived_tstamp AS behavior_at,
 
       -- Degenerate Dimensions (Event Attributes)
-      structured_events_w_clean_url.event_action,
-      structured_events_w_clean_url.event_category,
-      structured_events_w_clean_url.event_label,
-      structured_events_w_clean_url.event_property,
-      structured_events_w_clean_url.event_value,
       structured_events_w_clean_url.v_tracker,
       structured_events_w_clean_url.session_index,
       structured_events_w_clean_url.app_id,
@@ -105,11 +116,18 @@
     LEFT JOIN dim_behavior_operating_system
       ON structured_events_w_clean_url.os_name = dim_behavior_operating_system.os_name
         AND structured_events_w_clean_url.os_timezone = dim_behavior_operating_system.os_timezone
-    {% if is_incremental() %}
+    LEFT JOIN dim_behavior_event
+      ON structured_events_w_clean_url.event_action = dim_behavior_event.event_action
+        AND structured_events_w_clean_url.event_category = dim_behavior_event.event_category
+        AND structured_events_w_clean_url.event_label = dim_behavior_event.event_label
+        AND structured_events_w_clean_url.event_property = dim_behavior_event.event_property
+        AND structured_events_w_clean_url.gsc_environment = dim_behavior_event.environment
+    WHERE behavior_at::DATE = '2022-10-01'
+    -- {% if is_incremental() %}
 
-    WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
+    -- WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
 
-    {% endif %}
+    -- {% endif %}
 
 )
 
