@@ -57,17 +57,10 @@ def extract_logs(event: str, sdt: datetime.datetime, edt: datetime.datetime) -> 
     all_results: List[Dict] = []
 
     formatted_start_date = utils.format_datetime(sdt)
-    formatted_end_date = utils.format_datetime(edt)
-    info("SDT")
-    info(sdt)
-    info("formatted_start_date")
-    info(formatted_start_date)
     first_timestamp = sdt
     for domain in domains:
 
         while first_timestamp <= edt:
-            info(f"Current first timestamp {first_timestamp}")
-            info(f"Current edt {edt}")
             if page_token:
                 response = requests.get(page_token, auth=("api", api_key))
                 try:
