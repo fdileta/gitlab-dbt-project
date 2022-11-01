@@ -73,7 +73,11 @@ There is a separate backfill `DAG` that allows back filling service pings for th
 The process backfills by filtering the queries to only those that query over a specific timeframe defined in the `NAMESPACE_BACKFILL_VAR` variable in the `Airflow`,
 and then passing in the month it is backfilling for as the timeframe.
 
-The example how `NAMESPACE_BACKFILL_VAR` looks like:
+#### Namespace backfill
+
+In order to backfill particular metric (or set of them), need to add `NAMESPACE_BACKFILL_VAR` in the `Airflow`.
+
+The example how variable `NAMESPACE_BACKFILL_VAR` should look like:
 ```json
 {
  "start_date": "2022-10-01",
@@ -82,4 +86,8 @@ The example how `NAMESPACE_BACKFILL_VAR` looks like:
 }
 ```
 
+The `saas_usage_ping_backfill`  `DAG` will backfill data for the metrics where the following conditions are applied: 
+* For the defined period (`start_date` and `end_date` value from `NAMESPACE_BACKFILL_VAR` variable)
+* `"time_window_query": true`
+* Metrics is in the value `metrics_backfill` in the variable `NAMESPACE_BACKFILL_VAR`
 

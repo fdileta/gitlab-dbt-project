@@ -37,6 +37,12 @@ env = os.environ.copy()
 
 DAG_NAME = "saas_usage_ping_backfill"
 
+DAG_DESCRIPTION = (
+    "This DAG runs on demand to do a backfill "
+    "for namespace metrics. "
+    "In order to have this DAG run properly, "
+    "the variable NAMESPACE_BACKFILL_VAR should be filled"
+)
 BACKFILL_PARAMETERS = Variable.get("NAMESPACE_BACKFILL_VAR", deserialize_json=True)
 
 secrets = [
@@ -71,7 +77,7 @@ def get_command():
     return cmd
 
 
-def date_to_str(input_date: date):
+def date_to_str(input_date: date) -> str:
     """
     Convert date to string to assign it to DAG name
     """
@@ -176,12 +182,13 @@ start_date = get_monday(day=start_date)
 
 end_date = get_date(param="end_date")
 
+
 dag = DAG(
     DAG_NAME,
     default_args=default_args,
     schedule_interval=None,
     concurrency=2,
-    description="This DAG runs on demand to do a backfill for namespace metrics. In order to have this DAG run properly, the variable NAMESPACE_BACKFILL_VAR should be filled",
+    description=DAG_DESCRIPTION,
 )
 
 for run in get_date_range(start=start_date, end=end_date):

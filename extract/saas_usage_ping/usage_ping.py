@@ -360,7 +360,7 @@ class UsagePing:
         Upload result of namespace ping to Snowflake
         """
 
-        metric_name, metric_query, _  = self.get_prepared_values(query=query_dict)
+        metric_name, metric_query, _ = self.get_prepared_values(query=query_dict)
 
         if "namespace_ultimate_parent_id" not in metric_query:
             logging.info(
