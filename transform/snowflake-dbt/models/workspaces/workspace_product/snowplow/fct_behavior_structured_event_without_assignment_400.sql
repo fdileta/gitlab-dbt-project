@@ -5,7 +5,7 @@
     post_hook=["{{ rolling_window_delete('behavior_at','day',400) }}"]        
 ) }}
 
-WITH source_190 AS (
+WITH source_400 AS (
 
   SELECT
     {{ 
@@ -28,7 +28,7 @@ WITH source_190 AS (
 )
 
 {{ dbt_audit(
-    cte_ref="source_190",
+    cte_ref="source_400",
     created_by="@chrissharp",
     updated_by="@chrissharp",
     created_date="2022-11-01",
