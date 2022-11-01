@@ -78,7 +78,7 @@ WITH date_details AS (
         raw.pubsec_type__c          AS pubsec_type,
         raw.potential_arr_lam__c    AS potential_lam_arr
     --FROM prod.restricted_safe_common_mart_sales.mart_crm_account acc
-    FROM {{ref('mart_crm_account')}}
+    FROM {{ref('mart_crm_account')}} acc
     LEFT JOIN raw_account raw
       ON raw.id = acc.dim_crm_account_id
     

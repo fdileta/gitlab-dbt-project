@@ -32,7 +32,7 @@ WITH report_metrics_summary_account_year AS (
       MAX(zi_developers)            AS zi_developers,
       MAX(zi_revenue)               AS zi_revenue,
       MAX(employees)                AS employees,
-      MAX(lam_dev_count)  AS lam_dev_count,
+      MAX(upa_lam_dev_count)        AS lam_dev_count,
 
       SUM(has_technical_account_manager_flag) AS count_technical_account_managers,
 
