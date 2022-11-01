@@ -57,7 +57,7 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
     all_results: List[Dict] = []
 
     formatted_date = utils.format_datetime(start_date)
-
+    info(formatted_date)
     for domain in domains:
 
         while True:
