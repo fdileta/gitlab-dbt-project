@@ -135,7 +135,7 @@
 {{ dbt_audit(
     cte_ref="structured_events_w_dim",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@chrissharp",
     created_date="2022-09-01",
-    updated_date="2022-10-12"
+    updated_date="2022-11-01"
 ) }}
