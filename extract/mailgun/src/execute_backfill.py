@@ -82,11 +82,8 @@ def extract_logs(event: str, sdt: datetime.datetime, edt: datetime.datetime) -> 
                 if len(items) == 0:
                     break
 
-                first_timestamp = items[0].get("timestamp")
-                str_stamp = datetime.datetime.fromtimestamp(first_timestamp).strftime(
-                    "%d-%m-%Y %H:%M:%S.%f"
-                )
-                info(f"Processed data starting on {str_stamp}")
+                first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
+                info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
 
                 all_results = all_results[:] + items[:]
 
@@ -100,11 +97,8 @@ def extract_logs(event: str, sdt: datetime.datetime, edt: datetime.datetime) -> 
                     break
 
                 items = data.get("items")
-                first_timestamp = items[0].get("timestamp")
-                str_stamp = datetime.datetime.fromtimestamp(first_timestamp).strftime(
-                        "%d-%m-%Y %H:%M:%S.%f"
-                )
-                info(f"Processed data starting on {str_stamp}")
+                # first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
+                # info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
 
                 if items is None:
                     break
