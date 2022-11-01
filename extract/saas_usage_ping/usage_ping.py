@@ -309,9 +309,12 @@ class UsagePing:
         """
         Prepare variables for query
         """
+
+        name = query.get("counter_name", "Missing Name")
+
         sql_raw = str(query.get("counter_query"))
         prepared_sql = self.replace_placeholders(sql_raw)
-        name = query.get("counter_name", "Missing Name")
+
         level = query.get("level")
 
         return name, prepared_sql, level
