@@ -11,9 +11,9 @@
             }
         %}
 
-        {% set day_of_month = run_started_at.strftime("%d") %}
+        {% set today = run_started_at.strftime("%Y_%m_%d") %}
         
-        {{ log('Backing up for Day ' ~ day_of_month, info = true) }}
+        {{ log('Backing up for ' ~ today, info = true) }}
 
         {% for database, schemas in backups.items() %}
         
@@ -27,7 +27,7 @@
                     {% if ((table.name in TABLE_LIST_BACKUP and INCLUDED == True) or (table.name not in TABLE_LIST_BACKUP and INCLUDED == False)) %}
 
                         {{ log('Backing up ' ~ table.name ~ '...', info = true) }}
-                        {% set backup_table_command = get_backup_table_command(table, day_of_month) %}
+                        {% set backup_table_command = get_backup_table_command(table, today) %}
                         {{ backup_table_command }}
 
                     {% endif %}

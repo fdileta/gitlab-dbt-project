@@ -14,6 +14,7 @@ from gitlabdata.orchestration_utils import (
     bizible_snowflake_engine_factory,
 )
 
+
 class BizibleSnowFlakeExtractor:
     def __init__(self, config_dict: Dict):
         """

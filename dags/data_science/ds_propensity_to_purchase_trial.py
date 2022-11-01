@@ -35,8 +35,8 @@ default_args = {
     "depends_on_past": False,
     "on_failure_callback": slack_failed_task,
     "owner": "airflow",
-    "retries": 0,
-    "retry_delay": timedelta(minutes=1),
+    "retries": 2,
+    "retry_delay": timedelta(minutes=10),
     "start_date": datetime(2022, 8, 9),
     "dagrun_timeout": timedelta(hours=2),
 }
@@ -65,17 +65,17 @@ clone_data_science_ptp_repo_cmd = f"""
     cd .."""
 
 # Create the DAG
-# Run Every Monday
+# Run Every Day
 dag = DAG(
     "ds_propensity_to_purchase_trial",
     default_args=default_args,
-    schedule_interval="0 5 * * 1",
+    schedule_interval="0 5 * * *",
 )
 
 # Task 1
 ptpt_scoring_command = f"""
     {clone_data_science_ptp_repo_cmd} &&
-    cd propensity-to-purchase/prod &&
+    cd propensity-to-purchase/prod/saas-trials &&
     papermill scoring_code.ipynb -p is_local_development False
 """
 KubernetesPodOperator(

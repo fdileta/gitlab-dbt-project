@@ -38,30 +38,12 @@ models:
           - unique
           - not_null
 
-  - name: wk_fct_ping_instance_metric_gainsight_wave_monthly
+  - name: wk_pump_gainsight_metrics_monthly_paid
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - snapshot_month
             - dim_subscription_id_original
-            - dim_instance_id
-            - hostname
-
-  - name: wk_fct_saas_gainsight_metrics_monthly
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - snapshot_month
-            - dim_subscription_id_original
-            - dim_namespace_id
-
-  - name: wk_rpt_gainsight_metrics_monthly_paid
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - snapshot_month
-            - dim_subscription_id_original
-            - delivery_type
             - uuid
             - hostname
             - dim_namespace_id

@@ -17,6 +17,7 @@ WITH base AS (--NOTE: ONLY add columns to the END of the final query per PMG
                     a.account_demographics_region         AS region,
                     a.sales_segment                       AS sales_segmentation,
                     inquiry_datetime                      AS inquiry_datetime,
+                    true_mql_date                         AS true_mql_date,
                     marketo_qualified_lead_date           AS marketo_qualified_lead_date,
                     mql_datetime_inferred                 AS mql_datetime_inferred,
                     accepted_datetime                     AS accepted_datetime,
@@ -75,7 +76,7 @@ WITH base AS (--NOTE: ONLY add columns to the END of the final query per PMG
       IFNULL(ca.last_utm_campaign, l.last_utm_campaign)                                 AS person_last_utm_campaign,
       IFNULL(ca.last_utm_content, l.last_utm_content)                                   AS person_last_utm_content,
       IFNULL(ca.inquiry_datetime, l.inquiry_datetime)::DATE                             AS person_inquiry_datetime,
-      IFNULL(ca.marketo_qualified_lead_date, ca.marketo_qualified_lead_date)::DATE      AS person_mql_datetime,
+      IFNULL(ca.true_mql_date, l.true_mql_date)::DATE                                  AS person_mql_datetime,
       IFNULL(ca.mql_datetime_inferred, l.mql_datetime_inferred)::DATE                   AS person_mql_datetime_inferred,
       IFNULL(ca.accepted_datetime, l.accepted_datetime)::DATE                           AS person_accepted_datetime
     FROM {{ ref('sfdc_bizible_person') }} bp

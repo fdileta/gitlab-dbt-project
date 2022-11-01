@@ -24,6 +24,9 @@ from kube_secrets import (
     SALT_NAME,
     SALT_PASSWORD,
     SNOWFLAKE_ACCOUNT,
+    SNOWFLAKE_LOAD_USER,
+    SNOWFLAKE_LOAD_PASSWORD,
+    SNOWFLAKE_LOAD_ROLE,
     SNOWFLAKE_PASSWORD,
     SNOWFLAKE_TRANSFORM_ROLE,
     SNOWFLAKE_TRANSFORM_SCHEMA,
@@ -46,6 +49,9 @@ dbt_secrets = [
     SALT_NAME,
     SALT_PASSWORD,
     SNOWFLAKE_ACCOUNT,
+    SNOWFLAKE_LOAD_USER,
+    SNOWFLAKE_LOAD_PASSWORD,
+    SNOWFLAKE_LOAD_ROLE,
     SNOWFLAKE_PASSWORD,
     SNOWFLAKE_TRANSFORM_ROLE,
     SNOWFLAKE_TRANSFORM_SCHEMA,
@@ -56,7 +62,9 @@ dbt_secrets = [
 ]
 
 
-# Dictionary containing the configuration values for the various Postgres DBs for which we need to run DBT snapshots, De dupe model and DBT test on source and model.
+# Dictionary containing the configuration values for the various Postgres
+# DBs for which we need to run DBT snapshots,
+# De dupe model and DBT test on source and model.
 config_dict = {
     "t_gitlab_customers_db": {
         "dag_name": "t_gitlab_customers_db_dbt",
@@ -70,7 +78,7 @@ config_dict = {
         "dag_name": "t_gitlab_com_db_dbt",
         "dbt_name": "gitlab_dotcom",
         "start_date": datetime(2022, 9, 12),
-        "dbt_schedule_interval": "0 7 * * *",
+        "dbt_schedule_interval": "0 7,19 * * *",
         "task_name": "t_gitlab_dotcom",
         "description": "This DAG does Incremental Refresh gitlab.com source table,run snapshot on source table and DBT test ",
     },

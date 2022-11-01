@@ -13,12 +13,13 @@
     ('dim_crm_user','dim_crm_user')
 ]) }}
 
-, final AS (
+, joined AS (
 
     SELECT
       -- touchpoint info
       dim_crm_touchpoint.dim_crm_touchpoint_id,
       dim_crm_touchpoint.bizible_touchpoint_date,
+      dim_crm_touchpoint.bizible_touchpoint_month,
       dim_crm_touchpoint.bizible_touchpoint_position,
       dim_crm_touchpoint.bizible_touchpoint_source,
       dim_crm_touchpoint.bizible_touchpoint_source_type,
@@ -40,7 +41,9 @@
       dim_crm_touchpoint.touchpoint_segment,
       dim_crm_touchpoint.gtm_motion,
       dim_crm_touchpoint.integrated_campaign_grouping,
-      dim_crm_touchpoint.utm_content,
+      dim_crm_touchpoint.pipe_name,
+      dim_crm_touchpoint.is_dg_influenced,
+      dim_crm_touchpoint.is_dg_sourced,
       fct_crm_touchpoint.bizible_count_first_touch,
       fct_crm_touchpoint.bizible_count_lead_creation_touch,
       fct_crm_touchpoint.bizible_count_u_shaped,
@@ -77,6 +80,11 @@
       fct_crm_person.mql_count,
       fct_crm_person.last_utm_content,
       fct_crm_person.last_utm_campaign,
+      fct_crm_person.true_inquiry_date,
+      dim_crm_person.account_demographics_sales_segment,
+      dim_crm_person.account_demographics_geo,
+      dim_crm_person.account_demographics_region,
+      dim_crm_person.account_demographics_area,
 
       -- campaign info
       dim_campaign.dim_campaign_id,
@@ -133,6 +141,8 @@
       dim_crm_user.crm_user_geo                            AS touchpoint_crm_user_geo_name_live,
       dim_crm_user.crm_user_region                         AS touchpoint_crm_user_region_name_live,
       dim_crm_user.crm_user_area                           AS touchpoint_crm_user_area_name_live,
+      dim_crm_user.sdr_sales_segment,
+      dim_crm_user.sdr_region,
 
       -- campaign owner info
       campaign_owner.user_name                             AS campaign_rep_name,
@@ -183,14 +193,58 @@
 
       -- bizible influenced
        CASE
-        WHEN  dim_campaign.budget_holder = 'fmm'
+        WHEN dim_campaign.budget_holder = 'fmm'
               OR campaign_rep_role_name = 'Field Marketing Manager'
               OR LOWER(dim_crm_touchpoint.utm_content) LIKE '%field%'
               OR LOWER(dim_campaign.type) = 'field event'
               OR LOWER(dim_crm_person.lead_source) = 'field event'
-        THEN 1
+          THEN 1
         ELSE 0
-      END AS is_fmm_influenced
+      END AS is_fmm_influenced,
+      CASE
+        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%FT%' 
+          AND is_fmm_influenced = 1 
+          THEN 1
+        ELSE 0
+      END AS is_fmm_sourced,
+
+    -- counts
+     CASE
+        WHEN dim_crm_touchpoint.bizible_touchpoint_position LIKE '%LC%' 
+          AND dim_crm_touchpoint.bizible_touchpoint_position NOT LIKE '%PostLC%' 
+          THEN 1
+        ELSE 0
+      END AS count_inquiry,
+      CASE
+        WHEN fct_crm_person.true_inquiry_date >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN 1
+        ELSE 0
+      END AS count_true_inquiry,
+      CASE
+        WHEN fct_crm_person.mql_date_first >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN 1
+        ELSE 0
+      END AS count_mql,
+      CASE
+        WHEN fct_crm_person.mql_date_first >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN fct_crm_touchpoint.bizible_count_lead_creation_touch
+        ELSE 0
+      END AS count_net_new_mql,
+      CASE
+        WHEN fct_crm_person.accepted_date >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN 1
+        ELSE '0'
+      END AS count_accepted,
+      CASE
+        WHEN fct_crm_person.accepted_date >= dim_crm_touchpoint.bizible_touchpoint_date 
+          THEN fct_crm_touchpoint.bizible_count_lead_creation_touch
+        ELSE 0
+      END AS count_net_new_accepted,
+
+      CASE 
+        WHEN count_mql=1 THEN dim_crm_person.sfdc_record_id
+        ELSE NULL
+      END AS mql_crm_person_id
 
     FROM fct_crm_touchpoint
     LEFT JOIN dim_crm_touchpoint
@@ -210,13 +264,70 @@
     LEFT JOIN dim_crm_user
       ON fct_crm_touchpoint.dim_crm_user_id = dim_crm_user.dim_crm_user_id
 
+), count_of_pre_mql_tps AS (
+
+    SELECT DISTINCT
+      joined.email_hash,
+      COUNT(DISTINCT joined.dim_crm_touchpoint_id) AS pre_mql_touches
+    FROM joined
+    WHERE joined.mql_date_first IS NOT NULL
+      AND joined.bizible_touchpoint_date <= joined.mql_date_first
+    GROUP BY 1
+
+), pre_mql_tps_by_person AS (
+
+    SELECT
+      count_of_pre_mql_tps.email_hash,
+      count_of_pre_mql_tps.pre_mql_touches,
+      1/count_of_pre_mql_tps.pre_mql_touches AS pre_mql_weight
+    FROM count_of_pre_mql_tps
+    GROUP BY 1,2
+
+), pre_mql_tps AS (
+
+    SELECT
+      joined.dim_crm_touchpoint_id,
+      pre_mql_tps_by_person.pre_mql_weight
+    FROM pre_mql_tps_by_person
+    LEFT JOIN joined 
+      ON pre_mql_tps_by_person.email_hash=joined.email_hash
+    WHERE joined.mql_date_first IS NOT NULL
+      AND joined.bizible_touchpoint_date <= joined.mql_date_first
+
+), post_mql_tps AS (
+
+    SELECT
+      joined.dim_crm_touchpoint_id,
+      0 AS pre_mql_weight
+    FROM joined
+    WHERE joined.bizible_touchpoint_date > joined.mql_date_first
+      OR joined.mql_date_first IS null
+
+), mql_weighted_tps AS (
+
+    SELECT *
+    FROM pre_mql_tps
+
+    UNION ALL
+
+    SELECT *
+    FROM post_mql_tps
+
+),final AS (
+
+  SELECT 
+    joined.*,
+    mql_weighted_tps.pre_mql_weight
+  FROM joined
+  LEFT JOIN mql_weighted_tps 
+    ON joined.dim_crm_touchpoint_id=mql_weighted_tps.dim_crm_touchpoint_id
 
 )
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2021-02-18",
-    updated_date="2022-05-06"
+    updated_date="2022-10-05"
 ) }}
