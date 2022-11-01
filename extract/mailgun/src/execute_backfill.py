@@ -64,56 +64,56 @@ def extract_logs(event: str, sdt: datetime.datetime, edt: datetime.datetime) -> 
     info(formatted_start_date)
     for domain in domains:
         first_timestamp = sdt
-        while True:
-            while first_timestamp < edt:
-                if page_token:
-                    response = requests.get(page_token, auth=("api", api_key))
-                    try:
-                        data = response.json()
-                    except json.decoder.JSONDecodeError:
-                        error("No response received")
-                        break
 
-                    items = data.get("items")
-
-                    if items is None:
-                        break
-
-                    if len(items) == 0:
-                        break
-
-                    first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
-                    info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
-
-                    all_results = all_results[:] + items[:]
-
-                else:
-                    response = get_logs(domain, event, formatted_start_date)
-
-                    try:
-                        data = response.json()
-                    except json.decoder.JSONDecodeError:
-                        error("No response received")
-                        break
-
-                    items = data.get("items")
-                    first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
-                    info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
-                    # first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
-                    # info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
-
-                    if items is None:
-                        break
-
-                    if len(items) == 0:
-                        break
-
-                    all_results = all_results[:] + items[:]
-
-                page_token = data.get("paging").get("next")
-
-                if not page_token:
+        while first_timestamp <= edt:
+            info(f"Current first timestamp {first_timestamp}")
+            info(f"Current edt {edt}")
+            if page_token:
+                response = requests.get(page_token, auth=("api", api_key))
+                try:
+                    data = response.json()
+                except json.decoder.JSONDecodeError:
+                    error("No response received")
                     break
+
+                items = data.get("items")
+
+                if items is None:
+                    break
+
+                if len(items) == 0:
+                    break
+
+                first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
+                info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
+
+                all_results = all_results[:] + items[:]
+
+            else:
+                response = get_logs(domain, event, formatted_start_date)
+
+                try:
+                    data = response.json()
+                except json.decoder.JSONDecodeError:
+                    error("No response received")
+                    break
+
+                items = data.get("items")
+                first_timestamp = datetime.datetime.fromtimestamp(items[0].get("timestamp"))
+                info(f"Processed data starting on {first_timestamp.strftime('%d-%m-%Y %H:%M:%S.%f')}")
+
+                if items is None:
+                    break
+
+                if len(items) == 0:
+                    break
+
+                all_results = all_results[:] + items[:]
+
+            page_token = data.get("paging").get("next")
+
+            if not page_token:
+                break
 
     return all_results
 
