@@ -360,6 +360,7 @@ class UsagePing:
         metric_name, _, metric_query = self.get_prepared_values(query=query_dict)
 
         if "namespace_ultimate_parent_id" not in metric_query:
+            logging.info(f"{metric_query}")
             logging.info(
                 f"Skipping ping {metric_name} due to no namespace information."
             )

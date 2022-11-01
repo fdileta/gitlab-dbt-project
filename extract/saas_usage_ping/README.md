@@ -70,6 +70,16 @@ graph TD;
 
 There is also a process in place to recreate SaaS service pings from the past.
 There is a separate backfill `DAG` that allows back filling service pings for the last `12` months.
-The process backfills by filtering the queries to only those that query over a specific timeframe, and then passing in the month it is backfilling for as the timeframe.
-As a future iteration, we may add the ability to backfill metrics that do not query just over a specific timeframe _(all-time metrics)_.
+The process backfills by filtering the queries to only those that query over a specific timeframe defined in the `NAMESPACE_BACKFILL_VAR` variable in the `Airflow`,
+and then passing in the month it is backfilling for as the timeframe.
+
+The example how `NAMESPACE_BACKFILL_VAR` looks like:
+```json
+{
+ "start_date": "2022-10-01",
+ "end_date": "2022-11-25",
+ "metrics_backfill": "['usage_activity_by_stage_monthly.manage.project_imports.git','usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations','usage_activity_by_stage_monthly.manage.audit_event_destinations','counts.boards']"
+}
+```
+
 
