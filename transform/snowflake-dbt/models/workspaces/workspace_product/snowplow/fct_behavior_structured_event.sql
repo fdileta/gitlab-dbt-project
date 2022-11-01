@@ -62,6 +62,7 @@
       prep_snowplow_structured_event_all_source.*,
       {{ clean_url('prep_snowplow_structured_event_all_source.page_url_path') }}  AS clean_url_path
     FROM prep_snowplow_structured_event_all_source
+    WHERE derived_tstamp > DATEADD(MONTH, -25, CURRENT_DATE)
 
 ), structured_events_w_dim AS (
 
