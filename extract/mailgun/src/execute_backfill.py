@@ -63,9 +63,9 @@ def extract_logs(event: str, sdt: datetime.datetime, edt: datetime.datetime) -> 
     info("formatted_start_date")
     info(formatted_start_date)
     for domain in domains:
-        first_timestamp = formatted_start_date
+        first_timestamp = sdt
 
-        while first_timestamp < formatted_end_date:
+        while first_timestamp < edt:
             if page_token:
                 response = requests.get(page_token, auth=("api", api_key))
                 try:
