@@ -17,7 +17,6 @@ if __name__ == "__main__":
     NIGHTLY_PIPELINE_SCHEDULE = 47406
     GITLAB_COM_API_BASE_URL = "https://gitlab.com/api/v4"
     UPDATE_TESTS_METADATA_JOB_NAME = "update-tests-metadata"
-    RSPEC_FLAKY_REPORT_ARTIFACT = "rspec_flaky/report-suite.json"
     RSPEC_FLAKY_REPORT_URL = (
         "https://gitlab-org.gitlab.io/gitlab/rspec/flaky/report-suite.json"
     )
