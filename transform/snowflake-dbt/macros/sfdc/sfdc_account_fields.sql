@@ -132,7 +132,7 @@ WITH map_merged_crm_account AS (
       zoom_info_parent_company_name,
       zoom_info_ultimate_parent_company_zi_id,
       zoom_info_ultimate_parent_company_name,
-      zoom_info_total_funding,
+      zoom_info_total_funding
     FROM sfdc_account
     WHERE account_id = ultimate_parent_account_id
 
