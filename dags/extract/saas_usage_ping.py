@@ -1,5 +1,10 @@
+"""
+saas_usage_ping.py is responsible for orchestrating:
+- usage ping combined metrics (sql + redis)
+- usage ping namespace
+"""
+
 import logging
-import os
 from datetime import datetime, timedelta
 
 from airflow import DAG
@@ -20,9 +25,6 @@ from kube_secrets import (
     SNOWFLAKE_USER,
     GITLAB_ANALYTICS_PRIVATE_TOKEN,
 )
-
-# Load the env vars into a dict and set env vars
-env = os.environ.copy()
 
 # tomorrow_ds -  the day after the execution date as YYYY-MM-DD
 # ds - the execution date as YYYY-MM-DD
@@ -62,40 +64,24 @@ default_args = {
 dag = DAG("saas_usage_ping", default_args=default_args, schedule_interval="0 7 * * 1")
 
 # Instance Level Usage Ping
-instance_cmd = f"""
+instance_combined_metrics_cmd = f"""
     {clone_repo_cmd} &&
     cd analytics/extract/saas_usage_ping/ &&
     python3 transform_postgres_to_snowflake.py &&
-    python3 usage_ping.py saas_instance_ping
+    python3 usage_ping.py saas_instance_combined_metrics
 """
 
-instance_redis_metrics_cmd = f"""
-    {clone_repo_cmd} &&
-    cd analytics/extract/saas_usage_ping/ &&
-    python3 usage_ping.py saas_instance_redis_metrics
-"""
-
-instance_ping = KubernetesPodOperator(
+instance_combined_metrics_ping = KubernetesPodOperator(
     **gitlab_defaults,
     image=DATA_IMAGE,
-    task_id="saas-instance-usage-ping-sql-metrics",
-    name="saas-instance-usage-ping-sql-metrics",
+    task_id="saas-instance-usage-ping-combined-metrics",
+    name="saas-instance-usage-ping-combined-metrics",
     secrets=secrets,
     env_vars=pod_env_vars,
-    arguments=[instance_cmd],
+    arguments=[instance_combined_metrics_cmd],
     dag=dag,
 )
 
-instance_redis_metrics = KubernetesPodOperator(
-    **gitlab_defaults,
-    image=DATA_IMAGE,
-    task_id="saas-instance-usage-ping-redis-metrics",
-    name="saas-instance-usage-ping-redis-metrics",
-    secrets=secrets,
-    env_vars=pod_env_vars,
-    arguments=[instance_redis_metrics_cmd],
-    dag=dag,
-)
 # Namespace, Group, Project, User Level Usage Ping
 namespace_cmd = f"""
     {clone_repo_cmd} &&
@@ -113,3 +99,5 @@ namespace_ping = KubernetesPodOperator(
     arguments=[namespace_cmd],
     dag=dag,
 )
+
+[instance_combined_metrics_ping, namespace_ping]
