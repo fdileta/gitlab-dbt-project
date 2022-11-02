@@ -33,7 +33,7 @@
 
     {% endif %}
 
-    {{ dbt_utils.group_by(n=11) }}
+    {{ dbt_utils.group_by(n=10) }}
 
 ), referer_url AS (
 
@@ -60,7 +60,7 @@
 
     {% endif %}
 
-    {{ dbt_utils.group_by(n=11) }}
+    {{ dbt_utils.group_by(n=10) }}
 
 ), page AS (
 
