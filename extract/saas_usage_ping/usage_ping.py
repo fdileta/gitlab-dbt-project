@@ -42,7 +42,7 @@ def get_backfill_filter(filter_list: list):
     """
 
     return (
-        lambda namespace: namespace.get("time_window_query", False)
+        lambda namespace: namespace.get("time_window_query")
         and namespace.get("counter_name") in filter_list
     )
 
@@ -66,6 +66,8 @@ class UsagePing:
 
         if namespace_metrics_filter is not None:
             self.metrics_backfill = namespace_metrics_filter
+        else:
+            self.metrics_backfill = []
 
         self.start_date_28 = self.end_date - datetime.timedelta(28)
         self.dataframe_api_columns = META_API_COLUMNS
@@ -80,7 +82,7 @@ class UsagePing:
         """
         getter for metrics filter
         """
-        return self.metrics_backfill if self.metrics_backfill else []
+        return self.metrics_backfill
 
     def _get_instance_queries(self) -> Dict:
         """
@@ -188,8 +190,8 @@ class UsagePing:
                     data_to_write = int(query_output.loc[0, "counter_value"])
                 except (KeyError, ValueError):
                     data_to_write = 0
-                except SQLAlchemyError as err:
-                    error_data_to_write = str(err.__dict__["orig"])
+                except SQLAlchemyError as e:
+                    error_data_to_write = str(e.__dict__["orig"])
 
                 if data_to_write is not None:
                     results[key] = data_to_write
@@ -299,11 +301,13 @@ class UsagePing:
         Input: "SELECT 1 FROM TABLE WHERE created_at BETWEEN between_start_date AND between_end_date"
         Output: "SELECT 1 FROM TABLE WHERE created_at BETWEEN '2022-01-01' AND '2022-01-28'"
         """
-        res = sql
-        res = res.replace("between_end_date", f"'{str(self.end_date)}'")
-        res = res.replace("between_start_date", f"'{str(self.start_date_28)}'")
+        base_query = sql
+        base_query = base_query.replace("between_end_date", f"'{str(self.end_date)}'")
+        base_query = base_query.replace(
+            "between_start_date", f"'{str(self.start_date_28)}'"
+        )
 
-        return res
+        return base_query
 
     def get_prepared_values(self, query: dict) -> tuple:
         """
@@ -340,8 +344,8 @@ class UsagePing:
             # Expecting [id, namespace_ultimate_parent_id, counter_value]
             res = pd.read_sql(sql=sql, con=conn)
             error = "Success"
-        except SQLAlchemyError as err:
-            error = str(err.__dict__["orig"])
+        except SQLAlchemyError as e:
+            error = str(e.__dict__["orig"])
             res = pd.DataFrame(
                 columns=["id", "namespace_ultimate_parent_id", "counter_value"]
             )

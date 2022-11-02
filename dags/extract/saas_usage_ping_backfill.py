@@ -60,7 +60,7 @@ default_args = {
     "on_failure_callback": slack_failed_task,
     "owner": "airflow",
     "retries": 0,
-    "start_date": datetime(2019, 1, 1, 0, 0, 0),
+    "start_date": datetime(2019, 1, 1),
 }
 
 
@@ -168,19 +168,19 @@ def get_param_value(param: str) -> str:
     return res
 
 
-def get_date(param: str) -> datetime:
+def get_date(date_param: str) -> datetime:
     """
     Get starting date (Monday in this case)
     """
-    res = get_param_value(param=param)
+    res = get_param_value(param=date_param)
 
     return datetime.strptime(res, "%Y-%m-%d")
 
 
-start_date = get_date(param="start_date")
+start_date = get_date(date_param="start_date")
 start_date = get_monday(day=start_date)
 
-end_date = get_date(param="end_date")
+end_date = get_date(date_param="end_date")
 
 
 dag = DAG(

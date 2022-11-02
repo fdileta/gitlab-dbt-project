@@ -88,6 +88,23 @@ The example how variable `NAMESPACE_BACKFILL_VAR` should look like:
 
 The `saas_usage_ping_backfill`  `DAG` will backfill data for the metrics where the following conditions are applied: 
 * For the defined period (`start_date` and `end_date` value from `NAMESPACE_BACKFILL_VAR` variable)
-* `"time_window_query": true`
-* Metrics is in the value `metrics_backfill` in the variable `NAMESPACE_BACKFILL_VAR`
+* `"time_window_query": true` - `time_window_query` variable. This variable is stored in the `.json` file `usage_ping_namespace_queries.json` and predefined along with other metrics details. One example for namespace metrics definition is:
+    ```json{
+     ...
+     "counter_name": "counts.operations_dashboard_users_with_projects_added",
+     "counter_query": "SELECT 1",
+     "time_window_query": false,
+     "level": "namespace"
+    },
+    {
+     "counter_name": "counts_monthly.deployments",
+     "counter_query": "SELECT 1 FROM table WHERE created_at BETWEEN between_start_date AND between_end_date",
+     "time_window_query": true,
+     "level": "namespace"
+    }
+    ...
+    ```
+  
+    The `time_window_query` variable determines do we have time-specific filter (`time_window_query=true`) and need to replace placeholders or not (`time_window_query=false`). If `time_window_query=false`, we are talking about **all-time** metrics. 
+* The desired metric(s) to be backfilled need to be included within the `NAMESPACE_BACKFILL_VAR` variable, specifically as one of the list values in the `metrics_backfill` key.
 
