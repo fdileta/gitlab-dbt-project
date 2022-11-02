@@ -131,7 +131,8 @@ WITH map_merged_crm_account AS (
       zoom_info_parent_company_zi_id,
       zoom_info_parent_company_name,
       zoom_info_ultimate_parent_company_zi_id,
-      zoom_info_ultimate_parent_company_name
+      zoom_info_ultimate_parent_company_name,
+      zoom_info_total_funding,
     FROM sfdc_account
     WHERE account_id = ultimate_parent_account_id
 
@@ -155,12 +156,14 @@ WITH map_merged_crm_account AS (
       map_merged_crm_account.dim_crm_account_id                           AS merged_to_account_id,
       sfdc_account.record_type_id                                         AS record_type_id,
       account_owner.user_id                                               AS crm_account_owner_id,
+      proposed_account_owner.user_id                                      AS proposed_crm_account_owner_id,
       technical_account_manager.user_id                                   AS technical_account_manager_id,
       sfdc_account.master_record_id,
       prep_crm_person.dim_crm_person_id                                   AS dim_crm_person_primary_contact_id,
 
       --account people
       account_owner.name                                                  AS account_owner,
+      proposed_account_owner.name                                         AS proposed_crm_account_owner,
       technical_account_manager.name                                      AS technical_account_manager,
 
       ----ultimate parent crm account info
@@ -199,6 +202,7 @@ WITH map_merged_crm_account AS (
       ultimate_parent_account.zoom_info_parent_company_name              AS parent_crm_account_zoom_info_parent_company_name,
       ultimate_parent_account.zoom_info_ultimate_parent_company_zi_id    AS parent_crm_account_zoom_info_ultimate_parent_company_zi_id,
       ultimate_parent_account.zoom_info_ultimate_parent_company_name     AS parent_crm_account_zoom_info_ultimate_parent_company_name,
+      ultimate_parent_account.zoom_info_total_funding                    AS parent_crm_account_zoom_info_total_funding,
 
       --descriptive attributes
       sfdc_account.account_name                                           AS crm_account_name,
@@ -292,6 +296,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_ultimate_parent_company_zi_id                AS crm_account_zoom_info_ultimate_parent_company_zi_id,
       sfdc_account.zoom_info_ultimate_parent_company_name                 AS crm_account_zoom_info_ultimate_parent_company_name,
       sfdc_account.zoom_info_number_of_developers                         AS crm_account_zoom_info_number_of_developers,
+      sfdc_account.zoom_info_total_funding                                AS crm_account_zoom_info_total_funding,
       sfdc_account.forbes_2000_rank,
       sfdc_account.parent_account_industry_hierarchy,
       sfdc_account.sales_development_rep,      
@@ -461,6 +466,8 @@ WITH map_merged_crm_account AS (
       ON sfdc_account.technical_account_manager_id = technical_account_manager.user_id
     LEFT JOIN sfdc_users AS account_owner
       ON sfdc_account.owner_id = account_owner.user_id
+    LEFT JOIN sfdc_users AS proposed_account_owner
+      ON proposed_account_owner.user_id = sfdc_account.proposed_account_owner
     LEFT JOIN sfdc_users created_by
       ON sfdc_account.created_by_id = created_by.user_id
     LEFT JOIN sfdc_users AS last_modified_by
@@ -475,6 +482,9 @@ WITH map_merged_crm_account AS (
     LEFT JOIN sfdc_users AS account_owner
       ON account_owner.user_id = sfdc_account.owner_id
         AND account_owner.snapshot_id = sfdc_account.snapshot_id
+    LEFT JOIN sfdc_users AS proposed_account_owner
+      ON proposed_account_owner.user_id = sfdc_account.proposed_account_owner
+        AND proposed_account_owner.snapshot_id = sfdc_account.snapshot_id
     LEFT JOIN lam_corrections
       ON ultimate_parent_account.account_id = lam_corrections.dim_parent_crm_account_id
         AND sfdc_account.snapshot_id = lam_corrections.snapshot_id
