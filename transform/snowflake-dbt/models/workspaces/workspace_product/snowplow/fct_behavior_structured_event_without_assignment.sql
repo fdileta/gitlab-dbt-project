@@ -5,7 +5,8 @@
 
 {{ 
     simple_cte([
-    ('fct_behavior_structured_event', 'fct_behavior_structured_event')
+    ('fct_behavior_structured_event', 'fct_behavior_structured_event'),
+    ('dim_behavior_event', 'dim_behavior_event')
     ])
 }}
 
@@ -49,7 +50,9 @@
       fct_behavior_structured_event.gsc_source
 
     FROM fct_behavior_structured_event
-    WHERE event_action != 'assignment'
+    INNER JOIN dim_behavior_event
+      ON fct_behavior_structured_event.dim_behavior_event_sk = dim_behavior_event.dim_behavior_event_sk
+    WHERE dim_behavior_event.event_action != 'assignment'
 
     {% if is_incremental() %}
 
