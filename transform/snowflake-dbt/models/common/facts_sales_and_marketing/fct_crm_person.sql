@@ -29,7 +29,8 @@ WITH account_dims_mapping AS (
       last_activity_date,
       last_transfer_date_time,
       time_from_last_transfer_to_sequence,
-      time_from_mql_to_last_transfer
+      time_from_mql_to_last_transfer,
+      zoominfo_contact_id
       
 
     FROM {{ref('prep_crm_person')}}

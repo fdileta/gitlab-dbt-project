@@ -58,6 +58,7 @@ renamed AS (
     requested_contact__c AS requested_contact,
     company AS company,
     dozisf__zoominfo_company_id__c AS zoominfo_company_id,
+    dozisf__zoominfo_id__c AS zoominfo_contact_id,
     zi_company_revenue__c AS zoominfo_company_revenue,
     zi_employee_count__c AS zoominfo_company_employee_count,
     zi_contact_city__c AS zoominfo_contact_city,
