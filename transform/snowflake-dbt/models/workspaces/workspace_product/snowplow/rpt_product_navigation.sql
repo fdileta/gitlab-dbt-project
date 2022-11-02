@@ -6,7 +6,8 @@
 
 {{ simple_cte([
     ('fct_behavior_structured_event_without_assignment','fct_behavior_structured_event_without_assignment'),
-    ('dim_behavior_event','dim_behavior_event')
+    ('dim_behavior_event','dim_behavior_event'),
+    ('dim_behavior_operating_system', 'dim_behavior_operating_system')
 ]) }}
 
 , product_navigation AS (
@@ -19,14 +20,16 @@
     dim_behavior_event.event_label,
     dim_behavior_event.event_property,
     fct_behavior_structured_event_without_assignment.gsc_plan,
-    fct_behavior_structured_event_without_assignment.device_type,
-    dim_behavior_event.event_id,
+    dim_behavior_operating_system.device_type,
+    dim_behavior_structured_event.behavior_structured_event_pk AS event_id,
     fct_behavior_structured_event_without_assignment.app_id,
     fct_behavior_structured_event_without_assignment.dim_namespace_id,
     fct_behavior_structured_event_without_assignment.session_id
   FROM fct_behavior_structured_event_without_assignment
   LEFT JOIN dim_behavior_event
     ON fct_behavior_structured_event_without_assignment.dim_behavior_event_sk = dim_behavior_event.dim_behavior_event_sk
+  LEFT JOIN dim_behavior_operating_system
+    ON fct_behavior_structured_event_without_assignment.dim_behavior_operating_system_sk = dim_behavior_operating_system.dim_behavior_operating_system_sk
   WHERE fct_behavior_structured_event_without_assignment.behavior_at >= '2022-01-01'
     AND (
       (

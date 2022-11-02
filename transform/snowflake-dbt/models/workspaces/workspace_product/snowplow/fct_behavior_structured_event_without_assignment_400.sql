@@ -2,7 +2,7 @@
     materialized='incremental',
     unique_key='behavior_structured_event_pk',
     on_schema_change='sync_all_columns',
-    post_hook=["{{ rolling_window_delete('behavior_at','day',400) }}"]        
+    post_hook=["{{ rolling_window_delete('behavior_at','day',400) }}"]
 ) }}
 
 WITH source_400 AS (

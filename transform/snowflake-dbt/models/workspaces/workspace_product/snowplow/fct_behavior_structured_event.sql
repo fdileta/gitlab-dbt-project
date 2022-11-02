@@ -2,8 +2,9 @@
 
     materialized='incremental',
     unique_key='behavior_structured_event_pk',
-    full_refresh= true if flags.FULL_REFRESH and var('full_refresh_force', false) else false,
-    on_schema_change='sync_all_columns'
+    full_refresh= only_force_full_refresh(),
+    on_schema_change='sync_all_columns',
+    post_hook=["{{ rolling_window_delete('behavior_at','month',24) }}"]
 
   )
 
@@ -123,12 +124,10 @@
         AND structured_events_w_clean_url.event_label = dim_behavior_event.event_label
         AND structured_events_w_clean_url.event_property = dim_behavior_event.event_property
         AND structured_events_w_clean_url.gsc_environment = dim_behavior_event.environment
-    WHERE behavior_at::DATE = '2022-10-01'
-    -- {% if is_incremental() %}
-
-    -- WHERE behavior_at > (SELECT MAX(behavior_at) FROM {{this}})
-
-    -- {% endif %}
+    WHERE DATE_TRUNC(MONTH, behavior_at) >= DATEADD(MONTH, -24, DATE_TRUNC(MONTH, CURRENT_DATE))
+    {% if is_incremental() %}
+      AND behavior_at >= (SELECT MAX(behavior_at) FROM {{ this }})
+    {% endif %}
 
 )
 

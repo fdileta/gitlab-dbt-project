@@ -23,7 +23,7 @@
       fct_behavior_structured_event.dim_behavior_operating_system_sk,
       fct_behavior_structured_event.dim_namespace_id,
       fct_behavior_structured_event.dim_project_id,
-      fct_behavior_structured_event.dim_behavior_event_sk,
+      fct_behavior_stuctured_event.dim_behavior_event_sk,
 
       -- Time Attributes
       fct_behavior_structured_event.dvce_created_tstamp,
@@ -68,5 +68,5 @@
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-09-01",
-    updated_date="2022-10-03"
+    updated_date="2022-11-02"
 ) }}
