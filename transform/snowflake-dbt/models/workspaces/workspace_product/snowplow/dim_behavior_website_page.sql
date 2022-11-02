@@ -8,15 +8,14 @@
     ])
 }}
 
-, page AS (
+, page_url AS (
 
     SELECT
-      page_url,
       app_id,
       page_urlpath                                                                  AS page_url_path,
       {{ clean_url('page_urlpath') }}                                               AS clean_url_path,
       page_urlhost                                                                  AS page_url_host,
-      page_urlfragment                                                              AS page_url_scheme,
+      page_urlscheme                                                                AS page_url_scheme,
       page_urlfragment                                                              AS page_url_fragment,
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
@@ -36,18 +35,54 @@
 
     {{ dbt_utils.group_by(n=11) }}
 
+), referer_url AS (
+
+    SELECT
+      app_id,
+      refr_urlpath                                                                  AS page_url_path,
+      {{ clean_url('refr_urlpath') }}                                               AS clean_url_path,
+      refr_urlhost                                                                  AS page_url_host,
+      refr_urlscheme                                                                AS page_url_scheme,
+      refr_urlfragment                                                              AS page_url_fragment,
+      SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
+      SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
+      SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
+      refr_medium                                                                   AS referrer_medium,
+      min(uploaded_at)                                                              AS min_event_timestamp,
+      max(uploaded_at)                                                              AS max_event_timestamp
+    FROM events
+    WHERE event IN ('struct', 'page_view', 'unstruct')
+    AND refr_urlpath IS NOT NULL
+
+    {% if is_incremental() %}
+
+    AND uploaded_at > (SELECT max(max_event_timestamp) FROM {{ this }})
+
+    {% endif %}
+
+    {{ dbt_utils.group_by(n=11) }}
+
+), page AS (
+
+    SELECT *
+    FROM page_url
+
+    UNION
+
+    SELECT *
+    FROM referer_url
+
 ), dim_with_sk AS (
 
     SELECT DISTINCT
       -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['page_url', 'app_id']) }}               AS dim_behavior_website_page_sk,
+      {{ dbt_utils.surrogate_key(['page_url_path', 'app_id']) }}               AS dim_behavior_website_page_sk,
 
       -- Natural Keys
-      page_url,
+      page_url_path,
       app_id,
 
       -- Attributes
-      page_url_path,
       clean_url_path,
       page_url_host,
       page_url_scheme,
@@ -220,5 +255,5 @@
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-10-28"
+    updated_date="2022-11-02"
 ) }}

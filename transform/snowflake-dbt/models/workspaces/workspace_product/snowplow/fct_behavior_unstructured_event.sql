@@ -87,7 +87,7 @@
     INNER JOIN dim_event 
       ON unstruct_event.event_name = dim_event.event_name
     INNER JOIN dim_page 
-      ON unstruct_event.page_url = dim_page.page_url
+      ON unstruct_event.page_url_path = dim_page.page_url_path
         AND unstruct_event.app_id = dim_page.app_id
     LEFT JOIN dim_behavior_browser
       ON unstruct_event.browser_name = dim_behavior_browser.browser_name
@@ -104,5 +104,5 @@
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-09-27",
-    updated_date="2022-10-31"
+    updated_date="2022-11-02"
 ) }}

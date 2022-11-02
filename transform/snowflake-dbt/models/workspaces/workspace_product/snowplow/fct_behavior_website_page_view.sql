@@ -55,7 +55,7 @@
 
       -- Foreign Keys
       dim_behavior_website_page.dim_behavior_website_page_sk,
-      referrer_website_page.dim_behavior_website_page_sk AS dim_behavior_website_page_sk_referrer,
+      referrer_website_page.dim_behavior_website_page_sk AS dim_behavior_website_page_sk_referer,
       page_views_w_clean_url.gsc_project_id AS dim_namespace_id,
       page_views_w_clean_url.gsc_project_id AS dim_project_id,
 
@@ -79,7 +79,7 @@
 
       -- Attributes
       dim_behavior_website_page.page_url_path,
-      referrer_website_page.page_url_path AS referrer_url_path,
+      referrer_website_page.page_url_path AS referer_url_path,
       page_views_w_clean_url.event_name,
       NULL                                                                          AS sf_formid,
       page_views_w_clean_url.engaged_seconds,
@@ -88,7 +88,7 @@
       page_views_w_clean_url.page_view_in_session_index
     FROM page_views_w_clean_url
     LEFT JOIN dim_behavior_website_page 
-      ON page_views_w_clean_url.page_url = dim_behavior_website_page.page_url
+      ON page_views_w_clean_url.page_url_path = dim_behavior_website_page.page_url_path
         AND page_views_w_clean_url.app_id = dim_behavior_website_page.app_id
     LEFT JOIN dim_behavior_website_page AS referrer_website_page
       ON page_views_w_clean_url.referer_url = referrer_website_page.page_url
@@ -101,5 +101,5 @@
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-10-28"
+    updated_date="2022-11-02"
 ) }}

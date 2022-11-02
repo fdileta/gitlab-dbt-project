@@ -21,7 +21,7 @@
       dim_behavior_website_page.clean_url_path,
       dim_behavior_website_page.page_url_host,
       dim_behavior_website_page.app_id,
-      dim_behavior_website_page.page_url
+      dim_behavior_website_page.page_url_path
     FROM {{ ref('dim_behavior_website_page') }}
 
 ), dim_behavior_browser AS (
@@ -90,7 +90,7 @@
 
     FROM structured_events_w_clean_url
     LEFT JOIN dim_behavior_website_page
-      ON structured_events_w_clean_url.page_url = dim_behavior_website_page.page_url
+      ON structured_events_w_clean_url.page_url_path = dim_behavior_website_page.page_url_path
         AND structured_events_w_clean_url.app_id = dim_behavior_website_page.app_id
     LEFT JOIN dim_behavior_browser
       ON structured_events_w_clean_url.browser_name = dim_behavior_browser.browser_name
@@ -113,5 +113,5 @@
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-09-01",
-    updated_date="2022-10-31"
+    updated_date="2022-11-02"
 ) }}
