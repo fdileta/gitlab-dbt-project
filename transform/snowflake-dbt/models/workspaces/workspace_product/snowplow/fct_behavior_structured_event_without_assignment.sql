@@ -22,7 +22,7 @@
       fct_behavior_structured_event.dim_behavior_operating_system_sk,
       fct_behavior_structured_event.dim_namespace_id,
       fct_behavior_structured_event.dim_project_id,
-      dim_behavior_event.dim_behavior_event_sk,
+      fct_behavior_structured_event.dim_behavior_event_sk,
 
       -- Time Attributes
       fct_behavior_structured_event.dvce_created_tstamp,
