@@ -102,3 +102,11 @@ The distinct combination of subscriptions and opportunities generated through th
 This table is the distinct combination of the Gitlab team members and there Gitlab user IDs.  The two values are connected using the Gitlab user names that is recorded in the HRIS system
 
 {% enddocs %}
+
+{% docs map_latest_subscription_namespace_monthly %}
+
+This table contains the most recent subscription version associated with each namespace in each month, and represents the most complete namespace <> subscription mapping we have. It prefers the Zuora namespace <> subscription mappings, then fills in any nulls with bridge logic. The end objective is to backfill Zuora with all mappings so that `dim_subscription` can be the SSOT for namespace <> subscription relationships.
+
+Although in the prep data, namespaces can be associated with multiple `dim_subscription_id`s and/or multiple `dim_subscription_id_original`s in a single month, we use a `QUALIFY` statement in this table to limit down to **one** subscription per namespace per month (the most recently created subscription).
+
+{% enddocs %}
