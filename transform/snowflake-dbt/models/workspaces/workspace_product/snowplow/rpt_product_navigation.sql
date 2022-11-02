@@ -12,7 +12,7 @@
 , product_navigation AS (
 
   SELECT
-    fct_behavior_structured_event_without_assignment.derived_tstamp,
+    fct_behavior_structured_event_without_assignment.behavior_at,
     fct_behavior_structured_event_without_assignment.gsc_pseudonymized_user_id,
     dim_behavior_event.event_category,
     dim_behavior_event.event_action,
@@ -27,7 +27,7 @@
   FROM fct_behavior_structured_event_without_assignment
   LEFT JOIN dim_behavior_event
     ON fct_behavior_structured_event_without_assignment.dim_behavior_event_sk = dim_behavior_event.dim_behavior_event_sk
-  WHERE fct_behavior_structured_event_without_assignment.derived_tstamp >= '2022-01-01'
+  WHERE fct_behavior_structured_event_without_assignment.behavior_at >= '2022-01-01'
     AND (
       (
         dim_behavior_event.event_label IN (
@@ -74,7 +74,7 @@
     )
   {% if is_incremental() %}
 
-    AND  fct_behavior_structured_event_without_assignment.derived_tstamp > (SELECT MAX(fct_behavior_structured_event_without_assignment.derived_tstamp) FROM {{ this }})
+    AND  fct_behavior_structured_event_without_assignment.behavior_at > (SELECT MAX(fct_behavior_structured_event_without_assignment.behavior_at) FROM {{ this }})
 
   {% endif %}
 )
