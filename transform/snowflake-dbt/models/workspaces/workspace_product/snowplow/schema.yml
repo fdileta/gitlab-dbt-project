@@ -37,7 +37,7 @@ models:
     description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of structured events if the model is not run incrementally.
 
   - name: fct_behavior_link_click
-    description: Fact table containing details of links clicked.
+    description: A derived fact from fct_behavior_unstructured_event containing only link_click event types.
     columns: 
       - name: fct_behavior_unstructured_sk
         tests:
@@ -59,9 +59,6 @@ models:
         tests:
           - not_null
           - unique
-
-  - name: fct_behavior_link_click
-    description: A derived fact from fct_behavior_unstructured_event containing only link_click event types.
 
   - name: fct_behavior_structured_event_experiment
     description: A subset of structured events where there is an experiment context.
