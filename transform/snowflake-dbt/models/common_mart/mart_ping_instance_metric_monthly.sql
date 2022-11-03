@@ -269,8 +269,7 @@
 
 
     FROM joined
-    WHERE time_frame != 'none'
-      AND TRY_TO_DECIMAL(monthly_metric_value::TEXT) >= 0
+    WHERE TRY_TO_DECIMAL(monthly_metric_value::TEXT) >= 0
 
 )
 
