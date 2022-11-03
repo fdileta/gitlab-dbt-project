@@ -1722,3 +1722,16 @@ models:
         description: The value associated with the metric path
       - name: has_timed_out
         description: A flag to denote that it has timed out
+
+  - name: prep_ping_metric_first_last_versions
+    description: Prep view to allow first_last_versions with none types
+    columns:
+      - name: major_minor_version_id
+        tests:
+          - not_null
+      - name: ping_edition
+        tests:
+          - not_null
+      - name: metrics_path
+        tests:
+          - not_null
