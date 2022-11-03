@@ -26,6 +26,7 @@
       {{ clean_url('page_url_path') }}                  AS clean_url_path,
       page_url_host,
       page_url,
+      page_url_path,
       app_id,
       session_id,
       lc_targeturl                                      AS link_click_target_url,

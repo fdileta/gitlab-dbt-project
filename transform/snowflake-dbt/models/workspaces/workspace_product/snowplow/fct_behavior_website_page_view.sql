@@ -37,7 +37,7 @@
       total_time_in_ms                                                              AS page_load_time_in_ms,
       page_view_index,
       page_view_in_session_index,
-      referer_url,
+      referer_url_path,
       page_url
     FROM page_views
 
@@ -91,7 +91,7 @@
       ON page_views_w_clean_url.page_url_path = dim_behavior_website_page.page_url_path
         AND page_views_w_clean_url.app_id = dim_behavior_website_page.app_id
     LEFT JOIN dim_behavior_website_page AS referrer_website_page
-      ON page_views_w_clean_url.referer_url = referrer_website_page.page_url
+      ON page_views_w_clean_url.referer_url_path = referrer_website_page.page_url_path
         AND page_views_w_clean_url.app_id = referrer_website_page.app_id
 
 )
