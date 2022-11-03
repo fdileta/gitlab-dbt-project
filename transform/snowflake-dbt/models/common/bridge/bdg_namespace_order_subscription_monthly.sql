@@ -84,6 +84,7 @@
       subscriptions.dim_crm_account_id,
       subscriptions.subscription_start_date,
       subscriptions.subscription_end_date,
+      subscriptions.subscription_version,
       dates.first_day_of_month                                          AS subscription_snapshot_month,
       product_rate_plans.product_rate_plan_id                           AS product_rate_plan_id_subscription,
       product_rate_plans.dim_product_tier_id                            AS dim_product_tier_id_subscription,
@@ -214,6 +215,7 @@
       subscription_list.product_rate_plan_id_subscription,
       subscription_list.dim_product_tier_id_subscription,
       subscription_list.product_tier_name_subscription,
+      subscription_list.subscription_version,
       CASE
         WHEN namespace_list.gitlab_plan_id IN (102, 103)
           AND order_list.dim_order_id IS NULL

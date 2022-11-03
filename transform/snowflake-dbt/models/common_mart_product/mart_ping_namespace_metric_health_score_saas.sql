@@ -16,7 +16,7 @@
     ('bdg_namespace_subscription','bdg_namespace_order_subscription_monthly'),
     ('gainsight_wave_metrics','health_score_metrics'),
     ('instance_types', 'dim_host_instance_type'),
-    ('dim_subscription', 'dim_subscription')
+    ('map_subscription_namespace_month', 'map_latest_subscription_namespace_monthly')
 ]) }}
 
 , instance_types_ordering AS (
@@ -31,6 +31,18 @@
     FROM instance_types
 )
 
+, namespace_subscription_monthly_distinct AS (
+
+    SELECT DISTINCT
+      dim_namespace_id,
+      dim_subscription_id,
+      dim_subscription_id_original,
+      snapshot_month,
+      subscription_version
+    FROM bdg_namespace_subscription
+    WHERE namespace_order_subscription_match_status = 'Paid All Matching'
+)
+
 , joined AS (
 
     SELECT 
@@ -39,32 +51,45 @@
       prep_saas_usage_ping_namespace.ping_name,
       prep_saas_usage_ping_namespace.counter_value,
       dim_date.first_day_of_month                           AS reporting_month, 
-      bdg_namespace_subscription.dim_subscription_id,
-      dim_subscription.dim_subscription_id_original,
+      COALESCE(
+        map_subscription_namespace_month.dim_subscription_id, 
+        namespace_subscription_monthly_distinct.dim_subscription_id
+      ) AS dim_subscription_id,
+      COALESCE(
+        map_subscription_namespace_month.dim_subscription_id_original, 
+        namespace_subscription_monthly_distinct.dim_subscription_id_original
+      ) AS dim_subscription_id_original,
       instance_types_ordering.instance_type
     FROM prep_saas_usage_ping_namespace
     LEFT JOIN instance_types_ordering
       ON prep_saas_usage_ping_namespace.dim_namespace_id = instance_types_ordering.namespace_id
     INNER JOIN dim_date
       ON prep_saas_usage_ping_namespace.ping_date = dim_date.date_day
-    INNER JOIN bdg_namespace_subscription
-      ON prep_saas_usage_ping_namespace.dim_namespace_id = bdg_namespace_subscription.dim_namespace_id
-      AND dim_date.first_day_of_month = bdg_namespace_subscription.snapshot_month
-      AND namespace_order_subscription_match_status = 'Paid All Matching'
+    LEFT JOIN namespace_subscription_monthly_distinct
+      ON prep_saas_usage_ping_namespace.dim_namespace_id = namespace_subscription_monthly_distinct.dim_namespace_id
+      AND dim_date.first_day_of_month = namespace_subscription_monthly_distinct.snapshot_month
     INNER JOIN gainsight_wave_metrics
       ON prep_saas_usage_ping_namespace.ping_name = gainsight_wave_metrics.metric_name
-    INNER JOIN dim_subscription
-      ON bdg_namespace_subscription.dim_subscription_id = dim_subscription.dim_subscription_id
+    LEFT JOIN map_subscription_namespace_month
+      ON prep_saas_usage_ping_namespace.dim_namespace_id = map_subscription_namespace_month.dim_namespace_id
+      AND dim_date.first_day_of_month = map_subscription_namespace_month.date_month
+    WHERE COALESCE(
+        map_subscription_namespace_month.dim_subscription_id, 
+        namespace_subscription_monthly_distinct.dim_subscription_id
+      ) IS NOT NULL
     QUALIFY ROW_NUMBER() OVER (
       PARTITION BY 
         dim_date.first_day_of_month,
-        dim_subscription.dim_subscription_id_original,
+        map_subscription_namespace_month.dim_subscription_id_original,
         prep_saas_usage_ping_namespace.dim_namespace_id,
         prep_saas_usage_ping_namespace.ping_name
       ORDER BY 
         prep_saas_usage_ping_namespace.ping_date DESC,
         instance_types_ordering.ordering_field ASC, --prioritizing Production instances
-        dim_subscription.subscription_version DESC
+        COALESCE(
+          map_subscription_namespace_month.subscription_version,
+          namespace_subscription_monthly_distinct.subscription_version
+        ) DESC
 
     ) = 1
 
