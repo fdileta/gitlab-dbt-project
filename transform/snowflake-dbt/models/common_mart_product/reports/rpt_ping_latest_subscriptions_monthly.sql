@@ -35,6 +35,7 @@ Determine latest version for each subscription to determine if the potential met
       instance_user_count               AS instance_user_count
   FROM mart_ping_instance_metric_monthly
       WHERE ping_delivery_type = 'Self-Managed'
+      AND time_frame != 'none'
       QUALIFY ROW_NUMBER() OVER (
             PARTITION BY ping_created_date_month, latest_subscription_id, dim_installation_id
               ORDER BY major_minor_version_id DESC) = 1
