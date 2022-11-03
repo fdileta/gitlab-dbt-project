@@ -182,8 +182,6 @@ def test_evaluate_saas_queries():
     assert get_keys_in_nested_dict(errors) == get_keys_in_nested_dict(expected_errors)
 
 
-
-
 def test_json_file_consistency_time_window_query(namespace_file):
     """
     Test is dictionary is constructed properly in
