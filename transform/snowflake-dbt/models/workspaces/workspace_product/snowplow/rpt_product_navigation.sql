@@ -21,7 +21,7 @@
     dim_behavior_event.event_property,
     fct_behavior_structured_event_without_assignment.gsc_plan,
     dim_behavior_operating_system.device_type,
-    dim_behavior_structured_event.behavior_structured_event_pk AS event_id,
+    fct_behavior_structured_event_without_assignment.behavior_structured_event_pk AS event_id,
     fct_behavior_structured_event_without_assignment.app_id,
     fct_behavior_structured_event_without_assignment.dim_namespace_id,
     fct_behavior_structured_event_without_assignment.session_id

@@ -26,7 +26,7 @@ models:
           - unique
 
   - name: fct_behavior_website_page_view
-    description: TBD
+    description: Page views are a subset of Snowplow events and are fired by the Javascript tracker.
     columns:
       - name: fct_behavior_website_page_view_sk
         tests:
@@ -34,10 +34,10 @@ models:
           - unique
 
   - name: prep_snowplow_structured_event_all_source
-    description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of strutured events if the model is not run incrementally.
+    description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of structured events if the model is not run incrementally.
 
   - name: fct_behavior_link_click
-    description: Fact table containing details of links clicked.
+    description: A derived fact from fct_behavior_unstructured_event containing only link_click event types.
     columns: 
       - name: fct_behavior_unstructured_sk
         tests:
@@ -101,9 +101,39 @@ models:
           - unique
 
   - name: fct_behavior_unstructured_event
-    description: atomic fact table for unstructured events
+    description: Atomic fact table for unstructured events.
     columns:
       - name: fct_behavior_unstructured_sk
         tests:
           - not_null
           - unique
+
+  - name: fct_behavior_structured_event_experiment
+    description: A subset of structured events where there is an experiment context.
+
+  - name: fct_behavior_structured_event_redis_hll_counters
+    description: A subset of structured events where event_action is one of 'g_analytics_valuestream', 'action_active_users_project_repo', 'push_package', 'ci_templates_unique', 'p_terraform_state_api_unique_users', 'i_search_paid'
+
+  - name: fct_behavior_structured_event_without_assignment
+    description: A subset of structured events excluding 'assignment' event action types.
+
+  - name: fct_behavior_structured_event_without_assignment_190
+    description: The last 190 days of structured events excluding 'assignment' event action types.
+
+  - name: fct_behavior_structured_event_without_assignment_400
+    description: The last 400 days of structured events excluding 'assignment' event action types.
+
+  - name: fct_behavior_structured_event
+    description: Atomic fact table for unstructured events.
+
+  - name: prep_snowplow_unnested_events_all
+    description: This is the primary events view which is the union of the Fishtown and GitLab tables across all snowplow_YYYY_MM schemas. All of the unstructured events are unpacked - [link click tracking](https://github.com/snowplow/snowplow/wiki/2-Specific-event-tracking-with-the-Javascript-tracker#39-link-click-tracking), [form tracking](https://github.com/snowplow/snowplow/wiki/2-Specific-event-tracking-with-the-Javascript-tracker#3101-enableformtracking), and [time tracking](https://github.com/snowplow/snowplow/wiki/2-Specific-event-tracking-with-the-Javascript-tracker#timing).
+
+  - name: prep_snowplow_unstructured_events_all
+    description: This a view over all snowplow_YYYY_MM schemas for unstructured events.
+
+  - name: rpt_product_navigation
+
+  - name: rpt_saas_purchase_flow_funnel
+
+
