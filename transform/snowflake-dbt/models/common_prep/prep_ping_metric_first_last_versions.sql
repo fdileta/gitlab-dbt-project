@@ -42,6 +42,9 @@ final AS (
       OR 
       dim_ping_metric.time_frame = '28d'
       )
+      AND 
+      -- Removing SaaS
+      fct_ping_instance_metric.dim_instance_id != 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f'
 
 {{ dbt_audit(
     cte_ref="final",

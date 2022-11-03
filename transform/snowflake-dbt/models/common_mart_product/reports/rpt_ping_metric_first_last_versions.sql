@@ -4,8 +4,7 @@
 ) }}
 
 {{ simple_cte([
-  ('mart_ping_instance_metric_monthly', 'mart_ping_instance_metric_monthly'),
-  ('dim_gitlab_releases', 'dim_gitlab_releases')
+  ('prep_ping_metric_first_last_versions','prep_ping_metric_first_last_versions')
   ])
 }}
 
@@ -60,12 +59,10 @@
       )                                                                                                                                          AS last_minor_version_with_counter,
       -- Get count of installations per each metric/edition
       COUNT(DISTINCT dim_installation_id) OVER (PARTITION BY metrics_path, ping_edition, version_is_prerelease)                                  AS dim_installation_count
-    FROM mart_ping_instance_metric_monthly
+    FROM prep_ping_metric_first_last_versions
       INNER JOIN dim_gitlab_releases --limit to valid versions
           ON mart_ping_instance_metric_monthly.major_minor_version = dim_gitlab_releases.major_minor_version
-    WHERE --TRY_TO_DECIMAL(metric_value::TEXT) > 0
-      -- Removing SaaS
-      dim_instance_id != 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f'
+
       -- Removing pre-releases
       --AND version_is_prerelease = FALSE
 
@@ -74,7 +71,7 @@
 {{ dbt_audit(
     cte_ref="transformed",
     created_by="@icooper-acp",
-    updated_by="@snalamaru",
+    updated_by="@mpetersen",
     created_date="2022-04-07",
-    updated_date="2022-06-07"
+    updated_date="2022-11-04"
 ) }}
