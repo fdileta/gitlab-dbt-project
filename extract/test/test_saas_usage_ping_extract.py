@@ -136,7 +136,7 @@ def test_evaluate_saas_queries():
     Note: The snowflake outputs cannot be compared because they can change over time
     """
 
-    def get_keys_in_nested_dict(nested_dict, keys=list):
+    def get_keys_in_nested_dict(nested_dict, keys=[]):
         for key, val in nested_dict.items():
             if isinstance(val, dict):
                 get_keys_in_nested_dict(val, keys)
@@ -180,6 +180,8 @@ def test_evaluate_saas_queries():
     # check that the correct queries have suceeded and errored
     assert get_keys_in_nested_dict(results) == get_keys_in_nested_dict(expected_results)
     assert get_keys_in_nested_dict(errors) == get_keys_in_nested_dict(expected_errors)
+
+
 
 
 def test_json_file_consistency_time_window_query(namespace_file):
