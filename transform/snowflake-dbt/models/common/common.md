@@ -1465,3 +1465,41 @@ Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team
 Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [dim_subscription](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_subscription) model
 
 {% enddocs %}
+
+{% docs fct_behavior_structured_event %}
+
+**Description:** Atomic level Snowplow structured event data. Data is limited to the last 24 months.
+
+**Data Grain:**
+- behavior_structured_event_pk
+
+**Filter applied to model:**
+- event = 'struct' - limits to just structured events
+- DATE_TRUNC(MONTH, derived_tstamp::DATE) >= DATEADD(MONTH, -24, DATE_TRUNC(MONTH,CURRENT_DATE) - limits to last 24 months
+
+**Business Logic in this Model:**
+
+
+**Other Comments:** 
+
+{% enddocs %}
+
+{% docs fct_behavior_structured_event_without_assignment %}
+
+**Description:** Atomic level Snowplow structured event data, excluding experiment assignment events. Data is limited to the last 24 months.
+
+**Data Grain:**
+- behavior_structured_event_pk
+
+**Filters applied to model:**
+- event_action != 'assignment'
+- event = 'struct' - limits to just structured events
+- DATE_TRUNC(MONTH, derived_tstamp::DATE) >= DATEADD(MONTH, -24, DATE_TRUNC(MONTH,CURRENT_DATE) - limits to last 24 months
+
+**Business Logic in this Model:**
+
+
+**Other Comments:** 
+
+
+{% enddocs %}

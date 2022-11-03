@@ -297,3 +297,51 @@ The count of events generated
  For 28 day metrics, this is the metric value that comes directly from the service ping. For all-time metrics, this is the monthly metric value that is computed using the monthly_all_time_metric_calc macro.
 
 {% enddocs %}
+
+{% docs behavior_structured_event_pk %}
+
+Unique identifier of a Snowplow structured event. 
+
+{% enddocs %}
+
+{% docs behavior_at %}
+
+Timestamp of Snowplow event. Synonymous with `derived_tstamp` in the raw event data, `page_view_start_at` in the raw page view data.
+
+{% enddocs %}
+
+{% docs event_action %}
+
+(Pulled from GitLab docs, should be updated) The action the user takes, or aspect that’s being instrumented. The first word must describe the action or aspect. For example, clicks must be `click`, activations must be `activate`, creations must be `create`. Use underscores to describe what was acted on. For example, activating a form field is `activate_form_input`, an interface action like clicking on a dropdown list is `click_dropdown`, a behavior like creating a project record from the backend is `create_project`. This column will always be populated on structured events.
+
+{% enddocs %}
+
+{% docs event_category %}
+
+(Pulled from GitLab docs, should be updated) The page or backend section of the application. Unless infeasible, use the Rails page attribute by default in the frontend, and namespace + class name on the backend, for example, `Notes::CreateService`. This column will always be populated on structured events.
+
+{% enddocs %}
+
+{% docs event_label %}
+
+(Pulled from GitLab docs, should be updated) The specific element or object to act on. This can be one of the following: the label of the element, for example, a tab labeled ‘Create from template’ for `create_from_template`; a unique identifier if no text is available, for example, `groups_dropdown_close` for closing the Groups dropdown list in the top bar; or the name or title attribute of a record being created. This is an optional attribute on structured events.
+
+{% enddocs %}
+
+{% docs event_property %}
+
+(Pulled from GitLab docs, should be updated) Any additional property of the element, or object being acted on. This is an optional attribute on structured events.
+
+{% enddocs %}
+
+{% docs event_value %}
+
+(Pulled from GitLab docs, should be updated) Numeric value (decimal) directly related to the event. This could be the value of an input. For example, `10` when clicking `internal` visibility. This is an optional attribute on structured events.
+
+{% enddocs %}
+
+{% docs v_tracker %}
+
+Tracker version. This field can be used to differentiate frontend and backend events. Frontend will have a value starting with `js-` (JavaScript tracker), backend events will have a value starting with `rb-` (Ruby tracker)
+
+{% enddocs %}
