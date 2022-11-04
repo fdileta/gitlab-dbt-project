@@ -247,7 +247,7 @@ WITH sfdc_opportunity_xf AS (
       oppty.sales_type                                AS current_sales_type,
       oppty.order_type_stamped                        AS current_order_type,
       oppty.sales_qualified_source                    AS current_sales_qualified_source,
-      oppty.stagename                                 AS current_stage_name                                     
+      oppty.stage_name                                AS current_stage_name                                     
 
     FROM deltas_consolidated AS deltas
     LEFT JOIN sfdc_opportunity_xf AS oppty
