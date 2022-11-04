@@ -1723,7 +1723,7 @@ models:
       - name: has_timed_out
         description: A flag to denote that it has timed out
 
-  - name: zuora_user
+  - name: prep_zuora_user
     description: Zuora Billing users
     columns:
       - name: zuora_user_id
