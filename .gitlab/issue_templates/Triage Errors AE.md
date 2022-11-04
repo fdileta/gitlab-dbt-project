@@ -1,5 +1,5 @@
 <!-- Subject format should be: YYYY-MM-DD | task name | Error line from log-->
-<!-- example: 2020-05-15 | dbt-non-product-models-run | Database Error in model sheetload_manual_downgrade_dotcom_tracking -->
+<!-- example: 2022-11-04 | dbt-non-product-models-run | Database Error in model sheetload_manual_downgrade_dotcom_tracking -->
 
 Notification Link: <!-- link to airflow log with error / Monte Carlo incident -->
 
@@ -11,6 +11,26 @@ Downstream Airflow tasks or dbt models that were skipped: <!-- None -->
   <!-- list any downstream tasks that were skipped because of this error -->
 
 ## AE Triage Guidelines
+
+<details>
+<summary><b>Finding failing dbt models</b></summary>
+
+Occasionally the Airflow job will not display the run logs for the end of the dbt run, making it difficult to see if any models failed in that run. In such cases, you can run the following query to find the models that failed or were skipped:
+
+```sql
+SELECT
+  model_unique_id,
+  status,
+  message,
+  generated_at
+FROM prep.dbt.DBT_RUN_RESULTS_SOURCE
+WHERE status NOT IN ('success') 
+  AND TO_DATE(generated_at)='2022-11-04' --update this
+ORDER BY 
+  generated_at DESC;
+```
+
+</details>
 
 <details>
 <summary><b>dbt model/test failures</b></summary>
