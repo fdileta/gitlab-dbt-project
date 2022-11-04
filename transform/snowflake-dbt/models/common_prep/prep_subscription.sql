@@ -33,7 +33,6 @@ WITH date_details AS (
       zuora_user_id,
       is_integration_user
     FROM {{ ref('prep_zuora_user') }}
-)
 
 ), joined AS (
 
