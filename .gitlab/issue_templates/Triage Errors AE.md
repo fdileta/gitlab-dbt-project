@@ -22,7 +22,8 @@ SELECT
   model_unique_id,
   status,
   message,
-  generated_at
+  generated_at,
+  SPLIT_PART(model_unique_id,'.',3) AS model_name
 FROM prep.dbt.DBT_RUN_RESULTS_SOURCE
 WHERE status NOT IN ('success') 
   AND TO_DATE(generated_at)='2022-11-04' --update this
