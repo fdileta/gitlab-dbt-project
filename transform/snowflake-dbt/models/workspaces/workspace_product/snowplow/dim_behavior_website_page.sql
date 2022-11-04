@@ -43,7 +43,7 @@ WITH events AS (
     FROM events
     WHERE refr_urlpath IS NOT NULL
 
-), unioned_page AS (
+), page AS (
 
     SELECT *
     FROM page_url
@@ -53,32 +53,9 @@ WITH events AS (
     SELECT *
     FROM referer_url
 
-), page AS (
-
-    SELECT 
-      app_id,
-      page_url_path,
-      clean_url_path,
-      page_url_host,
-      page_url_scheme,
-      page_url_fragment,
-      page_group,
-      page_type,
-      page_sub_type,
-      referrer_medium,
-      min(uploaded_at)                                                              AS min_event_timestamp,
-      max(uploaded_at)                                                              AS max_event_timestamp
-    FROM unioned_page
-    {% if is_incremental() %}
-
-    WHERE uploaded_at > (SELECT max(max_event_timestamp) FROM {{ this }})
-
-    {% endif %}
-    {{ dbt_utils.group_by(n=10) }}
-
 ), dim_with_sk AS (
 
-    SELECT DISTINCT
+    SELECT
       -- Surrogate Key
       {{ dbt_utils.surrogate_key(['page_url_path', 'app_id']) }}               AS dim_behavior_website_page_sk,
 
@@ -95,8 +72,6 @@ WITH events AS (
       page_type,
       page_sub_type,
       referrer_medium,
-      min_event_timestamp,
-      max_event_timestamp,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1) AS url_namespace_id,
       REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1) AS url_project_id,
       CASE 
@@ -248,9 +223,16 @@ WITH events AS (
        and page_url_path not like '%/tree/%' -- ignore branches named 'security'
          THEN 1
        ELSE 0
-      END AS is_url_interacting_with_security
-
+      END AS is_url_interacting_with_security,
+      min(uploaded_at)                                                              AS min_event_timestamp,
+      max(uploaded_at)                                                              AS max_event_timestamp
     FROM page
+    {% if is_incremental() %}
+
+    WHERE uploaded_at > (SELECT max(max_event_timestamp) FROM {{ this }})
+
+    {% endif %}
+    {{ dbt_utils.group_by(n=15) }}
 
 )
 
