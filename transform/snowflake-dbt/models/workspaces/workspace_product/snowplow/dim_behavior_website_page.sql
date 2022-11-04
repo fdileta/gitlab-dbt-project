@@ -17,7 +17,6 @@ WITH events AS (
       {{ clean_url('page_urlpath') }}                                               AS clean_url_path,
       page_urlhost                                                                  AS page_url_host,
       page_urlscheme                                                                AS page_url_scheme,
-      page_urlfragment                                                              AS page_url_fragment,
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
@@ -34,7 +33,6 @@ WITH events AS (
       {{ clean_url('refr_urlpath') }}                                               AS clean_url_path,
       refr_urlhost                                                                  AS page_url_host,
       refr_urlscheme                                                                AS page_url_scheme,
-      refr_urlfragment                                                              AS page_url_fragment,
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
@@ -67,7 +65,6 @@ WITH events AS (
       clean_url_path,
       page_url_host,
       page_url_scheme,
-      page_url_fragment,
       page_group,
       page_type,
       page_sub_type,
@@ -232,7 +229,7 @@ WITH events AS (
     WHERE uploaded_at > (SELECT max(max_event_timestamp) FROM {{ this }})
 
     {% endif %}
-    {{ dbt_utils.group_by(n=15) }}
+    {{ dbt_utils.group_by(n=14) }}
 
 )
 
