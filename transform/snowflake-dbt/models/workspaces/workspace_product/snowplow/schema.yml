@@ -55,7 +55,7 @@ models:
   - name: fct_behavior_structured_event
     description: Atomic fact table for structured events.
     columns:
-      - name: fct_behavior_structured_sk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -63,7 +63,7 @@ models:
   - name: fct_behavior_structured_event_experiment
     description: Derived fact table for structured events related to experiments.
     columns:
-      - name: fct_behavior_structured_sk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -71,7 +71,7 @@ models:
   - name: fct_behavior_structured_event_redis_hll_counters
     description: Derived fact table for structured events related to redis hll metrics.
     columns:
-      - name: fct_behavior_structured_sk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -79,7 +79,7 @@ models:
   - name: fct_behavior_structured_event_without_assignment
     description: Derived fact table for structured events without assignment events.
     columns:
-      - name: fct_behavior_structured_sk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -87,7 +87,7 @@ models:
   - name: fct_behavior_structured_event_without_assignment_190
     description: Derived fact table for structured events without assignment events filtered to the last 190 days.
     columns:
-      - name: fct_behavior_structured_sk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -95,7 +95,7 @@ models:
   - name: fct_behavior_structured_event_without_assignment_400
     description: Derived fact table for structured events without assignment events fitlered to the last 400 days.
     columns:
-      - name: fct_behavior_structured_sk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
@@ -103,7 +103,7 @@ models:
   - name: fct_behavior_unstructured_event
     description: Atomic fact table for unstructured events.
     columns:
-      - name: fct_behavior_unstructured_sk
+      - name: behavior_structured_event_pk
         tests:
           - not_null
           - unique
