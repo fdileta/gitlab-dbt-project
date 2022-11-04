@@ -13,16 +13,65 @@
     ('bdg_subscription_product_rate_plan', 'bdg_subscription_product_rate_plan'),
     ('gitlab_subscriptions', 'gitlab_dotcom_gitlab_subscriptions_snapshots_namespace_id_base'),
     ('dates', 'dim_date'),
-    ('charges', 'fct_charge')
+    ('charges', 'fct_charge'),
+    ('subscriptions', 'dim_subscription')
 ]) }}
 
-, saas_subscriptions AS (
+, months AS (
+
+    {{ dbt_utils.date_spine(
+        datepart="month",
+        start_date="cast('2017-01-01' as date)",
+        end_date="DATEADD('month', 1,DATE_TRUNC('month', CURRENT_DATE()))"
+       )
+    }}
+
+),
+
+subscription_date_spine AS (
+
+  SELECT
+    months.date_month,
+    subscriptions.term_start_month,
+    subscriptions.term_end_month,
+    subscriptions.dim_subscription_id,
+    subscriptions.dim_subscription_id_original,
+    subscriptions.namespace_id AS dim_namespace_id,
+    subscriptions.subscription_version,
+    subscriptions.subscription_created_date
+  FROM subscriptions
+  INNER JOIN months
+    ON (months.date_month >= subscriptions.term_start_month
+        AND months.date_month <= subscriptions.term_end_month)
+
+),
+
+subscription_date_spine_final AS (
+
+  SELECT
+    date_month,
+    dim_subscription_id,
+    dim_subscription_id_original,
+    dim_namespace_id,
+    subscription_version
+  FROM subscription_date_spine
+  --picking most recent subscription version
+  QUALIFY
+    ROW_NUMBER() OVER(
+      PARTITION BY
+        dim_subscription_id_original, date_month
+      ORDER BY subscription_version DESC
+    ) = 1
+
+),
+
+saas_subscriptions AS (
 
     SELECT DISTINCT
       bdg_subscription_product_rate_plan.dim_subscription_id,
       bdg_subscription_product_rate_plan.dim_billing_account_id
     FROM bdg_subscription_product_rate_plan
-    LEFT JOIN charges 
+    LEFT JOIN charges
       ON charges.dim_subscription_id = bdg_subscription_product_rate_plan.dim_subscription_id
     WHERE bdg_subscription_product_rate_plan.product_delivery_type = 'SaaS'
       AND (
@@ -57,12 +106,12 @@
 ), joined AS (
 
     SELECT
-      saas_usage_ping.dim_subscription_id,
-      saas_usage_ping.dim_subscription_id_original,
+      subscription_date_spine_final.dim_subscription_id,
+      subscription_date_spine_final.dim_subscription_id_original,
       saas_subscriptions.dim_billing_account_id,
       saas_usage_ping.dim_namespace_id,
-      saas_usage_ping.reporting_month                                                   AS snapshot_month,
-      {{ get_date_id('saas_usage_ping.reporting_month') }}                              AS snapshot_date_id,
+      subscription_date_spine_final.date_month                                          AS snapshot_month,
+      {{ get_date_id('subscription_date_spine_final.date_month') }}                     AS snapshot_date_id,
       saas_usage_ping.ping_date                                                         AS ping_created_at,
       {{ get_date_id('saas_usage_ping.ping_date') }}                                    AS ping_created_date_id,
       saas_usage_ping.instance_type,
@@ -254,9 +303,12 @@
                                ORDER BY saas_usage_ping.reporting_month DESC
                             ) = 1,
           TRUE, FALSE)                                                                        AS is_latest_data
-    FROM saas_usage_ping
-    JOIN saas_subscriptions
-      ON saas_subscriptions.dim_subscription_id = saas_usage_ping.dim_subscription_id
+    FROM subscription_date_spine_final
+    INNER JOIN saas_subscriptions
+      ON subscription_date_spine_final.dim_subscription_id = saas_subscriptions.dim_subscription_id
+    LEFT JOIN saas_usage_ping
+      ON subscription_date_spine_final.date_month = saas_usage_ping.reporting_month
+      AND subscription_date_spine_final.dim_subscription_id = saas_usage_ping.dim_subscription_id
     LEFT JOIN gitlab_seats
       ON saas_usage_ping.dim_namespace_id = gitlab_seats.namespace_id
       AND saas_usage_ping.reporting_month = gitlab_seats.snapshot_month
@@ -268,5 +320,5 @@
     created_by="@mdrussell",
     updated_by="@mdrussell",
     created_date="2022-10-12",
-    updated_date="2022-10-12"
+    updated_date="2022-11-04"
 ) }}
