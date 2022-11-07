@@ -31,9 +31,6 @@
 
 <!-- Has the issue been resolved? How? Please include any relevant issue and/or MR links in the description -->
 
-## Timeline
-
-<!-- Please list incident activities and actions in the following format | XX:XX UTC - INCIDENT ACTIVITY; ACTION TAKEN -->
 
 ---
 
