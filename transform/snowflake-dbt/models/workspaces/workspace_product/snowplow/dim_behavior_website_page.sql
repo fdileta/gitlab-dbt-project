@@ -65,7 +65,6 @@ WITH events AS (
       -- Attributes
       page_url_path,
       clean_url_path,
-      page_url_host,
       page_url_scheme,
       page_group,
       page_type,
