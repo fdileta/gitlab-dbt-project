@@ -535,11 +535,11 @@ WITH map_merged_crm_account AS (
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
         AND sfdc_account.snapshot_id = last_modified_by.snapshot_id
     LEFT JOIN pte_scores 
-      ON sfdc_account.dim_crm_account_id = pte_scores.account_id
+      ON sfdc_account.account_id = pte_scores.account_id
         AND sfdc_account.snapshot_date >= pte_scores.valid_from::DATE
         AND  sfdc_account.snapshot_date < pte_scores.valid_to::DATE
     LEFT JOIN ptc_scores 
-      ON sfdc_account.dim_crm_account_id = ptc_scores.account_id
+      ON sfdc_account.account_id = ptc_scores.account_id
         AND sfdc_account.snapshot_date >= ptc_scores.valid_from::DATE
         AND  sfdc_account.snapshot_date < ptc_scores.valid_to::DATE
     
