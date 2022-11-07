@@ -16,6 +16,26 @@ DBT_IMAGE = "registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.11"
 PERMIFROST_IMAGE = "registry.gitlab.com/gitlab-data/permifrost:v0.13.1"
 ANALYST_IMAGE = "registry.gitlab.com/gitlab-data/data-image/analyst-image:v1.0.13"
 
+SALES_ANALYTICS_NOTEBOOKS_PATH = "analytics/sales_analytics_notebooks"
+#SALES_ANALYTICS_NOTEBOOKS_SSH_REPO = "git@gitlab.com:gitlab-data/analytics.git"
+#SALES_ANALYTICS_NOTEBOOKS_HTTP_REPO = "https://gitlab.com/gitlab-data/analytics.git"
+
+
+def get_sales_analytics_notebooks(frequency: str) -> Dict:
+
+    notebooks = []
+    fileNames = []
+
+    path =  f'{SALES_ANALYTICS_NOTEBOOKS_PATH}/{frequency}/'
+
+    for file in os.listdir(path):
+        filename = os.fsdecode(file)
+        if filename.endswith(".ipynb"):
+            notebooks.append(filename)
+            fileNames.append(os.path.splitext(filename)[0])
+        else:
+            continue
+    return dict(zip(notebooks, fileNames))
 
 analytics_pipelines_dag = [
     "dbt",
