@@ -3,11 +3,52 @@
     materialized = "table"
 ) }}
 
+
 {{ simple_cte([
-  ('prep_ping_metric_first_last_versions','prep_ping_metric_first_last_versions')
-  ])
+    ('dim_ping_instance', 'dim_ping_instance'),
+    ('dim_ping_metric', 'dim_ping_metric'),
+    ('dim_gitlab_releases', 'dim_gitlab_releases')
+    ])
+
 }}
 
+, fct_ping_instance_metric AS (
+
+    SELECT
+      {{ dbt_utils.star(from=ref('fct_ping_instance_metric'), except=['METRIC_VALUE', 'CREATED_BY', 'UPDATED_BY', 'MODEL_CREATED_DATE',
+          'MODEL_UPDATED_DATE', 'DBT_CREATED_AT', 'DBT_UPDATED_AT']) }},
+      TRY_TO_NUMBER(metric_value::TEXT) AS metric_value
+    FROM {{ ref('fct_ping_instance_metric') }}
+
+),
+
+final AS (
+
+
+    SELECT
+      fct_ping_instance_metric.metrics_path,
+      dim_ping_instance.ping_edition,
+      dim_ping_instance.version_is_prerelease
+      dim_ping_instance.major_minor_version_id ,
+      dim_ping_metric.time_frame
+    FROM fct_ping_instance_metric
+    INNER JOIN dim_ping_metric
+      ON fct_ping_instance_metric.metrics_path = dim_ping_metric.metrics_path
+    INNER JOIN dim_ping_instance
+      ON fct_ping_instance_metric.dim_ping_instance_id = dim_ping_instance.dim_ping_instance_id
+      WHERE --excluding 7d but thought this would be more forward reliable in case of new time_frames
+      (
+      dim_ping_metric.time_frame = 'none'
+      OR 
+      dim_ping_metric.time_frame = 'all'
+      OR 
+      dim_ping_metric.time_frame = '28d'
+      )
+      AND 
+      -- Removing SaaS
+      fct_ping_instance_metric.dim_instance_id != 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f'
+
+)
 -- find min and max version for each metric
 
 , transformed AS (
@@ -59,7 +100,7 @@
       )                                                                                                                                          AS last_minor_version_with_counter,
       -- Get count of installations per each metric/edition
       COUNT(DISTINCT dim_installation_id) OVER (PARTITION BY metrics_path, ping_edition, version_is_prerelease)                                  AS dim_installation_count
-    FROM prep_ping_metric_first_last_versions
+    FROM final
       INNER JOIN dim_gitlab_releases --limit to valid versions
           ON mart_ping_instance_metric_monthly.major_minor_version = dim_gitlab_releases.major_minor_version
 
