@@ -33,3 +33,4 @@
       2. [ ] Stage name should be following this name convention: `{model_short_name}_LOAD` (Examples of existing stages: `PTE_LOAD`, `PTC_LOAD`, `PTPT_LOAD`)
       3. [ ] Make sure to grant all privileges on the newly created stage to the `DATA_SCIENCE_LOADER` & `TRANSFORMER` role (permissions on stages are not handled via Periscope, which is how we generally handle Snowflake permissions)
       4. [ ] Make sure to update `roles.yml` (/permissions/snowflake/roles.yml) to add all the necessary permissions (if any new objects are queried by the new notebook) to the `DATA_SCIENCE_LOADER` role
+      5. Make sure to add the new model to the following [list](https://gitlab.com/gitlab-data/analytics/-/blob/master/dags/airflow_utils.py#L53), so that Airflow errors related to the newly introduced model will be sent to the #data-science-pipelines Slack channel
