@@ -1742,4 +1742,4 @@ models:
       - name: created_date
         description: Date the Zuora Billing user was created
       - name: is_integration_user
-        description: A flag indentifying integration users based on Zuora Billing user last names. This field is in testing as of 2022-08-11. Enterprise Apps team's templates have not been updated yet to reflect the new rules requiring all integration users to have the same last name, but will be soon.
+        description: A flag indentifying integration users based on Zuora Billing user last names.
