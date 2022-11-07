@@ -3,8 +3,9 @@
 #### Requestor To Complete
 
 1. [ ] If creating a new Data Science model ensure that all necesaary steps have been completed from the [Scoring Template](https://gitlab.com/gitlab-data/data-science/-/blob/main/templates/propensity/Score%20Model.ipynb)
-   - To read data from Snowflake, Step 2 must be completed
-   - To write data back to a Snowflake table, Step 10 must be completed
+   - To read data from Snowflake, _**Step 2**_ must be completed
+   - To write data back to a Snowflake table, _**Step 10**_ must be completed
+1. [ ] (Optional) If notebook outputs will be imported into Snowflake, specify table name: ` `
 1. [ ] Create a deployment or prod directory in your project repository from which the notebook will run. 
    - This should contain all of the snowflake queries, parameter (.yml) files, model file, notebook(s), and any additional files needed to run the process. 
    - For example, see the [PtE Prod directory](https://gitlab.com/gitlab-data/data-science-projects/propensity-to-expand/-/tree/main/prod) 
@@ -18,7 +19,7 @@
 1. [ ] Ping @data-team/engineers and request the below process
 
 
-#### Data Engineer To
+#### Data Engineer To Complete
 
 1. [ ] Create MR for new DAG in analytics repo under [/dags/data_science](https://gitlab.com/gitlab-data/analytics/-/blob/master/dags/data_science) folder.
    1. The [propensity_to_expand](https://gitlab.com/gitlab-data/analytics/-/blob/master/dags/data_science/ds_propensity_to_expand.py) DAG can be used as a template.
