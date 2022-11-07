@@ -18,6 +18,7 @@ WITH final AS (
 
       --account people
       prep_crm_account.crm_account_owner,
+      prep_crm_account.proposed_crm_account_owner,
       prep_crm_account.account_owner,
       prep_crm_account.technical_account_manager,
 
@@ -191,9 +192,9 @@ WITH final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@msendal",
-    updated_by="@j_kim",
+    updated_by="@michellecooper",
     created_date="2020-06-01",
-    updated_date="2022-10-12"
+    updated_date="2022-11-02"
 ) }}
 
 
