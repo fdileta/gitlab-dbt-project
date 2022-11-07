@@ -11,6 +11,6 @@
 
 ## To Do
 
-* [ ] For dbt models need to be refreshed, follow the [instructions](https://about.gitlab.com/handbook/business-ops/data-team/platform/infrastructure/#dbt-models-full-refresh).
+* [ ] For dbt models need to be refreshed, follow the [instructions](https://about.gitlab.com/handbook/business-technology/data-team/platform/infrastructure/#dbt-model-manual-full-refresh).
 
 cc @gitlab-data/analytics-engineers 
