@@ -3,8 +3,6 @@ import sys
 import logging
 import requests
 
-from typing import Dict, Any
-from logging import error, info, basicConfig, getLogger, warning
 from os import environ as env
 
 from gitlabdata.orchestration_utils import (
