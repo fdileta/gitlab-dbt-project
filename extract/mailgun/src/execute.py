@@ -120,7 +120,8 @@ def load_event_logs(event: str, full_refresh: bool = False):
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    run_start_date = env.get("START_TIME")
+    run_start_date = datetime.strptime(env.get("START_TIME"), '%Y-%m-%dT%H:%M:%S%z')
+
     info(run_start_date)
     info(type(run_start_date))
     # real_start_date = datetime.datetime.utcfromtimestamp(start_date)
