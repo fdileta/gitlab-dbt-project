@@ -90,6 +90,7 @@
     INNER JOIN dim_page 
       ON unstruct_event.page_url_path = dim_page.page_url_path
         AND unstruct_event.app_id = dim_page.app_id
+        AND unstruct_event.page_url_host.dim_page.page_url_host
     LEFT JOIN dim_behavior_browser
       ON unstruct_event.browser_name = dim_behavior_browser.browser_name
         AND unstruct_event.browser_major_version = dim_behavior_browser.browser_major_version

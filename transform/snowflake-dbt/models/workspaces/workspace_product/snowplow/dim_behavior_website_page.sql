@@ -13,6 +13,7 @@ WITH events AS (
 
     SELECT DISTINCT 
       app_id,
+      page_url                                                                      AS page_url,
       page_urlpath                                                                  AS page_url_path,
       {{ clean_url('page_urlpath') }}                                               AS clean_url_path,
       page_urlhost                                                                  AS page_url_host,
@@ -20,7 +21,6 @@ WITH events AS (
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
-      refr_medium                                                                   AS referrer_medium,
       uploaded_at
     FROM events
     WHERE page_urlpath IS NOT NULL
@@ -29,6 +29,7 @@ WITH events AS (
 
     SELECT DISTINCT 
       app_id,
+      refr_urlhost || refr_urlpath                                                  AS page_url,
       refr_urlpath                                                                  AS page_url_path,
       {{ clean_url('refr_urlpath') }}                                               AS clean_url_path,
       refr_urlhost                                                                  AS page_url_host,
@@ -36,7 +37,6 @@ WITH events AS (
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
-      refr_medium                                                                   AS referrer_medium,
       uploaded_at
     FROM events
     WHERE refr_urlpath IS NOT NULL
@@ -55,20 +55,21 @@ WITH events AS (
 
     SELECT
       -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['page_url_path', 'app_id']) }}               AS dim_behavior_website_page_sk,
+      {{ dbt_utils.surrogate_key(['page_url', 'app_id', 'page_url_host']) }}               AS dim_behavior_website_page_sk,
 
       -- Natural Keys
-      page_url_path,
+      page_url,
       app_id,
+      page_url_host,
 
       -- Attributes
+      page_url_path,
       clean_url_path,
       page_url_host,
       page_url_scheme,
       page_group,
       page_type,
       page_sub_type,
-      referrer_medium,
       REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1) AS url_namespace_id,
       REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1) AS url_project_id,
       CASE 
