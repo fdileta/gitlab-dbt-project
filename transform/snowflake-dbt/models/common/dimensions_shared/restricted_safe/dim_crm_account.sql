@@ -182,6 +182,7 @@ WITH final AS (
       prep_crm_account.last_modified_date,
       prep_crm_account.last_activity_date,
       prep_crm_account.is_deleted,
+      prep_crm_account.pte_score,
       prep_crm_account.pte_decile,
       prep_crm_account.pte_score_group,
       prep_crm_account.ptc_score,
