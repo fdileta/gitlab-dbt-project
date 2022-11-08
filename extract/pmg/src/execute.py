@@ -12,8 +12,7 @@ config_dict = env.copy()
 
 
 def get_pmg_reporting_data_query(start_date: str, end_date: str) -> str:
-    return (
-        f"""
+    return f"""
         SELECT 
           date,
           medium                    AS utm_medium,
@@ -46,7 +45,6 @@ def get_pmg_reporting_data_query(start_date: str, end_date: str) -> str:
           `pmg-datawarehouse.gitlab_analytics.cross_channel`
           WHERE date >= '{end_date}' and date < '{start_date}'
         """
-    )
 
 
 def write_date_json(date: str, df: DataFrame) -> str:
