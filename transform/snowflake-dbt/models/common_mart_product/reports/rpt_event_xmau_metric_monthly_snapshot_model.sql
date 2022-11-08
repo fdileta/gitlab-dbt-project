@@ -1,5 +1,6 @@
 {{ config(
-    materialized='table',
+    materialized='incremental',
+    unique_key='rpt_event_xmau_metric_monthly_snapshot_id'
     tags=["mnpi_exception", "product"]
 ) }}
 
@@ -245,7 +246,7 @@ results AS (
 {{ dbt_audit(
     cte_ref="results",
     created_by="@icooper_acp",
-    updated_by="@iweeks",
+    updated_by="@snalamaru",
     created_date="2022-02-23",
-    updated_date="2022-09-19"
+    updated_date="2022-11-03"
 ) }}
