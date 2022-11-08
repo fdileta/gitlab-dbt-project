@@ -17,9 +17,9 @@ def get_pmg_reporting_data_query(start_date: str, end_date: str) -> str:
         f"""
         SELECT 
           date,
-          utm_medium,
-          utm_source,
-          utm_campaign,
+          medium,
+          source,
+          campaign_id,
           campaign_code,
           geo,
           targeting,
@@ -34,7 +34,7 @@ def get_pmg_reporting_data_query(start_date: str, end_date: str) -> str:
           impressions,
           clicks,
           conversions,
-          cost,
+          total_cost,
           ga_conversions,
           sends, 
           opens, 
