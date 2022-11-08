@@ -16,7 +16,8 @@
 1. [ ] Specify requested schedule: ` `
    1. The schedule should be specified using cron tab scheduling.
    2. For examples and help specifying a schedule, see [CronTab Guru](https://crontab.guru/#*_*_*/1__)
-1. Specify table structure for the scores source table and the final view.
+1. Specify table names and structure for the scores source table and the final view.
+    1. Usually the source table is named as follows: `[model_name]_scores` (ex. `ptc_scores`, `ptpt_scores`, `namespace_segmentation_scores`)
     1. Existing examples (the raw table is the one where the JSON scores are loaded directly from the notebook and the prod view is how these values are exposed to the `workspace_data_science` schema): `raw.data_science.ptc_scores (JSONTEXT VARIANT, UPLOADED_AT TIMESTAMP_NTZ(9))` and `prod.workspace_data_science.ptc_scores(CRM_ACCOUNT_ID VARCHAR, SCORE_DATE TIMESTAMP, SCORE NUMBER(38,4), DECILE NUMBER(38,0), IMPORTANCE NUMBER(38,0), SCORE_GROUP NUMBER(38,0), INSIGHTS VARCHAR, RENEWAL_DATE TIMESTAMP, UPLOADED_AT TIMESTAMP)`
 1. [ ] Ping @data-team/engineers and request the below process
 
