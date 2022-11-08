@@ -41,7 +41,7 @@ default_args = {
 dag = DAG(
     "mailgun_extract_backfill",
     default_args=default_args,
-    schedule_interval="0 */12 * * *",
+    schedule_interval=None,
     concurrency=1
 )
 
