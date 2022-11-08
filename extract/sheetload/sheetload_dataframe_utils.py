@@ -1,13 +1,11 @@
 import time
-from logging import error, info, basicConfig, getLogger, warning
+from logging import errorinfo
 
 import numpy as np
 import pandas as pd
 from sqlalchemy.engine.base import Engine
 
 from gitlabdata.orchestration_utils import (
-    postgres_engine_factory,
-    snowflake_engine_factory,
     query_executor,
 )
 
