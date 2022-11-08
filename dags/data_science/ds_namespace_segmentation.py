@@ -2,7 +2,6 @@
 Namespace Segmentation DAG
 """
 
-
 import os
 from datetime import datetime, timedelta
 
@@ -68,7 +67,7 @@ clone_data_science_ptc_repo_cmd = f"""
 dag = DAG(
     "ds_namespace_segmentation",
     default_args=default_args,
-    schedule_interval="0 4 9 * *",
+    schedule_interval="0 4 3 * *",
 )
 
 # Task 1
