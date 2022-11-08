@@ -79,7 +79,7 @@ def dw_uploader_append_only(
 
     # Clean the column names and add metadata, generate the dtypes
     data.columns = [
-        str(column_name).replace(" ", "_").replace("/", "_")
+        str(column_name).strip().replace(" ", "_").replace("/", "_")
         for column_name in data.columns
     ]
     data = data.infer_objects()
