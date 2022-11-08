@@ -38,7 +38,8 @@
       page_view_index,
       page_view_in_session_index,
       referer_url_path,
-      page_url
+      page_url,
+      referer_url
     FROM page_views
 
     {% if is_incremental() %}
@@ -88,13 +89,13 @@
       page_views_w_clean_url.page_view_in_session_index
     FROM page_views_w_clean_url
     LEFT JOIN dim_behavior_website_page 
-      ON page_views_w_clean_url.page_url_path = dim_behavior_website_page.page_url_path
+      ON page_views_w_clean_url.page_url = dim_behavior_website_page.page_url
         AND page_views_w_clean_url.app_id = dim_behavior_website_page.app_id
-        AND page_views_w_clean_url.page_url_host = dim_behavior_website_page.page_url_host
+        AND page_views_w_clean_url.page_url_scheme = dim_behavior_website_page.page_url_scheme
     LEFT JOIN dim_behavior_website_page AS referrer_website_page
-      ON page_views_w_clean_url.referer_url_path = referrer_website_page.page_url_path
+      ON page_views_w_clean_url.referer_url = referrer_website_page.page_url
         AND page_views_w_clean_url.app_id = referrer_website_page.app_id
-        AND page_views_w_clean_url.page_url_host = referrer_website_page.page_url_host
+        AND page_views_w_clean_url.page_url_scheme = referrer_website_page.page_url_scheme
 
 )
 
@@ -103,5 +104,5 @@
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-11-02"
+    updated_date="2022-11-08"
 ) }}

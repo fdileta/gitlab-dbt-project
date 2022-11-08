@@ -55,7 +55,7 @@ WITH events AS (
 
     SELECT
       -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['page_url', 'app_id', 'page_url_host']) }}               AS dim_behavior_website_page_sk,
+      {{ dbt_utils.surrogate_key(['page_url', 'app_id', 'page_url_scheme']) }}               AS dim_behavior_website_page_sk,
 
       -- Natural Keys
       page_url,

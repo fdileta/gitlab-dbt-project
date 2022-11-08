@@ -90,9 +90,9 @@
 
     FROM structured_events_w_clean_url
     LEFT JOIN dim_behavior_website_page
-      ON structured_events_w_clean_url.page_url_path = dim_behavior_website_page.page_url_path
+      ON structured_events_w_clean_url.page_url = dim_behavior_website_page.page_url
         AND structured_events_w_clean_url.app_id = dim_behavior_website_page.app_id
-        AND structured_events_w_clean_url.page_url_host = dim_behavior_website_page.page_url_host
+        AND structured_events_w_clean_url.page_url_scheme = dim_behavior_website_page.page_url_scheme
     LEFT JOIN dim_behavior_browser
       ON structured_events_w_clean_url.browser_name = dim_behavior_browser.browser_name
         AND structured_events_w_clean_url.browser_major_version = dim_behavior_browser.browser_major_version
