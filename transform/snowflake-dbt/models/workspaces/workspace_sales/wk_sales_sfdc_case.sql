@@ -53,4 +53,4 @@ from source
 
 )
 SELECT *
-FROM final;
+FROM renamed
