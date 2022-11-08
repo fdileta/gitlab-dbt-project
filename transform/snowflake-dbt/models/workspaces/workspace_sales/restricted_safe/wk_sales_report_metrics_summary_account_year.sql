@@ -111,7 +111,7 @@ WITH date_details AS (
   FROM dim_crm_account AS a
   CROSS JOIN report_dates AS d
 
-  ), nfy_atr_base AS (
+   ), nfy_atr_base AS (
 
     SELECT
       o.account_id,
@@ -582,10 +582,17 @@ WITH date_details AS (
     trim(upa_owner.employee_number)     AS upa_owner_employee_number,
     dim_account.forbes_2000_rank        AS account_forbes_rank,
     a.billing_country                   AS account_country,
-    coalesce(dim_account.parent_crm_account_billing_country, REPLACE(REPLACE(REPLACE(upa.tsp_address_country,'The Netherlands','Netherlands'),'Russian Federation','Russia'), 'Russia','Russian Federation'))                                     AS upa_country,
-    dim_account.parent_crm_account_demographics_upa_state           AS upa_state,
-    dim_account.parent_crm_account_demographics_upa_city            AS upa_city,
-    dim_account.parent_crm_account_demographics_upa_postal_code     AS upa_zip_code,
+    
+    -- Account demographics fields
+    dim_account.parent_crm_account_demographics_geo                 AS upa_ad_geo,
+    dim_account.parent_crm_account_demographics_region              AS upa_ad_region,
+    dim_account.parent_crm_account_demographics_area                AS upa_ad_area,
+    
+    coalesce(dim_account.parent_crm_account_billing_country, REPLACE(REPLACE(REPLACE(upa.tsp_address_country,'The Netherlands','Netherlands'),'Russian Federation','Russia'), 'Russia','Russian Federation'))              AS upa_ad_country,
+    dim_account.parent_crm_account_demographics_upa_state           AS upa_ad_state,
+    dim_account.parent_crm_account_demographics_upa_city            AS upa_ad_city,
+    dim_account.parent_crm_account_demographics_upa_postal_code     AS upa_ad_zip_code,
+
 
     
     -- substitute this by key segment
@@ -847,16 +854,25 @@ WITH date_details AS (
     upa_name,
     upa_owner_name,
     upa_owner_id,
-    upa_country,
-    upa_state,
-    upa_city,
-    upa_zip_code,
+    upa_industry,
+    
+    -- Account Demographics Fields
+    upa_ad_geo,
+    upa_ad_region,
+    upa_ad_area,
+    upa_ad_country,
+    upa_ad_state,
+    upa_ad_city,
+    upa_ad_zip_code,
+
+    -- Account User Owner fields
     upa_user_geo,
     upa_user_region,
     upa_user_segment,
     upa_user_area,
     upa_user_role,
-    upa_industry,
+    
+    
     SUM(CASE WHEN account_forbes_rank IS NOT NULL THEN 1 ELSE 0 END)   AS count_forbes_accounts,
     MIN(account_forbes_rank)      AS forbes_rank,
     MAX(potential_users)          AS potential_users,
@@ -865,13 +881,9 @@ WITH date_details AS (
     MAX(zi_developers)            AS zi_developers,
     MAX(zi_revenue)               AS zi_revenue,
     MAX(employees)                AS employees,
-    MAX(upa_lam_dev_count)  AS upa_lam_dev_count,
+    MAX(upa_lam_dev_count)        AS upa_lam_dev_count,
 
     SUM(has_technical_account_manager_flag) AS count_technical_account_managers,
-
-    -- LAM
-   -- MAX(potential_arr_lam)            AS potential_arr_lam,
-   -- MAX(potential_carr_this_account)  AS potential_carr_this_account,
 
     -- atr for current fy
     SUM(fy_sfdc_atr)  AS fy_sfdc_atr,
@@ -962,7 +974,7 @@ WITH date_details AS (
     SUM(fy_sao_booked_net_arr)                      AS fy_sao_booked_net_arr
     
   FROM consolidated_accounts
-  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
     
 ), final AS (
 
@@ -999,6 +1011,6 @@ WITH date_details AS (
 )
 
 SELECT *
-FROM final
+FROM consolidated_accounts
 
 
