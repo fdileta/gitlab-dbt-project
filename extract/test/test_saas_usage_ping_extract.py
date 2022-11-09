@@ -1,18 +1,22 @@
-""" Test module for saas service ping """
-import sys
-import os
-from datetime import datetime
+"""
+The main test routine for Automated Service Ping
+"""
+from datetime import datetime, timedelta
+
 import pytest
 
-# Tweak path as due to script execution way in Airflow, can't touch the original code
-abs_path = os.path.dirname(os.path.realpath(__file__))
-abs_path = abs_path[: abs_path.find("extract")] + "/extract/saas_usage_ping"
-sys.path.append(abs_path)
+from extract.saas_usage_ping.usage_ping import (
+    UsagePing,
+    SCHEMA_NAME,
+    ENCODING,
+    NAMESPACE_FILE,
+    get_backfill_filter,
+    SQL_KEY,
+    REDIS_KEY,
+)
 
-from extract.saas_usage_ping.usage_ping import UsagePing, SQL_KEY, REDIS_KEY
 
-
-@pytest.fixture
+@pytest.fixture(name="metrics_definition_test_dict")
 def get_metrics_definition_test_dict():
     """
     Returns a test metric_definitions dict...
@@ -57,8 +61,46 @@ def get_metrics_definition_test_dict():
     }
 
 
-def test_get_md5():
-    usage_ping_test = UsagePing
+@pytest.fixture(name="usage_ping")
+def get_usage_ping():
+    """
+    Return UsagePing object
+    """
+    usage_ping = UsagePing
+    usage_ping.end_date = datetime.now()
+    usage_ping.start_date_28 = usage_ping.end_date - timedelta(days=28)
+
+    return usage_ping
+
+
+@pytest.fixture(name="namespace_file")
+def get_usage_ping_namespace_file(usage_ping):
+    """
+    Fixture for namespace file
+    """
+
+    return usage_ping._get_meta_data(
+        usage_ping, file_name="usage_ping_namespace_queries.json"
+    )
+
+
+def test_static_variables():
+    """
+    Check static variables
+    """
+    assert SCHEMA_NAME == "saas_usage_ping"
+    assert ENCODING == "utf8"
+    assert NAMESPACE_FILE == "usage_ping_namespace_queries.json"
+
+
+def test_get_md5(usage_ping):
+    """
+    Simple MD5 test.
+    Know testing the private method is not aligned
+    with the best praxis,
+    but found it is sufficient
+    in this implementation.
+    """
 
     input_timestamps = [
         datetime(2021, 9, 1, 23, 10, 21).timestamp(),
@@ -68,17 +110,17 @@ def test_get_md5():
         "",
         None,
     ]
-    """
-    Know testing the private method is not aligned with best praxis, but found it is sufficient
-    in this implementation.
-    """
+
     for check_time in input_timestamps:
-        res = usage_ping_test._get_md5(None, check_time)
+        res = usage_ping._get_md5(None, check_time)
+
         # Check output data type
         assert isinstance(res, str)
         # Check is len 32 as it is expected length
         assert len(res) == 32  # bytes in hex representation
-        # As this is one-way function, can't test it with many things - let see to we have all details with various inputs
+        # As this is one-way function,
+        # can't test it with many things
+        # let see to we have all details with various inputs
         assert res is not None
 
 
@@ -140,7 +182,108 @@ def test_evaluate_saas_queries():
     assert get_keys_in_nested_dict(errors) == get_keys_in_nested_dict(expected_errors)
 
 
-def test_check_data_source(get_metrics_definition_test_dict):
+def test_json_file_consistency_time_window_query(namespace_file):
+    """
+    Test is dictionary is constructed properly in
+    the file usage_ping_namespace_queries.json
+
+    If time_window_query=True,
+    counter_query should contain ["between_start_date","between_end_date"]
+    """
+
+    for metrics in namespace_file:
+        counter_query = metrics.get("counter_query")
+        time_window_query = bool(metrics.get("time_window_query", False))
+
+        time_window_yes = (
+            "between_start_date" in counter_query
+            and "between_end_date" in counter_query
+            and time_window_query is True
+        )
+        time_window_no = (
+            "between_start_date" not in counter_query
+            and "between_end_date" not in counter_query
+            and time_window_query is False
+        )
+
+        assert time_window_yes or time_window_no
+
+
+def test_namespace_file(namespace_file):
+    """
+    Test file loading
+    """
+
+    assert namespace_file
+
+
+def test_namespace_file_error(usage_ping):
+    """
+    Test file loading
+    """
+    with pytest.raises(FileNotFoundError):
+        usage_ping._get_meta_data(usage_ping, file_name="THIS_DOES_NOT_EXITS.json")
+
+
+def test_json_file_consistency_level(namespace_file):
+    """
+    Test is dictionary is constructed properly in
+    the file usage_ping_namespace_queries.json
+
+    If level=namespace
+    """
+
+    for metrics in namespace_file:
+        level = metrics.get("level")
+
+        assert level == "namespace"
+
+
+@pytest.mark.parametrize(
+    "test_value, expected_value",
+    [
+        ("active_user_count", False),
+        (
+            "usage_activity_by_stage_monthly.manage.groups_with_event_streaming_destinations",
+            True,
+        ),
+        ("usage_activity_by_stage_monthly.manage.audit_event_destinations", True),
+        ("counts.boards", False),
+        ("usage_activity_by_stage_monthly.configure.instance_clusters_enabled", True),
+        ("counts_monthly.deployments", True),
+    ],
+)
+def test_get_backfill_filter(namespace_file, test_value, expected_value):
+    """
+    test backfill filter accuracy with
+    lambda as a return statement
+    """
+
+    metrics_filter = get_backfill_filter([test_value])
+
+    for namespace in namespace_file:
+        if metrics_filter(namespace):
+            assert namespace.get("time_window_query") == expected_value
+            assert expected_value is True
+            assert namespace.get("counter_name") == test_value
+
+
+def test_replace_placeholders(usage_ping):
+    """
+    Test string replace for query
+    """
+    sql = "SELECT 1 FROM TABLE WHERE created_at BETWEEN between_start_date AND between_end_date"
+
+    actual = usage_ping.replace_placeholders(usage_ping, sql=sql)
+
+    assert "between_start_date" not in actual
+    assert "between_end_date" not in actual
+
+    assert datetime.strftime(usage_ping.end_date, "%Y-%m-%d") in actual
+    assert datetime.strftime(usage_ping.start_date_28, "%Y-%m-%d") in actual
+
+
+def test_check_data_source(metrics_definition_test_dict):
     """
     Test the following:
         1. Valid matching source is returned for the current metric, and the parent metric
@@ -155,7 +298,7 @@ def test_check_data_source(get_metrics_definition_test_dict):
     prev_concat_metric_name = "counts"
     res = usage_ping_test.check_data_source(
         payload_source,
-        get_metrics_definition_test_dict,
+        metrics_definition_test_dict,
         concat_metric_name,
         prev_concat_metric_name,
     )
@@ -167,7 +310,7 @@ def test_check_data_source(get_metrics_definition_test_dict):
     prev_concat_metric_name = "usage_activity_by_stage.secure"
     res = usage_ping_test.check_data_source(
         payload_source,
-        get_metrics_definition_test_dict,
+        metrics_definition_test_dict,
         concat_metric_name,
         prev_concat_metric_name,
     )
@@ -181,7 +324,7 @@ def test_check_data_source(get_metrics_definition_test_dict):
     prev_concat_metric_name = "usage_activity_by_stage.manage.user_auth_by_provider"
     res = usage_ping_test.check_data_source(
         payload_source,
-        get_metrics_definition_test_dict,
+        metrics_definition_test_dict,
         concat_metric_name,
         prev_concat_metric_name,
     )
@@ -195,7 +338,7 @@ def test_check_data_source(get_metrics_definition_test_dict):
     prev_concat_metric_name = "usage_activity_by_stage.manage.user_auth_by_provider"
     res = usage_ping_test.check_data_source(
         payload_source,
-        get_metrics_definition_test_dict,
+        metrics_definition_test_dict,
         concat_metric_name,
         prev_concat_metric_name,
     )
@@ -207,14 +350,14 @@ def test_check_data_source(get_metrics_definition_test_dict):
     prev_concat_metric_name = "some_missing_key"
     res = usage_ping_test.check_data_source(
         payload_source,
-        get_metrics_definition_test_dict,
+        metrics_definition_test_dict,
         concat_metric_name,
         prev_concat_metric_name,
     )
     assert res == "missing_definition"
 
 
-def test_keep_valid_metric_definitions(get_metrics_definition_test_dict):
+def test_keep_valid_metric_definitions(metrics_definition_test_dict):
     """
     Test that only the correct metrics as defined by the metric_definitions yaml file are preserved within the payload.
 
@@ -235,7 +378,7 @@ def test_keep_valid_metric_definitions(get_metrics_definition_test_dict):
 
     payload_source = REDIS_KEY
     valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(
-        payload, payload_source, get_metrics_definition_test_dict
+        payload, payload_source, metrics_definition_test_dict
     )
     expected_results = {
         "recorded_at": "2022-10-13T20:23:45.242Z",
@@ -247,7 +390,7 @@ def test_keep_valid_metric_definitions(get_metrics_definition_test_dict):
     assert valid_metric_dict == expected_results
 
 
-def test_metric_exceptions(get_metrics_definition_test_dict):
+def test_metric_exceptions(metrics_definition_test_dict):
     """
     Tests that metrics defined in list(METRICS_EXCEPTION) are removed.
     """
@@ -259,7 +402,7 @@ def test_metric_exceptions(get_metrics_definition_test_dict):
 
     payload_source = SQL_KEY
     valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(
-        payload, payload_source, get_metrics_definition_test_dict
+        payload, payload_source, metrics_definition_test_dict
     )
     expected_results = {
         "active_user_count": 'SELECT COUNT("users"."id") FROM "users" WHERE ("users"."state" IN (\'active\')) AND ("users"."user_type" IS NULL OR "users"."user_type" IN (6, 4))'
