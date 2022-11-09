@@ -22,10 +22,6 @@ This macro stores all of the shared logic between the live and snapshot crm acco
 This macro buckets a unit into a deal size (Small, Medium, Big, or Jumbo) based on an inputted value.
 {% enddocs %}
 
-{% docs sfdc_opportunity_fields%}
-This macro stores all of the shared logic between the live and snapshot crm opportunity models. It takes two values for the model_type variable ('snapshot', 'live') to create either the snapshot or live view of a model from the `source` models. Whenever a new field is added to the live `_source` model, it will need to be added to the `_snapshots_source` model as well to maintain continuity between the live and snapshot models.
-{% enddocs %}
-
 {% docs sfdc_source_buckets %}
 This macro is a CASE WHEN statement that groups the lead sources into new marketing-defined buckets. @rkohnke is the DRI on any changes made to this macro.
 {% enddocs %}

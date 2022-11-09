@@ -75,3 +75,9 @@ https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/access.rb#L12
 https://docs.gitlab.com/ee/api/access_requests.html
 
 {% enddocs %}
+
+{% docs net_iacv_to_net_arr_ratio %}
+
+Prior to using Net Annual Recurring Revneue (ARR) as for financial reporting, GitLab calculated Net Incremental Annual Contract Value (IACV). This CSV maps the ratio between the two metrics by order type and user segment so older opportunities with IACV can be adjusted to show ARR.
+
+{% enddocs %}
