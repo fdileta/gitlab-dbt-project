@@ -1074,6 +1074,8 @@ roles:
         warehouses:
             - dev_xs
             - loading
+        member_of:
+            - restricted_safe
         owns:
             schemas:
                 - raw.sales_analytics
@@ -2483,7 +2485,6 @@ roles:
             - analyst_sales
             - data_team_analyst
             - reporter
-            - restricted_safe
             - xactly
 
         warehouses:
