@@ -384,6 +384,7 @@
     cohort_base.inquiry_order_type_historical,
     cohort_base.mql_order_type_historical,
     cohort_base.lead_source,    
+    cohort_base.status AS crm_person_status,
     cohort_base.email_domain_type,
     cohort_base.is_mql,
     cohort_base.account_demographics_sales_segment,
@@ -638,5 +639,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-07-20",
-    updated_date="2022-10-19",
+    updated_date="2022-11-09",
   ) }}
