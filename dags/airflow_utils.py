@@ -26,11 +26,8 @@ DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = (
 )
 
 
-
-
-
 def get_data_science_project_command(model_http_path, model_ssh_path, model_folder):
-    return  f"""
+    return f"""
     {data_test_ssh_key_cmd} &&
     if [[ -z "$GIT_COMMIT" ]]; then
         export GIT_COMMIT="HEAD"

@@ -43,7 +43,11 @@ default_args = {
 }
 
 # Prep the cmd
-clone_data_science_namespace_segmentation_repo_cmd = get_data_science_project_command(DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO, DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO, 'namespace-segmentation')
+clone_data_science_namespace_segmentation_repo_cmd = get_data_science_project_command(
+    DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO,
+    DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO,
+    "namespace-segmentation",
+)
 
 # Create the DAG
 # Run on the 3rd day of every month at 4AM
