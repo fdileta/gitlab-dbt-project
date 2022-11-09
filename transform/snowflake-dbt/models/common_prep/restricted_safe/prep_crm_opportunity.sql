@@ -1,7 +1,8 @@
 {{ simple_cte([
     ('sfdc_user_roles_source','sfdc_user_roles_source'),
     ('net_iacv_to_net_arr_ratio', 'net_iacv_to_net_arr_ratio'),
-    ('dim_date', 'dim_date')
+    ('dim_date', 'dim_date'),
+    ('sfdc_opportunity_stage', 'sfdc_opportunity_stage_source')
 ]) }}
 
 --- union live and snapshot sources with a 
@@ -36,11 +37,6 @@
       COUNT(DISTINCT attribution_touchpoints.campaign_id)   AS count_campaigns
     FROM attribution_touchpoints
     GROUP BY 1
-
-), sfdc_opportunity_stage AS (
-
-    SELECT *
-    FROM {{ref('sfdc_opportunity_stage_source')}}
 
 ), sfdc_opportunity_base AS (
 
