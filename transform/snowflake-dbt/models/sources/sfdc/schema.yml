@@ -63,7 +63,7 @@ models:
         tags: ["tdf", "sfdc"]
         tests:
           - relationships:
-              to: ref('sfdc_campaign')
+              to: ref('sfdc_campaign_source')
               field: campaign_id
   - name: sfdc_bizible_touchpoint_source
     description: Touch points are on leads and contacts.
