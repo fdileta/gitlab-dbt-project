@@ -65,6 +65,15 @@ def dw_uploader(
     return True
 
 
+def translate_column_names(input: str):
+    """
+        Converts column names into a SnowFlake - parsable format.
+    :param input:
+    :return:
+    """
+    return input.strip().translate(input.maketrans(" /", "__"))  # can easily add more
+
+
 def dw_uploader_append_only(
     engine: Engine,
     table: str,
@@ -77,7 +86,7 @@ def dw_uploader_append_only(
 
     # Clean the column names and add metadata, generate the dtypes
     data.columns = [
-        str(column_name).strip().replace(" ", "_").replace("/", "_")
+        translate_column_names(str(column_name))
         for column_name in data.columns
     ]
     data = data.infer_objects()
