@@ -25,6 +25,7 @@ from kube_secrets import (
     SNOWFLAKE_SALES_ANALYTICS_LOAD_ROLE,
     GITLAB_ANALYTICS_PRIVATE_TOKEN,
 )
+from kubernetes_helpers import get_affinity, get_toleration
 
 # Load the env vars into a dict and set Secrets
 env = os.environ.copy()
@@ -82,6 +83,8 @@ for notebook, task_name in notebooks.items():
             GITLAB_ANALYTICS_PRIVATE_TOKEN,
         ],
         env_vars=pod_env_vars,
+        affinity=get_affinity(True),
+        tolerations=get_toleration(True),
         arguments=[container_cmd_load],
         dag=dag,
     )
