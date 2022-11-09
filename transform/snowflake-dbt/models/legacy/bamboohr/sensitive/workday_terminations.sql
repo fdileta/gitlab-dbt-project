@@ -12,6 +12,7 @@ final AS (
       uploaded_at,
       effective_date,
       employment_status,
+      exit_impact,
       termination_reason,
       initiated_at
     FROM workday
