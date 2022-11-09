@@ -12,7 +12,9 @@ from airflow_utils import (
     gitlab_defaults,
     gitlab_pod_env_vars,
     slack_failed_task,
-    data_test_ssh_key_cmd,
+    get_data_science_project_command,
+    DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO,
+    DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO,
 )
 from kube_secrets import (
     SNOWFLAKE_ACCOUNT,
@@ -40,34 +42,11 @@ default_args = {
     "dagrun_timeout": timedelta(hours=2),
 }
 
-# Prepare the cmd
-DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO = (
-    "git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git"
-)
-DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = (
-    "https://gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git"
-)
-
-clone_data_science_ptc_repo_cmd = f"""
-    {data_test_ssh_key_cmd} &&
-    if [[ -z "$GIT_COMMIT" ]]; then
-        export GIT_COMMIT="HEAD"
-    fi
-    if [[ -z "$GIT_DATA_TESTS_PRIVATE_KEY" ]]; then
-        export REPO="{DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO}";
-        else
-        export REPO="{DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO}";
-    fi &&
-    echo "git clone -b main --single-branch --depth 1 $REPO" &&
-    git clone -b main --single-branch --depth 1 $REPO &&
-    echo "checking out commit $GIT_COMMIT" &&
-    cd namespace-segmentation &&
-    git checkout $GIT_COMMIT &&
-    echo pwd &&
-    cd .."""
+# Prep the cmd
+clone_data_science_namespace_segmentation_repo_cmd = get_data_science_project_command(DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO, DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO, 'namespace-segmentation')
 
 # Create the DAG
-# Run on the 9th of every month
+# Run on the 3rd day of every month at 4AM
 dag = DAG(
     "ds_namespace_segmentation",
     default_args=default_args,
@@ -76,7 +55,7 @@ dag = DAG(
 
 # Task 1
 ptc_scoring_command = f"""
-    {clone_data_science_ptc_repo_cmd} &&
+    {clone_data_science_namespace_segmentation_repo_cmd} &&
     cd namespace-segmentation/prod &&
     papermill scoring_code.ipynb -p is_local_development False
 """
