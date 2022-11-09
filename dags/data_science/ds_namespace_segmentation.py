@@ -41,8 +41,12 @@ default_args = {
 }
 
 # Prepare the cmd
-DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO = "git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git"
-DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = "https://gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git"
+DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO = (
+    "git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git"
+)
+DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = (
+    "https://gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git"
+)
 
 clone_data_science_ptc_repo_cmd = f"""
     {data_test_ssh_key_cmd} &&
