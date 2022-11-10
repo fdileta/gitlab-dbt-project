@@ -299,7 +299,9 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_total_funding                                AS crm_account_zoom_info_total_funding,
       sfdc_account.forbes_2000_rank,
       sfdc_account.parent_account_industry_hierarchy,
-      sfdc_account.sales_development_rep,      
+      sfdc_account.sales_development_rep,
+	  sfdc_account.admin_manual_source_number_of_employees,
+      sfdc_account.admin_manual_source_account_address,      
 
       --degenerative dimensions
       sfdc_account.is_sdr_target_account,
