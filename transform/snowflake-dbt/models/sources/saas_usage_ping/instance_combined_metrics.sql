@@ -51,7 +51,7 @@ final AS (
     run_results['license_trial']::BOOLEAN AS license_trial,
     run_results['source_license_id']::NUMBER AS source_license_id,
     run_results['installation_type']::VARCHAR AS installation_type,
-    -- run_results['database_version']::VARCHAR                    AS database_version,
+    -- run_results['database_version']::VARCHAR AS database_version,
     run_results['license_plan']::VARCHAR AS license_plan,
     run_results['database']['adapter']::VARCHAR AS database_adapter,
     CONCAT(
@@ -74,11 +74,11 @@ final AS (
     run_results['reply_by_email_enabled']::BOOLEAN AS reply_by_email_enabled,
     run_results['signup_enabled']::BOOLEAN AS signup_enabled,
     run_results['prometheus_metrics_enabled']::BOOLEAN AS prometheus_metrics_enabled,
-    -- run_results['gitaly_clusters']::NUMBER                      AS gitaly_clusters,
+    -- run_results['gitaly_clusters']::NUMBER AS gitaly_clusters,
     PARSE_JSON(run_results['usage_activity_by_stage']) AS usage_activity_by_stage,
-    -- run_results['gitaly_servers']::NUMBER                       AS gitaly_servers,
+    -- run_results['gitaly_servers']::NUMBER AS gitaly_servers,
     PARSE_JSON(run_results['usage_activity_by_stage_monthly']) AS usage_activity_by_stage_monthly,
-    -- run_results['gitpod_enabled']::VARCHAR                      AS gitpod_enabled,
+    -- run_results['gitpod_enabled']::VARCHAR AS gitpod_enabled,
     run_results['gitaly']['version']::VARCHAR AS gitaly_version,
     run_results['gitaly']['filesystems']::VARCHAR AS gitaly_filesystems,
     PARSE_JSON(run_results['object_store']) AS object_store,
@@ -90,11 +90,9 @@ final AS (
     run_results['ingress_modsecurity_enabled']::BOOLEAN AS is_ingress_modsecurity_enabled,
     PARSE_JSON(run_results['topology']) AS topology,
     run_results['grafana_link_enabled']::BOOLEAN AS is_grafana_link_enabled,
-    -- run_results['container_registry_vendor']::VARCHAR           AS container_registry_vendor,
+    -- run_results['container_registry_vendor']::VARCHAR AS container_registry_vendor,
     PARSE_JSON(run_results['analytics_unique_visits']) AS analytics_unique_visits,
-    run_results[
-      'container_registry_server'
-    ]['version']::VARCHAR AS container_registry_version
+    run_results['container_registry_server']['version']::VARCHAR AS container_registry_version
   FROM cleaned
 )
 
