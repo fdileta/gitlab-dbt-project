@@ -21,6 +21,7 @@ cleaned AS (
     PARSE_JSON(run_results) AS run_results,
     DATEADD('s', _uploaded_at, '1970-01-01')::TIMESTAMP AS uploaded_at
   FROM source
+  WHERE ping_source = 'combined'
 
 ),
 
