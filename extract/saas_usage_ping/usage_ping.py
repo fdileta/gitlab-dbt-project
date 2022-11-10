@@ -453,10 +453,17 @@ class UsagePing:
         - The Redis & SQL metrics dont share the same key
             - unlikely unless the duplicate keys are missing from definition file
         """
+
+        def is_first_seven_days_of_month(dt):
+            if dt.day >= 1 and dt.day <= 7:
+                return True
+            return False
+
         has_error = False
-        if self.missing_definitions[SQL_KEY] or self.missing_definitions[REDIS_KEY]:
+        # only alert once a month as missing definitons need to be fixed by PI team
+        if is_first_seven_days_of_month(datetime.datetime.now()) and (self.missing_definitions[SQL_KEY] or self.missing_definitions[REDIS_KEY]):
             logging.warning(
-                f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}. Please open up an issue with product intelligence to add missing definition into the yaml file."
+                f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}. If there is not already an issue, please open one for product intelligence to add missing definition(s) to the yaml file."
             )
             has_error = True
 
@@ -522,7 +529,7 @@ class UsagePing:
         if sql_metric_errors:
             self.upload_sql_metric_errors(sql_metric_errors)
 
-        # self.run_metric_checks()
+        self.run_metric_checks()
 
     def replace_placeholders(self, sql: str) -> str:
         """
