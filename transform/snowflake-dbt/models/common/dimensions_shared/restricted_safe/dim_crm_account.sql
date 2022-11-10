@@ -135,6 +135,8 @@ WITH final AS (
       prep_crm_account.forbes_2000_rank,
       prep_crm_account.parent_account_industry_hierarchy,
       prep_crm_account.sales_development_rep,
+      prep_crm_account.admin_manual_source_number_of_employees,
+      prep_crm_account.admin_manual_source_account_address,
 
       --measures (maintain for now to not break reporting)
       prep_crm_account.parent_crm_account_lam,
@@ -192,9 +194,9 @@ WITH final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@msendal",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2020-06-01",
-    updated_date="2022-11-02"
+    updated_date="2022-11-10"
 ) }}
 
 
