@@ -66,7 +66,7 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
             if page_token:
                 try:
                     response = requests.get(page_token, auth=("api", api_key))
-                except SSLError as sl:
+                except SSLError:
                     # Not a particularly cultured retry, but handles SSL errors sometimes experienced here and has
                     # no risk of infinite loops.
                     error("SSL error received, waiting 30 seconds before retrying")
