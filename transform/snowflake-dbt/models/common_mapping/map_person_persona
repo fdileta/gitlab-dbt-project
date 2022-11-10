@@ -1,0 +1,3 @@
+select
+    dim_crm_person_id,
+    lower(title),
