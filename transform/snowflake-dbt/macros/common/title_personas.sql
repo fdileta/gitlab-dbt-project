@@ -67,26 +67,16 @@ lower([title]) as lower_title,
                              or lower_title like '%event%' or lower_title like '%channel%' or lower_title like '%territory%' 
                             )
                           )
-                       or lower_title like '%purchasing%' or lower_title like '%procurement%' or lower_title like '%buyer%'
-                       or lower_title like '%contract specialist%' or lower_title like '%legal%' or lower_title like '%lawyer%'
-                       or lower_title like '%negotiator%' or lower_title like '%sale%manager' or lower_title like '%partner'
-                       or lower_title like '%sourcer%' or lower_title like '%presales consultant'
-                       or lower_title like '%chief operating officer%' or lower_title like '%account administrator%'
-                       or lower_title like '%partner' or lower_title like '%sale%' or lower_title like '%office manager%' 
-                       or lower_title like '%business development%' or lower_title like '%human%' or lower_title like '%account manager%'
-                       or lower_title like '%finance%' or lower_title like '%people%' or lower_title like '%payable%' 
-                       or lower_title like '%art%' or lower_title like 'head of operations'
-                       or lower_title like '%culture%' or lower_title like '%practice%' or lower_title like '%financial officer%'
-                       or lower_title like '%contracts administrator%' or lower_title like '%talent acquisition%'
-                       or lower_title like '%contracting officer%' or lower_title like '%account executive%' 
-                       or lower_title like '%press consultant%' or lower_title like '%license%' 
-                       or lower_title like '%financial controller%' or lower_title like '%contracting%'
-                       or lower_title like '%business relations%' or lower_title like '%controller %'
-                       or lower_title like '%purchaser%' or lower_title like '%office administrator%' 
-                       or lower_title like '%accountant%' or lower_title like '%administrative assistant%'
-                       or lower_title like '%executive assistant%' or lower_title like '%company administrator%'
-                       or lower_title like '%billing%' or lower_title like '%payments%'
-                       
+                       or lower_title like any ('%purchasing%', '%procurement%', '%buyer%', '%contract specialist%', '%legal%',
+                          '%lawyer%', '%negotiator%', '%sale%manager', '%partner', '%sourcer%', '%presales consultant', 
+                           '%chief operating officer%', '%account administrator%', '%partner', '%sale%', '%office manager%',
+                           '%business development%', '%human%', '%account manager%', '%finance%', '%people%', '%payable%',
+                           '%art%', 'head of operations', '%culture%', '%practice%', '%financial officer%', '%contracts administrator%',
+                            '%talent acquisition%', '%contracting officer%', '%account executive%', '%press consultant%', '%license%',
+                            '%financial controller%', '%contracting%', '%business relations%', '%controller %', '%purchaser%',
+                            '%office administrator%', '%accountant%', '%administrative assistant%', '%executive assistant%',
+                            '%company administrator%', '%billing%', '%payments%'
+                       )
   then 'NON-DEVELOPMENT BACK OFFICE'
         
 
@@ -101,15 +91,12 @@ lower([title]) as lower_title,
                          'co-fondateur', 'it executive'
                         )
                        -- rank & titles
-                       or ((lower_title like '%vp%' or lower_title like '%vice product%' or lower_title like '%head%' or lower_title like '%chief%') and
-                            (lower_title like '%technology%' or lower_title like '%infrastructure%' or lower_title like '% it%' 
-                             or lower_title like '% it%' or lower_title like '%product%' or lower_title like '%engineering%'
-                             or lower_title like '%app dev%' or lower_title like '%technologist%' or lower_title like '%software%'
-                             or lower_title like '%technology%'  or lower_title like '%cloud%' or lower_title like '%r&d%')
+                       or ((lower_title like any ('%vp%', '%vice product%', '%head%', '%chief%')) and
+                            (lower_title like any ('%technology%', '%infrastructure%', '% it%', '%product%', '%engineering%',
+                              '%app dev%', '%technologist%', '%software%', '%technology%', '%cloud%', '%r&d%'))
                           )
-                       or lower_title like '%president%' or lower_title like '%founder%' or lower_title like '%chief executive officer%')
-                       or lower_title like '%co-founder%' or lower_title like '%founder%' or lower_title like '%chief information officer%'
-                       or lower_title like '%co-owner%' or lower_title like '%unternehmensinhaber %'
+                       or lower_title like any ('%president%', '%founder%', '%chief executive officer%'))
+                       or lower_title like any ('%co-founder%', '%founder%'  '%chief information officer%', '%co-owner%', '%unternehmensinhaber %')
                        --only dirrector
                        or (contains(lower_title, 'director') and 
                            (contains(lower_title, 'technology') or contains(lower_title, 'class') or contains(lower_title, 'company') or contains(lower_title, 'it')
@@ -129,23 +116,17 @@ lower([title]) as lower_title,
                         'it administrator', 'it functional associate & analyst',
                         'principal', 'gitlab admin', 'it admin', 'principal consultant', 'it associate'
                        )
-                        or lower_title like '%architect%' or lower_title like '%devop%' or lower_title like '%technical%' 
-                        or lower_title like '%dev ops%' or lower_title like '%network technician%'
-                        or lower_title like '%delivery%' or lower_title like '%information technology%' 
-                        or lower_title like '%network admin%' or lower_title like '%admin network%' 
-                        or lower_title like '%system specialist%' or lower_title like '%it tech%'
-                        or lower_title like 'it pro%'
-                        or lower_title like '%data science%' or lower_title like '%sre%'  or lower_title like '%site reliability engineer%'
-                        or lower_title like '%sysadmin%' or lower_title like '%system admin%' or lower_title like '%systems admin%'
-                        or lower_title like '%systems integration%' or lower_title like '%it admin%'
+                        or lower_title like any ( '%architect%', '%devop%', '%technical%', '%dev ops%', '%network technician%',
+                         '%delivery%', '%information technology%', '%network admin%', '%admin network%', '%system specialist%',
+                          '%it tech%', 'it pro%', '%data science%', '%sre%', '%site reliability engineer%', '%sysadmin%', '%system admin%',
+                          '%systems admin%', '%systems integration%', '%it admin%')
         
                         --manager
-                           or ((lower_title like '%manager%' or lower_title like '%director%' or lower_title like '%lead%' or lower_title like '%principal%')                               and 
-                                (lower_title like '%engineer%' or lower_title like '%program%' or lower_title like '%information technology%'
-                                 or lower_title like ' it ' or lower_title like '%technical%' or lower_title like '%operations%'
-                                 or lower_title like '%technology%' or lower_title like '%infrastructure%' or lower_title like '%data%'
-                                or lower_title like '%implementation%' or lower_title like '%system%' or lower_title like '%technical%'
-                                or lower_title like '%network%')
+                           or ((lower_title like any ('%manager%', '%director%', '%lead%', '%principal%'))                  
+                           and 
+                                (lower_title like any ('%engineer%', '%program%', '%information technology%',  ' it ', '%technical%',
+                                 '%operations%', '%technology%', '%infrastructure%', '%data%', '%implementation%', '%system%', '%technical%',
+                                  '%network%'))
                               )
                            or ((lower_title like '%engineer%' ) and
                                 (lower_title like '%system%' or lower_title like '%data%' or lower_title like '%cloud%' 
