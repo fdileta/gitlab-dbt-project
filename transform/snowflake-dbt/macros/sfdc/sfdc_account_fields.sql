@@ -146,8 +146,8 @@ WITH map_merged_crm_account AS (
       COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), CURRENT_DATE())        AS valid_to,
       CASE 
         WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_from DESC) = 1 
-          THEN 1
-        ELSE 0
+          THEN TRUE
+        ELSE FALSE
       END                                                                                                      AS is_current
     FROM {{ ref('pte_scores_source') }}    
     {{ dbt_utils.group_by(n=4)}}
@@ -165,8 +165,8 @@ WITH map_merged_crm_account AS (
       COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), CURRENT_DATE())        AS valid_to,
       CASE 
         WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_from DESC) = 1 
-          THEN 1
-        ELSE 0
+          THEN TRUE
+        ELSE FALSE
       END                                                                                                      AS is_current
     FROM {{ ref('ptc_scores_source') }}    
     {{ dbt_utils.group_by(n=4)}}
@@ -500,10 +500,10 @@ WITH map_merged_crm_account AS (
     {%- if model_type == 'live' %}
     LEFT JOIN pte_scores 
       ON sfdc_account.account_id = pte_scores.account_id 
-        AND pte_scores.is_current = 1
+        AND pte_scores.is_current = TRUE
     LEFT JOIN ptc_scores
       ON sfdc_account.account_id = ptc_scores.account_id 
-        AND ptc_scores.is_current = 1
+        AND ptc_scores.is_current = TRUE
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
     LEFT OUTER JOIN sfdc_users AS technical_account_manager
