@@ -38,6 +38,7 @@ renamed AS (
     account_manager__c AS account_manager,
     account_owner_calc__c AS account_owner,
     account_owner_team__c AS account_owner_team,
+    proposed_account_owner__c AS proposed_account_owner,
     business_development_rep__c AS business_development_rep,
     dedicated_service_engineer__c AS dedicated_service_engineer,
     sdr_assigned__c AS sales_development_rep,
@@ -208,6 +209,7 @@ renamed AS (
     zi_ultimate_parent_company_zoominfo_id__c AS zoom_info_ultimate_parent_company_zi_id,
     zi_ultimate_parent_company_name__c AS zoom_info_ultimate_parent_company_name,
     zi_number_of_developers__c AS zoom_info_number_of_developers,
+    zi_total_funding__c AS zoom_info_total_funding,
 
     -- NF: Added on 20220427 to support EMEA reporting
     key_account__c                     AS is_key_account,

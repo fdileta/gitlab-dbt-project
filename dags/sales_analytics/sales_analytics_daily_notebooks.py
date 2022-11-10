@@ -25,6 +25,7 @@ from kube_secrets import (
     SNOWFLAKE_SALES_ANALYTICS_LOAD_ROLE,
     GITLAB_ANALYTICS_PRIVATE_TOKEN,
 )
+from kubernetes_helpers import get_affinity, get_toleration
 
 # Load the env vars into a dict and set Secrets
 env = os.environ.copy()
@@ -37,8 +38,8 @@ default_args = {
     "depends_on_past": False,
     "on_failure_callback": slack_failed_task,
     "owner": "airflow",
-    "retries": 0,
-    "retry_delay": timedelta(minutes=1),
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
     "start_date": datetime(2022, 10, 12),
     "dagrun_timeout": timedelta(hours=2),
 }
@@ -82,6 +83,8 @@ for notebook, task_name in notebooks.items():
             GITLAB_ANALYTICS_PRIVATE_TOKEN,
         ],
         env_vars=pod_env_vars,
+        affinity=get_affinity(True),
+        tolerations=get_toleration(True),
         arguments=[container_cmd_load],
         dag=dag,
     )

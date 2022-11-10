@@ -159,3 +159,17 @@ models:
       - name: updated_at
       - name: bamboo_locality
       - name: location_factor
+    
+    
+  - name: workday_terminations
+    description: Provides the termination reason to allow the People Analytics team to accurately report on termination data
+    columns:
+      - name: employee_id
+        tests: 
+          - not_null
+      - name: uploaded_at
+      - name: effective_date
+      - name: employment_status
+      - name: termination_reason
+      - name: initiated_at
+

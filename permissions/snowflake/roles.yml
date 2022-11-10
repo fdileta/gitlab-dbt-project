@@ -1149,6 +1149,7 @@ roles:
             tables:
                 read:
                     - prep.sensitive.bamboohr_separations
+                    - prep.sensitive.workday_terminations
 
     - bamboohr:
         warehouses:
@@ -2480,6 +2481,8 @@ roles:
 
     - alpcohen:
         member_of:
+            - analyst_sales
+            - data_team_analyst
             - reporter
             - restricted_safe
             - xactly
