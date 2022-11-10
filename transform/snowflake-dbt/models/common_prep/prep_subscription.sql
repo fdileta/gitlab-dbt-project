@@ -32,7 +32,7 @@ WITH date_details AS (
     SELECT
       zuora_user_id,
       is_integration_user
-    FROM {{ ref('prep_zuora_user') }}
+    FROM {{ ref('prep_billing_account_user') }}
 
 ), joined AS (
 
