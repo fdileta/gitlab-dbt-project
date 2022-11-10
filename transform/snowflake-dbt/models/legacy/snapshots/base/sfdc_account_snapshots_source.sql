@@ -86,6 +86,8 @@ renamed AS (
     numberofemployees                AS number_of_employees,
     phone AS account_phone,
     zi_phone__c AS zoominfo_account_phone,
+	number_of_employees_manual_source_admin__c AS admin_manual_source_number_of_employees,
+    account_address_manual_source_admin__c AS admin_manual_source_account_address,
 
     -- territory success planning fields
     atam_approved_next_owner__c AS tsp_approved_next_owner,
