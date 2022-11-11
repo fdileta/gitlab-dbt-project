@@ -191,6 +191,8 @@ setup_dbt:
       expire_in: 1 week
 
 test_artifacts:
+  <<: *snowflake_dbt_jobs
+  dependencies: setup_dbt
   script:
     - dbt --quiet ls --models +dim_subscription --output json --output-keys "database schema name depends_on unique_id config" --profiles-dir profile --target prod
 
