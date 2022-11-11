@@ -17,6 +17,7 @@ models:
   - name: manage_gitlab_dotcom_smau_events
     description: '{{ doc("manage_gitlab_dotcom_smau_events") }}'
     columns:
+      - name: user_id
       - name: event_date
         tests:
           - not_null
