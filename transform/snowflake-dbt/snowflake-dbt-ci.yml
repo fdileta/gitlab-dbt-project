@@ -187,13 +187,13 @@ setup_dbt:
   artifacts:
       name: "dbt deps Compiled Files"
       paths:
-        - $CI_PROJECT_DIR/transform/snowflake-dbt/
+        - $CI_PROJECT_DIR/transform/snowflake-dbt/dbt_packages
       expire_in: 1 week
 
 test_artifacts:
   <<: *snowflake_dbt_jobs
   script:
-    - ls $CI_PROJECT_DIR/transform/snowflake-dbt/
+    - ls $CI_PROJECT_DIR/transform/snowflake-dbt/dbt_packages
   dependencies:
     - setup_dbt
 
