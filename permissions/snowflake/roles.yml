@@ -3541,6 +3541,7 @@ roles:
             - data_team_analyst
             - restricted_safe
             - workday
+            - zendesk
         warehouses:
             - dev_xs
         owns:
