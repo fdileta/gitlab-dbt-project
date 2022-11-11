@@ -9,12 +9,17 @@
     ('sfdc_campaigns', 'prep_campaign'),
     ('dr_partner_engagement', 'prep_dr_partner_engagement'),
     ('alliance_type', 'prep_alliance_type_scd'),
-    ('channel_type', 'prep_channel_type'),
-    ('sfdc_opportunity', 'prep_crm_opportunity')
+    ('channel_type', 'prep_channel_type')
 
 ]) }}
 
-, user_hierarchy_stamped_sales_segment AS (
+, sfdc_opportunity AS (
+
+    SELECT  *
+    FROM {{ ref('prep_crm_opportunity') }}
+    WHERE is_live = 1
+
+), user_hierarchy_stamped_sales_segment AS (
 
     SELECT DISTINCT
       dim_crm_opp_owner_sales_segment_stamped_id,
@@ -275,5 +280,5 @@
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2020-11-30",
-    updated_date="2022-09-06"
+    updated_date="2022-11-10"
 ) }}

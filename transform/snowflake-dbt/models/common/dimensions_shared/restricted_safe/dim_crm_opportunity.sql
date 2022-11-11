@@ -2,6 +2,7 @@ WITH prep_crm_opportunity AS (
 
     SELECT *
     FROM {{ref('prep_crm_opportunity')}}
+    WHERE is_live = 1
 
 ), layered AS (
 
@@ -212,5 +213,5 @@ WITH prep_crm_opportunity AS (
     created_by="@iweeks",
     updated_by="@michellecooper",
     created_date="2020-11-20",
-    updated_date="2022-08-05"
+    updated_date="2022-11-10"
 ) }}

@@ -2,10 +2,11 @@
     ('sfdc_user_roles_source','sfdc_user_roles_source'),
     ('net_iacv_to_net_arr_ratio', 'net_iacv_to_net_arr_ratio'),
     ('dim_date', 'dim_date'),
+    ('sfdc_opportunity_stage_source', 'sfdc_opportunity_stage_source'),
+    ('sfdc_opportunity_source', 'sfdc_opportunity_source'),
+    ('sfdc_opportunity_snapshots_source','sfdc_opportunity_snapshots_source'),
     ('sfdc_opportunity_stage', 'sfdc_opportunity_stage_source')
 ]) }}
-
---- union live and snapshot sources with a 
 
 , first_contact  AS (
 
@@ -38,33 +39,232 @@
     FROM attribution_touchpoints
     GROUP BY 1
 
-), sfdc_opportunity_base AS (
+), snapshot_dates AS (
+
+    SELECT *
+    FROM dim_date
+    WHERE date_actual::DATE >= '2020-02-01' -- Restricting snapshot model to only have data from this date forward. More information https://gitlab.com/gitlab-data/analytics/-/issues/14418#note_1134521216
+      AND date_actual <= CURRENT_DATE
+
+), live_opportunity_owner_fields AS (
+
+  SELECT
+    sfdc_opportunity_source.opportunity_id AS dim_crm_opportunity_id,
+    CASE
+      WHEN sfdc_opportunity_source.stage_name IN ('8-Closed Lost', 'Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate')
+        THEN 0
+      ELSE 1
+    END                                                                   AS is_open,
+    CASE
+      WHEN sfdc_opportunity_source.user_segment_stamped IS NULL
+        OR is_open = 1
+        THEN prep_crm_user.crm_user_sales_segment
+      ELSE sfdc_opportunity_source.user_segment_stamped
+    END                                                                   AS opportunity_owner_user_segment,
+
+    CASE
+      WHEN sfdc_opportunity_source.user_geo_stamped IS NULL
+          OR is_open = 1
+        THEN prep_crm_user.crm_user_geo
+      ELSE sfdc_opportunity_source.user_geo_stamped
+    END                                                                   AS opportunity_owner_user_geo,
+
+      CASE
+        WHEN sfdc_opportunity_source.user_region_stamped IS NULL
+             OR is_open = 1
+          THEN prep_crm_user.crm_user_region
+          ELSE sfdc_opportunity_source.user_region_stamped
+      END                                                                   AS opportunity_owner_user_region,
+
+      CASE
+        WHEN sfdc_opportunity_source.user_area_stamped IS NULL
+             OR is_open = 1
+          THEN prep_crm_user.crm_user_area
+        ELSE sfdc_opportunity_source.user_area_stamped
+      END                                                                   AS opportunity_owner_user_area,
+      sfdc_opportunity_source.is_edu_oss,
+      sfdc_opportunity_source.order_type_grouped,
+      prep_crm_user.user_role_name                                          AS opportunity_owner_role,
+      prep_crm_user.title                                                   AS opportunity_owner_title
+  FROM sfdc_opportunity_source
+  INNER JOIN {{ ref('prep_crm_user') }}
+    ON sfdc_opportunity_source.owner_id = prep_crm_user.dim_crm_user_id
+
+), sfdc_account_snapshot AS (
 
     SELECT
-      account_id                                                         AS dim_crm_account_id,
-      opportunity_id                                                     AS dim_crm_opportunity_id,
-      owner_id                                                           AS dim_crm_user_id,
-      order_type_stamped                                                 AS order_type,
-      opportunity_term                                                   AS opportunity_term_base,
-      {{ sales_qualified_source_cleaning('sales_qualified_source') }}    AS sales_qualified_source,
-      user_segment_stamped                                               AS crm_opp_owner_sales_segment_stamped,
-      user_geo_stamped                                                   AS crm_opp_owner_geo_stamped,
-      user_region_stamped                                                AS crm_opp_owner_region_stamped,
-      user_area_stamped                                                  AS crm_opp_owner_area_stamped,
-      user_segment_geo_region_area_stamped                               AS crm_opp_owner_sales_segment_geo_region_area_stamped,
-      created_date::DATE                                                 AS created_date,
-      sales_accepted_date::DATE                                          AS sales_accepted_date,
-      close_date::DATE                                                   AS close_date,
-      net_arr                                                            AS raw_net_arr,
+      {{ dbt_utils.surrogate_key(['sfdc_account_snapshots_source.account_id','snapshot_dates.date_id'])}}   AS crm_account_snapshot_id,
+      snapshot_dates.date_id                                                                                AS snapshot_id,
+      sfdc_account_snapshots_source.*
+    FROM {{ ref('sfdc_account_snapshots_source') }}
+    INNER JOIN snapshot_dates
+      ON sfdc_account_snapshots_source.dbt_valid_from::DATE <= snapshot_dates.date_actual
+        AND (sfdc_account_snapshots_source.dbt_valid_to::DATE > snapshot_dates.date_actual OR sfdc_account_snapshots_source.dbt_valid_to IS NULL)
+    WHERE account_id IS NOT NULL
+
+), sfdc_user_snapshot AS (
+
+    SELECT
+      {{ dbt_utils.surrogate_key(['sfdc_user_snapshots_source.user_id','snapshot_dates.date_id'])}}         AS crm_user_snapshot_id,
+      snapshot_dates.date_id                                                                                AS snapshot_id,
+      sfdc_user_snapshots_source.*
+    FROM {{ ref('sfdc_user_snapshots_source') }}
+    INNER JOIN snapshot_dates
+      ON sfdc_user_snapshots_source.dbt_valid_from::DATE <= snapshot_dates.date_actual
+        AND (sfdc_user_snapshots_source.dbt_valid_to::DATE > snapshot_dates.date_actual OR sfdc_user_snapshots_source.dbt_valid_to IS NULL)
+    WHERE user_id IS NOT NULL
+
+), sfdc_account AS (
+
+    SELECT *
+    FROM {{ ref('sfdc_account_source') }}
+    WHERE account_id IS NOT NULL
+
+), sfdc_user AS (
+
+    SELECT *
+    FROM {{ ref('sfdc_users_source') }}
+    WHERE user_id IS NOT NULL
+
+), sfdc_opportunity_snapshot AS (
+
+    SELECT
+      sfdc_opportunity_snapshots_source.account_id                                                         AS dim_crm_account_id,
+      sfdc_opportunity_snapshots_source.opportunity_id                                                     AS dim_crm_opportunity_id,
+      sfdc_opportunity_snapshots_source.owner_id                                                           AS dim_crm_user_id,
+      sfdc_opportunity_snapshots_source.order_type_stamped                                                 AS order_type,
+      sfdc_opportunity_snapshots_source.opportunity_term                                                   AS opportunity_term_base,
+      {{ sales_qualified_source_cleaning('sfdc_opportunity_snapshots_source.sales_qualified_source') }}    AS sales_qualified_source,
+      sfdc_opportunity_snapshots_source.user_segment_stamped                                               AS crm_opp_owner_sales_segment_stamped,
+      sfdc_opportunity_snapshots_source.user_geo_stamped                                                   AS crm_opp_owner_geo_stamped,
+      sfdc_opportunity_snapshots_source.user_region_stamped                                                AS crm_opp_owner_region_stamped,
+      sfdc_opportunity_snapshots_source.user_area_stamped                                                  AS crm_opp_owner_area_stamped,
+      sfdc_opportunity_snapshots_source.user_segment_geo_region_area_stamped                               AS crm_opp_owner_sales_segment_geo_region_area_stamped,
+      sfdc_opportunity_snapshots_source.created_date::DATE                                                 AS created_date,
+      sfdc_opportunity_snapshots_source.sales_accepted_date::DATE                                          AS sales_accepted_date,
+      sfdc_opportunity_snapshots_source.close_date::DATE                                                   AS close_date,
+      sfdc_opportunity_snapshots_source.net_arr                                                            AS raw_net_arr,
+      {{ dbt_utils.surrogate_key(['sfdc_opportunity_snapshots_source.opportunity_id','snapshot_dates.date_id'])}}   AS crm_opportunity_snapshot_id,
+      snapshot_dates.date_id                                                                                        AS snapshot_id,
+      snapshot_dates.date_actual                                                                                    AS snapshot_date,
+      snapshot_dates.first_day_of_month                                                                             AS snapshot_month,
+      snapshot_dates.fiscal_year                                                                                    AS snapshot_fiscal_year,
+      snapshot_dates.fiscal_quarter_name_fy                                                                         AS snapshot_fiscal_quarter_name,
+      snapshot_dates.first_day_of_fiscal_quarter                                                                    AS snapshot_fiscal_quarter_date,
+      snapshot_dates.day_of_fiscal_quarter_normalised                                                               AS snapshot_day_of_fiscal_quarter_normalised,
+      snapshot_dates.day_of_fiscal_year_normalised                                                                  AS snapshot_day_of_fiscal_year_normalised,
+      account_owner.user_segment  AS account_owner_user_segment,
+      account_owner.user_geo  AS account_owner_user_geo,
+      account_owner.user_region AS account_owner_user_region,
+      account_owner.user_area AS account_owner_user_area,
+      account_owner.user_segment_geo_region_area  AS account_owner_user_segment_geo_region_area,
+      fulfillment_partner.account_name AS fulfillment_partner_account_name,
+      fulfillment_partner.partner_track AS fulfillment_partner_partner_track,
+      partner_account.account_name AS partner_account_account_name,
+      partner_account.partner_track AS partner_account_partner_track,
+      sfdc_account_snapshot.is_jihu_account,
+      sfdc_account_snapshot.ultimate_parent_account_id,
+      CASE
+        WHEN sfdc_opportunity_snapshots_source.stage_name IN ('8-Closed Lost', 'Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate')
+            THEN 0
+        ELSE 1
+      END                                                                                         AS is_open,
+      {{ dbt_utils.star(from=ref('sfdc_opportunity_snapshots_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM", "SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"],relation_alias="sfdc_opportunity_snapshots_source")}},
+      0 AS is_live
+    FROM sfdc_opportunity_snapshots_source
+    INNER JOIN snapshot_dates
+      ON sfdc_opportunity_snapshots_source.dbt_valid_from::DATE <= snapshot_dates.date_actual
+        AND (sfdc_opportunity_snapshots_source.dbt_valid_to::DATE > snapshot_dates.date_actual OR sfdc_opportunity_snapshots_source.dbt_valid_to IS NULL)
+    LEFT JOIN sfdc_account_snapshot AS fulfillment_partner
+      ON sfdc_opportunity_snapshots_source.fulfillment_partner = fulfillment_partner.account_id
+        AND snapshot_dates.date_id = fulfillment_partner.snapshot_id
+    LEFT JOIN sfdc_account_snapshot AS partner_account
+      ON sfdc_opportunity_snapshots_source.partner_account = partner_account.account_id
+        AND snapshot_dates.date_id = partner_account.snapshot_id
+    LEFT JOIN sfdc_account_snapshot
+      ON sfdc_opportunity_snapshots_source.account_id= sfdc_account_snapshot.account_id
+        AND snapshot_dates.date_id = sfdc_account_snapshot.snapshot_id
+    LEFT JOIN sfdc_user_snapshot account_owner
+      ON sfdc_opportunity_snapshots_source.owner_id= account_owner.user_id
+        AND snapshot_dates.date_id = account_owner.snapshot_id
+    LEFT JOIN sfdc_user_roles_source
+      ON account_owner.user_role_id = sfdc_user_roles_source.id
+    WHERE sfdc_opportunity_snapshots_source.account_id IS NOT NULL
+      AND sfdc_opportunity_snapshots_source.is_deleted = FALSE
+
+), sfdc_opportunity_live AS (
+
+    SELECT
+      sfdc_opportunity_source.account_id                                                         AS dim_crm_account_id,
+      sfdc_opportunity_source.opportunity_id                                                     AS dim_crm_opportunity_id,
+      sfdc_opportunity_source.owner_id                                                           AS dim_crm_user_id,
+      sfdc_opportunity_source.order_type_stamped                                                 AS order_type,
+      sfdc_opportunity_source.opportunity_term                                                   AS opportunity_term_base,
+      {{ sales_qualified_source_cleaning('sfdc_opportunity_source.sales_qualified_source') }}    AS sales_qualified_source,
+      sfdc_opportunity_source.user_segment_stamped                                               AS crm_opp_owner_sales_segment_stamped,
+      sfdc_opportunity_source.user_geo_stamped                                                   AS crm_opp_owner_geo_stamped,
+      sfdc_opportunity_source.user_region_stamped                                                AS crm_opp_owner_region_stamped,
+      sfdc_opportunity_source.user_area_stamped                                                  AS crm_opp_owner_area_stamped,
+      sfdc_opportunity_source.user_segment_geo_region_area_stamped                               AS crm_opp_owner_sales_segment_geo_region_area_stamped,
+      sfdc_opportunity_source.created_date::DATE                                                 AS created_date,
+      sfdc_opportunity_source.sales_accepted_date::DATE                                          AS sales_accepted_date,
+      sfdc_opportunity_source.close_date::DATE                                                   AS close_date,
+      sfdc_opportunity_source.net_arr                                                            AS raw_net_arr,
+      {{ dbt_utils.surrogate_key(['sfdc_opportunity_source.opportunity_id','snapshot_dates.date_id'])}}             AS crm_opportunity_snapshot_id,
+      snapshot_dates.date_id                                                                                        AS snapshot_id,
+      snapshot_dates.date_actual                                                                                    AS snapshot_date,
+      snapshot_dates.first_day_of_month                                                                             AS snapshot_month,
+      snapshot_dates.fiscal_year                                                                                    AS snapshot_fiscal_year,
+      snapshot_dates.fiscal_quarter_name_fy                                                                         AS snapshot_fiscal_quarter_name,
+      snapshot_dates.first_day_of_fiscal_quarter                                                                    AS snapshot_fiscal_quarter_date,
+      snapshot_dates.day_of_fiscal_quarter_normalised                                                               AS snapshot_day_of_fiscal_quarter_normalised,
+      snapshot_dates.day_of_fiscal_year_normalised                                                                  AS snapshot_day_of_fiscal_year_normalised,
+      account_owner.user_segment  AS account_owner_user_segment,
+      account_owner.user_geo  AS account_owner_user_geo,
+      account_owner.user_region AS account_owner_user_region,
+      account_owner.user_area AS account_owner_user_area,
+      account_owner.user_segment_geo_region_area  AS account_owner_user_segment_geo_region_area,
+      fulfillment_partner.account_name AS fulfillment_partner_account_name,
+      fulfillment_partner.partner_track AS fulfillment_partner_partner_track,
+      partner_account.account_name AS partner_account_account_name,
+      partner_account.partner_track AS partner_account_partner_track,
+      sfdc_account.is_jihu_account,
+      sfdc_account.ultimate_parent_account_id,
       CASE
         WHEN sfdc_opportunity_source.stage_name IN ('8-Closed Lost', 'Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate')
             THEN 0
         ELSE 1
       END                                                                                         AS is_open,
-        {{ dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"])}}
-    FROM {{ref('sfdc_opportunity_source')}}
-    WHERE account_id IS NOT NULL
-      AND is_deleted = FALSE
+      {{ dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"],relation_alias="sfdc_opportunity_source")}},
+      NULL AS dbt_scd_id,
+      CURRENT_DATE() AS dbt_valid_from,
+      CURRENT_DATE() AS dbt_valid_to,
+      1 AS is_live
+    FROM sfdc_opportunity_source
+    LEFT JOIN snapshot_dates
+      ON CURRENT_DATE() = snapshot_dates.date_actual
+    LEFT JOIN sfdc_account AS fulfillment_partner
+      ON sfdc_opportunity_source.fulfillment_partner = fulfillment_partner.account_id
+    LEFT JOIN sfdc_account AS partner_account
+      ON sfdc_opportunity_source.partner_account = partner_account.account_id
+    LEFT JOIN sfdc_account
+      ON sfdc_opportunity_source.account_id= sfdc_account.account_id
+    LEFT JOIN sfdc_user AS account_owner
+      ON sfdc_account.owner_id = account_owner.user_id
+    LEFT JOIN sfdc_user_roles_source
+      ON account_owner.user_role_id = sfdc_user_roles_source.id
+    WHERE sfdc_opportunity_source.account_id IS NOT NULL
+      AND sfdc_opportunity_source.is_deleted = FALSE
+
+), sfdc_opportunity AS (
+
+    SELECT *
+    FROM sfdc_opportunity_snapshot
+
+    UNION ALL 
+
+    SELECT * 
+    FROM sfdc_opportunity_live
 
 ), sfdc_zqu_quote_source AS (
 
@@ -81,105 +281,11 @@
       (ROW_NUMBER() OVER (PARTITION BY sfdc_zqu_quote_source.zqu__opportunity ORDER BY sfdc_zqu_quote_source.created_date DESC))
                                                             AS record_number
     FROM sfdc_zqu_quote_source
-    INNER JOIN sfdc_opportunity_base
-      ON sfdc_zqu_quote_source.zqu__opportunity = sfdc_opportunity_base.dim_crm_opportunity_id
+    INNER JOIN sfdc_opportunity
+      ON sfdc_zqu_quote_source.zqu__opportunity = sfdc_opportunity.dim_crm_opportunity_id
     WHERE stage_name IN ('Closed Won', '8-Closed Lost')
       AND zqu__primary = TRUE
     QUALIFY record_number = 1
-
-), sfdc_account AS (
-
-    SELECT *
-    FROM {{ ref('sfdc_account_source') }}
-    WHERE account_id IS NOT NULL
-
-), sfdc_user AS (
-
-    SELECT *
-    FROM {{ ref('sfdc_users_source') }}
-    WHERE user_id IS NOT NULL
-
-), sfdc_opportunity AS (
-
-
-    SELECT 
-      sfdc_opportunity_base.*,
-      close_date.first_day_of_fiscal_quarter AS close_fiscal_quarter_date,
-      -- account owner information
-      account_owner.user_segment AS crm_account_owner_sales_segment,
-      account_owner.user_geo AS crm_account_owner_geo,
-      account_owner.user_region AS crm_account_owner_region,
-      account_owner.user_area AS crm_account_owner_area,
-      account_owner.user_segment_geo_region_area AS crm_account_owner_sales_segment_geo_region_area,
-      -- opportunity owner information
-      CASE
-        WHEN sfdc_opportunity_base.user_segment_stamped IS NULL
-          OR sfdc_opportunity_base.is_open = 1
-          THEN account_owner.user_segment
-        ELSE sfdc_opportunity_base.user_segment_stamped
-      END AS opportunity_owner_user_segment,
-      CASE
-        WHEN sfdc_opportunity_base.user_geo_stamped IS NULL
-            OR sfdc_opportunity_base.is_open = 1
-          THEN account_owner.user_geo
-        ELSE sfdc_opportunity_base.user_geo_stamped
-      END AS opportunity_owner_user_geo,
-      CASE
-        WHEN sfdc_opportunity_base.user_region_stamped IS NULL
-             OR sfdc_opportunity_base.is_open = 1
-          THEN account_owner.user_region
-          ELSE sfdc_opportunity_base.user_region_stamped
-      END AS opportunity_owner_user_region,
-      CASE
-        WHEN sfdc_opportunity_base.user_area_stamped IS NULL
-             OR sfdc_opportunity_base.is_open = 1
-          THEN account_owner.user_area
-        ELSE sfdc_opportunity_base.user_area_stamped
-      END AS opportunity_owner_user_area,
-      sfdc_user_roles_source.name AS opportunity_owner_role,
-      account_owner.title  AS opportunity_owner_title,
-      LOWER(
-        CASE
-          WHEN sfdc_opportunity_base.close_date < close_date.current_first_day_of_fiscal_year
-            THEN account_owner.user_segment
-          ELSE opportunity_owner_user_segment
-        END
-      ) AS report_opportunity_user_segment,
-      LOWER(
-        CASE
-          WHEN sfdc_opportunity_base.close_date < close_date.current_first_day_of_fiscal_year
-            THEN account_owner.user_geo
-          ELSE opportunity_owner_user_geo
-        END
-      ) AS report_opportunity_user_geo,
-      LOWER(
-        CASE
-          WHEN sfdc_opportunity_base.close_date < close_date.current_first_day_of_fiscal_year
-            THEN account_owner.user_region
-          ELSE opportunity_owner_user_region
-        END
-      ) AS report_opportunity_user_region,
-      LOWER(
-        CASE
-          WHEN sfdc_opportunity_base.close_date < close_date.current_first_day_of_fiscal_year
-            THEN account_owner.user_area
-          ELSE opportunity_owner_user_area
-        END
-      ) AS report_opportunity_user_area,
-      LOWER(
-        CONCAT(
-          report_opportunity_user_segment,'-',report_opportunity_user_geo,'-',report_opportunity_user_region,'-',report_opportunity_user_area
-        )
-      ) AS report_user_segment_geo_region_area
-    FROM sfdc_opportunity_base
-    LEFT JOIN dim_date AS close_date
-      ON sfdc_opportunity_base.close_date = close_date.date_actual
-    LEFT JOIN sfdc_account
-      ON sfdc_opportunity_base.dim_crm_account_id= sfdc_account.account_id
-    LEFT JOIN sfdc_user AS account_owner
-      ON sfdc_account.owner_id = account_owner.user_id
-    LEFT JOIN sfdc_user_roles_source
-      ON account_owner.user_role_id = sfdc_user_roles_source.id
 
 ), final AS (
 
@@ -206,6 +312,17 @@
       {{ get_date_id('sfdc_opportunity.subscription_end_date') }}                                 AS subscription_end_date_id,
       {{ get_date_id('sfdc_opportunity.sales_qualified_date') }}                                  AS sales_qualified_date_id,
 
+      -- account owner information
+      sfdc_opportunity.account_owner_user_segment AS crm_account_owner_sales_segment,
+      sfdc_opportunity.account_owner_user_geo AS crm_account_owner_geo,
+      sfdc_opportunity.account_owner_user_region AS crm_account_owner_region,
+      sfdc_opportunity.account_owner_user_area AS crm_account_owner_area,
+      sfdc_opportunity.account_owner_user_segment_geo_region_area AS crm_account_owner_sales_segment_geo_region_area,
+
+
+      close_date.first_day_of_fiscal_quarter                                                      AS close_fiscal_quarter_date,
+      90 - DATEDIFF(DAY, sfdc_opportunity.snapshot_date, close_date.last_day_of_fiscal_quarter) AS close_day_of_fiscal_quarter_normalised,
+
       {{ get_date_id('sfdc_opportunity.iacv_created_date')}}                                      AS arr_created_date_id,
       sfdc_opportunity.iacv_created_date                                                          AS arr_created_date,
       arr_created_date.fiscal_quarter_name_fy                                                     AS arr_created_fiscal_quarter_name,
@@ -217,8 +334,19 @@
       COALESCE(net_iacv_to_net_arr_ratio.ratio_net_iacv_to_net_arr,0)                             AS segment_order_type_iacv_to_net_arr_ratio,
 
       -- net arr
+      CASE
+        WHEN sfdc_opportunity_source_live.is_won = 1 -- only consider won deals
+          AND sfdc_opportunity_source_live.opportunity_category <> 'Contract Reset' -- contract resets have a special way of calculating net iacv
+          AND COALESCE(sfdc_opportunity_source_live.net_arr,0) <> 0
+          AND COALESCE(sfdc_opportunity_source_live.net_incremental_acv,0) <> 0
+            THEN COALESCE(sfdc_opportunity_source_live.net_arr / sfdc_opportunity_source_live.net_incremental_acv,0)
+        ELSE NULL
+      END                                                                     AS opportunity_based_iacv_to_net_arr_ratio,
+      -- If there is no opportunity, use a default table ratio
+      -- I am faking that using the upper CTE, that should be replaced by the official table
       -- calculated net_arr
       -- uses ratios to estimate the net_arr based on iacv if open or net_iacv if closed
+      -- if there is an opportunity based ratio, use that, if not, use default from segment / order type
       -- NUANCE: Lost deals might not have net_incremental_acv populated, so we must rely on iacv
       -- Using opty ratio for open deals doesn't seem to work well
       CASE
@@ -226,15 +354,20 @@
             THEN COALESCE(sfdc_opportunity.incremental_acv,0) * COALESCE(segment_order_type_iacv_to_net_arr_ratio,0)
         WHEN sfdc_opportunity.stage_name IN ('8-Closed Lost')                       -- CLOSED LOST DEAL and no Net IACV
           AND COALESCE(sfdc_opportunity.net_incremental_acv,0) = 0
-           THEN COALESCE(sfdc_opportunity.incremental_acv,0) * COALESCE(segment_order_type_iacv_to_net_arr_ratio,0)
+            THEN COALESCE(sfdc_opportunity.incremental_acv,0) * COALESCE(segment_order_type_iacv_to_net_arr_ratio,0)
         WHEN sfdc_opportunity.stage_name IN ('8-Closed Lost', 'Closed Won')         -- REST of CLOSED DEAL
-            THEN COALESCE(sfdc_opportunity.net_incremental_acv,0) * COALESCE(segment_order_type_iacv_to_net_arr_ratio,0)
+            THEN COALESCE(sfdc_opportunity.net_incremental_acv,0) * COALESCE(opportunity_based_iacv_to_net_arr_ratio,segment_order_type_iacv_to_net_arr_ratio)
         ELSE NULL
       END                                                                     AS calculated_from_ratio_net_arr,
-
-      -- Calculated NET ARR is only used for deals closed earlier than FY19 and that have no raw_net_arr
+      -- For opportunities before start of FY22, as Net ARR was WIP, there are a lot of opties with IACV or Net IACV and no Net ARR
+      -- Those were later fixed in the opportunity object but stayed in the snapshot table.
+      -- To account for those issues and give a directionally correct answer, we apply a ratio to everything before FY22
       CASE
-        WHEN sfdc_opportunity.close_date::DATE < '2018-02-01'
+        WHEN  sfdc_opportunity.snapshot_date::DATE < '2021-02-01' -- All deals before cutoff and that were not updated to Net ARR
+          THEN calculated_from_ratio_net_arr
+        WHEN  sfdc_opportunity.snapshot_date::DATE >= '2021-02-01'  -- After cutoff date, for all deals earlier than FY19 that are closed and have no net arr
+              AND sfdc_opportunity.close_date::DATE < '2018-02-01'
+              AND sfdc_opportunity.stage_name IN ('8-Closed Lost', 'Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate')
               AND COALESCE(sfdc_opportunity.raw_net_arr,0) = 0
           THEN calculated_from_ratio_net_arr
         ELSE COALESCE(sfdc_opportunity.raw_net_arr,0) -- Rest of deals after cut off date
@@ -256,38 +389,14 @@
       -- opportunity stage information
       sfdc_opportunity_stage.is_active                                                            AS is_active,
       sfdc_opportunity_stage.is_won                                                               AS is_won,
-      CASE
-        WHEN sfdc_opportunity.stage_name
-          IN ('1-Discovery', '2-Developing', '2-Scoping','3-Technical Evaluation', '4-Proposal', 'Closed Won','5-Negotiating', '6-Awaiting Signature', '7-Closing')
-        THEN 1
-        ELSE 0
-      END                                                                                         AS is_stage_1_plus,
-      CASE
-        WHEN sfdc_opportunity.stage_name
-          IN ('3-Technical Evaluation', '4-Proposal', 'Closed Won','5-Negotiating', '6-Awaiting Signature', '7-Closing')
-            THEN 1
-        ELSE 0
-      END                                                                                         AS is_stage_3_plus,
-      CASE
-        WHEN sfdc_opportunity.stage_name
-          IN ('4-Proposal', 'Closed Won','5-Negotiating', '6-Awaiting Signature', '7-Closing')
-            THEN 1
-        ELSE 0
-      END                                                                                         AS is_stage_4_plus,
-      CASE
-        WHEN sfdc_opportunity.stage_name IN ('8-Closed Lost', 'Closed Lost')
-          THEN 1 ELSE 0
-      END                                                                                         AS is_lost,
-      CASE
-        WHEN LOWER(sfdc_opportunity.sales_type) like '%renewal%'
-          THEN 1
-        ELSE 0
-      END                                                                                         AS is_renewal,
-      CASE
-        WHEN sfdc_opportunity.opportunity_category IN ('Decommission')
-          THEN 1
-        ELSE 0
-      END                                                                                         AS is_decommissed,
+      IFF(sfdc_opportunity.stage_name IN ('1-Discovery', '2-Developing', '2-Scoping','3-Technical Evaluation', '4-Proposal', 'Closed Won','5-Negotiating', '6-Awaiting Signature', '7-Closing'), 1, 0) AS is_stage_1_plus,
+      IFF(sfdc_opportunity.stage_name IN ('3-Technical Evaluation', '4-Proposal', 'Closed Won','5-Negotiating', '6-Awaiting Signature', '7-Closing'), 1, 0) AS is_stage_3_plus,
+      IFF(sfdc_opportunity.stage_name IN ('4-Proposal', 'Closed Won','5-Negotiating', '6-Awaiting Signature', '7-Closing'), 1, 0) AS is_stage_4_plus,
+      IFF(sfdc_opportunity.stage_name IN ('8-Closed Lost', 'Closed Lost'), 1, 0) AS is_lost,
+      IFF(LOWER(sfdc_opportunity.sales_type) like '%renewal%', 1, 0) AS is_renewal,
+      IFF(sfdc_opportunity.opportunity_category IN ('Decommission'), 1, 0) AS is_decommissed,
+
+     -- flags
       CASE
         WHEN sfdc_opportunity.sales_accepted_date IS NOT NULL
           AND sfdc_opportunity.is_edu_oss = 0
@@ -309,7 +418,7 @@
                (sfdc_opportunity.sales_type = 'Renewal' AND sfdc_opportunity.stage_name = '8-Closed Lost')
                  OR sfdc_opportunity.stage_name = 'Closed Won'
               )
-            AND sfdc_account.is_jihu_account = FALSE
+            AND sfdc_opportunity.is_jihu_account = FALSE
           THEN TRUE
         ELSE FALSE
       END                                                                                         AS is_net_arr_closed_deal,
@@ -317,11 +426,28 @@
         WHEN (sfdc_opportunity.new_logo_count = 1
           OR sfdc_opportunity.new_logo_count = -1
           )
-          AND sfdc_account.is_jihu_account = FALSE
+          AND sfdc_opportunity.is_jihu_account = FALSE
           THEN TRUE
         ELSE FALSE
       END                                                                                         AS is_new_logo_first_order,
-      sfdc_opportunity.is_pipeline_created_eligible                                               AS is_net_arr_pipeline_created,
+      COALESCE(
+        sfdc_opportunity.is_pipeline_created_eligible,
+        CASE
+         WHEN sfdc_opportunity.order_type IN ('1. New - First Order' ,'2. New - Connected', '3. Growth')
+           AND sfdc_opportunity.is_edu_oss = 0
+           AND arr_created_date.first_day_of_fiscal_quarter IS NOT NULL
+           AND sfdc_opportunity.opportunity_category IN ('Standard','Internal Correction','Ramp Deal','Credit','Contract Reset')
+           -- 20211222 Adjusted to remove the ommitted filter
+           AND sfdc_opportunity.stage_name NOT IN ('00-Pre Opportunity','10-Duplicate', '9-Unqualified','0-Pending Acceptance')
+           AND (net_arr > 0
+             OR sfdc_opportunity.opportunity_category = 'Credit')
+           -- 20220128 Updated to remove webdirect SQS deals
+           AND sfdc_opportunity.sales_qualified_source  != 'Web Direct Generated'
+           AND sfdc_opportunity.is_jihu_account = 0
+          THEN 1
+          ELSE 0
+        END
+        ) AS is_net_arr_pipeline_created,
       CASE
         WHEN sfdc_opportunity_stage.is_closed = TRUE
           AND sfdc_opportunity.amount >= 0
@@ -338,8 +464,8 @@
         ELSE FALSE
       END                                                                                         AS is_closed_won,
       CASE
-        WHEN LOWER(sfdc_opportunity.order_type_grouped) LIKE ANY ('%growth%', '%new%')
-          AND sfdc_opportunity.is_edu_oss = 0
+        WHEN lower(live_opportunity_owner_fields.order_type_grouped) LIKE ANY ('%growth%', '%new%')
+          AND live_opportunity_owner_fields.is_edu_oss = 0
           AND is_stage_1_plus = 1
           AND sfdc_opportunity.forecast_category_name != 'Omitted'
           AND sfdc_opportunity.is_open = 1
@@ -410,13 +536,13 @@
 
       -- alliance type fields
 
-      {{ alliance_partner_current('fulfillment_partner.account_name', 'partner_account.account_name', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type_current,
-      {{ alliance_partner_short_current('fulfillment_partner.account_name', 'partner_account.account_name', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type_short_current,
+      {{ alliance_partner_current('sfdc_opportunity.fulfillment_partner_account_name', 'sfdc_opportunity.partner_account_account_name', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type_current,
+      {{ alliance_partner_short_current('sfdc_opportunity.fulfillment_partner_account_name', 'sfdc_opportunity.partner_account_account_name', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type_short_current,
 
-      {{ alliance_partner('fulfillment_partner.account_name', 'partner_account.account_name', 'sfdc_opportunity.close_date', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type,
-      {{ alliance_partner_short('fulfillment_partner.account_name', 'partner_account.account_name', 'sfdc_opportunity.close_date', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type_short,
+      {{ alliance_partner('sfdc_opportunity.fulfillment_partner_account_name', 'sfdc_opportunity.partner_account_account_name', 'sfdc_opportunity.close_date', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type,
+      {{ alliance_partner_short('sfdc_opportunity.fulfillment_partner_account_name', 'sfdc_opportunity.partner_account_account_name', 'sfdc_opportunity.close_date', 'sfdc_opportunity.partner_track', 'sfdc_opportunity.resale_partner_track', 'sfdc_opportunity.deal_path') }} AS alliance_type_short,
 
-      fulfillment_partner.account_name AS resale_partner_name,
+      sfdc_opportunity.fulfillment_partner_account_name AS resale_partner_name,
 
       --  quote information
       quote.dim_quote_id,
@@ -528,10 +654,10 @@
      END                                                                                        AS churn_contraction_type,
      CASE
         WHEN is_renewal = 1
-          AND subscription_start_date_fiscal_quarter_date >= sfdc_opportunity.close_fiscal_quarter_date
+          AND subscription_start_date_fiscal_quarter_date >= close_fiscal_quarter_date
          THEN 'On-Time'
         WHEN is_renewal = 1
-          AND subscription_start_date_fiscal_quarter_date < sfdc_opportunity.close_fiscal_quarter_date
+          AND subscription_start_date_fiscal_quarter_date < close_fiscal_quarter_date
             THEN 'Late'
       END                                                                                       AS renewal_timing_status,
       CASE
@@ -754,220 +880,190 @@
       END                                                           AS is_booked_net_arr,
       CASE
         WHEN sfdc_opportunity.deal_path = 'Channel'
-          THEN REPLACE(COALESCE(sfdc_opportunity.partner_track, partner_account.partner_track, fulfillment_partner.partner_track,'Open'),'select','Select')
+          THEN REPLACE(COALESCE(sfdc_opportunity.partner_track, sfdc_opportunity.partner_account_partner_track, sfdc_opportunity.fulfillment_partner_partner_track,'Open'),'select','Select')
         ELSE 'Direct'
       END                                                                                           AS calculated_partner_track,
       CASE
-        WHEN sfdc_account.ultimate_parent_id IN ('001610000111bA3','0016100001F4xla','0016100001CXGCs','00161000015O9Yn','0016100001b9Jsc')
-          AND sfdc_opportunity.close_date < '2020-08-01'
-            THEN 1
-        -- NF 2021 - Pubsec extreme deals
-        WHEN sfdc_opportunity.dim_crm_opportunity_id IN ('0064M00000WtZKUQA3','0064M00000Xb975QAB')
-          THEN 1
-        -- NF 20220415 PubSec duplicated deals on Pipe Gen -- Lockheed Martin GV - 40000 Ultimate Renewal
-        WHEN sfdc_opportunity.dim_crm_opportunity_id IN ('0064M00000ZGpfQQAT','0064M00000ZGpfVQAT','0064M00000ZGpfGQAT')
+        WHEN
+        sfdc_opportunity.ultimate_parent_account_id IN (
+          '001610000111bA3',
+          '0016100001F4xla',
+          '0016100001CXGCs',
+          '00161000015O9Yn',
+          '0016100001b9Jsc'
+        )
+        AND sfdc_opportunity.close_date < '2020-08-01'
+        THEN 1
+      -- NF 2021 - Pubsec extreme deals
+      WHEN
+        sfdc_opportunity.dim_crm_opportunity_id IN ('0064M00000WtZKUQA3', '0064M00000Xb975QAB')
+        AND sfdc_opportunity.snapshot_date < '2021-05-01'
+        THEN 1
+      -- exclude vision opps from FY21-Q2
+      WHEN arr_created_fiscal_quarter_name = 'FY21-Q2'
+        AND sfdc_opportunity.snapshot_day_of_fiscal_quarter_normalised = 90
+        AND sfdc_opportunity.stage_name IN (
+          '00-Pre Opportunity', '0-Pending Acceptance', '0-Qualifying'
+        )
+        THEN 1
+      -- NF 20220415 PubSec duplicated deals on Pipe Gen -- Lockheed Martin GV - 40000 Ultimate Renewal
+      WHEN
+        sfdc_opportunity.dim_crm_opportunity_id IN (
+          '0064M00000ZGpfQQAT', '0064M00000ZGpfVQAT', '0064M00000ZGpfGQAT'
+        )
+        THEN 1
+       -- remove test accounts
+       WHEN
+         sfdc_opportunity.dim_crm_account_id = '0014M00001kGcORQA0'
+         THEN 1
+       --remove test accounts
+       WHEN (sfdc_account_source_live.ultimate_parent_account_id = ('0016100001YUkWVAA1')
+            OR sfdc_account_source_live.account_id IS NULL)
+         THEN 1
+       -- remove jihu accounts
+       WHEN sfdc_account_source_live.is_jihu_account = 1
+         THEN 1
+       -- remove deleted opps
+        WHEN sfdc_opportunity.is_deleted = 1
           THEN 1
         ELSE 0
-      END                                                                       AS is_excluded_from_pipeline_created,
+      END AS is_excluded_from_pipeline_created,
       CASE
         WHEN sfdc_opportunity.is_open = 1
-          THEN DATEDIFF(days, sfdc_opportunity.created_date, CURRENT_DATE)
+          THEN DATEDIFF(days, sfdc_opportunity.created_date, sfdc_opportunity.snapshot_date)
+        WHEN sfdc_opportunity.is_open = 0 AND sfdc_opportunity.snapshot_date < sfdc_opportunity.close_date
+          THEN DATEDIFF(days, sfdc_opportunity.created_date, sfdc_opportunity.snapshot_date)
         ELSE DATEDIFF(days, sfdc_opportunity.created_date, sfdc_opportunity.close_date)
-      END                                                           AS calculated_age_in_days,
+      END                                                       AS calculated_age_in_days,
       CASE
-        WHEN arr_created_fiscal_quarter_date = sfdc_opportunity.close_fiscal_quarter_date
+        WHEN arr_created_fiscal_quarter_date = close_fiscal_quarter_date
           AND is_net_arr_pipeline_created = 1
             THEN net_arr
         ELSE 0
       END                                                         AS created_and_won_same_quarter_net_arr,
-      CASE
-        WHEN sfdc_opportunity.comp_new_logo_override = 'Yes'
-          THEN 1
-        ELSE 0
-      END                                 AS is_comp_new_logo_override,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Other')
-          THEN 1
-        ELSE 0
-      END AS competitors_other_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'GitLab Core')
-          THEN 1
-        ELSE 0
-      END AS competitors_gitlab_core_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'None')
-          THEN 1
-        ELSE 0
-      END AS competitors_none_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'GitHub Enterprise')
-          THEN 1
-        ELSE 0
-      END AS competitors_github_enterprise_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'BitBucket Server')
-          THEN 1
-        ELSE 0
-      END AS competitors_bitbucket_server_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Unknown')
-          THEN 1
-        ELSE 0
-      END AS competitors_unknown_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'GitHub.com')
-          THEN 1
-        ELSE 0
-      END AS competitors_github_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'GitLab.com')
-          THEN 1
-        ELSE 0
-      END AS competitors_gitlab_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Jenkins')
-          THEN 1
-        ELSE 0
-      END AS competitors_jenkins_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Azure DevOps')
-          THEN 1
-        ELSE 0
-      END AS competitors_azure_devops_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'SVN')
-          THEN 1
-        ELSE 0
-      END AS competitors_svn_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'BitBucket.Org')
-          THEN 1
-        ELSE 0
-      END AS competitors_bitbucket_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Atlassian')
-          THEN 1
-        ELSE 0
-      END AS competitors_atlassian_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Perforce')
-          THEN 1
-        ELSE 0
-      END AS competitors_perforce_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Visual Studio Team Services')
-          THEN 1
-        ELSE 0
-      END AS competitors_visual_studio_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Azure')
-          THEN 1
-        ELSE 0
-      END AS competitors_azure_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Amazon Code Commit')
-          THEN 1
-        ELSE 0
-      END AS competitors_amazon_code_commit_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'CircleCI')
-          THEN 1
-        ELSE 0
-      END AS competitors_circleci_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'Bamboo')
-          THEN 1
-        ELSE 0
-      END AS competitors_bamboo_flag,
-      CASE
-        WHEN CONTAINS(sfdc_opportunity.competitors, 'AWS')
-          THEN 1
-        ELSE 0
-      END AS competitors_aws_flag,
-
-      -- Reporting Keys/Groupings
+      live_opportunity_owner_fields.opportunity_owner_user_segment,
+      live_opportunity_owner_fields.opportunity_owner_user_geo,
+      live_opportunity_owner_fields.opportunity_owner_user_region,
+      live_opportunity_owner_fields.opportunity_owner_user_area,
+      live_opportunity_owner_fields.opportunity_owner_role,
+      live_opportunity_owner_fields.opportunity_owner_title,
+      IFF(sfdc_opportunity.comp_new_logo_override = 'Yes', 1, 0) AS is_comp_new_logo_override,
+      IFF(arr_created_date.fiscal_quarter_name_fy = sfdc_opportunity.snapshot_fiscal_quarter_name AND is_net_arr_pipeline_created = 1, net_arr, 0) AS created_in_snapshot_quarter_net_arr,
+      IFF(arr_created_date.fiscal_quarter_name_fy = sfdc_opportunity.snapshot_fiscal_quarter_name AND is_net_arr_pipeline_created = 1, calculated_deal_count, 0) AS created_in_snapshot_quarter_deal_count,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Other'),1,0) AS competitors_other_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'GitLab Core'),1,0) AS competitors_gitlab_core_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'None'),1,0) AS competitors_none_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'GitHub Enterprise'),1,0) AS competitors_github_enterprise_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'BitBucket Server'),1,0) AS competitors_bitbucket_server_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Unknown'),1,0) AS competitors_unknown_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'GitHub.com'),1,0) AS competitors_github_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'GitLab.com'),1,0) AS competitors_gitlab_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Jenkins'),1,0) AS competitors_jenkins_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Azure DevOps'),1,0) AS competitors_azure_devops_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'SVN'),1,0) AS competitors_svn_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'BitBucket.Org'),1,0) AS competitors_bitbucket_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Atlassian'),1,0) AS competitors_atlassian_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Perforce'),1,0) AS competitors_perforce_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Visual Studio Team Services'),1,0) AS competitors_visual_studio_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Azure'),1,0) AS competitors_azure_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Amazon Code Commit'),1,0) AS competitors_amazon_code_commit_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'CircleCI'),1,0) AS competitors_circleci_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'Bamboo'),1,0) AS competitors_bamboo_flag,
+      IFF(CONTAINS(sfdc_opportunity.competitors, 'AWS'),1,0) AS competitors_aws_flag,
+      LOWER(
+        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.account_owner_user_segment, live_opportunity_owner_fields.opportunity_owner_user_segment)
+      )                                                     AS report_opportunity_user_segment,
+      LOWER(
+        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.account_owner_user_geo, live_opportunity_owner_fields.opportunity_owner_user_geo)
+      ) AS report_opportunity_user_geo,
+      LOWER(
+        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.account_owner_user_region, live_opportunity_owner_fields.opportunity_owner_user_region)
+      ) AS report_opportunity_user_region,
+      LOWER(
+        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.account_owner_user_area, live_opportunity_owner_fields.opportunity_owner_user_area)
+      ) AS report_opportunity_user_area,
+      LOWER(
+        CONCAT(
+          report_opportunity_user_segment,'-',report_opportunity_user_geo,'-',report_opportunity_user_region,'-',report_opportunity_user_area
+        )
+      ) AS report_user_segment_geo_region_area,
       COALESCE(sfdc_opportunity.sales_qualified_source, 'Missing sales_qualified_source_name') AS key_sqs,
       LOWER(
         CONCAT(
-          sfdc_opportunity.report_user_segment_geo_region_area,
-          '-',
-          key_sqs,
-          '-',
-          COALESCE(sfdc_opportunity.order_type, 'Missing order_type_name')
+          report_user_segment_geo_region_area,'-',key_sqs,'-',COALESCE(sfdc_opportunity.order_type, 'Missing order_type_name')
         )
       ) AS report_user_segment_geo_region_area_sqs_ot,
       COALESCE(report_opportunity_user_segment, 'other') AS key_segment,
       COALESCE(deal_group, 'other') AS key_ot,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || key_sqs, 'other') AS key_segment_sqs,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || deal_group, 'other') AS key_segment_ot,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo, 'other') AS key_segment_geo,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || key_sqs, 'other') AS key_segment_geo_sqs,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || deal_group, 'other') AS key_segment_geo_ot,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || sfdc_opportunity.report_opportunity_user_region, 'other') AS key_segment_geo_region,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || sfdc_opportunity.report_opportunity_user_region || '_' || key_sqs, 'other') AS key_segment_geo_region_sqs,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || sfdc_opportunity.report_opportunity_user_region || '_' || deal_group, 'other') AS key_segment_geo_region_ot,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || sfdc_opportunity.report_opportunity_user_region || '_' || sfdc_opportunity.report_opportunity_user_area, 'other') AS key_segment_geo_region_area,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || sfdc_opportunity.report_opportunity_user_region || '_' || sfdc_opportunity.report_opportunity_user_area || '_' || key_sqs, 'other') AS key_segment_geo_region_area_sqs,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || sfdc_opportunity.report_opportunity_user_region || '_' || sfdc_opportunity.report_opportunity_user_area || '_' || deal_group, 'other') AS key_segment_geo_region_area_ot,
-      COALESCE(sfdc_opportunity.report_opportunity_user_segment || '_' || sfdc_opportunity.report_opportunity_user_geo || '_' || sfdc_opportunity.report_opportunity_user_area, 'other') AS key_segment_geo_area,
+      COALESCE(report_opportunity_user_segment || '_' || key_sqs, 'other') AS key_segment_sqs,
+      COALESCE(report_opportunity_user_segment || '_' || deal_group, 'other') AS key_segment_ot,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo, 'other') AS key_segment_geo,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || key_sqs, 'other') AS key_segment_geo_sqs,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || deal_group, 'other') AS key_segment_geo_ot,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region, 'other') AS key_segment_geo_region,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || key_sqs, 'other') AS key_segment_geo_region_sqs,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || deal_group, 'other') AS key_segment_geo_region_ot,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area, 'other') AS key_segment_geo_region_area,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || key_sqs, 'other') AS key_segment_geo_region_area_sqs,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_region || '_' || report_opportunity_user_area || '_' || deal_group, 'other') AS key_segment_geo_region_area_ot,
+      COALESCE(report_opportunity_user_segment || '_' || report_opportunity_user_geo || '_' || report_opportunity_user_area, 'other') AS key_segment_geo_area,
       COALESCE(
         report_opportunity_user_segment, 'other'
       ) AS sales_team_cro_level,
       -- This code replicates the reporting structured of FY22, to keep current tools working
       CASE
-        WHEN sfdc_opportunity.report_opportunity_user_segment = 'large'
-          AND sfdc_opportunity.report_opportunity_user_geo = 'emea'
+        WHEN report_opportunity_user_segment = 'large'
+          AND report_opportunity_user_geo = 'emea'
           THEN 'large_emea'
-        WHEN sfdc_opportunity.report_opportunity_user_segment = 'mid-market'
-          AND sfdc_opportunity.report_opportunity_user_region = 'amer'
-          AND LOWER(sfdc_opportunity.report_opportunity_user_area) LIKE '%west%'
+        WHEN report_opportunity_user_segment = 'mid-market'
+          AND report_opportunity_user_region = 'amer'
+          AND LOWER(report_opportunity_user_area) LIKE '%west%'
           THEN 'mid-market_west'
-        WHEN sfdc_opportunity.report_opportunity_user_segment = 'mid-market'
-          AND sfdc_opportunity.report_opportunity_user_region = 'amer'
-          AND LOWER(sfdc_opportunity.report_opportunity_user_area) NOT LIKE '%west%'
+        WHEN report_opportunity_user_segment = 'mid-market'
+          AND report_opportunity_user_region = 'amer'
+          AND LOWER(report_opportunity_user_area) NOT LIKE '%west%'
           THEN 'mid-market_east'
-        WHEN sfdc_opportunity.report_opportunity_user_segment = 'smb'
-          AND sfdc_opportunity.report_opportunity_user_region = 'amer'
-          AND LOWER(sfdc_opportunity.report_opportunity_user_area) LIKE '%west%'
+        WHEN report_opportunity_user_segment = 'smb'
+          AND report_opportunity_user_region = 'amer'
+          AND LOWER(report_opportunity_user_area) LIKE '%west%'
           THEN 'smb_west'
-        WHEN sfdc_opportunity.report_opportunity_user_segment = 'smb'
-          AND sfdc_opportunity.report_opportunity_user_region = 'amer'
-          AND LOWER(sfdc_opportunity.report_opportunity_user_area) NOT LIKE '%west%'
+        WHEN report_opportunity_user_segment = 'smb'
+          AND report_opportunity_user_region = 'amer'
+          AND LOWER(report_opportunity_user_area) NOT LIKE '%west%'
           THEN 'smb_east'
-        WHEN sfdc_opportunity.report_opportunity_user_segment = 'smb'
-          AND sfdc_opportunity.report_opportunity_user_region = 'latam'
+        WHEN report_opportunity_user_segment = 'smb'
+          AND report_opportunity_user_region = 'latam'
           THEN 'smb_east'
-        WHEN (sfdc_opportunity.report_opportunity_user_segment IS NULL
-          OR sfdc_opportunity.report_opportunity_user_region IS NULL)
+        WHEN (report_opportunity_user_segment IS NULL
+          OR report_opportunity_user_region IS NULL)
           THEN 'other'
         WHEN
-          CONCAT(sfdc_opportunity.report_opportunity_user_segment, '_', sfdc_opportunity.report_opportunity_user_region) LIKE '%other%'
+          CONCAT(report_opportunity_user_segment, '_', report_opportunity_user_region) LIKE '%other%'
           THEN 'other'
-        ELSE CONCAT(sfdc_opportunity.report_opportunity_user_segment, '_', sfdc_opportunity.report_opportunity_user_region)
+        ELSE CONCAT(report_opportunity_user_segment, '_', report_opportunity_user_region)
       END AS sales_team_rd_asm_level,
       COALESCE(
-        CONCAT(sfdc_opportunity.report_opportunity_user_segment, '_', sfdc_opportunity.report_opportunity_user_geo), 'other'
+        CONCAT(report_opportunity_user_segment, '_', report_opportunity_user_geo), 'other'
       ) AS sales_team_vp_level,
       COALESCE(
         CONCAT(
-          sfdc_opportunity.report_opportunity_user_segment,
+          report_opportunity_user_segment,
           '_',
-          sfdc_opportunity.report_opportunity_user_geo,
+          report_opportunity_user_geo,
           '_',
-          sfdc_opportunity.report_opportunity_user_region
+          report_opportunity_user_region
         ),
         'other'
       ) AS sales_team_avp_rd_level,
       COALESCE(
         CONCAT(
-          sfdc_opportunity.report_opportunity_user_segment,
+          report_opportunity_user_segment,
           '_',
-          sfdc_opportunity.report_opportunity_user_geo,
+          report_opportunity_user_geo,
           '_',
-          sfdc_opportunity.report_opportunity_user_region,
+          report_opportunity_user_region,
           '_',
-          sfdc_opportunity.report_opportunity_user_area
+          report_opportunity_user_area
         ),
         'other'
       ) AS sales_team_asm_level,
@@ -1000,21 +1096,22 @@
     LEFT JOIN campaigns_per_opp
       ON sfdc_opportunity.dim_crm_opportunity_id = campaigns_per_opp.dim_crm_opportunity_id
     LEFT JOIN first_contact
-      ON sfdc_opportunity.dim_crm_opportunity_id = first_contact.opportunity_id 
-        AND first_contact.row_num = 1
+      ON sfdc_opportunity.dim_crm_opportunity_id = first_contact.opportunity_id AND first_contact.row_num = 1
+    LEFT JOIN dim_date AS close_date
+      ON sfdc_opportunity.close_date = close_date.date_actual
     LEFT JOIN dim_date AS arr_created_date
       ON sfdc_opportunity.iacv_created_date::DATE = arr_created_date.date_actual
     LEFT JOIN dim_date AS subscription_start_date
       ON sfdc_opportunity.subscription_start_date::DATE = subscription_start_date.date_actual
-    LEFT JOIN sfdc_account AS fulfillment_partner
-      ON sfdc_opportunity.fulfillment_partner = fulfillment_partner.account_id
-    LEFT JOIN sfdc_account AS partner_account
-      ON sfdc_opportunity.partner_account = partner_account.account_id
-    LEFT JOIN sfdc_account
-      ON sfdc_opportunity.dim_crm_account_id= sfdc_account.account_id
+    LEFT JOIN live_opportunity_owner_fields
+      ON sfdc_opportunity.dim_crm_opportunity_id = live_opportunity_owner_fields.dim_crm_opportunity_id
+    LEFT JOIN {{ ref('sfdc_opportunity_source') }} AS sfdc_opportunity_source_live
+      ON sfdc_opportunity.dim_crm_opportunity_id = sfdc_opportunity_source_live.opportunity_id
+    LEFT JOIN {{ ref('sfdc_account_source')}} AS sfdc_account_source_live
+      ON sfdc_opportunity_source_live.account_id = sfdc_account_source_live.account_id
     LEFT JOIN net_iacv_to_net_arr_ratio
-      ON sfdc_opportunity.opportunity_owner_user_segment = net_iacv_to_net_arr_ratio.user_segment_stamped
-        AND sfdc_opportunity.order_type = net_iacv_to_net_arr_ratio.order_type
+      ON live_opportunity_owner_fields.opportunity_owner_user_segment = net_iacv_to_net_arr_ratio.user_segment_stamped
+        AND sfdc_opportunity_source_live.order_type_stamped = net_iacv_to_net_arr_ratio.order_type
 
 )
 
@@ -1022,6 +1119,6 @@
     cte_ref="final",
     created_by="@michellecooper",
     updated_by="@michellecooper",
-    created_date="2022-02-01",
+    created_date="2022-02-23",
     updated_date="2022-11-07"
 ) }}
