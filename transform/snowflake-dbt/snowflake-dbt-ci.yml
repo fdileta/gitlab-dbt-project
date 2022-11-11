@@ -179,6 +179,17 @@
 # DBT cloning
 # ======
 
+setup_dbt:
+  <<: *snowflake_dbt_jobs
+  script:
+  - *deps_and_seed
+  - echo "Complete"
+  artifacts:
+      name: "dbt deps Compiled Files"
+      paths:
+        - $CI_PROJECT_DIR/transform/snowflake-dbt/
+      expire_in: 1 week
+
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   variables:
