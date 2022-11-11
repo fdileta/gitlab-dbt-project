@@ -193,7 +193,7 @@ setup_dbt:
 test_artifacts:
   <<: *snowflake_dbt_jobs
   script:
-    - dbt --quiet ls --models +dim_subscription --output json --output-keys "database schema name depends_on unique_id config" --profiles-dir profile --target prod
+    - ls $CI_PROJECT_DIR/transform/snowflake-dbt/
   dependencies:
     - setup_dbt
 
