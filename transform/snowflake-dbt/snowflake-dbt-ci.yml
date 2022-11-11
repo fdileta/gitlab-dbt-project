@@ -192,7 +192,7 @@ setup_dbt:
 
 test_artifacts:
   script:
-      dbt --quiet ls --models +dim_subscription --output json --output-keys "database schema name depends_on unique_id config" --profiles-dir profile --target prod
+    - dbt --quiet ls --models +dim_subscription --output json --output-keys "database schema name depends_on unique_id config" --profiles-dir profile --target prod
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
