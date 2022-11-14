@@ -3,7 +3,7 @@ Main test file for reduce_file_size.py
 """
 
 import os
-
+import sys
 import gzip
 import shutil
 from typing import Dict, Any
@@ -17,6 +17,10 @@ from orchestration.reduce_file_size import (
     get_file_size,
 )
 
+
+abs_path = os.path.dirname(os.path.realpath(__file__))
+abs_path = abs_path[: abs_path.find("orchestration")] + "orchestration/test"
+sys.path.append(abs_path)
 
 COLUMN_LIMIT_SIZE_SNOWFLAKE_MB = 14
 
@@ -42,9 +46,10 @@ TEST_JSON_DICT: Dict[Any, Any] = {
     },
 }
 
+
 TARGET_FILE = "test_file.json"
 
-FILE_NAME_ZIPPED = f"test_manifest.json.gz"
+FILE_NAME_ZIPPED = f"{abs_path}/test_manifest.json.gz"
 FILE_NAME_ORIGINAL = f"{FILE_NAME_ZIPPED.replace('.gz','')}"
 FILE_NAME_REDUCED = f"{FILE_NAME_ORIGINAL}.reduced"
 
