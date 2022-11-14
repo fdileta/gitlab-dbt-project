@@ -2,13 +2,10 @@
 Testing routine for manifest decomposition
 """
 import os
-import sys
-
 import pytest
-
 import yaml
-from yaml.loader import SafeLoader
 
+from yaml.loader import SafeLoader
 
 abs_path = os.path.dirname(os.path.realpath(__file__))
 abs_path = (
