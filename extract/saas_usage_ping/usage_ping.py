@@ -447,7 +447,7 @@ class UsagePing:
         )
         self.loader_engine.dispose()
 
-    def run_metric_checks(self) -> None:
+    def run_metric_checks(self, date_to_check=datetime.datetime.now()) -> None:
         """Checks the following:
         - All payload metrics appear in the metric_definitions yaml file
         - The Redis & SQL metrics dont share the same key
@@ -461,7 +461,7 @@ class UsagePing:
 
         has_error = False
         # only alert once a month as missing definitons need to be fixed by PI team
-        if is_first_seven_days_of_month(datetime.datetime.now()) and (self.missing_definitions[SQL_KEY] or self.missing_definitions[REDIS_KEY]):
+        if is_first_seven_days_of_month(date_to_check) and (self.missing_definitions[SQL_KEY] or self.missing_definitions[REDIS_KEY]):
             logging.warning(
                 f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}. If there is not already an issue, please open one for product intelligence to add missing definition(s) to the yaml file."
             )

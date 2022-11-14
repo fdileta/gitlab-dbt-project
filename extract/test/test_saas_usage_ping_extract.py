@@ -422,7 +422,10 @@ def test_run_metric_checks():
     # ensure that an error is raised if there's a missing definition
     usage_ping_test.missing_definitions[SQL_KEY].append("some_missing_definition")
     with pytest.raises(ValueError, match="Raising error to.*"):
-        usage_ping_test.run_metric_checks()
+        usage_ping_test.run_metric_checks(datetime(2022, 11, 7))
+
+    # should do nothing since this only throws error on first week of mo
+    usage_ping_test.run_metric_checks(datetime(2022, 11, 14))
 
     usage_ping_test.missing_definitions[SQL_KEY] = []  # reset
     usage_ping_test.run_metric_checks()  # nothing should happen
