@@ -131,9 +131,47 @@ WITH map_merged_crm_account AS (
       zoom_info_parent_company_zi_id,
       zoom_info_parent_company_name,
       zoom_info_ultimate_parent_company_zi_id,
-      zoom_info_ultimate_parent_company_name
+      zoom_info_ultimate_parent_company_name,
+      zoom_info_total_funding
     FROM sfdc_account
     WHERE account_id = ultimate_parent_account_id
+
+), pte_scores AS (
+
+    SELECT 
+      crm_account_id                                                                                           AS account_id,
+      score                                                                                                    AS score,
+      decile                                                                                                   AS decile,
+      score_group                                                                                              AS score_group,
+      MIN(score_date)                                                                                          AS valid_from,
+      COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), CURRENT_DATE())        AS valid_to,
+      CASE 
+        WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_from DESC) = 1 
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                                      AS is_current
+    FROM {{ ref('pte_scores_source') }}    
+    {{ dbt_utils.group_by(n=4)}}
+    ORDER BY valid_from, valid_to
+
+
+), ptc_scores AS (
+
+    SELECT 
+      crm_account_id                                                                                           AS account_id,
+      score                                                                                                    AS score,
+      decile                                                                                                   AS decile,
+      score_group                                                                                              AS score_group,
+      MIN(score_date)                                                                                          AS valid_from,
+      COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), CURRENT_DATE())        AS valid_to,
+      CASE 
+        WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_from DESC) = 1 
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                                      AS is_current
+    FROM {{ ref('ptc_scores_source') }}    
+    {{ dbt_utils.group_by(n=4)}}
+    ORDER BY valid_from, valid_to
 
 ), final AS (
 
@@ -155,12 +193,14 @@ WITH map_merged_crm_account AS (
       map_merged_crm_account.dim_crm_account_id                           AS merged_to_account_id,
       sfdc_account.record_type_id                                         AS record_type_id,
       account_owner.user_id                                               AS crm_account_owner_id,
+      proposed_account_owner.user_id                                      AS proposed_crm_account_owner_id,
       technical_account_manager.user_id                                   AS technical_account_manager_id,
       sfdc_account.master_record_id,
       prep_crm_person.dim_crm_person_id                                   AS dim_crm_person_primary_contact_id,
 
       --account people
       account_owner.name                                                  AS account_owner,
+      proposed_account_owner.name                                         AS proposed_crm_account_owner,
       technical_account_manager.name                                      AS technical_account_manager,
 
       ----ultimate parent crm account info
@@ -199,6 +239,7 @@ WITH map_merged_crm_account AS (
       ultimate_parent_account.zoom_info_parent_company_name              AS parent_crm_account_zoom_info_parent_company_name,
       ultimate_parent_account.zoom_info_ultimate_parent_company_zi_id    AS parent_crm_account_zoom_info_ultimate_parent_company_zi_id,
       ultimate_parent_account.zoom_info_ultimate_parent_company_name     AS parent_crm_account_zoom_info_ultimate_parent_company_name,
+      ultimate_parent_account.zoom_info_total_funding                    AS parent_crm_account_zoom_info_total_funding,
 
       --descriptive attributes
       sfdc_account.account_name                                           AS crm_account_name,
@@ -292,6 +333,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_ultimate_parent_company_zi_id                AS crm_account_zoom_info_ultimate_parent_company_zi_id,
       sfdc_account.zoom_info_ultimate_parent_company_name                 AS crm_account_zoom_info_ultimate_parent_company_name,
       sfdc_account.zoom_info_number_of_developers                         AS crm_account_zoom_info_number_of_developers,
+      sfdc_account.zoom_info_total_funding                                AS crm_account_zoom_info_total_funding,
       sfdc_account.forbes_2000_rank,
       sfdc_account.parent_account_industry_hierarchy,
       sfdc_account.sales_development_rep,      
@@ -436,6 +478,15 @@ WITH map_merged_crm_account AS (
       IFNULL(lam_corrections.dev_count, sfdc_account.lam_dev_count)       AS parent_crm_account_lam_dev_count,
       {%- endif %}
 
+      -- PtC and PtE 
+      pte_scores.score                                               AS pte_score,
+      pte_scores.decile                                              AS pte_decile,
+      pte_scores.score_group                                         AS pte_score_group,
+      ptc_scores.score                                               AS ptc_score,
+      ptc_scores.decile                                              AS ptc_decile,
+      ptc_scores.score_group                                         AS ptc_score_group,
+
+
       --metadata
       sfdc_account.created_by_id,
       created_by.name                                                     AS created_by_name,
@@ -455,12 +506,20 @@ WITH map_merged_crm_account AS (
     LEFT JOIN prep_crm_person
       ON sfdc_account.primary_contact_id = prep_crm_person.sfdc_record_id
     {%- if model_type == 'live' %}
+    LEFT JOIN pte_scores 
+      ON sfdc_account.account_id = pte_scores.account_id 
+        AND pte_scores.is_current = TRUE
+    LEFT JOIN ptc_scores
+      ON sfdc_account.account_id = ptc_scores.account_id 
+        AND ptc_scores.is_current = TRUE
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
     LEFT OUTER JOIN sfdc_users AS technical_account_manager
       ON sfdc_account.technical_account_manager_id = technical_account_manager.user_id
     LEFT JOIN sfdc_users AS account_owner
       ON sfdc_account.owner_id = account_owner.user_id
+    LEFT JOIN sfdc_users AS proposed_account_owner
+      ON proposed_account_owner.user_id = sfdc_account.proposed_account_owner
     LEFT JOIN sfdc_users created_by
       ON sfdc_account.created_by_id = created_by.user_id
     LEFT JOIN sfdc_users AS last_modified_by
@@ -475,6 +534,9 @@ WITH map_merged_crm_account AS (
     LEFT JOIN sfdc_users AS account_owner
       ON account_owner.user_id = sfdc_account.owner_id
         AND account_owner.snapshot_id = sfdc_account.snapshot_id
+    LEFT JOIN sfdc_users AS proposed_account_owner
+      ON proposed_account_owner.user_id = sfdc_account.proposed_account_owner
+        AND proposed_account_owner.snapshot_id = sfdc_account.snapshot_id
     LEFT JOIN lam_corrections
       ON ultimate_parent_account.account_id = lam_corrections.dim_parent_crm_account_id
         AND sfdc_account.snapshot_id = lam_corrections.snapshot_id
@@ -485,6 +547,15 @@ WITH map_merged_crm_account AS (
     LEFT JOIN sfdc_users AS last_modified_by
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
         AND sfdc_account.snapshot_id = last_modified_by.snapshot_id
+    LEFT JOIN pte_scores 
+      ON sfdc_account.account_id = pte_scores.account_id
+        AND sfdc_account.snapshot_date >= pte_scores.valid_from::DATE
+        AND  sfdc_account.snapshot_date < pte_scores.valid_to::DATE
+    LEFT JOIN ptc_scores 
+      ON sfdc_account.account_id = ptc_scores.account_id
+        AND sfdc_account.snapshot_date >= ptc_scores.valid_from::DATE
+        AND  sfdc_account.snapshot_date < ptc_scores.valid_to::DATE
+    
     {%- endif %}
 
 )

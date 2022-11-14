@@ -34,6 +34,7 @@ renamed AS (
     account_manager__c AS account_manager,
     account_owner_calc__c AS account_owner,
     account_owner_team__c AS account_owner_team,
+    proposed_account_owner__c AS proposed_account_owner,
     business_development_rep__c AS business_development_rep,
     dedicated_service_engineer__c AS dedicated_service_engineer,
     sdr_assigned__c AS sales_development_rep,
@@ -46,7 +47,7 @@ renamed AS (
       ), 0, 15)) AS ultimate_parent_account_id,
     type AS account_type,
     dfox_industry__c AS df_industry,
-    industry AS industry,
+    parent_lam_industry_acct_heirarchy__c AS industry,
     sub_industry__c AS sub_industry,
     parent_lam_industry_acct_heirarchy__c AS parent_account_industry_hierarchy,
     account_tier__c AS account_tier,
@@ -58,7 +59,7 @@ renamed AS (
     support_level__c AS support_level,
     named_account__c AS named_account,
     billingcountry AS billing_country,
-    billingcountrycode AS billing_country_code,
+    account_demographics_upa_country__c AS billing_country_code,
     billingpostalcode AS billing_postal_code,
     sdr_target_account__c::BOOLEAN AS is_sdr_target_account,
     lam_tier__c AS lam,
@@ -89,12 +90,12 @@ renamed AS (
     -- territory success planning fields
     atam_approved_next_owner__c AS tsp_approved_next_owner,
     atam_next_owner_role__c AS tsp_next_owner_role,
-    atam_account_employees__c AS tsp_account_employees,
-    jb_max_family_employees__c AS tsp_max_family_employees,
-    TRIM(SPLIT_PART(atam_region__c, '-', 1)) AS tsp_region,
+    account_demographics_employee_count__c AS tsp_account_employees,
+    account_demographic_max_family_employees__c AS tsp_max_family_employees,
+    account_demographics_region__c AS tsp_region,
     TRIM(SPLIT_PART(atam_sub_region__c, '-', 1)) AS tsp_sub_region,
-    TRIM(SPLIT_PART(atam_area__c, '-', 1)) AS tsp_area,
-    atam_territory__c AS tsp_territory,
+    account_demographics_area__c AS tsp_area,
+    account_demographics_territory__c AS tsp_territory,
     atam_address_country__c AS tsp_address_country,
     atam_address_state__c AS tsp_address_state,
     atam_address_city__c AS tsp_address_city,
@@ -156,9 +157,9 @@ renamed AS (
     trending_onsite_engagement__c AS demandbase_trending_onsite_engagement,
 
     -- sales segment fields
-    ultimate_parent_sales_segment_employees__c AS ultimate_parent_sales_segment,
+    account_demographics_sales_segment__c AS ultimate_parent_sales_segment,
     sales_segmentation_new__c AS division_sales_segment,
-    jb_test_sales_segment__c AS tsp_max_hierarchy_sales_segment,
+    account_demographics_sales_segment__c AS tsp_max_hierarchy_sales_segment,
     account_owner_user_segment__c AS account_owner_user_segment,
     -- ************************************
     -- sales segmentation deprecated fields - 2020-09-03
@@ -205,6 +206,7 @@ renamed AS (
     zi_ultimate_parent_company_zoominfo_id__c AS zoom_info_ultimate_parent_company_zi_id,
     zi_ultimate_parent_company_name__c AS zoom_info_ultimate_parent_company_name,
     zi_number_of_developers__c AS zoom_info_number_of_developers,
+    zi_total_funding__c AS zoom_info_total_funding,
 
     -- NF: Added on 20220427 to support EMEA reporting
     key_account__c                     AS is_key_account,

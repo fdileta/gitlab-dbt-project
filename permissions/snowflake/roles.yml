@@ -1074,6 +1074,8 @@ roles:
         warehouses:
             - dev_xs
             - loading
+        member_of:
+            - restricted_safe
         owns:
             schemas:
                 - raw.sales_analytics
@@ -1149,6 +1151,7 @@ roles:
             tables:
                 read:
                     - prep.sensitive.bamboohr_separations
+                    - prep.sensitive.workday_terminations
 
     - bamboohr:
         warehouses:
@@ -2037,6 +2040,7 @@ roles:
                     - prod.restricted_safe_workspace_sales
                     - prod.restricted_safe_common_mart_product
                     - prod.workspace_data_science
+                    - prod.workspace_sales
 
             tables:
                 read:
@@ -2051,6 +2055,7 @@ roles:
                     - prod.restricted_safe_workspace_sales.*
                     - prod.restricted_safe_common_mart_product.*
                     - prod.workspace_data_science.*
+                    - prod.workspace_sales.*
 
     - salesforce:
         warehouses:
@@ -2478,6 +2483,8 @@ roles:
 
     - alpcohen:
         member_of:
+            - analyst_sales
+            - data_team_analyst
             - reporter
             - restricted_safe
             - xactly
@@ -3534,6 +3541,7 @@ roles:
             - data_team_analyst
             - restricted_safe
             - workday
+            - zendesk
         warehouses:
             - dev_xs
         owns:
@@ -4569,6 +4577,16 @@ roles:
                     - vprakash_prep.*.*
                     - vprakash_prod.*.*
 
+    - warias:
+        member_of:
+            - data_team_analyst
+            - analyst_core
+            - restricted_safe
+            - dbt_data_science
+            - snowplow
+        warehouses:
+            - dev_xs
+
     - webrahim:
         member_of:
             - analyst_finance
@@ -4605,7 +4623,6 @@ users:
             - transformer
             - data_science_loader
             - sales_analytics
-            - restricted_safe
             - reporter
 
     - alpcohen:
@@ -5064,6 +5081,11 @@ users:
             - accountadmin
             - securityadmin
             - vprakash
+
+    - warias:
+        can_login: yes
+        member_of:
+            - warias
 
     - webrahim:
         can_login: yes
