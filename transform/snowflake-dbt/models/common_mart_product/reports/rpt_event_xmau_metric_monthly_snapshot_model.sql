@@ -1,6 +1,6 @@
 {{ config(
     materialized='incremental',
-    unique_key='rpt_event_xmau_metric_monthly_snapshot_id'
+    unique_key='rpt_event_xmau_metric_monthly_snapshot_id',
     tags=["edm_snapshot", "product"]
 ) }}
 
