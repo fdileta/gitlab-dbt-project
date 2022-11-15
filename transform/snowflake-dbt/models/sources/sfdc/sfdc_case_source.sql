@@ -1,5 +1,3 @@
-
-
 WITH source AS (
 
   SELECT *
