@@ -407,8 +407,31 @@ WITH edm_opty AS (
     CASE edm_opty.is_sao 
       WHEN TRUE THEN 1 
       ELSE 0 
-    END                                             AS is_eligible_sao_flag 
-    
+    END                                             AS is_eligible_sao_flag,
+
+    CASE
+      WHEN  edm_opty.order_type = '1. New - First Order'
+          THEN 'First Order'          
+      WHEN lower(opportunity_owner.role_name) like ('pooled%')
+              AND edm_opty.key_segment IN ('smb','mid-market')
+              AND edm_opty.order_type != '1. New - First Order'
+          THEN 'Pooled'
+      WHEN lower(opportunity_owner.role_name) like ('terr%') 
+              AND edm_opty.key_segment IN ('smb','mid-market')
+              AND edm_opty.order_type != '1. New - First Order'
+          THEN 'Territory'
+      WHEN lower(opportunity_owner.role_name) like ('named%') 
+              AND edm_opty.key_segment IN ('smb','mid-market')
+              AND edm_opty.order_type != '1. New - First Order'
+          THEN 'Named'
+      WHEN  edm_opty.order_type IN ('2. New - Connected','4. Contraction','6. Churn - Final','5. Churn - Partial','3. Growth')
+              AND edm_opty.key_segment IN ('smb','mid-market')
+          THEN 'Expansion'
+      ELSE 'Other'
+    END                                                            AS commercial_sal_category,
+
+    LOWER(CONCAT(report_user_segment_geo_region_area_sqs_ot, '-', commercial_sal_category))    AS report_user_segment_geo_region_area_sqs_ot_rt
+
 
     FROM edm_opty
     -- Date helpers

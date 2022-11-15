@@ -50,6 +50,7 @@ WITH date_details AS (
       report_opportunity_user_area,
       report_user_segment_geo_region_area,
       report_user_segment_geo_region_area_sqs_ot,
+      report_user_segment_geo_region_area_sqs_ot_rt,
 
       -- NF 2022-02-17 new aggregated keys 
       key_sqs,
@@ -57,11 +58,13 @@ WITH date_details AS (
 
       key_segment,
       key_segment_sqs,                 
-      key_segment_ot,    
+      key_segment_ot,
+      key_segment_rt,
 
       key_segment_geo,
       key_segment_geo_sqs,
-      key_segment_geo_ot,      
+      key_segment_geo_ot,
+      key_segment_geo_rt,      
 
       key_segment_geo_region,
       key_segment_geo_region_sqs,
@@ -793,17 +796,20 @@ WITH date_details AS (
       -- NF 2022-02-17 new aggregated keys 
       sfdc_opportunity_xf.report_user_segment_geo_region_area,
       sfdc_opportunity_xf.report_user_segment_geo_region_area_sqs_ot,
+      sfdc_opportunity_xf.report_user_segment_geo_region_area_sqs_ot_rt,
 
       sfdc_opportunity_xf.key_sqs,
       sfdc_opportunity_xf.key_ot,
 
       sfdc_opportunity_xf.key_segment,
       sfdc_opportunity_xf.key_segment_sqs,                 
-      sfdc_opportunity_xf.key_segment_ot,    
+      sfdc_opportunity_xf.key_segment_ot,
+      sfdc_opportunity_xf.key_segment_rt,
 
       sfdc_opportunity_xf.key_segment_geo,
       sfdc_opportunity_xf.key_segment_geo_sqs,
-      sfdc_opportunity_xf.key_segment_geo_ot,      
+      sfdc_opportunity_xf.key_segment_geo_ot,
+      sfdc_opportunity_xf.key_segment_geo_rt,
 
       sfdc_opportunity_xf.key_segment_geo_region,
       sfdc_opportunity_xf.key_segment_geo_region_sqs,

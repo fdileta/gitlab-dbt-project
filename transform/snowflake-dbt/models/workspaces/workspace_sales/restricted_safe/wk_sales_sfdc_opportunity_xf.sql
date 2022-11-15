@@ -43,7 +43,8 @@ we can delete this connection and use the mart table directly.
 -- keys used for aggregated historical analysis
 
     SELECT *
-    FROM {{ ref('wk_sales_report_agg_demo_sqs_ot_keys') }} 
+    --FROM {{ ref('wk_sales_report_agg_demo_sqs_ot_keys') }} 
+    FROM {{ ref('wk_sales_report_agg_demo_sqs_ot_rt_keys' )}}
 
 ), today AS (
 
@@ -622,6 +623,7 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
     AND (o.is_won = 1
         OR (is_renewal = 1 AND is_lost = 1))
 
+
 ), oppty_final AS (
 
     SELECT 
@@ -689,6 +691,31 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
       -- NF 2022-02-17 these next two fields leverage the logic of comparing current fy opportunity demographics stamped vs account demo for previous years
       LOWER(CONCAT(report_opportunity_user_segment,'-',report_opportunity_user_geo,'-',report_opportunity_user_region,'-',report_opportunity_user_area)) AS report_user_segment_geo_region_area,
       LOWER(CONCAT(report_opportunity_user_segment,'-',report_opportunity_user_geo,'-',report_opportunity_user_region,'-',report_opportunity_user_area, '-', sfdc_opportunity_xf.sales_qualified_source, '-', sfdc_opportunity_xf.order_type_stamped)) AS report_user_segment_geo_region_area_sqs_ot,
+
+      -- getting commercial sal category (role type)
+      CASE
+        WHEN  sfdc_opportunity_xf.order_type_stamped = '1. New - First Order'
+            THEN 'First Order'
+        WHEN lower(owner.role_name) like ('pooled%')
+                AND lower(report_opportunity_user_segment) IN ('smb','mid-market')
+                AND sfdc_opportunity_xf.order_type_stamped != '1. New - First Order'
+            THEN 'Pooled'
+        WHEN lower(owner.role_name) like ('terr%')
+                AND lower(report_opportunity_user_segment) IN ('smb','mid-market')
+                AND sfdc_opportunity_xf.order_type_stamped != '1. New - First Order'
+            THEN 'Territory'
+        WHEN lower(owner.role_name) like ('named%')
+                AND lower(report_opportunity_user_segment) IN ('smb','mid-market')
+                AND sfdc_opportunity_xf.order_type_stamped != '1. New - First Order'
+            THEN 'Named'
+        WHEN  sfdc_opportunity_xf.order_type_stamped IN ('2. New - Connected','4. Contraction','6. Churn - Final','5. Churn - Partial','3. Growth')
+               AND lower(report_opportunity_user_segment) IN ('smb','mid-market')
+            THEN 'Expansion'
+        ELSE 'Other'
+      END                                                            AS commercial_sal_category,
+
+      -- new key for joining aggregation key table
+      LOWER(CONCAT(report_opportunity_user_segment,'-',report_opportunity_user_geo,'-',report_opportunity_user_region,'-',report_opportunity_user_area, '-', sfdc_opportunity_xf.sales_qualified_source, '-', sfdc_opportunity_xf.order_type_stamped, '-', commercial_sal_category)) AS report_user_segment_geo_region_area_sqs_ot_rt,
 
       -- account driven fields 
       sfdc_accounts_xf.account_name,
@@ -827,7 +854,9 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
       ON sfdc_accounts_xf.ultimate_parent_account_id = upa.account_id
     LEFT JOIN churn_metrics 
       ON churn_metrics.opportunity_id = sfdc_opportunity_xf.opportunity_id
-    
+    LEFT JOIN sfdc_users_xf AS owner
+      ON sfdc_opportunity_xf.owner_id = owner.user_id
+
     WHERE sfdc_accounts_xf.ultimate_parent_account_id NOT IN ('0016100001YUkWVAA1')   -- remove test account
       AND sfdc_opportunity_xf.account_id NOT IN ('0014M00001kGcORQA0')                -- remove test account
       AND sfdc_opportunity_xf.is_deleted = 0
@@ -1138,11 +1167,13 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
 
         COALESCE(agg_demo_keys.key_segment,'other')                     AS key_segment,
         COALESCE(agg_demo_keys.key_segment_sqs,'other')                 AS key_segment_sqs,                 
-        COALESCE(agg_demo_keys.key_segment_ot,'other')                  AS key_segment_ot,       
+        COALESCE(agg_demo_keys.key_segment_ot,'other')                  AS key_segment_ot,
+        COALESCE(agg_demo_keys.key_segment_rt,'other')                  AS key_segment_rt,       
 
         COALESCE(agg_demo_keys.key_segment_geo,'other')                 AS key_segment_geo,
         COALESCE(agg_demo_keys.key_segment_geo_sqs,'other')             AS key_segment_geo_sqs,
-        COALESCE(agg_demo_keys.key_segment_geo_ot,'other')              AS key_segment_geo_ot,      
+        COALESCE(agg_demo_keys.key_segment_geo_ot,'other')              AS key_segment_geo_ot,
+        COALESCE(agg_demo_keys.key_segment_geo_rt,'other')              AS key_segment_geo_rt,      
 
         COALESCE(agg_demo_keys.key_segment_geo_region,'other')          AS key_segment_geo_region,
         COALESCE(agg_demo_keys.key_segment_geo_region_sqs,'other')      AS key_segment_geo_region_sqs,
@@ -1171,7 +1202,7 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
       AND net_iacv_to_net_arr_ratio.order_type_stamped = oppty_final.order_type_stamped
     -- Add keys for aggregated analysis
     LEFT JOIN agg_demo_keys
-      ON oppty_final.report_user_segment_geo_region_area_sqs_ot = agg_demo_keys.report_user_segment_geo_region_area_sqs_ot
+      ON oppty_final.report_user_segment_geo_region_area_sqs_ot_rt = agg_demo_keys.report_user_segment_geo_region_area_sqs_ot_rt
 
 )
 SELECT *
