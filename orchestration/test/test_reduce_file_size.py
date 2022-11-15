@@ -3,7 +3,6 @@ Main test file for reduce_file_size.py
 """
 
 import os
-import sys
 import gzip
 import shutil
 from typing import Dict, Any
