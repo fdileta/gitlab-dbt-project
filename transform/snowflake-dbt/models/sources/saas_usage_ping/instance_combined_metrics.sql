@@ -45,7 +45,7 @@ final AS (
     run_results['license_starts_at']::TIMESTAMP AS license_starts_at,
     run_results['license_expires_at']::TIMESTAMP AS license_expires_at,
     PARSE_JSON(run_results['license_expires_at']) AS license_add_ons,
-    -- run_results['host_id']::VARCHAR AS host_id,
+    632::INT AS host_id, -- this is the GitLab host_id
     run_results['mattermost_enabled']::BOOLEAN AS mattermost_enabled,
     run_results['hostname']::VARCHAR AS hostname,
     run_results['license_trial']::BOOLEAN AS license_trial,
@@ -74,11 +74,11 @@ final AS (
     run_results['reply_by_email_enabled']::BOOLEAN AS reply_by_email_enabled,
     run_results['signup_enabled']::BOOLEAN AS signup_enabled,
     run_results['prometheus_metrics_enabled']::BOOLEAN AS prometheus_metrics_enabled,
-    -- run_results['gitaly_clusters']::NUMBER AS gitaly_clusters,
+    1::NUMBER AS gitaly_clusters,
     PARSE_JSON(run_results['usage_activity_by_stage']) AS usage_activity_by_stage,
     -- run_results['gitaly_servers']::NUMBER AS gitaly_servers,
     PARSE_JSON(run_results['usage_activity_by_stage_monthly']) AS usage_activity_by_stage_monthly,
-    -- run_results['gitpod_enabled']::VARCHAR AS gitpod_enabled,
+    't'::VARCHAR AS gitpod_enabled, -- matching the data type of prep_ping_instance
     run_results['gitaly']['version']::VARCHAR AS gitaly_version,
     run_results['gitaly']['filesystems']::VARCHAR AS gitaly_filesystems,
     PARSE_JSON(run_results['object_store']) AS object_store,
@@ -90,7 +90,7 @@ final AS (
     run_results['ingress_modsecurity_enabled']::BOOLEAN AS is_ingress_modsecurity_enabled,
     PARSE_JSON(run_results['topology']) AS topology,
     run_results['grafana_link_enabled']::BOOLEAN AS is_grafana_link_enabled,
-    -- run_results['container_registry_vendor']::VARCHAR AS container_registry_vendor,
+    'gitlab'::VARCHAR AS container_registry_vendor,
     PARSE_JSON(run_results['analytics_unique_visits']) AS analytics_unique_visits,
     run_results['container_registry_server']['version']::VARCHAR AS container_registry_version
   FROM cleaned
@@ -101,5 +101,5 @@ final AS (
     created_by="@mdrussell",
     updated_by="@mdrussell",
     created_date="2022-11-09",
-    updated_date="2022-11-09"
+    updated_date="2022-11-14"
 ) }}
