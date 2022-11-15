@@ -20,7 +20,6 @@ from orchestration.reduce_file_size import (
 
 abs_path = os.path.dirname(os.path.realpath(__file__))
 abs_path = abs_path[: abs_path.find("orchestration")] + "orchestration/test"
-sys.path.append(abs_path)
 
 COLUMN_LIMIT_SIZE_SNOWFLAKE_MB = 14
 
