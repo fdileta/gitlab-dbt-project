@@ -238,7 +238,7 @@ WITH accounts AS (
        SUM(CASE
              WHEN LOWER(accounts.account_type) IN {{net_income_retained_earnings}}
                THEN -converted_amount_using_transaction_accounting_period
-             WHEN accounts.account_number = '3000'
+             WHEN accounts.account_number IN ('3000','3014.1')
                THEN -converted_amount_using_transaction_accounting_period
              WHEN (LOWER(accounts.general_rate_type) = 'historical' AND accounts.is_leftside_account = false)
                THEN -converted_amount_using_transaction_accounting_period
