@@ -38,7 +38,7 @@ sources:
         identifier: campaignmember
         description: '{{ doc("sfdc_campaignmember_source") }}'
       - name: case
-        description: 'Source model for SFDC Case'
+        description: '{{ doc("sfdc_case_source") }}'
       - name: contact
         description: '{{ doc("sfdc_contact_source") }}'
       - name: contact_history

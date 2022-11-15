@@ -92,6 +92,14 @@ models:
         tests:
           - not_null
           - unique
+  - name: sfdc_case_source
+    description: Source model for SFDC Case
+    columns:
+      - name: case_id
+        tags: ["tdf", "sfdc"]
+        tests:
+          - not_null
+          - unique
   - name: sfdc_contact_source
     description: Source model for SFDC Contacts
     columns:
