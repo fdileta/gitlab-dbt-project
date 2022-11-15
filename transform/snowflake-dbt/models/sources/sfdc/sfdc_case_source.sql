@@ -1,4 +1,3 @@
-{{ config(alias='sfdc_case_source') }}
 
 
 WITH source AS (
