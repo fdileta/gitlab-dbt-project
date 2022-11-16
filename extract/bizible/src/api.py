@@ -123,11 +123,12 @@ class BizibleSnowFlakeExtractor:
         :type date_column:
         """
         end_date = datetime.now()
+        time_increments = 1
         for dt in rrule.rrule(
-            rrule.HOURLY, dtstart=last_modified_date, until=end_date, interval=2
+            rrule.HOURLY, dtstart=last_modified_date, until=end_date, interval=time_increments
         ):
             query_start_date = dt
-            query_end_date = dt + timedelta(hours=2)
+            query_end_date = dt + timedelta(hours=time_increments)
 
             query = f"""
             SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
