@@ -109,8 +109,8 @@ def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str):
     # Excludes the first sunday of every month, this is captured by the regular full refresh.
     if next_run.date() == timestamp.date():
         return False
-    else:
-        return True
+
+    return True
 
 
 dbt_evaluate_run_date_task = ShortCircuitOperator(
