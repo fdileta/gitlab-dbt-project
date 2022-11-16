@@ -118,12 +118,10 @@ def dbt_evaluate_run_date(timestamp: datetime):
     :return:
     """
 
-    current_weekday = timestamp.isoweekday()
-
     # Excludes the first sunday of every month, this is captured by the regular full refresh.
-    if current_weekday == 7 and get_week_of_month(
+    if timestamp.isoweekday() == 3 and get_week_of_month(
         timestamp.year, timestamp.month, timestamp.day
-    ):
+    ) == 3:
         return False
     else:
         return True
