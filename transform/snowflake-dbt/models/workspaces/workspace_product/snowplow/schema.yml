@@ -103,7 +103,7 @@ models:
   - name: fct_behavior_unstructured_event
     description: Atomic fact table for unstructured events.
     columns:
-      - name: behavior_structured_event_pk
+      - name: fct_behavior_unstructured_sk
         tests:
           - not_null
           - unique
