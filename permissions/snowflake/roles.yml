@@ -1074,6 +1074,8 @@ roles:
         warehouses:
             - dev_xs
             - loading
+        member_of:
+            - restricted_safe
         owns:
             schemas:
                 - raw.sales_analytics
@@ -1094,6 +1096,19 @@ roles:
                 write:
                     - raw.sales_analytics.*
 
+    - data_science_readonly:
+        warehouses:
+            - dev_xs
+        privileges:
+            databases:
+                read:
+                    - raw
+            schemas:
+                read:
+                    - raw.data_science
+            tables:
+                read:
+                    - raw.data_science.*
 
 
 # ==========================================
@@ -1149,6 +1164,7 @@ roles:
             tables:
                 read:
                     - prep.sensitive.bamboohr_separations
+                    - prep.sensitive.workday_terminations
 
     - bamboohr:
         warehouses:
@@ -2480,6 +2496,8 @@ roles:
 
     - alpcohen:
         member_of:
+            - analyst_sales
+            - data_team_analyst
             - reporter
             - restricted_safe
             - xactly
@@ -3035,6 +3053,7 @@ roles:
             - bi_tool_eval_read
             - xactly
             - sales_analytics
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -3536,6 +3555,7 @@ roles:
             - data_team_analyst
             - restricted_safe
             - workday
+            - zendesk
         warehouses:
             - dev_xs
         owns:
@@ -3841,6 +3861,7 @@ roles:
             - bi_tool_eval_read
             - xactly
             - sales_analytics
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -4617,7 +4638,6 @@ users:
             - transformer
             - data_science_loader
             - sales_analytics
-            - restricted_safe
             - reporter
 
     - alpcohen:

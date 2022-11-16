@@ -1,7 +1,7 @@
 WITH source AS (
 
     SELECT *
-    FROM {{ source('data_science', 'ptpt_scores') }}
+    FROM {{ source('data_science', 'namespace_segmentation_scores') }}
 
 ), intermediate AS (
 

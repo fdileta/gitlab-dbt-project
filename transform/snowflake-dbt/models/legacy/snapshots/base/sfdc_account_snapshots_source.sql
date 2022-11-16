@@ -47,7 +47,7 @@ renamed AS (
       ), 0, 15)) AS ultimate_parent_account_id,
     type AS account_type,
     dfox_industry__c AS df_industry,
-    industry AS industry,
+    parent_lam_industry_acct_heirarchy__c AS industry,
     sub_industry__c AS sub_industry,
     parent_lam_industry_acct_heirarchy__c AS parent_account_industry_hierarchy,
     account_tier__c AS account_tier,
@@ -59,7 +59,7 @@ renamed AS (
     support_level__c AS support_level,
     named_account__c AS named_account,
     billingcountry AS billing_country,
-    billingcountrycode AS billing_country_code,
+    account_demographics_upa_country__c AS billing_country_code,
     billingpostalcode AS billing_postal_code,
     sdr_target_account__c::BOOLEAN AS is_sdr_target_account,
     lam_tier__c AS lam,
@@ -86,16 +86,18 @@ renamed AS (
     numberofemployees                AS number_of_employees,
     phone AS account_phone,
     zi_phone__c AS zoominfo_account_phone,
+	number_of_employees_manual_source_admin__c AS admin_manual_source_number_of_employees,
+    account_address_manual_source_admin__c AS admin_manual_source_account_address,
 
     -- territory success planning fields
     atam_approved_next_owner__c AS tsp_approved_next_owner,
     atam_next_owner_role__c AS tsp_next_owner_role,
-    atam_account_employees__c AS tsp_account_employees,
-    jb_max_family_employees__c AS tsp_max_family_employees,
-    TRIM(SPLIT_PART(atam_region__c, '-', 1)) AS tsp_region,
+    account_demographics_employee_count__c AS tsp_account_employees,
+    account_demographic_max_family_employees__c AS tsp_max_family_employees,
+    account_demographics_region__c AS tsp_region,
     TRIM(SPLIT_PART(atam_sub_region__c, '-', 1)) AS tsp_sub_region,
-    TRIM(SPLIT_PART(atam_area__c, '-', 1)) AS tsp_area,
-    atam_territory__c AS tsp_territory,
+    account_demographics_area__c AS tsp_area,
+    account_demographics_territory__c AS tsp_territory,
     atam_address_country__c AS tsp_address_country,
     atam_address_state__c AS tsp_address_state,
     atam_address_city__c AS tsp_address_city,
@@ -157,9 +159,9 @@ renamed AS (
     trending_onsite_engagement__c AS demandbase_trending_onsite_engagement,
 
     -- sales segment fields
-    ultimate_parent_sales_segment_employees__c AS ultimate_parent_sales_segment,
+    account_demographics_sales_segment__c AS ultimate_parent_sales_segment,
     sales_segmentation_new__c AS division_sales_segment,
-    jb_test_sales_segment__c AS tsp_max_hierarchy_sales_segment,
+    account_demographics_sales_segment__c AS tsp_max_hierarchy_sales_segment,
     account_owner_user_segment__c AS account_owner_user_segment,
     -- ************************************
     -- sales segmentation deprecated fields - 2020-09-03
