@@ -119,9 +119,9 @@ def dbt_evaluate_run_date(timestamp: datetime):
     """
 
     # Excludes the first sunday of every month, this is captured by the regular full refresh.
-    if timestamp.isoweekday() == 3 and get_week_of_month(
+    if timestamp.isoweekday() == 7 and get_week_of_month(
         timestamp.year, timestamp.month, timestamp.day
-    ) == 3:
+    ) == 1:
         return False
     else:
         return True
