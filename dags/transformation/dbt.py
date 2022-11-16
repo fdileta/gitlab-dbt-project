@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import calendar
 
+from croniter import croniter
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 from airflow.operators.python_operator import ShortCircuitOperator
@@ -97,31 +98,16 @@ dag = DAG(
 dag.doc_md = __doc__
 
 
-def get_week_of_month(year: int, month: int, day: int):
+def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str):
     """
-    Very simple function to return the current week of the month for use in the short circuit operator
-    :param year:
-    :param month:
-    :param day:
-    :return:
-    """
-    x = np.array(calendar.monthcalendar(year, month))
-    week_of_month = np.where(x == day)[0][0] + 1
-    return week_of_month
 
-
-def dbt_evaluate_run_date(timestamp: datetime):
-    """
-    Checks the current date and returns False (causing the short circuit to happen) only on the first sunday of the
-    month
     :param timestamp:
+    :param exclude_schedule:
     :return:
     """
-
+    next_run = croniter(exclude_schedule).get_next(datetime)
     # Excludes the first sunday of every month, this is captured by the regular full refresh.
-    if timestamp.isoweekday() == 7 and get_week_of_month(
-        timestamp.year, timestamp.month, timestamp.day
-    ) == 1:
+    if next_run.date() == timestamp.date():
         return False
     else:
         return True
@@ -129,7 +115,7 @@ def dbt_evaluate_run_date(timestamp: datetime):
 
 dbt_evaluate_run_date_task = ShortCircuitOperator(
     task_id="evaluate_dbt_run_date",
-    python_callable=lambda: dbt_evaluate_run_date(datetime.now()),
+    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "45 8 * * SUN#1"),
     dag=dag,
 )
 
