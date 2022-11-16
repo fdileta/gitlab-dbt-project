@@ -5,8 +5,6 @@ This DAG is responsible for doing incremental model refresh for both product, no
 
 import os
 from datetime import datetime, timedelta
-import numpy as np
-import calendar
 
 from croniter import croniter
 from airflow import DAG
