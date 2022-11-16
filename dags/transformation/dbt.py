@@ -96,14 +96,14 @@ dag = DAG(
 dag.doc_md = __doc__
 
 
-def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str):
+def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
     """
     Simple function written to exclude a given schedule, currently only checking against dates.
     Designed to exclude the first Sundays of a given month from the schedule as this is the only date
     the full refresh now runs on.
     :param timestamp: Current run date
     :param exclude_schedule: Cron schedule to exclude
-    :return:
+    :return: Bool, false if it is the first Sunday of the month.
     """
     next_run = croniter(exclude_schedule).get_next(datetime)
     # Excludes the first sunday of every month, this is captured by the regular full refresh.
