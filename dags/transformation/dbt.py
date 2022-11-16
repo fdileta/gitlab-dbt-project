@@ -5,9 +5,12 @@ This DAG is responsible for doing incremental model refresh for both product, no
 
 import os
 from datetime import datetime, timedelta
+import numpy as np
+import calendar
 
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
+from airflow.operators.python_operator import ShortCircuitOperator
 from airflow.utils.trigger_rule import TriggerRule
 from airflow_utils import (
     DBT_IMAGE,
@@ -89,31 +92,36 @@ dag = DAG(
     "dbt",
     description="This DAG is responsible for doing incremental model refresh",
     default_args=default_args,
-    schedule_interval="45 8 * * MON-SAT",
+    schedule_interval="45 8 * * *",
 )
 dag.doc_md = __doc__
 
+def get_week_of_month(year, month, day):
+    x = np.array(calendar.monthcalendar(year, month))
+    week_of_month = np.where(x==day)[0][0] + 1
+    return(week_of_month)
 
-# BranchPythonOperator functions
-def dbt_run_or_refresh(timestamp: datetime) -> str:
-    """
-    Use the current date to determine whether to do a full-refresh or a
-    normal run.
-
-    If it is a Sunday and the current hour is less than the schedule_interval
-    for the DAG, then run a full_refresh. This ensures only one full_refresh is
-    run every week.
+def dbt_evaluate_run_date(timestamp: datetime):
     """
 
-    # TODO: make this not hardcoded
+    :param timestamp:
+    :return:
+    """
+
     current_weekday = timestamp.isoweekday()
 
-    # run a full-refresh once per week (on sunday early AM)
-    if current_weekday == 7:
-        return "dbt-full-refresh"
+    # Excludes the first sunday of every month, this is captured by the regular full refresh.
+    if current_weekday == 7 and get_week_of_month(timestamp.year, timestamp.month, timestamp.day):
+        return False
     else:
-        return "dbt-non-product-models-run"
+        return True
 
+
+dbt_evaluate_run_date_task = ShortCircuitOperator(
+    task_id='evaluate_dbt_run_date',
+    python_callable=lambda: dbt_evaluate_run_date(datetime.now()),
+    dag=dag,
+)
 
 # run non-product models on small warehouse
 dbt_non_product_models_command = f"""
@@ -271,7 +279,8 @@ dbt_workspaces_test = KubernetesPodOperator(
 )
 
 (
-    dbt_non_product_models_task
+    dbt_evaluate_run_date_task
+    >> dbt_non_product_models_task
     >> dbt_product_models_task
     >> dbt_test
     >> dbt_workspaces
