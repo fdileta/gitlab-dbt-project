@@ -121,14 +121,16 @@ def dbt_evaluate_run_date(timestamp: datetime):
     current_weekday = timestamp.isoweekday()
 
     # Excludes the first sunday of every month, this is captured by the regular full refresh.
-    if current_weekday == 7 and get_week_of_month(timestamp.year, timestamp.month, timestamp.day):
+    if current_weekday == 7 and get_week_of_month(
+        timestamp.year, timestamp.month, timestamp.day
+    ):
         return False
     else:
         return True
 
 
 dbt_evaluate_run_date_task = ShortCircuitOperator(
-    task_id='evaluate_dbt_run_date',
+    task_id="evaluate_dbt_run_date",
     python_callable=lambda: dbt_evaluate_run_date(datetime.now()),
     dag=dag,
 )
