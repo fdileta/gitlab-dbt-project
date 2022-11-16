@@ -37,7 +37,7 @@ The results of the queries are then uploaded into the `RAW.SAAS_USAGE_PING` sche
 The `instance queries` generate data about GitLab.com as a whole, while the `namespace queries` generate data about each namespace on GitLab.com.
 Data is stored in the table: 
 - `RAW.SAAS_USAGE_PING.INSTANCE_SQL_METRICS` - this data is generated results of `SQL` queries. 
-    - Note: this is table is deprecated as of Nov 2022,  as only the `combined` metrics are persisted into Snowflake
+    - Note: this is table is deprecated as of Nov 2022,  as only the `combined` metrics are persisted into Snowflake in the table `INSTANCE_COMBINED_METRICS`.
 - `RAW.SAAS_USAGE_PING.INSTANCE_SQL_ERROR` - this table contains `SQL` commands where error pops-up with the error description. If there is any record in this table, means some `SQL` query failed with an execution and the `Data team` will be alerted - via logs in `Airflow` and in [Trusted data framework (`TDF`)](https://about.gitlab.com/handbook/business-technology/data-team/platform/#tdf). 
 - `RAW.SAAS_USAGE_PING.GITLAB_DOTCOM_NAMESPACE` - namespace data is stored in this table 
 
@@ -50,7 +50,7 @@ graph TD;
   DNLD--Keep metadata-->MTD[Store meta data in .json];
   MTD--Save meta data-->FIN_RAW;
   TR_SQL--Execute queries-->SF_TP;
-  SF_TP-->ERROR_CHECK{Metrics generated?}--Yes-->FIN_RAW(Preserve SQL metrics results - to combine with Redis later);
+  SF_TP-->ERROR_CHECK{Metrics generated?}--Yes-->FIN_RAW(Preserve SQL metrics results - to combine with Instance Redis Metrics later);
   ERROR_CHECK--No-->ERR(Generate error record in RAW.SAAS_USAGE_PING.INSTANCE_SQL_ERROR);
 ```
 
@@ -63,7 +63,7 @@ The main purpose of loading data from Redis is to ensure fine granulation of met
 
 Data is stored in the table:
 - `RAW.SAAS_USAGE_PING.INSTANCE_REDIS_METRICS` - this data is generated results of `RESTful API` call
-    - Note: this is table is deprecated as of Nov 2022,  as only the `combined` metrics are persisted into Snowflake
+    - Note: this is table is deprecated as of Nov 2022,  as only the `combined` metrics are persisted into Snowflake in the table `INSTANCE_COMBINED_METRICS`.
     
 ##### Graphical representation of the pipeline for `INSTANCE_REDIS_METRICS`:
 ```mermaid
@@ -71,7 +71,7 @@ graph TD;
   SP_API[[Redis API]]--Call API-->DNLD(Download data);
   DNLD--Keep metadata-->MTD[Store meta data in .json];
   MTD--Save meta data-->FIN_RAW;
-  DNLD--Store data-->FIN_RAW(Preserve Redis metrics results - to combine with SQL later);
+  DNLD--Store data-->FIN_RAW(Preserve Redis metrics results - to combine with Instance SQL Metrics later);
 ```
         
 #### Combined data
