@@ -96,14 +96,24 @@ dag = DAG(
 )
 dag.doc_md = __doc__
 
-def get_week_of_month(year, month, day):
+
+def get_week_of_month(year: int, month: int, day: int):
+    """
+    Very simple function to return the current week of the month for use in the short circuit operator
+    :param year:
+    :param month:
+    :param day:
+    :return:
+    """
     x = np.array(calendar.monthcalendar(year, month))
-    week_of_month = np.where(x==day)[0][0] + 1
-    return(week_of_month)
+    week_of_month = np.where(x == day)[0][0] + 1
+    return week_of_month
+
 
 def dbt_evaluate_run_date(timestamp: datetime):
     """
-
+    Checks the current date and returns False (causing the short circuit to happen) only on the first sunday of the
+    month
     :param timestamp:
     :return:
     """
