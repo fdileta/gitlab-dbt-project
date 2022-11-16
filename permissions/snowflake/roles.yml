@@ -1096,6 +1096,19 @@ roles:
                 write:
                     - raw.sales_analytics.*
 
+    - data_science_readonly:
+        warehouses:
+            - dev_xs
+        privileges:
+            databases:
+                read:
+                    - raw
+            schemas:
+                read:
+                    - raw.data_science
+            tables:
+                read:
+                    - raw.data_science.*
 
 
 # ==========================================
@@ -3040,6 +3053,7 @@ roles:
             - bi_tool_eval_read
             - xactly
             - sales_analytics
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -3847,6 +3861,7 @@ roles:
             - bi_tool_eval_read
             - xactly
             - sales_analytics
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
