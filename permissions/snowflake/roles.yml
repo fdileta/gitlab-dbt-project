@@ -2561,6 +2561,13 @@ roles:
         warehouses:
             - dev_xs
 
+    - caitlin:
+        member_of:
+            - analyst_core
+            - data_team_analyst
+        warehouses:
+            - dev_xs
+
     - cbraza:
         member_of:
             - analyst_growth
@@ -4728,6 +4735,11 @@ users:
         can_login: yes
         member_of:
             - bnguyen
+
+    - caitlin:
+        can_login: yes
+        member_of:
+            - caitlin
 
     - cbraza:
         can_login: yes
