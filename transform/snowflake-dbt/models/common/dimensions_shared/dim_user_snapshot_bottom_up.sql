@@ -10,12 +10,12 @@
 
 {{ simple_cte([
     ('dim_date', 'dim_date'),
-    ('users_snapshots', 'gitlab_dotcom_users_snapshots'),
+    ('users_snapshots', 'gitlab_dotcom_users_snapshots_source'),
     ('email_classification', 'driveload_email_domain_classification_source'),
-    ('identities_snapshots','gitlab_dotcom_identities_snapshots'),
-    ('preferences_snapshots','gitlab_dotcom_user_preferences_snapshots'),
-    ('details_snapshots','gitlab_dotcom_user_details_snapshots'),
-    ('leads_snapshots','customers_db_leads_snapshots')
+    ('identities_snapshots','gitlab_dotcom_identities_snapshots_source'),
+    ('preferences_snapshots','gitlab_dotcom_user_preferences_snapshots_source'),
+    ('details_snapshots','gitlab_dotcom_user_details_snapshots_source'),
+    ('leads_snapshots','customers_db_leads_snapshots_source')
 
 ]) }} 
 
@@ -69,13 +69,13 @@
 ),closest_provider_spined AS (
 
     SELECT
-        user_spined.id AS user_id,
+        user_spined.user_id,
         user_spined.snapshot_date_id,
         identity_snapshot_spined.provider AS identity_provider
     FROM 
         user_spined
         LEFT JOIN identity_snapshot_spined
-        ON user_spined.id = identity_snapshot_spined.user_id
+        ON user_spined.user_id = identity_snapshot_spined.user_id
         AND user_spined.snapshot_date_id = identity_snapshot_spined.snapshot_date_id
 
     WHERE 
@@ -157,10 +157,10 @@
         {{ dbt_utils.surrogate_key(['user_spined.user_id']) }}  AS dim_user_sk,
                 
         --natural_key
-        user_spined.id AS user_id,
+        user_spined.user_id AS user_id,
         
         --legacy natural_key to be deprecated during change management plan
-        user_spined.id AS dim_user_id,
+        user_spined.user_id AS dim_user_id,
         
         --Other attributes
         user_spined.remember_created_at AS remember_created_at,
