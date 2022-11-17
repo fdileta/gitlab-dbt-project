@@ -951,7 +951,7 @@ The following Columns have a Varchar Data Type and are set up to handle Missing 
 
 {% enddocs %}
 
-{% docs dim_user_snapshot_bottom %}
+{% docs dim_user_snapshot_bottom_up %}
 
 Snapshot table with Spined Dates that contains all Gitlab.com Users.
 
