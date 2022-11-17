@@ -83,20 +83,9 @@ renamed AS (
     numberofemployees                AS number_of_employees,
 
     -- territory success planning fields
-    atam_approved_next_owner__c AS tsp_approved_next_owner,
-    atam_next_owner_role__c AS tsp_next_owner_role,
-    atam_account_employees__c AS tsp_account_employees,
-    jb_max_family_employees__c AS tsp_max_family_employees,
-    TRIM(SPLIT_PART(atam_region__c, '-', 1)) AS tsp_region,
-    TRIM(SPLIT_PART(atam_sub_region__c, '-', 1)) AS tsp_sub_region,
-    TRIM(SPLIT_PART(atam_area__c, '-', 1)) AS tsp_area,
-    atam_territory__c AS tsp_territory,
-    atam_address_country__c AS tsp_address_country,
-    atam_address_state__c AS tsp_address_state,
-    atam_address_city__c AS tsp_address_city,
-    atam_address_street__c AS tsp_address_street,
-    atam_address_postal_code__c AS tsp_address_postal_code,
-
+    atam_approved_next_owner__c AS approved_next_owner,
+    atam_next_owner_role__c AS next_owner_role,
+    
     -- account demographics fields
     account_demographics_sales_segment__c AS account_demographics_sales_segment,
     account_demographics_geo__c AS account_demographics_geo,
