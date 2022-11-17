@@ -2678,6 +2678,12 @@ roles:
         warehouses:
             - dev_xs
 
+    - ddeng:
+        member_of:
+            - analyst_engineering
+        warehouses:
+            - dev_xs
+
     - degan:
         member_of:
             - reporter
@@ -4747,6 +4753,11 @@ users:
         can_login: yes
         member_of:
             - dcharukulvanich
+
+    - ddeng:
+        can_login: yes
+        member_of:
+            - ddeng
 
     - degan:
         can_login: yes
