@@ -2587,6 +2587,12 @@ roles:
                 - cbraza_prep.*.*
                 - cbraza_prod.*.*
 
+    - cleroux:
+        member_of:
+            - analyst_engineering
+        warehouses:
+            - dev_xs
+
     - cmeddaugh:
         member_of:
             - reporter
@@ -4745,6 +4751,11 @@ users:
         can_login: yes
         member_of:
             - cbraza
+
+    - cleroux:
+        can_login: yes
+        member_of:
+            - cleroux            
 
     - cmeddaugh:
         can_login: yes
