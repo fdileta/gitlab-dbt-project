@@ -279,6 +279,7 @@ tables:
       , updated_at
       , project_id
       , name
+      , created_by_user_id
       FROM cluster_agents
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
