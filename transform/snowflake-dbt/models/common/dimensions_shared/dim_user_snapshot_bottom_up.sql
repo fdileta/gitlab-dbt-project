@@ -17,9 +17,9 @@
     ('details_snapshots','gitlab_dotcom_user_details_snapshots'),
     ('leads_snapshots','customers_db_leads_snapshots')
 
-]) }}, 
+]) }} 
 
-WITH snapshot_dates AS (
+,snapshot_dates AS (
 
     SELECT *
     FROM dim_date
@@ -152,7 +152,7 @@ WITH snapshot_dates AS (
 
     SELECT  
         --surrogate_key
-        {{ dbt_utils.surrogate_key(['user_spined.user_id',user_spined.snapshot_date_id]) }}  AS user_snapshot_id,
+        {{ dbt_utils.surrogate_key(['user_spined.user_id','user_spined.snapshot_date_id']) }}  AS user_snapshot_id,
         user_spined.snapshot_date_id AS spined_date_id,
         {{ dbt_utils.surrogate_key(['user_spined.user_id']) }}  AS dim_user_sk,
                 
