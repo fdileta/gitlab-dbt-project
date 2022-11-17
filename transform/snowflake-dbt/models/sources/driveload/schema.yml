@@ -48,3 +48,5 @@ models:
   description: Snapshot LAM values correction file.
 - name: driveload_marketing_press_sov_source
   description: Marketing's FY23 success metric for the awareness stage of the journey
+- name: booking_to_billing_monthly_reconciliation
+  description: Output of Finance's analysis determining timing differences between bookings and billings
