@@ -2923,6 +2923,37 @@ models:
       - name: state
         description: A state that is part of the given country selected during registration
 
+  - name: dim_user_snapshot_bottom_up
+    description: '{{ doc("dim_user_snapshot_bottom_up") }}'
+    columns:
+      - name: user_snapshot_id
+        description: Unique key of User.
+        tests:
+          - not_null
+          - unique
+      - name: spined_date_id
+        description: Unique Date Id between dbt_valid_from and dbt_valid_to in Snapshots    
+      - name: is_blocked_user
+        description: TRUE if user_state is one of 'blocked' or 'banned', otherwise FALSE
+      - name: role
+        description: User role in company selected during registration
+      - name: last_activity_date
+        description: Date of last User Activity
+      - name: last_sign_in_date
+        description: Last time the User signed in
+      - name: setup_for_company
+        description: Is the Product setup for Company use selected during registration
+      - name: jobs_to_be_done
+        description:  What the product is used for
+      - name: for_business_use
+        description: Product is used for Business selected during registration
+      - name: employee_count
+        description: Number of employees selected during registration
+      - name: country
+        description: User Country selected during registration
+      - name: state
+        description: A state that is part of the given country selected during registration
+
   - name: dim_ci_runner
     description: '{{ doc("dim_ci_runner") }}'
     columns:
