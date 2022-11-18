@@ -2744,6 +2744,18 @@ roles:
         warehouses:
             - dev_xs
 
+    - dgupta:
+        member_of:
+            - adaptive
+            - analyst_finance
+            - customers_db
+            - analyst_marketing
+            - data_team_analyst
+            - restricted_safe
+            - xactly
+        warehouses:
+            - dev_xs
+
     - dmicovic:
         member_of:
             - reporter
@@ -4791,6 +4803,11 @@ users:
         can_login: yes
         member_of:
             - dfelton
+
+    - dgupta:
+        can_login: yes
+        member_of:
+            - dgupta            
 
     - dmicovic:
         can_login: yes
