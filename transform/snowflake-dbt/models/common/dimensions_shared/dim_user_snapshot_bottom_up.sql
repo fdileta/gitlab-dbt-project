@@ -94,7 +94,7 @@
         ON snapshot_dates.date_actual >= preferences_snapshots.dbt_valid_from
         AND snapshot_dates.date_actual < {{ coalesce_to_infinity('preferences_snapshots.dbt_valid_to') }}
 
-), details_snapshots_spined AS (
+), details_spined AS (
 
     SELECT 
         details_snapshots.user_id AS user_id,
