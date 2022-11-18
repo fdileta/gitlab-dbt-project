@@ -69,7 +69,7 @@ WITH map_merged_crm_account AS (
       map_merged_crm_account.dim_crm_account_id                         AS dim_crm_account_id,
       ultimate_parent_account.account_id                                AS dim_parent_crm_account_id,
       {{ get_date_id('zuora_rate_plan_charge.effective_start_date') }}   AS effective_start_date_id,
-      {{ get_date_id('zuora_rate_plan_charge.effective_end_date')        AS effective_end_date_id,
+      {{ get_date_id('zuora_rate_plan_charge.effective_end_date') }}     AS effective_end_date_id,
 
       --Information
       zuora_subscription.subscription_status                            AS subscription_status,
