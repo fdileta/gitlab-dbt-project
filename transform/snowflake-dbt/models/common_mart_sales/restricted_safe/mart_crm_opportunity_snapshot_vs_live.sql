@@ -850,6 +850,7 @@
     mart_crm_opportunity_daily_snapshot.booked_churned_contraction_net_arr AS booked_churned_contraction_net_arr_snapshot,
     mart_crm_opportunity.booked_churned_contraction_net_arr AS booked_churned_contraction_net_arr_live,
     mart_crm_opportunity_daily_snapshot.raw_net_arr AS raw_net_arr_snapshot,
+    mart_crm_opportunity.raw_net_arr AS raw_net_arr_live,
     mart_crm_opportunity_daily_snapshot.arr AS arr_snapshot,
     mart_crm_opportunity.arr AS arr_live,
     mart_crm_opportunity_daily_snapshot.recurring_amount AS recurring_amount_snapshot,
@@ -882,5 +883,5 @@
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-08-08",
-    updated_date="2022-09-06"
+    updated_date="2022-11-14"
 ) }}

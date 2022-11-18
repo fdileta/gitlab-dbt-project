@@ -530,6 +530,7 @@
       fct_crm_opportunity.segment_order_type_iacv_to_net_arr_ratio,
       fct_crm_opportunity.calculated_from_ratio_net_arr,
       fct_crm_opportunity.net_arr,
+      fct_crm_opportunity.raw_net_arr,
       fct_crm_opportunity.created_and_won_same_quarter_net_arr,
       fct_crm_opportunity.new_logo_count,
       fct_crm_opportunity.amount,
@@ -648,5 +649,5 @@
     created_by="@jeanpeguero",
     updated_by="@michellecooper",
     created_date="2022-02-28",
-    updated_date="2022-09-06"
+    updated_date="2022-11-14"
   ) }}

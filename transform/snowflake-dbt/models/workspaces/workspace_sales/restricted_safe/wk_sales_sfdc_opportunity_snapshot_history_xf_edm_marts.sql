@@ -148,9 +148,14 @@ WITH date_details AS (
       edm_snapshot_opty.dim_crm_account_id                          AS raw_account_id,
       edm_snapshot_opty.raw_net_arr,
       edm_snapshot_opty.net_arr,
-      --sfdc_opportunity_snapshot_history.incremental_acv,
-      --sfdc_opportunity_snapshot_history.net_incremental_acv,
+      edm_snapshot_opty.calculated_from_ratio_net_arr,
+      edm_snapshot_opty.opportunity_based_iacv_to_net_arr_ratio,
+      edm_snapshot_opty.segment_order_type_iacv_to_net_arr_ratio,
 
+      edm_snapshot_opty.incremental_acv,
+      edm_snapshot_opty.net_incremental_acv,
+
+      edm_snapshot_opty.source_buckets,
       edm_snapshot_opty.deployment_preference,
       edm_snapshot_opty.merged_opportunity_id,
       edm_snapshot_opty.sales_path,
@@ -223,7 +228,7 @@ WITH date_details AS (
       edm_snapshot_opty.stage_3_technical_evaluation_date,
       edm_snapshot_opty.stage_4_proposal_date,
       edm_snapshot_opty.stage_5_negotiating_date,
-      edm_snapshot_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
+      edm_snapshot_opty.stage_6_awaiting_signature_date AS stage_6_awaiting_signature_date,
       edm_snapshot_opty.stage_6_closed_won_date,
       edm_snapshot_opty.stage_6_closed_lost_date,
       
@@ -314,6 +319,12 @@ WITH date_details AS (
       edm_snapshot_opty.pipeline_created_fiscal_quarter_name,
       edm_snapshot_opty.pipeline_created_fiscal_quarter_date,
 
+      edm_snapshot_opty.arr_created_date                        AS iacv_created_date,
+      edm_snapshot_opty.arr_created_month                       AS iacv_created_date_month,
+      edm_snapshot_opty.arr_created_fiscal_year                 AS iacv_created_fiscal_year,
+      edm_snapshot_opty.arr_created_fiscal_quarter_name         AS iacv_created_fiscal_quarter_name,
+      edm_snapshot_opty.arr_created_fiscal_quarter_date         AS iacv_created_fiscal_quarter_date,
+
       edm_snapshot_opty.sales_accepted_month,
       edm_snapshot_opty.sales_accepted_fiscal_year,
       edm_snapshot_opty.sales_accepted_fiscal_quarter_name,
@@ -340,11 +351,11 @@ WITH date_details AS (
       edm_snapshot_opty.open_4plus_deal_count,
       edm_snapshot_opty.booked_deal_count,
       -- JK 2022-10-25 they are being calculated in a CTE later for now
-      -- edm_snapshot_opty.churned_contraction_deal_count,
-      -- edm_snapshot_opty.open_1plus_net_arr,
-      -- edm_snapshot_opty.open_3plus_net_arr,
-      -- edm_snapshot_opty.open_4plus_net_arr,
-      -- edm_snapshot_opty.churned_contraction_net_arr,
+      edm_snapshot_opty.churned_contraction_deal_count,
+      edm_snapshot_opty.open_1plus_net_arr,
+      edm_snapshot_opty.open_3plus_net_arr,
+      edm_snapshot_opty.open_4plus_net_arr,
+      edm_snapshot_opty.churned_contraction_net_arr,
       edm_snapshot_opty.booked_net_arr,
       edm_snapshot_opty.is_excluded_from_pipeline_created       AS is_excluded_flag,
 
@@ -569,44 +580,44 @@ WITH date_details AS (
 ), temp_calculations AS (
 
     SELECT
-      *,
-      CASE 
-        WHEN is_eligible_open_pipeline_flag = 1
-          THEN net_arr
-        ELSE 0                                                                                              
-      END                                                 AS open_1plus_net_arr,
+      *
+      -- CASE 
+      --   WHEN is_eligible_open_pipeline_flag = 1
+      --     THEN net_arr
+      --   ELSE 0                                                                                              
+      -- END                                                 AS open_1plus_net_arr,
 
-      CASE 
-        WHEN is_eligible_open_pipeline_flag = 1
-          AND is_stage_3_plus = 1   
-            THEN net_arr
-        ELSE 0
-      END                                                 AS open_3plus_net_arr,
+      -- CASE 
+      --   WHEN is_eligible_open_pipeline_flag = 1
+      --     AND is_stage_3_plus = 1   
+      --       THEN net_arr
+      --   ELSE 0
+      -- END                                                 AS open_3plus_net_arr,
   
-      CASE 
-        WHEN is_eligible_open_pipeline_flag = 1  
-          AND is_stage_4_plus = 1
-            THEN net_arr
-        ELSE 0
-      END                                                 AS open_4plus_net_arr,
+      -- CASE 
+      --   WHEN is_eligible_open_pipeline_flag = 1  
+      --     AND is_stage_4_plus = 1
+      --       THEN net_arr
+      --   ELSE 0
+      -- END                                                 AS open_4plus_net_arr,
 
-      CASE
-        WHEN ((is_renewal = 1
-            AND is_lost = 1)
-            OR is_won = 1 )
-            AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
-        THEN calculated_deal_count
-        ELSE 0
-      END                                                 AS churned_contraction_deal_count,
+      -- CASE
+      --   WHEN ((is_renewal = 1
+      --       AND is_lost = 1)
+      --       OR is_won = 1 )
+      --       AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
+      --   THEN calculated_deal_count
+      --   ELSE 0
+      -- END                                                 AS churned_contraction_deal_count,
 
-      CASE
-        WHEN ((is_renewal = 1
-            AND is_lost = 1)
-            OR is_won = 1 )
-            AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
-        THEN net_arr
-        ELSE 0
-      END                                                 AS churned_contraction_net_arr
+      -- CASE
+      --   WHEN ((is_renewal = 1
+      --       AND is_lost = 1)
+      --       OR is_won = 1 )
+      --       AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
+      --   THEN net_arr
+      --   ELSE 0
+      -- END                                                 AS churned_contraction_net_arr
     
     FROM add_compound_metrics
 

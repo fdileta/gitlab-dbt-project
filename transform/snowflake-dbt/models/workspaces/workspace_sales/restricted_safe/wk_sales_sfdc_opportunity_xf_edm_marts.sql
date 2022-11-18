@@ -79,7 +79,7 @@ WITH edm_opty AS (
     ----------------------------------------------------------
     ----------------------------------------------------------
     -- Amount fields
-    COALESCE(edm_opty.net_arr,0)       AS raw_net_arr,
+    edm_opty.raw_net_arr,
     edm_opty.net_arr,
     edm_opty.amount,
     edm_opty.renewal_amount,
@@ -404,6 +404,8 @@ WITH edm_opty AS (
     edm_opty.churn_contraction_net_arr_bucket       AS churn_contracton_net_arr_bucket,  --typo in wk sales keeping it until the full migration
     edm_opty.churn_contraction_net_arr_bucket,
     edm_opty.reason_for_loss_calc,
+    NVL(edm_opty.reason_for_loss, edm_opty.downgrade_reason) AS reason_for_loss_staged,
+    edm_opty.churn_contraction_type                 AS churn_contraction_type_calc,
     CASE edm_opty.is_sao 
       WHEN TRUE THEN 1 
       ELSE 0 
@@ -429,25 +431,6 @@ WITH edm_opty AS (
         AND account.ultimate_parent_account_id NOT IN ('0016100001YUkWVAA1')            -- remove test account
         AND edm_opty.dim_crm_account_id NOT IN ('0014M00001kGcORQA0')                -- remove test account
         AND edm_opty.is_deleted = 0
-
-
-), churn_metrics AS (
-
-SELECT
-    o.opportunity_id,
-    NVL(o.reason_for_loss, o.downgrade_reason) AS reason_for_loss_staged,
-    o.reason_for_loss_details,
-
-    CASE
-      WHEN o.order_type_stamped IN ('4. Contraction','5. Churn - Partial')
-        THEN 'Contraction'
-      ELSE 'Churn'
-    END                                    AS churn_contraction_type_calc
-
-FROM sfdc_opportunity_xf o
-WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn - Final')
-    AND (o.is_won = 1
-        OR (is_renewal = 1 AND is_lost = 1))
 
 ), oppty_final AS (
 
@@ -475,18 +458,10 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
       -------------------
       -- BASE KEYS
       -- 20220214 NF: Temporary keys, until the SFDC key is exposed
-      LOWER(CONCAT(sfdc_opportunity_xf.opportunity_owner_user_segment,'-',sfdc_opportunity_xf.opportunity_owner_user_geo,'-',sfdc_opportunity_xf.opportunity_owner_user_region,'-',sfdc_opportunity_xf.opportunity_owner_user_area)) AS opportunity_user_segment_geo_region_area,
-
-      -- Customer Success related fields
-      -- DRI Michael Armtz
-      churn_metrics.reason_for_loss_staged,
-      -- churn_metrics.reason_for_loss_calc, -- part of edm opp mart
-      churn_metrics.churn_contraction_type_calc
+      LOWER(CONCAT(sfdc_opportunity_xf.opportunity_owner_user_segment,'-',sfdc_opportunity_xf.opportunity_owner_user_geo,'-',sfdc_opportunity_xf.opportunity_owner_user_region,'-',sfdc_opportunity_xf.opportunity_owner_user_area)) AS opportunity_user_segment_geo_region_area
 
     FROM sfdc_opportunity_xf
     CROSS JOIN today
-   LEFT JOIN churn_metrics
-      ON churn_metrics.opportunity_id = sfdc_opportunity_xf.opportunity_id
 
 ), add_calculated_net_arr_to_opty_final AS (
 

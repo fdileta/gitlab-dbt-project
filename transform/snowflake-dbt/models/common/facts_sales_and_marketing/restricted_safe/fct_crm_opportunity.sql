@@ -206,6 +206,7 @@
       sfdc_opportunity.segment_order_type_iacv_to_net_arr_ratio,
       sfdc_opportunity.calculated_from_ratio_net_arr,
       sfdc_opportunity.net_arr,
+      sfdc_opportunity.raw_net_arr,
       sfdc_opportunity.created_and_won_same_quarter_net_arr,
       sfdc_opportunity.new_logo_count,
       sfdc_opportunity.amount,
@@ -280,5 +281,5 @@
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2020-11-30",
-    updated_date="2022-11-10"
+    updated_date="2022-11-14"
 ) }}

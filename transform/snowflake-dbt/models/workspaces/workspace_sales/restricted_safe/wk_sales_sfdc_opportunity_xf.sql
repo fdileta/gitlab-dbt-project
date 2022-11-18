@@ -137,6 +137,26 @@ we can delete this connection and use the mart table directly.
       sfdc_opportunity_xf.professional_services_value,
       sfdc_opportunity_xf.reason_for_loss,
       sfdc_opportunity_xf.reason_for_loss_details,
+      COALESCE(sfdc_opportunity_xf.reason_for_loss, sfdc_opportunity_xf.downgrade_reason) AS reason_for_loss_staged,
+      CASE 
+        WHEN (reason_for_loss_staged IN ('Do Nothing','Other','Competitive Loss','Operational Silos') 
+          OR reason_for_loss_staged IS NULL )
+          THEN 'Unknown'
+        WHEN reason_for_loss_staged IN ('Missing Feature','Product value/gaps','Product Value / Gaps',
+                                          'Stayed with Community Edition','Budget/Value Unperceived') 
+          THEN 'Product Value / Gaps'
+        WHEN reason_for_loss_staged IN ('Lack of Engagement / Sponsor','Went Silent','Evangelist Left') 
+          THEN 'Lack of Engagement / Sponsor'
+        WHEN reason_for_loss_staged IN ('Loss of Budget','No budget') 
+          THEN 'Loss of Budget'
+        WHEN reason_for_loss_staged = 'Merged into another opportunity' 
+          THEN 'Merged Opp'
+        WHEN reason_for_loss_staged = 'Stale Opportunity' 
+          THEN 'No Progression - Auto-close'
+        WHEN reason_for_loss_staged IN ('Product Quality / Availability','Product quality/availability') 
+          THEN 'Product Quality / Availability'
+        ELSE reason_for_loss_staged
+      END                                    AS reason_for_loss_calc,
       sfdc_opportunity_xf.downgrade_reason,
       sfdc_opportunity_xf.renewal_acv,
       sfdc_opportunity_xf.renewal_amount,
@@ -146,7 +166,6 @@ we can delete this connection and use the mart table directly.
             THEN 'SDR Generated'
         ELSE COALESCE(sfdc_opportunity_xf.sales_qualified_source, 'Missing sales_qualified_source_name')
       END                                                           AS sales_qualified_source,
-
       sfdc_opportunity_xf.solutions_to_be_replaced,
       sfdc_opportunity_xf.total_contract_value,
       sfdc_opportunity_xf.upside_iacv,
@@ -589,29 +608,7 @@ we can delete this connection and use the mart table directly.
 
 SELECT
     o.opportunity_id,
-    NVL(o.reason_for_loss, o.downgrade_reason) AS reason_for_loss_staged,
-    CASE 
-      WHEN reason_for_loss_staged IN ('Do Nothing','Other','Competitive Loss','Operational Silos') 
-        OR reason_for_loss_staged IS NULL 
-          THEN 'Unknown'
-      WHEN reason_for_loss_staged IN ('Missing Feature','Product value/gaps','Product Value / Gaps',
-                                          'Stayed with Community Edition','Budget/Value Unperceived') 
-          THEN 'Product Value / Gaps'
-      WHEN reason_for_loss_staged IN ('Lack of Engagement / Sponsor','Went Silent','Evangelist Left') 
-          THEN 'Lack of Engagement / Sponsor'
-      WHEN reason_for_loss_staged IN ('Loss of Budget','No budget') 
-          THEN 'Loss of Budget'
-      WHEN reason_for_loss_staged = 'Merged into another opportunity' 
-          THEN 'Merged Opp'
-      WHEN reason_for_loss_staged = 'Stale Opportunity' 
-          THEN 'No Progression - Auto-close'
-      WHEN reason_for_loss_staged IN ('Product Quality / Availability','Product quality/availability') 
-          THEN 'Product Quality / Availability'
-      ELSE reason_for_loss_staged
-     END                                    AS reason_for_loss_calc,
-    o.reason_for_loss_details,
-    
-    CASE 
+        CASE 
       WHEN o.order_type_stamped IN ('4. Contraction','5. Churn - Partial')
         THEN 'Contraction'
       ELSE 'Churn'
@@ -815,8 +812,6 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
 
       -- Customer Success related fields
       -- DRI Michael Armtz
-      churn_metrics.reason_for_loss_staged,
-      churn_metrics.reason_for_loss_calc,
       churn_metrics.churn_contraction_type_calc
 
     FROM sfdc_opportunity_xf
@@ -907,6 +902,8 @@ WHERE o.order_type_stamped IN ('4. Contraction','5. Churn - Partial','6. Churn -
       -- if closed, b) the close is in the past, use close date
       CASE
         WHEN oppty_final.is_open = 1
+          THEN DATEDIFF(days, oppty_final.created_date, CURRENT_DATE)
+        WHEN oppty_final.is_open = 0 AND oppty_final.close_date > CURRENT_DATE
           THEN DATEDIFF(days, oppty_final.created_date, CURRENT_DATE)
         ELSE DATEDIFF(days, oppty_final.created_date, oppty_final.close_date)
       END                                                           AS calculated_age_in_days,

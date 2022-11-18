@@ -371,7 +371,7 @@ final AS (
     stage_5_negotiating_date.first_day_of_fiscal_quarter            AS stage_5_negotiating_fiscal_quarter_date,
     stage_5_negotiating_date.fiscal_quarter_name_fy                 AS stage_5_negotiating_fiscal_quarter_name,
     stage_5_negotiating_date.fiscal_year                            AS stage_5_negotiating_fiscal_year,
-    stage_6_awaiting_signature_date.date_actual                     AS stage_6_awaiting_signature_date_date,
+    stage_6_awaiting_signature_date.date_actual                     AS stage_6_awaiting_signature_date,
     stage_6_awaiting_signature_date.first_day_of_month              AS stage_6_awaiting_signature_date_month,
     stage_6_awaiting_signature_date.first_day_of_fiscal_quarter     AS stage_6_awaiting_signature_date_fiscal_quarter_date,
     stage_6_awaiting_signature_date.fiscal_quarter_name_fy          AS stage_6_awaiting_signature_date_fiscal_quarter_name,
@@ -475,7 +475,9 @@ final AS (
     fct_crm_opportunity.total_contract_value,
     fct_crm_opportunity.created_in_snapshot_quarter_net_arr,
     fct_crm_opportunity.created_in_snapshot_quarter_deal_count,
-    fct_crm_opportunity.days_in_stage
+    fct_crm_opportunity.days_in_stage,
+    fct_crm_opportunity.net_incremental_acv,
+    fct_crm_opportunity.incremental_acv
 
   FROM fct_crm_opportunity
   LEFT JOIN dim_crm_account
@@ -536,7 +538,7 @@ final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@jpeguero",
+    updated_by="@michellecooper",
     created_date="2022-05-05",
-    updated_date="2022-10-20"
+    updated_date="2022-11-17"
   ) }}

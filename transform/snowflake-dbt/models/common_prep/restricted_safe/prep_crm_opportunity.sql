@@ -5,7 +5,8 @@
     ('sfdc_opportunity_stage_source', 'sfdc_opportunity_stage_source'),
     ('sfdc_opportunity_source', 'sfdc_opportunity_source'),
     ('sfdc_opportunity_snapshots_source','sfdc_opportunity_snapshots_source'),
-    ('sfdc_opportunity_stage', 'sfdc_opportunity_stage_source')
+    ('sfdc_opportunity_stage', 'sfdc_opportunity_stage_source'),
+    ('sfdc_account_source_live', 'sfdc_account_source')
 ]) }}
 
 , first_contact  AS (
@@ -38,6 +39,18 @@
       COUNT(DISTINCT attribution_touchpoints.campaign_id)   AS count_campaigns
     FROM attribution_touchpoints
     GROUP BY 1
+
+), sfdc_opportunity_source_live AS (
+
+    SELECT 
+      opportunity_id,
+      account_id,
+      is_won AS is_won_live,
+      opportunity_category AS opportunity_category_live,
+      net_arr AS net_arr_live,
+      net_incremental_acv AS net_incremental_acv_live,
+      order_type_stamped AS order_type_stamped_live
+    FROM {{ ref('sfdc_opportunity_source') }}
 
 ), snapshot_dates AS (
 
@@ -335,11 +348,11 @@
 
       -- net arr
       CASE
-        WHEN sfdc_opportunity_source_live.is_won = 1 -- only consider won deals
-          AND sfdc_opportunity_source_live.opportunity_category <> 'Contract Reset' -- contract resets have a special way of calculating net iacv
-          AND COALESCE(sfdc_opportunity_source_live.net_arr,0) <> 0
-          AND COALESCE(sfdc_opportunity_source_live.net_incremental_acv,0) <> 0
-            THEN COALESCE(sfdc_opportunity_source_live.net_arr / sfdc_opportunity_source_live.net_incremental_acv,0)
+        WHEN sfdc_opportunity_source_live.is_won_live = 1 -- only consider won deals
+          AND sfdc_opportunity_source_live.opportunity_category_live <> 'Contract Reset' -- contract resets have a special way of calculating net iacv
+          AND COALESCE(sfdc_opportunity_source_live.net_arr_live,0) <> 0
+          AND COALESCE(sfdc_opportunity_source_live.net_incremental_acv_live,0) <> 0
+            THEN COALESCE(sfdc_opportunity_source_live.net_arr_live / sfdc_opportunity_source_live.net_incremental_acv_live,0)
         ELSE NULL
       END                                                                     AS opportunity_based_iacv_to_net_arr_ratio,
       -- If there is no opportunity, use a default table ratio
@@ -628,6 +641,7 @@
        ELSE '5. Other'
       END                                                                                       AS deal_category,
       COALESCE(sfdc_opportunity.reason_for_loss, sfdc_opportunity.downgrade_reason)               AS reason_for_loss_staged,
+      IFNULL(sfdc_opportunity.reason_for_loss, sfdc_opportunity.downgrade_reason) AS reason_for_loss_staged_test,
       CASE
         WHEN reason_for_loss_staged IN ('Do Nothing','Other','Competitive Loss','Operational Silos')
           OR reason_for_loss_staged IS NULL
@@ -648,9 +662,25 @@
         ELSE reason_for_loss_staged
      END                                                                                        AS reason_for_loss_calc,
      CASE
-       WHEN sfdc_opportunity.order_type IN ('4. Contraction','5. Churn - Partial')
-        THEN 'Contraction'
-        ELSE 'Churn'
+       WHEN (
+              (
+                is_renewal = 1
+                  AND is_lost = 1
+               )
+                OR sfdc_opportunity_stage.is_won = 1
+              )
+               AND sfdc_opportunity.order_type IN ('4. Contraction','5. Churn - Partial')
+          THEN 'Contraction'
+               WHEN (
+              (
+                is_renewal = 1
+                  AND is_lost = 1
+               )
+                OR sfdc_opportunity_stage.is_won = 1
+              )
+               AND sfdc_opportunity.order_type = '6. Churn - Final'
+          THEN 'Churn'
+        ELSE NULL
      END                                                                                        AS churn_contraction_type,
      CASE
         WHEN is_renewal = 1
@@ -855,6 +885,25 @@
         ELSE 0
       END                                                AS open_4plus_net_arr,
       CASE
+        WHEN (sfdc_opportunity_stage.is_won = 1 
+            OR (is_renewal = 1 
+                AND is_lost = 1))
+          THEN 1
+        ELSE 0
+      END                                                AS test_booked_net_arr_stage_flag,
+      CASE
+        WHEN (sfdc_opportunity_stage.is_won = 1 
+            OR (is_renewal = 1 
+                AND is_lost = 1))
+          THEN net_arr
+        ELSE 0 
+      END                                                 AS test_booked_net_arr,
+      CASE
+        WHEN test_booked_net_arr_stage_flag = 1
+          THEN net_arr
+        ELSE 0 
+      END                                                 AS test_booked_net_arr_with_flag,
+      CASE
         WHEN (
                 sfdc_opportunity_stage.is_won = 1
                 OR (
@@ -897,7 +946,7 @@
       -- NF 2021 - Pubsec extreme deals
       WHEN
         sfdc_opportunity.dim_crm_opportunity_id IN ('0064M00000WtZKUQA3', '0064M00000Xb975QAB')
-        AND sfdc_opportunity.snapshot_date < '2021-05-01'
+        AND (sfdc_opportunity.snapshot_date < '2021-05-01' OR sfdc_opportunity.is_live = 1)
         THEN 1
       -- exclude vision opps from FY21-Q2
       WHEN arr_created_fiscal_quarter_name = 'FY21-Q2'
@@ -926,7 +975,7 @@
        -- remove deleted opps
         WHEN sfdc_opportunity.is_deleted = 1
           THEN 1
-        ELSE 0
+         ELSE 0
       END AS is_excluded_from_pipeline_created,
       CASE
         WHEN sfdc_opportunity.is_open = 1
@@ -1105,13 +1154,13 @@
       ON sfdc_opportunity.subscription_start_date::DATE = subscription_start_date.date_actual
     LEFT JOIN live_opportunity_owner_fields
       ON sfdc_opportunity.dim_crm_opportunity_id = live_opportunity_owner_fields.dim_crm_opportunity_id
-    LEFT JOIN {{ ref('sfdc_opportunity_source') }} AS sfdc_opportunity_source_live
+    LEFT JOIN sfdc_opportunity_source_live
       ON sfdc_opportunity.dim_crm_opportunity_id = sfdc_opportunity_source_live.opportunity_id
-    LEFT JOIN {{ ref('sfdc_account_source')}} AS sfdc_account_source_live
+    LEFT JOIN sfdc_account_source_live
       ON sfdc_opportunity_source_live.account_id = sfdc_account_source_live.account_id
     LEFT JOIN net_iacv_to_net_arr_ratio
       ON live_opportunity_owner_fields.opportunity_owner_user_segment = net_iacv_to_net_arr_ratio.user_segment_stamped
-        AND sfdc_opportunity_source_live.order_type_stamped = net_iacv_to_net_arr_ratio.order_type
+        AND sfdc_opportunity_source_live.order_type_stamped_live = net_iacv_to_net_arr_ratio.order_type
 
 )
 
