@@ -337,7 +337,7 @@ sheets:
     owner: '@j_kim'
     tabs: 
       - sales_analytics_tableau_rls_roles
-  - name: toy_marketing_data
-    owner: '@jstemmer1 '
+  - name: toy_marketing_handbook
+    owner: '@jstemmer1'
     tabs: 
-      - toy_marketing_data
+      - toy_marketing_handbook
