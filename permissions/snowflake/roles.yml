@@ -4010,7 +4010,7 @@ roles:
             databases:
                 read:
                     - nmcavinue_prep
-                    - inmcavinue_prod
+                    - nmcavinue_prod
                 write:
                     - nmcavinue_prep
                     - nmcavinue_prod
