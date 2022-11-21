@@ -46,7 +46,12 @@ dag = DAG(
 )
 
 events = [
-    "delivered",
+    "rejected",
+    "failed",
+    "opened",
+    "clicked",
+    "unsubscribed",
+    "complained",
 ]
 
 
