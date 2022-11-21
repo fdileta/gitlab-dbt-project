@@ -39,7 +39,8 @@
       page_view_in_session_index,
       referer_url_path,
       page_url,
-      referer_url
+      referer_url,
+      page_url_scheme
     FROM page_views
 
     {% if is_incremental() %}
@@ -104,5 +105,5 @@
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-11-08"
+    updated_date="2022-11-21"
 ) }}

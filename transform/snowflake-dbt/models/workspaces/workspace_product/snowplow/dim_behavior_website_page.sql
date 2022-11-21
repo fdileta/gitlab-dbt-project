@@ -238,5 +238,5 @@ WITH events AS (
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-11-02"
+    updated_date="2022-11-21"
 ) }}

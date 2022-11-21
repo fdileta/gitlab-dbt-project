@@ -22,6 +22,7 @@
       dim_behavior_website_page.clean_url_path,
       dim_behavior_website_page.page_url_host,
       dim_behavior_website_page.app_id,
+      dim_behavior_website_page.page_url,
       dim_behavior_website_page.page_url_path
     FROM {{ ref('dim_behavior_website_page') }}
 
@@ -132,5 +133,5 @@
     created_by="@michellecooper",
     updated_by="@chrissharp",
     created_date="2022-09-01",
-    updated_date="2022-11-02"
+    updated_date="2022-11-21"
 ) }}
