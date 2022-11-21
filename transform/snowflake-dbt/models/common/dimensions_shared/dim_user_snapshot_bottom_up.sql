@@ -29,7 +29,8 @@
 ), user_spined AS (
 
     SELECT
-        snapshot_dates.date_id AS snapshot_date_id,
+        snapshot_dates.date_id AS spined_date_id,
+        snapshot_dates.date_actual AS spined_date,
         users_snapshots.*
     FROM users_snapshots
     INNER JOIN snapshot_dates
@@ -58,7 +59,7 @@
 ),identity_snapshot_spined AS (
 
     SELECT
-        snapshot_dates.date_id AS snapshot_date_id,
+        snapshot_dates.date_id AS spined_date_id,
         identities_snapshots.*
     FROM 
         identities_snapshots
@@ -70,24 +71,24 @@
 
     SELECT
         user_spined.user_id,
-        user_spined.snapshot_date_id,
+        user_spined.spined_date_id,
         identity_snapshot_spined.provider AS identity_provider
     FROM 
         user_spined
         LEFT JOIN identity_snapshot_spined
         ON user_spined.user_id = identity_snapshot_spined.user_id
-        AND user_spined.snapshot_date_id = identity_snapshot_spined.snapshot_date_id
+        AND user_spined.spined_date_id = identity_snapshot_spined.spined_date_id
 
     WHERE 
         identity_snapshot_spined.user_id IS NOT NULL
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY user_spined.id, user_spined.snapshot_date_id 
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY user_spined.id, user_spined.spined_date_id 
             ORDER BY TIMEDIFF(MILLISECONDS,user_spined.created_at,COALESCE(identity_snapshot_spined.created_at,{{var('infinity_future')}})) ASC) = 1       
 
 ), preferences_spined AS (
 
     SELECT 
         preferences_snapshots.user_id AS user_id,
-        snapshot_dates.date_id AS snapshot_date_id,
+        snapshot_dates.date_id AS spined_date_id,
         COALESCE(preferences_snapshots.setup_for_company::VARCHAR,'Unknown') AS setup_for_company
     FROM preferences_snapshots
     INNER JOIN snapshot_dates
@@ -98,7 +99,7 @@
 
     SELECT 
         details_snapshots.user_id AS user_id,
-        snapshot_dates.date_id AS snapshot_date_id,
+        snapshot_dates.date_id AS spined_date_id,
         CASE COALESCE(details_snapshots.registration_objective,-1)
             WHEN 0 THEN 'basics' 
             WHEN 1 THEN 'move_repository' 
@@ -124,8 +125,7 @@
         MAX(employees_bucket) AS employees_bucket,
         MAX(country) AS country,
         MAX(state) AS state
-    FROM 
-        leads_snapshots 
+    FROM leads_snapshots 
     GROUP BY
         user_id,
         dbt_valid_from,
@@ -135,7 +135,7 @@
 
     SELECT 
         max_leads_snapshots.user_id,
-        snapshot_dates.date_id AS snapshot_date_id,
+        snapshot_dates.date_id AS spined_date_id,
         COALESCE(MAX(max_leads_snapshots.is_for_business_use)::VARCHAR,'Unknown') AS for_business_use,
         COALESCE(MAX(max_leads_snapshots.employees_bucket)::VARCHAR,'Unknown') AS employee_count,
         COALESCE(MAX(max_leads_snapshots.country)::VARCHAR,'Unknown') AS country,
@@ -152,46 +152,42 @@
 
     SELECT  
         --surrogate_key
-        {{ dbt_utils.surrogate_key(['user_spined.user_id','user_spined.snapshot_date_id']) }}  AS user_snapshot_id,
-        user_spined.snapshot_date_id AS spined_date_id,
+        {{ dbt_utils.surrogate_key(['user_spined.user_id','user_spined.spined_date_id']) }}  AS user_snapshot_id,
+        user_spined.spined_date_id,
         {{ dbt_utils.surrogate_key(['user_spined.user_id']) }}  AS dim_user_sk,
                 
         --natural_key
-        user_spined.user_id AS user_id,
+        user_spined.user_id,
         
         --legacy natural_key to be deprecated during change management plan
         user_spined.user_id AS dim_user_id,
         
         --Other attributes
-        user_spined.remember_created_at AS remember_created_at,
-        user_spined.sign_in_count AS sign_in_count,
-        user_spined.current_sign_in_at AS current_sign_in_at,
-        user_spined.last_sign_in_at AS last_sign_in_at,
-        user_spined.created_at AS created_at,
-        --snapshot_dates.date_id AS created_date_id,  (not in Dim_User)
-        user_spined.updated_at AS updated_at,
-        user_spined.admin AS is_admin,
-        --user_spined.state AS user_state,  (not in Dim_User)
-        CASE 
-            WHEN user_spined.state in ('blocked', 'banned') THEN TRUE
-            ELSE FALSE 
-        END AS is_blocked_user,
+        user_spined.spined_date,
+        user_spined.remember_created_at,
+        user_spined.sign_in_count,
+        user_spined.current_sign_in_at,
+        user_spined.last_sign_in_at,
+        user_spined.created_at,
+        user_spined.updated_at,
+        user_spined.is_admin ,
+        user_spined.is_blocked_user,
         
-        SPLIT_PART(COALESCE(user_spined.notification_email, email), '@', 2)     AS notification_email_domain,
-        notification_email_domain.classification                                AS notification_email_domain_classification,
-        SPLIT_PART(user_spined.email, '@', 2)                                   AS email_domain,
-        email_domain.classification                                             AS email_domain_classification,
+        user_spined.notification_email_domain,
+        notification_email_domain.classification AS notification_email_domain_classification,
+        user_spined.email_domain,
+        email_domain.classification AS email_domain_classification,
         
-        SPLIT_PART(user_spined.public_email, '@', 2)                            AS public_email_domain,
-        public_email_domain.classification                                      AS public_email_domain_classification,
-        IFF(SPLIT_PART(user_spined.commit_email, '@', 2) = '', NULL, SPLIT_PART(user_spined.commit_email, '@', 2)) AS commit_email_domain,
-        commit_email_domain.classification                                      AS commit_email_domain_classification,
-        closest_provider.identity_provider                                      AS identity_provider,
+        user_spined.public_email_domain,
+        public_email_domain.classification AS public_email_domain_classification,
+        user_spined.commit_email_domain,
+        commit_email_domain.classification AS commit_email_domain_classification,
+        closest_provider.identity_provider,
 
         -- Expanded Attributes  (Not Found = Joined Row Not found for the Attribute)
-        {{ user_role_mapping(user_role='role') }}::VARCHAR AS role,
-        COALESCE(TO_DATE(user_spined.last_activity_on)::VARCHAR,'Unknown') AS last_activity_date,              
-        COALESCE(TO_DATE(user_spined.last_sign_in_at)::VARCHAR,'Unknown')  AS last_sign_in_date,               
+        user_spined.role_description,
+        user_spined.last_activity_date,              
+        user_spined.last_sign_in_date,               
         COALESCE(preferences_spined.setup_for_company,'Not Found') AS setup_for_company,               
         COALESCE(details_spined.jobs_to_be_done,'Not Found') AS jobs_to_be_done,
         COALESCE(leads_spined.for_business_use,'Not Found') AS for_business_use,                 
@@ -200,28 +196,36 @@
         COALESCE(leads_spined.state,'Not Found') AS state
 
     FROM user_spined
+
+    -- LEFT JOIN email_classification AS notification_email_domain
+    --     ON SPLIT_PART(COALESCE(user_spined.notification_email, email), '@', 2) = notification_email_domain.domain 
+    -- LEFT JOIN email_classification AS email_domain
+    --     ON SPLIT_PART(user_spined.email, '@', 2) = email_domain.domain 
+    -- LEFT JOIN email_classification AS public_email_domain
+    --     ON SPLIT_PART(user_spined.public_email, '@', 2) = public_email_domain.domain 
+    -- LEFT JOIN email_classification AS commit_email_domain
+    --     ON IFF(SPLIT_PART(user_spined.commit_email, '@', 2) = '', NULL, SPLIT_PART(user_spined.commit_email, '@', 2)) = commit_email_domain.domain    
+
     LEFT JOIN email_classification AS notification_email_domain
-        ON SPLIT_PART(COALESCE(user_spined.notification_email, email), '@', 2) = notification_email_domain.domain 
+        ON user_spined.notification_email_domain = notification_email_domain.domain 
     LEFT JOIN email_classification AS email_domain
-        ON SPLIT_PART(user_spined.email, '@', 2) = email_domain.domain 
+        ON user_spined.email_domain = email_domain.domain 
     LEFT JOIN email_classification AS public_email_domain
-        ON SPLIT_PART(user_spined.public_email, '@', 2) = public_email_domain.domain 
+        ON user_spined.public_email_domain = public_email_domain.domain 
     LEFT JOIN email_classification AS commit_email_domain
-        ON IFF(SPLIT_PART(user_spined.commit_email, '@', 2) = '', NULL, SPLIT_PART(user_spined.commit_email, '@', 2)) = commit_email_domain.domain    
+        ON user_spined.commit_email_domain = commit_email_domain.domain    
     LEFT JOIN closest_provider_spined AS closest_provider
         ON user_spined.id = closest_provider.user_id 
-        AND user_spined.snapshot_date_id = closest_provider.snapshot_date_id
+        AND user_spined.spined_date_id = closest_provider.spined_date_id
     LEFT JOIN preferences_spined  AS preferences_spined
         ON user_spined.id = preferences_spined.user_id
-        AND user_spined.snapshot_date_id = preferences_spined.snapshot_date_id
+        AND user_spined.spined_date_id = preferences_spined.spined_date_id
     LEFT JOIN details_spined AS details_spined
         ON user_spined.id = details_spined.user_id
-        AND user_spined.snapshot_date_id = details_spined.snapshot_date_id
+        AND user_spined.spined_date_id = details_spined.spined_date_id
     LEFT JOIN leads_spined AS leads_spined
         ON user_spined.id = leads_spined.user_id
-        AND user_spined.snapshot_date_id = leads_spined.snapshot_date_id
-    LEFT JOIN snapshot_dates
-        ON TO_DATE(user_spined.created_at) = snapshot_dates.date_day
+        AND user_spined.spined_date_id = leads_spined.spined_date_id
 
 )
 
