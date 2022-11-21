@@ -41,7 +41,7 @@
       zuora_account_spined.status                                  AS account_status,
       zuora_account_spined.parent_id,
       zuora_account_spined.sfdc_account_code,
-      zuroa_account_spined.sfdc_entity,
+      zuora_account_spined.sfdc_entity,
       zuora_account_spined.currency                                AS account_currency,
       zuora_contact.country                                        AS sold_to_country,
       zuora_account_spined.ssp_channel,
