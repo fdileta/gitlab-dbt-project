@@ -216,6 +216,11 @@ databases:
     - snalamaru_prep:
         shared: no
 
+    - srehm_prod:
+        shared: no
+    - srehm_prep:
+        shared: no
+
     - tpoole_prod:
         shared: no
     - tpoole_prep:
@@ -1096,6 +1101,19 @@ roles:
                 write:
                     - raw.sales_analytics.*
 
+    - data_science_readonly:
+        warehouses:
+            - dev_xs
+        privileges:
+            databases:
+                read:
+                    - raw
+            schemas:
+                read:
+                    - raw.data_science
+            tables:
+                read:
+                    - raw.data_science.*
 
 
 # ==========================================
@@ -2543,6 +2561,13 @@ roles:
         warehouses:
             - dev_xs
 
+    - caitlin:
+        member_of:
+            - analyst_core
+            - data_team_analyst
+        warehouses:
+            - dev_xs
+
     - cbraza:
         member_of:
             - analyst_growth
@@ -2561,6 +2586,12 @@ roles:
             tables:
                 - cbraza_prep.*.*
                 - cbraza_prod.*.*
+
+    - cleroux:
+        member_of:
+            - analyst_engineering
+        warehouses:
+            - dev_xs
 
     - cmeddaugh:
         member_of:
@@ -2660,6 +2691,12 @@ roles:
         warehouses:
             - dev_xs
 
+    - ddeng:
+        member_of:
+            - analyst_engineering
+        warehouses:
+            - dev_xs
+
     - degan:
         member_of:
             - reporter
@@ -2704,6 +2741,18 @@ roles:
     - dfelton:
         member_of:
             - securityadmin
+        warehouses:
+            - dev_xs
+
+    - dgupta:
+        member_of:
+            - adaptive
+            - analyst_finance
+            - customers_db
+            - analyst_marketing
+            - data_team_analyst
+            - restricted_safe
+            - xactly
         warehouses:
             - dev_xs
 
@@ -3040,6 +3089,7 @@ roles:
             - bi_tool_eval_read
             - xactly
             - sales_analytics
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -3847,6 +3897,7 @@ roles:
             - bi_tool_eval_read
             - xactly
             - sales_analytics
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -4356,6 +4407,44 @@ roles:
                     - snalamaru_prep.*.*
                     - snalamaru_prod.*.*
 
+    - srehm:
+        member_of:
+            - analyst_growth
+        warehouses:
+            - dev_xs
+        owns:
+            databases:
+                - srehm_prep
+                - srehm_prod
+            schemas:
+                - srehm_prep.*
+                - srehm_prod.*
+            tables:
+                - srehm_prep.*.*
+                - srehm_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - srehm_prep
+                    - srehm_prod
+                write:
+                    - srehm_prep
+                    - srehm_prod
+            schemas:
+                read:
+                    - srehm_prep.*
+                    - srehm_prod.*
+                write:
+                    - srehm_prep.*
+                    - srehm_prod.*
+            tables:
+                read:
+                    - srehm_prep.*.*
+                    - srehm_prod.*.*
+                write:
+                    - srehm_prep.*.*
+                    - srehm_prod.*.*
+
     - statimatla:
         member_of:
             - adaptive
@@ -4665,10 +4754,20 @@ users:
         member_of:
             - bnguyen
 
+    - caitlin:
+        can_login: yes
+        member_of:
+            - caitlin
+
     - cbraza:
         can_login: yes
         member_of:
             - cbraza
+
+    - cleroux:
+        can_login: yes
+        member_of:
+            - cleroux            
 
     - cmeddaugh:
         can_login: yes
@@ -4690,6 +4789,11 @@ users:
         member_of:
             - dcharukulvanich
 
+    - ddeng:
+        can_login: yes
+        member_of:
+            - ddeng
+
     - degan:
         can_login: yes
         member_of:
@@ -4699,6 +4803,11 @@ users:
         can_login: yes
         member_of:
             - dfelton
+
+    - dgupta:
+        can_login: yes
+        member_of:
+            - dgupta            
 
     - dmicovic:
         can_login: yes
@@ -5028,6 +5137,11 @@ users:
         can_login: yes
         member_of:
             - snalamaru
+
+    - srehm:
+        can_login: yes
+        member_of:
+            - srehm
 
     - statimatla:
         can_login: yes

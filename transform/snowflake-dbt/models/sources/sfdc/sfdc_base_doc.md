@@ -24,6 +24,12 @@ This campaign source table represents and tracks a marketing campaign, such as a
 
 {% enddocs %}
 
+{% docs sfdc_case_source %}
+
+The case source table represents a case, which is a customer issue or problem. [Link to Documentation](https://developer.salesforce.com/docs/atlas.en-us.234.0.object_reference.meta/object_reference/sforce_api_objects_case.htm)
+
+{% enddocs %}
+
 {% docs sfdc_contact_source %}
 
 The contact source table contains info about your contacts, who are individuals associated with accounts in your Salesforce instance. [Link to Documentation](https://www.stitchdata.com/docs/integrations/saas/salesforce/#contact)
