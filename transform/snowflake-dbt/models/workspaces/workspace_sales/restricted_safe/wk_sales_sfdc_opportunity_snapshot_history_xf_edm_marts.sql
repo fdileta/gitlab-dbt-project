@@ -5,122 +5,28 @@
 WITH date_details AS (
 
     SELECT *
-    FROM {{ ref('wk_sales_date_details') }}
+    FROM {{ ref('dim_date') }}
     -- FROM prod.workspace_sales.date_details
 
-), sfdc_accounts_xf AS (
+), edm_account_live AS (
 
     SELECT *
-    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
-    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    FROM {{ ref('mart_crm_account') }}
 
-), sfdc_opportunity_xf AS (
+), edm_opp_live AS (
 
-    SELECT 
-      opportunity_id,
-      owner_id,
-      account_id,
-      order_type_stamped,
-      deal_category,
-      opportunity_category,
-      deal_group,
-      opportunity_owner_manager,
-      is_edu_oss,
-      account_owner_team_stamped, 
+    SELECT *
+    FROM {{ ref('mart_crm_opportunity') }}
 
-      -- Opportunity Owner Stamped fields
-      opportunity_owner_user_segment,
-      opportunity_owner_user_region,
-      opportunity_owner_user_area,
-      opportunity_owner_user_geo,
 
-      -------------------
-      --  NF 2022-01-28 TO BE DEPRECATED once pipeline velocity reports in Sisense are updated
-      sales_team_rd_asm_level,
-      -------------------
-
-      sales_team_cro_level,
-      sales_team_vp_level,
-      sales_team_avp_rd_level,
-      sales_team_asm_level,
-
-      -- this fields use the opportunity owner version for current FY and account fields for previous years
-      report_opportunity_user_segment,
-      report_opportunity_user_geo,
-      report_opportunity_user_region,
-      report_opportunity_user_area,
-      report_user_segment_geo_region_area,
-      report_user_segment_geo_region_area_sqs_ot,
-
-      -- NF 2022-02-17 new aggregated keys 
-      key_sqs,
-      key_ot,
-
-      key_segment,
-      key_segment_sqs,                 
-      key_segment_ot,    
-
-      key_segment_geo,
-      key_segment_geo_sqs,
-      key_segment_geo_ot,      
-
-      key_segment_geo_region,
-      key_segment_geo_region_sqs,
-      key_segment_geo_region_ot,   
-
-      key_segment_geo_region_area,
-      key_segment_geo_region_area_sqs,
-      key_segment_geo_region_area_ot,
-
-      key_segment_geo_area,
-      
-      -------------------------------------
-      -- NF: These fields are not exposed yet in opty history, just for check
-      -- I am adding this logic
-
-      stage_1_date,
-      stage_1_date_month,
-      stage_1_fiscal_year,
-      stage_1_fiscal_quarter_name,
-      stage_1_fiscal_quarter_date,
-      --------------------------------------
-
-      is_won,
-      is_duplicate_flag,
-      raw_net_arr,
-      net_incremental_acv,
-      sales_qualified_source,
-      incremental_acv
-
-      -- Channel Org. fields
-      -- this fields should be changed to this historical version
-      --deal_path,
-      --dr_partner_deal_type,
-      --dr_partner_engagement,
-      --partner_account,
-      --dr_status,
-      --distributor,
-      --influence_partner,
-      --fulfillment_partner,
-      --platform_partner,
-      --partner_track,
-      --is_public_sector_opp,
-      --is_registration_from_portal,
-      --calculated_discount,
-      --partner_discount,
-      --partner_discount_calc,
-      --comp_channel_neutral
-
-    FROM {{ref('wk_sales_sfdc_opportunity_xf')}}
-
-), sfdc_users_xf AS (
+), edm_user_live AS (
 
     SELECT * 
-    FROM {{ref('wk_sales_sfdc_users_xf')}}  
+    FROM {{ref('dim_crm_user')}}  
 
 
 -- all the fields are sourcing from edm opp snapshot
-), sfdc_opportunity_snapshot_history AS (
+), edm_snapshot AS (
     SELECT 
       edm_snapshot_opty.crm_opportunity_snapshot_id                 AS opportunity_snapshot_id,
       edm_snapshot_opty.dim_crm_opportunity_id                      AS opportunity_id,
@@ -242,13 +148,13 @@ WITH date_details AS (
       edm_snapshot_opty.is_stage_1_plus,
       edm_snapshot_opty.is_stage_3_plus,
       edm_snapshot_opty.is_stage_4_plus,
-      edm_snapshot_opty.is_won,
-      edm_snapshot_opty.is_lost,
-      edm_snapshot_opty.is_open,
-      CASE edm_snapshot_opty.is_closed 
+      CASE edm_snapshot_opty.is_won 
         WHEN TRUE THEN 1 
         ELSE 0 
-      END                                                        AS is_closed,
+      END                                                       AS is_won,
+      edm_snapshot_opty.is_lost,
+      edm_snapshot_opty.is_open,
+      edm_snapshot_opty.is_closed,
       edm_snapshot_opty.is_renewal,
 
       edm_snapshot_opty.is_credit                                AS is_credit_flag,
@@ -361,7 +267,6 @@ WITH date_details AS (
 
       --------------------------------
 
-      edm_snapshot_opty.opportunity_owner_manager,
       edm_snapshot_opty.is_edu_oss,
       --edm_snapshot_opty.sales_qualified_source_name             AS sales_qualified_source,
       edm_snapshot_opty.dim_crm_account_id                      AS account_id,
@@ -369,178 +274,111 @@ WITH date_details AS (
 
       edm_snapshot_opty.account_owner_team_stamped,
       edm_snapshot_opty.account_owner_team_stamped_cro_level,
-
-      -- JK 2022-10-25: for now we leverage the live opp model for the following keys
-      --edm_snapshot_opty.opportunity_owner_user_segment,
-      --edm_snapshot_opty.opportunity_owner_user_region,
-      --edm_snapshot_opty.opportunity_owner_user_area,
-      --edm_snapshot_opty.opportunity_owner_user_geo,
-      
-      --edm_snapshot_opty.sales_team_rd_asm_level,
-      --edm_snapshot_opty.sales_team_cro_level,
-      --edm_snapshot_opty.sales_team_vp_level,
-      --edm_snapshot_opty.sales_team_avp_rd_level,
-      --edm_snapshot_opty.sales_team_asm_level,
-      --edm_snapshot_opty.report_opportunity_user_segment,
-      --edm_snapshot_opty.report_opportunity_user_geo,
-      --edm_snapshot_opty.report_opportunity_user_region,
-      --edm_snapshot_opty.report_opportunity_user_area,
-      --edm_snapshot_opty.report_user_segment_geo_region_area,
-      --edm_snapshot_opty.report_user_segment_geo_region_area_sqs_ot,
-      --LOWER(edm_snapshot_opty.key_sqs)                           AS key_sqs,
-      --LOWER(edm_snapshot_opty.key_ot)                            AS key_ot,
-      --LOWER(edm_snapshot_opty.key_segment)                       AS key_segment,
-      --LOWER(edm_snapshot_opty.key_segment_sqs)                   AS key_segment_sqs,
-      --LOWER(edm_snapshot_opty.key_segment_ot)                    AS key_segment_ot,
-      --LOWER(edm_snapshot_opty.key_segment_geo)                   AS key_segment_geo,
-      --LOWER(edm_snapshot_opty.key_segment_geo_sqs)               AS key_segment_geo_sqs,
-      --LOWER(edm_snapshot_opty.key_segment_geo_ot)                AS key_segment_geo_ot,
-      --LOWER(edm_snapshot_opty.key_segment_geo_region)            AS key_segment_geo_region,
-      --LOWER(edm_snapshot_opty.key_segment_geo_region_sqs)        AS key_segment_geo_region_sqs,
-      --LOWER(edm_snapshot_opty.key_segment_geo_region_ot)         AS key_segment_geo_region_ot,
-      --LOWER(edm_snapshot_opty.key_segment_geo_region_area)       AS key_segment_geo_region_area,
-      --LOWER(edm_snapshot_opty.key_segment_geo_region_area_sqs)   AS key_segment_geo_region_area_sqs,
-      --LOWER(edm_snapshot_opty.key_segment_geo_region_area_ot)    AS key_segment_geo_region_area_ot,
-      --LOWER(edm_snapshot_opty.key_segment_geo_area)              AS key_segment_geo_area,
-      edm_snapshot_opty.deal_group,
-      edm_snapshot_opty.deal_category,
-      -- edm_snapshot_opty.opportunity_owner,
-      edm_snapshot_opty.crm_account_name                         AS account_name,
-      
-      -- double check regarding parent crm account = ultimate parent account?
-      edm_snapshot_opty.dim_parent_crm_account_id                AS ultimate_parent_account_id,
-      edm_snapshot_opty.parent_crm_account_name                  AS ultimate_parent_account_name,
-      edm_snapshot_opty.is_jihu_account,
-      edm_snapshot_opty.account_owner_user_segment,
-      edm_snapshot_opty.account_owner_user_geo,
-      edm_snapshot_opty.account_owner_user_region,
-      edm_snapshot_opty.account_owner_user_area,
-      edm_snapshot_opty.account_demographics_segment,
-      edm_snapshot_opty.account_demographics_geo,
-      edm_snapshot_opty.account_demographics_region,
-      edm_snapshot_opty.account_demographics_area,
-      edm_snapshot_opty.account_demographics_territory,
-
-      -- edm_snapshot_opty.account_demographics_segment             AS upa_demographics_segment,
-      -- edm_snapshot_opty.account_demographics_geo                 AS upa_demographics_geo,
-      -- edm_snapshot_opty.account_demographics_region              AS upa_demographics_region,
-      -- edm_snapshot_opty.account_demographics_area                AS upa_demographics_area,
-      -- edm_snapshot_opty.account_demographics_territory           AS upa_demographics_territory,
-
       edm_snapshot_opty.stage_1_discovery_date                   AS stage_1_date,
       edm_snapshot_opty.stage_1_discovery_month                  AS stage_1_date_month,
       edm_snapshot_opty.stage_1_discovery_fiscal_year            AS stage_1_fiscal_year,
       edm_snapshot_opty.stage_1_discovery_fiscal_quarter_name    AS stage_1_fiscal_quarter_name,
       edm_snapshot_opty.stage_1_discovery_fiscal_quarter_date    AS stage_1_fiscal_quarter_date,
-      
       CASE edm_snapshot_opty.is_sao 
         WHEN TRUE THEN 1 
         ELSE 0 
-      END                                             AS is_eligible_sao_flag 
+      END                                             AS is_eligible_sao_flag ,
+
+      edm_opp_live.crm_account_name                         AS account_name,
+      
+      -- double check regarding parent crm account = ultimate parent account?
+      edm_account_live.dim_parent_crm_account_id                AS ultimate_parent_account_id,
+      edm_opp_live.is_jihu_account,
+      edm_opp_live.account_owner_user_segment,
+      edm_opp_live.account_owner_user_geo,
+      edm_opp_live.account_owner_user_region,
+      edm_opp_live.account_owner_user_area,
+      edm_opp_live.account_demographics_segment,
+      edm_opp_live.account_demographics_geo,
+      edm_opp_live.account_demographics_region,
+      edm_opp_live.account_demographics_area,
+      edm_opp_live.account_demographics_territory,
+      LEFT(edm_account_live.dim_parent_crm_account_id,15) AS ultimate_parent_id, -- same is ultimate_parent_account_id?
+      edm_account_live.crm_account_tsp_region AS tsp_region,
+      edm_account_live.crm_account_tsp_sub_region AS tsp_sub_region,
+      edm_account_live.parent_crm_account_sales_segment AS ultimate_parent_sales_segment,
+      edm_account_live.tsp_max_hierarchy_sales_segment,
+      -- account_owner_subarea_stamped
+
+      edm_opp_live.order_type AS order_type_stamped,
+
+      -- duplicates flag
+      edm_opp_live.is_duplicate                               AS current_is_duplicate_flag,
+
+      -- JK 2022-10-25: using live fields instead of the edm snapshot opp table directly
+      opportunity_owner.user_name                        AS opportunity_owner,
+      edm_opp_live.opportunity_owner_user_segment,
+      edm_opp_live.opportunity_owner_user_region,
+      edm_opp_live.opportunity_owner_user_area,
+      edm_opp_live.opportunity_owner_user_geo,
+      edm_opp_live.opportunity_owner_manager,
+      edm_opp_live.sales_team_rd_asm_level,
+      edm_opp_live.sales_team_cro_level,
+      edm_opp_live.sales_team_vp_level,
+      edm_opp_live.sales_team_avp_rd_level,
+      edm_opp_live.sales_team_asm_level,
+      edm_opp_live.report_opportunity_user_segment,
+      edm_opp_live.report_opportunity_user_geo,
+      edm_opp_live.report_opportunity_user_region,
+      edm_opp_live.report_opportunity_user_area,
+      edm_opp_live.report_user_segment_geo_region_area,
+      edm_opp_live.report_user_segment_geo_region_area_sqs_ot,
+      edm_opp_live.key_sqs,
+      edm_opp_live.key_ot,
+      edm_opp_live.key_segment,
+      edm_opp_live.key_segment_sqs,
+      edm_opp_live.key_segment_ot,
+      edm_opp_live.key_segment_geo,
+      edm_opp_live.key_segment_geo_sqs,
+      edm_opp_live.key_segment_geo_ot,
+      edm_opp_live.key_segment_geo_region,
+      edm_opp_live.key_segment_geo_region_sqs,
+      edm_opp_live.key_segment_geo_region_ot,
+      edm_opp_live.key_segment_geo_region_area,
+      edm_opp_live.key_segment_geo_region_area_sqs,
+      edm_opp_live.key_segment_geo_region_area_ot,
+      edm_opp_live.key_segment_geo_area,
+      edm_opp_live.sales_qualified_source_name AS sales_qualified_source,
+      edm_opp_live.deal_group,
+      edm_opp_live.deal_category,
+
+      upa.crm_account_name                                           AS ultimate_parent_account_name,
+      upa.parent_crm_account_demographics_sales_segment                     AS upa_demographics_segment,
+      upa.parent_crm_account_demographics_geo                               AS upa_demographics_geo,
+      upa.parent_crm_account_demographics_region                            AS upa_demographics_region,
+      upa.parent_crm_account_demographics_area                              AS upa_demographics_area,
+      upa.parent_crm_account_demographics_territory                         AS upa_demographics_territory
 
 
     FROM {{ref('mart_crm_opportunity_daily_snapshot')}} AS edm_snapshot_opty
     INNER JOIN date_details AS close_date_detail
       ON edm_snapshot_opty.close_date::DATE = close_date_detail.date_actual
-
-), sfdc_opportunity_snapshot_history_xf AS (
-
-  SELECT DISTINCT
-      opp_snapshot.*,
-      
-      -- using current opportunity perspective instead of historical
-      -- NF 2021-01-26: this might change to order type live 2.1    
-      -- NF 2022-01-28: Update to OT 2.3 will be stamped directly  
-      sfdc_opportunity_xf.order_type_stamped,     
-
-      -- duplicates flag
-      sfdc_opportunity_xf.is_duplicate_flag                               AS current_is_duplicate_flag,
-      
-      -- JK 2022-10-25: using live fields instead of the edm snapshot opp table directly
-      sfdc_opportunity_xf.opportunity_owner_user_segment,
-      sfdc_opportunity_xf.opportunity_owner_user_region,
-      sfdc_opportunity_xf.opportunity_owner_user_area,
-      sfdc_opportunity_xf.opportunity_owner_user_geo,
-      
-      sfdc_opportunity_xf.sales_team_rd_asm_level,
-      sfdc_opportunity_xf.sales_team_cro_level,
-      sfdc_opportunity_xf.sales_team_vp_level,
-      sfdc_opportunity_xf.sales_team_avp_rd_level,
-      sfdc_opportunity_xf.sales_team_asm_level,
-      sfdc_opportunity_xf.report_opportunity_user_segment,
-      sfdc_opportunity_xf.report_opportunity_user_geo,
-      sfdc_opportunity_xf.report_opportunity_user_region,
-      sfdc_opportunity_xf.report_opportunity_user_area,
-      sfdc_opportunity_xf.report_user_segment_geo_region_area,
-      sfdc_opportunity_xf.report_user_segment_geo_region_area_sqs_ot,
-      sfdc_opportunity_xf.key_sqs,
-      sfdc_opportunity_xf.key_ot,
-      sfdc_opportunity_xf.key_segment,
-      sfdc_opportunity_xf.key_segment_sqs,
-      sfdc_opportunity_xf.key_segment_ot,
-      sfdc_opportunity_xf.key_segment_geo,
-      sfdc_opportunity_xf.key_segment_geo_sqs,
-      sfdc_opportunity_xf.key_segment_geo_ot,
-      sfdc_opportunity_xf.key_segment_geo_region,
-      sfdc_opportunity_xf.key_segment_geo_region_sqs,
-      sfdc_opportunity_xf.key_segment_geo_region_ot,
-      sfdc_opportunity_xf.key_segment_geo_region_area,
-      sfdc_opportunity_xf.key_segment_geo_region_area_sqs,
-      sfdc_opportunity_xf.key_segment_geo_region_area_ot,
-      sfdc_opportunity_xf.key_segment_geo_area,
-
-      sfdc_opportunity_xf.sales_qualified_source,
-
-      ------------------------------------------------------------------------------------------------------
-      ------------------------------------------------------------------------------------------------------
-
-      -- account driven fields
-      sfdc_accounts_xf.tsp_region,
-      sfdc_accounts_xf.tsp_sub_region,
-      sfdc_accounts_xf.ultimate_parent_sales_segment,
-      sfdc_accounts_xf.tsp_max_hierarchy_sales_segment,
-
-      opportunity_owner.name                                     AS opportunity_owner,
-      
-      sfdc_accounts_xf.ultimate_parent_id, -- same is ultimate_parent_account_id?
-
-      upa.account_demographics_sales_segment                     AS upa_demographics_segment,
-      upa.account_demographics_geo                               AS upa_demographics_geo,
-      upa.account_demographics_region                            AS upa_demographics_region,
-      upa.account_demographics_area                              AS upa_demographics_area,
-      upa.account_demographics_territory                         AS upa_demographics_territory
-
-      
-    FROM sfdc_opportunity_snapshot_history AS opp_snapshot
-    INNER JOIN sfdc_opportunity_xf    
-      ON sfdc_opportunity_xf.opportunity_id = opp_snapshot.opportunity_id
-    LEFT JOIN sfdc_accounts_xf
-      ON sfdc_opportunity_xf.account_id = sfdc_accounts_xf.account_id 
-    LEFT JOIN sfdc_accounts_xf AS upa
-      ON upa.account_id = sfdc_accounts_xf.ultimate_parent_account_id
-    LEFT JOIN sfdc_users_xf AS account_owner
-      ON account_owner.user_id = sfdc_accounts_xf.owner_id
-    LEFT JOIN sfdc_users_xf AS opportunity_owner
-      ON opportunity_owner.user_id = opp_snapshot.owner_id
-    
-    WHERE opp_snapshot.raw_account_id NOT IN ('0014M00001kGcORQA0')                           -- remove test account
-      AND (sfdc_accounts_xf.ultimate_parent_account_id NOT IN ('0016100001YUkWVAA1')
-            OR sfdc_accounts_xf.account_id IS NULL)                                        -- remove test account
-      AND opp_snapshot.is_deleted = 0
+    LEFT JOIN edm_account_live
+      ON edm_snapshot_opty.dim_crm_account_id = edm_account_live.dim_crm_account_id
+    LEFT JOIN edm_opp_live
+      ON edm_snapshot_opty.dim_crm_opportunity_id = edm_opp_live.dim_crm_opportunity_id
+    LEFT JOIN edm_account_live AS upa
+      ON upa.dim_crm_account_id = edm_account_live.dim_parent_crm_account_id
+    LEFT JOIN edm_user_live opportunity_owner 
+      ON edm_snapshot_opty.owner_id = opportunity_owner.dim_crm_user_id
+    WHERE edm_snapshot_opty.dim_crm_account_id NOT IN ('0014M00001kGcORQA0')  -- remove test account
+      AND (edm_account_live.dim_parent_crm_account_id NOT IN ('0016100001YUkWVAA1')
+            OR edm_account_live.dim_crm_account_id IS NULL) -- remove test account
+      AND edm_snapshot_opty.is_deleted = 0
       -- NF 20210906 remove JiHu opties from the models
-      AND sfdc_accounts_xf.is_jihu_account = 0
+      AND edm_account_live.is_jihu_account = 0
 
-)
--- in Q2 FY21 a few deals where created in the wrong stage, and as they were purely aspirational, 
--- they needed to be removed from stage 1, eventually by the end of the quarter they were removed
--- The goal of this list is to use in the Created Pipeline flag, to exclude those deals that at 
--- day 90 had stages of less than 1, that should smooth the chart
-, vision_opps  AS (
+), vision_opps  AS (
   
   SELECT opp_snapshot.opportunity_id,
          opp_snapshot.stage_name,
          opp_snapshot.snapshot_fiscal_quarter_date
-  FROM sfdc_opportunity_snapshot_history_xf opp_snapshot
+  FROM edm_snapshot opp_snapshot
   WHERE opp_snapshot.snapshot_fiscal_quarter_name = 'FY21-Q2'
     And opp_snapshot.pipeline_created_fiscal_quarter_date = opp_snapshot.snapshot_fiscal_quarter_date
     AND opp_snapshot.snapshot_day_of_fiscal_quarter_normalised = 90
@@ -569,59 +407,12 @@ WITH date_details AS (
          ELSE 0
       END                                                      AS is_eligible_created_pipeline_flag
 
-    FROM sfdc_opportunity_snapshot_history_xf opp_snapshot
-      LEFT JOIN vision_opps
+    FROM edm_snapshot opp_snapshot
+    LEFT JOIN vision_opps
         ON vision_opps.opportunity_id = opp_snapshot.opportunity_id
         AND vision_opps.snapshot_fiscal_quarter_date = opp_snapshot.snapshot_fiscal_quarter_date
-
-
--- JK 2022-10-25: temporarily calculating open_nplus_net_arrs & churn_contraction fields 
--- in wk sales model instead of using the fields directly from edm marts
-), temp_calculations AS (
-
-    SELECT
-      *
-      -- CASE 
-      --   WHEN is_eligible_open_pipeline_flag = 1
-      --     THEN net_arr
-      --   ELSE 0                                                                                              
-      -- END                                                 AS open_1plus_net_arr,
-
-      -- CASE 
-      --   WHEN is_eligible_open_pipeline_flag = 1
-      --     AND is_stage_3_plus = 1   
-      --       THEN net_arr
-      --   ELSE 0
-      -- END                                                 AS open_3plus_net_arr,
-  
-      -- CASE 
-      --   WHEN is_eligible_open_pipeline_flag = 1  
-      --     AND is_stage_4_plus = 1
-      --       THEN net_arr
-      --   ELSE 0
-      -- END                                                 AS open_4plus_net_arr,
-
-      -- CASE
-      --   WHEN ((is_renewal = 1
-      --       AND is_lost = 1)
-      --       OR is_won = 1 )
-      --       AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
-      --   THEN calculated_deal_count
-      --   ELSE 0
-      -- END                                                 AS churned_contraction_deal_count,
-
-      -- CASE
-      --   WHEN ((is_renewal = 1
-      --       AND is_lost = 1)
-      --       OR is_won = 1 )
-      --       AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
-      --   THEN net_arr
-      --   ELSE 0
-      -- END                                                 AS churned_contraction_net_arr
-    
-    FROM add_compound_metrics
 
 )
 
 SELECT *
-FROM temp_calculations
+FROM  add_compound_metrics
