@@ -7,7 +7,7 @@ from gitlabdata.orchestration_utils import snowflake_engine_factory
 from sqlalchemy.engine import Engine
 
 
-def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage):
+def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, single):
     """
     Generate a copy command based on data passed from pumps.yml
     """
@@ -31,18 +31,28 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage):
         else:
             query = "SELECT * " + from_statement + where_statement
 
+        if single == False:
+            target_name = model
+            option = "INCLUDE_QUERY_ID"
+        else:
+            target_name = f"{timestamp}.csv"
+            option = "SINGLE"
+
         copy_command_tmp = """
-        COPY INTO @RAW.PUBLIC.{stage}/{model}
+        COPY INTO @RAW.PUBLIC.{stage}/{target_name}
         FROM ({query} LIMIT 1000000)
         FILE_FORMAT = (TYPE = CSV, NULL_IF = (), FIELD_OPTIONALLY_ENCLOSED_BY = '"', COMPRESSION=NONE)
         HEADER = TRUE
-        INCLUDE_QUERY_ID = TRUE;
+        {option} = TRUE
+        ;
       """
 
         copy_command = copy_command_tmp.format(
             stage=stage.upper(),
             model=model,
             query=query,
+            target_name=target_name,
+            option=option
         )
 
     except:

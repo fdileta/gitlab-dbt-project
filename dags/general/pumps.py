@@ -73,7 +73,8 @@ for pump_model in pumps:
         --timestamp={pump_model["timestamp_column"]} \
         --inc_start={execution_date} \
         --inc_end={next_execution_date} \
-        --stage={pump_model["stage"]}
+        --stage={pump_model["stage"]} \
+        --single={pump_model["single"]}
         """
 
     run_pumps = KubernetesPodOperator(
