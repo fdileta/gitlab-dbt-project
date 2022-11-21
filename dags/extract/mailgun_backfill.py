@@ -55,7 +55,7 @@ events = [
 ]
 
 
-start_date = datetime(2022, 9, 30)
+start_date = datetime(2022, 9, 20)
 end_date = datetime(2022, 10, 27)
 
 delta = timedelta(hours=12)
