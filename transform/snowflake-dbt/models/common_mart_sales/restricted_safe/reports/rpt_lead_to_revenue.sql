@@ -352,7 +352,7 @@
       opp.churned_contraction_net_arr,
       opp.calculated_deal_count,
       opp.days_in_stage,
-      opp_user.role_name AS opp_user_role_name
+      opp_user.user_role_name AS opp_user_role_name
     FROM person_base
     INNER JOIN dim_crm_person
       ON person_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
