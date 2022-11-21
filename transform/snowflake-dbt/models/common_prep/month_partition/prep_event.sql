@@ -405,7 +405,7 @@
   },
   {
     "event_name": "kubernetes_with_agent",
-    "source_cte_name": "cluster_agents",
+    "source_cte_name": "prep_cluster_agent",
     "user_column_name": "dim_user_id",
     "ultimate_parent_namespace_column_name": "ultimate_parent_namespace_id",
     "project_column_name": "dim_project_id",
@@ -450,7 +450,7 @@
     ('prep_snippet', 'prep_snippet'),
     ('prep_project', 'prep_project'),
     ('prep_ci_trigger', 'prep_ci_trigger'),
-    ('cluster_agents', 'cluster_agents')
+    ('prep_cluster_agent', 'prep_cluster_agent')
 ]) }}
 
 , dast_jobs AS (
