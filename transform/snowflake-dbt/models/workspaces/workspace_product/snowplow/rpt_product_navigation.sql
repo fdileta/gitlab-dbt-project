@@ -77,7 +77,7 @@
     )
   {% if is_incremental() %}
 
-    AND  fct_behavior_structured_event_without_assignment.behavior_at > (SELECT MAX(fct_behavior_structured_event_without_assignment.behavior_at) FROM {{ this }})
+    AND behavior_at > (SELECT MAX(behavior_at) FROM {{ this }})
 
   {% endif %}
 )
