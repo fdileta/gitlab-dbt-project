@@ -195,7 +195,6 @@ WITH prep_crm_opportunity AS (
       prep_crm_opportunity.sales_team_avp_rd_level,
       prep_crm_opportunity.sales_team_asm_level,
       prep_crm_opportunity.account_owner_team_stamped_cro_level,
-	  prep_crm_opportunity.record_type_name,
 
       -- channel reporting
       prep_crm_opportunity.dr_partner_deal_type,

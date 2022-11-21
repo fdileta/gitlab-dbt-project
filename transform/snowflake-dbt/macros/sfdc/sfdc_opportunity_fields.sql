@@ -190,7 +190,7 @@ WITH first_contact  AS (
       created_date::DATE                                                 AS created_date,
       sales_accepted_date::DATE                                          AS sales_accepted_date,
       close_date::DATE                                                   AS close_date,
-      net_arr                                                            AS raw_net_arr,
+      net_arr                                                            AS raw_net_arr, 
     {%- if model_type == 'live' %}
         CASE
           WHEN sfdc_opportunity_source.stage_name
@@ -622,6 +622,9 @@ WITH first_contact  AS (
       -- contact information
       first_contact.dim_crm_person_id,
       first_contact.sfdc_contact_id,
+
+	  -- record type information
+	  record_type.record_type_name,
 
       -- attribution information
       linear_attribution_base.count_crm_attribution_touchpoints,
@@ -1315,6 +1318,8 @@ WITH first_contact  AS (
       ON sfdc_opportunity.subscription_start_date::DATE = subscription_start_date.date_actual
     LEFT JOIN sfdc_account AS fulfillment_partner
       ON sfdc_opportunity.fulfillment_partner = fulfillment_partner.account_id
+	LEFT JOIN {{ref('sfdc_record_type_source')}} AS record_type
+		ON sfdc_opportunity.record_type_id=record_type.record_type_id
     {%- if model_type == 'snapshot' %}
         AND sfdc_opportunity.snapshot_id = fulfillment_partner.snapshot_id
     {%- endif %}
