@@ -5,7 +5,8 @@
     ('mart_crm_opportunity_stamped_hierarchy_hist','mart_crm_opportunity_stamped_hierarchy_hist'),
     ('rpt_sfdc_bizible_tp_opp_linear_blended','rpt_sfdc_bizible_tp_opp_linear_blended'),
     ('dim_crm_account','dim_crm_account'),
-    ('map_alternative_lead_demographics','map_alternative_lead_demographics')
+    ('map_alternative_lead_demographics','map_alternative_lead_demographics'),
+    ('dim_crm_user','dim_crm_user')
 ]) }}
 
 , upa_base AS ( --pulls every account and it's UPA
@@ -235,6 +236,8 @@
       opp.is_sao,
       opp.new_logo_count,
       opp.net_arr,
+      opp.amount,
+      opp.invoice_number,
       opp.is_net_arr_closed_deal,
       opp.crm_opp_owner_sales_segment_stamped,
       opp.crm_opp_owner_region_stamped,
@@ -346,7 +349,8 @@
       opp.churned_contraction_deal_count,
       opp.churned_contraction_net_arr,
       opp.calculated_deal_count,
-      opp.days_in_stage
+      opp.days_in_stage,
+      opp_user.role_name AS opp_user_role_name
     FROM person_base
     INNER JOIN dim_crm_person
       ON person_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
@@ -360,6 +364,8 @@
       ON person_base.email_hash=order_type_final.email_hash
 	LEFT JOIN map_alternative_lead_demographics
 	  ON person_base.dim_crm_person_id=map_alternative_lead_demographics.dim_crm_person_id
+  LEFT JOIN dim_crm_user opp_user 
+    ON opp.dim_crm_user_id=opp_user.dim_crm_user_id
 
 ), fo_inquiry_with_tp AS (
   
@@ -437,6 +443,7 @@
     cohort_base.employee_count_segment_custom,
     cohort_base.employee_bucket_segment_custom,
     cohort_base.geo_custom,
+   
     --opportunity data
     cohort_base.opp_created_date,
     cohort_base.sales_accepted_date,
@@ -445,6 +452,8 @@
     cohort_base.is_won,
     cohort_base.new_logo_count,
     cohort_base.net_arr,
+    cohort_base.amount,
+    cohort_base.invoice_number,
     cohort_base.is_net_arr_closed_deal,
     cohort_base.opp_order_type,
     cohort_base.sales_qualified_source_name,
@@ -560,6 +569,7 @@
     cohort_base.churned_contraction_net_arr,
     cohort_base.calculated_deal_count,
     cohort_base.days_in_stage,
+    cohort_base.opp_user_role_name,
     CASE
       WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_touchpoint_id IS NOT null THEN cohort_base.dim_crm_opportunity_id
       ELSE null
