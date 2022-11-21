@@ -77,7 +77,7 @@
     )
   {% if is_incremental() %}
 
-    AND behavior_at > (SELECT MAX(behavior_at) FROM {{ this }})
+    AND fct_behavior_structured_event_without_assignment.behavior_at > (SELECT MAX(behavior_at) FROM {{ this }})
 
   {% endif %}
 )
@@ -85,7 +85,7 @@
 {{ dbt_audit(
     cte_ref="product_navigation",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@chrissharp",
     created_date="2022-11-01",
-    updated_date="2022-11-01"
+    updated_date="2022-11-21"
 ) }}
