@@ -169,6 +169,11 @@ databases:
     - nhervas_prep:
         shared: no
 
+    - nmcavinue_prod:
+        shared: no
+    - nmcavinue_prep:
+        shared: no
+
     - nraisinghani_prod:
         shared: no
     - nraisinghani_prep:
@@ -3979,6 +3984,51 @@ roles:
         warehouses:
             - dev_xs
 
+    - nmcavinue:
+        member_of:
+            - adaptive
+            - analyst_finance
+            - customers_db
+            - data_team_analyst
+            - data_manager
+            - restricted_safe
+            - xactly
+            - bi_tool_eval_db
+        warehouses:
+            - dev_xs
+        owns:
+            databases:
+                - nmcavinue_prep
+                - nmcavinue_prod
+            schemas:
+                - nmcavinue_prep.*
+                - nmcavinue_prod.*
+            tables:
+                - nmcavinue_prep.*.*
+                - nmcavinue_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - nmcavinue_prep
+                    - inmcavinue_prod
+                write:
+                    - nmcavinue_prep
+                    - nmcavinue_prod
+            schemas:
+                read:
+                    - nmcavinue_prep.*
+                    - nmcavinue_prod.*
+                write:
+                    - nmcavinue_prep.*
+                    - nmcavinue_prod.*
+            tables:
+                read:
+                    - nmcavinue_prep.*.*
+                    - nmcavinue_prod.*.*
+                write:
+                    - nmcavinue_prep.*.*
+                    - nmcavinue_prod.*.*
+
     - nraisinghani:
         member_of:
             - analyst_growth
@@ -5041,6 +5091,11 @@ users:
         can_login: yes
         member_of:
             - nkhanna
+
+    - nmcavinue:
+        can_login: yes
+        member_of:
+            - nmcavinue
 
     - nraisinghani:
         can_login: yes
