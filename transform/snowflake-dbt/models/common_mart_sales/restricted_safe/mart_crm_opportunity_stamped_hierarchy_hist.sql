@@ -154,6 +154,7 @@
       dim_sales_qualified_source.sales_qualified_source_name,
       dim_sales_qualified_source.sales_qualified_source_grouped,
       dim_sales_qualified_source.sqs_bucket_engagement,
+	  fct_crm_opportunity.record_type_name,
 
        -- Account fields
       dim_crm_account.crm_account_name,
@@ -646,7 +647,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@jeanpeguero",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2022-02-28",
-    updated_date="2022-09-06"
+    updated_date="2022-11-21"
   ) }}
