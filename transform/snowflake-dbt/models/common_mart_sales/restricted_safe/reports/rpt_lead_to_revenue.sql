@@ -237,6 +237,7 @@
       opp.new_logo_count,
       opp.net_arr,
       opp.amount,
+	  opp.record_type_name,
       opp.invoice_number,
       opp.is_net_arr_closed_deal,
       opp.crm_opp_owner_sales_segment_stamped,
@@ -570,6 +571,7 @@
     cohort_base.calculated_deal_count,
     cohort_base.days_in_stage,
     cohort_base.opp_user_role_name,
+	cohort_base.record_type_name,
     CASE
       WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_touchpoint_id IS NOT null THEN cohort_base.dim_crm_opportunity_id
       ELSE null
