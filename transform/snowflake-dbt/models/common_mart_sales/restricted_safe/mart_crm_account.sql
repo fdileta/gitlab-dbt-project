@@ -147,6 +147,8 @@
       dim_crm_account.forbes_2000_rank,
       dim_crm_account.parent_account_industry_hierarchy,
       dim_crm_account.sales_development_rep,
+	  dim_crm_account.admin_manual_source_number_of_employees,
+      dim_crm_account.admin_manual_source_account_address,
 
       --degenerative dimensions
       dim_crm_account.is_sdr_target_account,
