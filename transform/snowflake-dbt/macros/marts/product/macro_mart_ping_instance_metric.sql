@@ -40,35 +40,29 @@
 ), license_subscriptions AS (
 
     SELECT DISTINCT
-      dim_date.first_day_of_month                                                 AS reporting_month,
-      dim_license_id                                                              AS license_id,
-      dim_license.license_md5                                                     AS license_md5,
-      dim_license.company                                                         AS license_company_name,
-      subscription_source.subscription_name_slugify                               AS original_subscription_name_slugify,
-      dim_subscription.dim_subscription_id                                        AS dim_subscription_id,
-      dim_subscription.subscription_start_date                                    AS subscription_start_date,
-      dim_subscription.subscription_end_date                                      AS subscription_end_date,
-      dim_subscription.subscription_start_month                                   AS subscription_start_month,
-      dim_subscription.subscription_end_month                                     AS subscription_end_month,
-      dim_subscription.dim_subscription_id_original                               AS dim_subscription_id_original,
-      dim_billing_account.dim_billing_account_id                                  AS dim_billing_account_id,
-      dim_crm_accounts.crm_account_name                                           AS crm_account_name,
-      dim_crm_accounts.dim_parent_crm_account_id                                  AS dim_parent_crm_account_id,
-      dim_crm_accounts.parent_crm_account_name                                    AS parent_crm_account_name,
-      dim_crm_accounts.parent_crm_account_billing_country                         AS parent_crm_account_billing_country,
-      dim_crm_accounts.parent_crm_account_sales_segment                           AS parent_crm_account_sales_segment,
-      dim_crm_accounts.parent_crm_account_industry                                AS parent_crm_account_industry,
-      dim_crm_accounts.parent_crm_account_owner_team                              AS parent_crm_account_owner_team,
-      dim_crm_accounts.parent_crm_account_sales_territory                         AS parent_crm_account_sales_territory,
-      dim_crm_accounts.technical_account_manager                                  AS technical_account_manager,
-      IFF(MAX(mrr) > 0, TRUE, FALSE)                                              AS is_paid_subscription,
-      MAX(IFF(product_rate_plan_name ILIKE ANY ('%edu%', '%oss%'), TRUE, FALSE))  AS is_program_subscription,
+      dim_date.first_day_of_month                                                                                                     AS reporting_month,
+      dim_license_id                                                                                                                  AS license_id,
+      dim_license.license_md5                                                                                                         AS license_md5,
+      dim_license.company                                                                                                             AS license_company_name,
+      subscription_source.subscription_name_slugify                                                                                   AS original_subscription_name_slugify,
+      dim_subscription.dim_subscription_id                                                                                            AS dim_subscription_id,
+      dim_subscription.subscription_start_date                                                                                        AS subscription_start_date,
+      dim_subscription.subscription_end_date                                                                                          AS subscription_end_date,
+      dim_subscription.subscription_start_month                                                                                       AS subscription_start_month,
+      dim_subscription.subscription_end_month                                                                                         AS subscription_end_month,
+      dim_subscription.dim_subscription_id_original                                                                                   AS dim_subscription_id_original,
+      dim_billing_account.dim_billing_account_id                                                                                      AS dim_billing_account_id,
+      dim_crm_accounts.crm_account_name                                                                                               AS crm_account_name,
+      dim_crm_accounts.dim_parent_crm_account_id                                                                                      AS dim_parent_crm_account_id,
+      dim_crm_accounts.technical_account_manager                                                                                      AS technical_account_manager,
+      IFF(MAX(mrr) > 0, TRUE, FALSE)                                                                                                  AS is_paid_subscription,
+      MAX(IFF(product_rate_plan_name ILIKE ANY ('%edu%', '%oss%'), TRUE, FALSE))                                                      AS is_program_subscription,
       ARRAY_AGG(DISTINCT dim_product_detail.product_tier_name)
-        WITHIN GROUP (ORDER BY dim_product_detail.product_tier_name ASC)          AS product_category_array,
+        WITHIN GROUP (ORDER BY dim_product_detail.product_tier_name ASC)                                                              AS product_category_array,
       ARRAY_AGG(DISTINCT product_rate_plan_name)
-        WITHIN GROUP (ORDER BY product_rate_plan_name ASC)                        AS product_rate_plan_name_array,
-      SUM(quantity)                                                               AS quantity,
-      SUM(mrr * 12)                                                               AS arr
+        WITHIN GROUP (ORDER BY product_rate_plan_name ASC)                                                                            AS product_rate_plan_name_array,
+      SUM(quantity)                                                                                                                   AS quantity,
+      SUM(mrr * 12)                                                                                                                   AS arr
     FROM dim_license
     INNER JOIN subscription_source
       ON dim_license.dim_subscription_id = subscription_source.subscription_id
@@ -95,8 +89,8 @@
   ), latest_subscription AS (
 
     SELECT
-        dim_subscription_id             AS latest_subscription_id,
-        dim_subscription_id_original    AS dim_subscription_id_original
+        dim_subscription_id                                                                                                             AS latest_subscription_id,
+        dim_subscription_id_original                                                                                                    AS dim_subscription_id_original
     FROM dim_subscription
         WHERE subscription_status IN ('Active', 'Cancelled')
 
@@ -141,12 +135,6 @@
         license_subscriptions_w_latest_subscription.dim_billing_account_id                                                              AS dim_billing_account_id,
         license_subscriptions_w_latest_subscription.crm_account_name                                                                    AS crm_account_name,
         license_subscriptions_w_latest_subscription.dim_parent_crm_account_id                                                           AS dim_parent_crm_account_id,
-        license_subscriptions_w_latest_subscription.parent_crm_account_name                                                             AS parent_crm_account_name,
-        license_subscriptions_w_latest_subscription.parent_crm_account_billing_country                                                  AS parent_crm_account_billing_country,
-        license_subscriptions_w_latest_subscription.parent_crm_account_sales_segment                                                    AS parent_crm_account_sales_segment,
-        license_subscriptions_w_latest_subscription.parent_crm_account_industry                                                         AS parent_crm_account_industry,
-        license_subscriptions_w_latest_subscription.parent_crm_account_owner_team                                                       AS parent_crm_account_owner_team,
-        license_subscriptions_w_latest_subscription.parent_crm_account_sales_territory                                                  AS parent_crm_account_sales_territory,
         license_subscriptions_w_latest_subscription.technical_account_manager                                                           AS technical_account_manager,
         COALESCE(is_paid_subscription, FALSE)                                                                                           AS is_paid_subscription,
         COALESCE(is_program_subscription, FALSE)                                                                                        AS is_program_subscription,
@@ -197,9 +185,9 @@
     SELECT
 
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['dim_ping_instance_id', 'metrics_path']) }} AS ping_instance_metric_id,
-      dim_ping_date_id,
-      metrics_path,
+      {{ dbt_utils.surrogate_key(['dim_ping_instance_id', 'metrics_path']) }}                                                         AS ping_instance_metric_id,
+      dim_ping_date_id                                                                                                               
+      metrics_path                                                  
       metric_value,
       has_timed_out,
       dim_ping_instance_id,
@@ -253,12 +241,6 @@
 
       -- account metadata
       crm_account_name,
-      parent_crm_account_name,
-      parent_crm_account_billing_country,
-      parent_crm_account_sales_segment,
-      parent_crm_account_industry,
-      parent_crm_account_owner_team,
-      parent_crm_account_sales_territory,
       technical_account_manager,
 
       ping_created_at,
