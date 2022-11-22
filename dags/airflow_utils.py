@@ -7,7 +7,7 @@ from typing import List, Dict
 from airflow.models import Variable
 from airflow.operators.slack_operator import SlackAPIPostOperator
 from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
-
+from kube_secrets import GITLAB_ANALYTICS_PRIVATE_TOKEN
 
 SSH_REPO = "git@gitlab.com:gitlab-data/analytics.git"
 HTTP_REPO = "https://gitlab.com/gitlab-data/analytics.git"
@@ -22,7 +22,7 @@ DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO = (
     "git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git"
 )
 DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = (
-    "https://gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git"
+    "https://gitlab_analytics:$GITLAB_ANALYTICS_PRIVATE_TOKEN@gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git"
 )
 
 
