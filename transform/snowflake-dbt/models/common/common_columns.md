@@ -444,7 +444,7 @@ Boolean flag which is set to True if the installation has a valid trial license 
 
 {% docs umau_value %}
 
-The unique monthly active user value for the installation (i.e., the value of the metric flagged as UMAU)
+The unique monthly active user (UMAU) value for the installation (i.e., the value of the metric flagged as UMAU)
 
 {% enddocs %}
 
