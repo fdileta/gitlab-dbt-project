@@ -39,8 +39,7 @@ class BizibleSnowFlakeExtractor:
         """
         table_name = full_table_name.split(".")[-1]
         if len(date_column) > 0:
-            snowflake_query_max_date = \
-                f"""SELECT 
+            snowflake_query_max_date = f"""SELECT 
                         max({date_column}) as last_modified_date
                     FROM "BIZIBLE".{table_name}"""
             df = query_dataframe(self.snowflake_engine, snowflake_query_max_date)
@@ -131,8 +130,7 @@ class BizibleSnowFlakeExtractor:
             query_start_date = dt
             query_end_date = dt + timedelta(hours=time_increments)
 
-            query = \
-                f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
+            query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
                 WHERE {date_column} >= '{query_start_date}' 
                 AND {date_column} < '{query_end_date}'"""
 
