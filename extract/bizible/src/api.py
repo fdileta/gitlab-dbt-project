@@ -125,7 +125,10 @@ class BizibleSnowFlakeExtractor:
         end_date = datetime.now()
         time_increments = 1
         for dt in rrule.rrule(
-            rrule.HOURLY, dtstart=last_modified_date, until=end_date, interval=time_increments
+            rrule.HOURLY,
+            dtstart=last_modified_date,
+            until=end_date,
+            interval=time_increments,
         ):
             query_start_date = dt
             query_end_date = dt + timedelta(hours=time_increments)
