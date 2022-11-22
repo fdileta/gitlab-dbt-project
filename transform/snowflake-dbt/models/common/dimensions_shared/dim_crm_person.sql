@@ -14,6 +14,7 @@ WITH crm_person AS (
       email_hash,
       email_domain,
       email_domain_type,
+      is_valuable_signup,
 
       --keys
       master_record_id,
@@ -104,7 +105,7 @@ WITH crm_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@jjstark",
-    updated_by="@rkohnke",
+    updated_by="@degan",
     created_date="2020-09-10",
-    updated_date="2022-09-30"
+    updated_date="2022-11-22"
 ) }}

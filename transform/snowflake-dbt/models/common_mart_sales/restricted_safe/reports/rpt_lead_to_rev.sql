@@ -152,6 +152,7 @@
     SELECT DISTINCT
       mart_crm_person.email_hash,
       mart_crm_person.email_domain_type,
+      mart_crm_person.is_valuable_signup,
       mart_crm_person.true_inquiry_date,
       mart_crm_person.mql_date_lastest_pt,
       mart_crm_person.status,
@@ -221,6 +222,7 @@
     cohort_base.mql_order_type_historical,
     cohort_base.lead_source,
     cohort_base.email_domain_type,
+    cohort_base.is_valuable_signup,
     cohort_base.is_mql,
     cohort_base.account_demographics_sales_segment,
     cohort_base.account_demographics_geo,
@@ -353,7 +355,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@degan",
     created_date="2022-10-05",
-    updated_date="2022-10-05",
+    updated_date="2022-11-23",
   ) }}
