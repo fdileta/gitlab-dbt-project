@@ -86,8 +86,6 @@ WITH sfdc_lead AS (
       END                                                                                                                   AS company_name,
       crm_person.title                                                                                                      AS job_title,
       crm_person.it_job_title_hierarchy,
-      crm_account.parent_crm_account_sales_segment,
-      crm_account.parent_crm_account_tsp_region,
       sfdc_account.tsp_region,
       crm_person.account_demographics_geo                                                                                                    AS crm_person_region,
       CASE
@@ -119,25 +117,25 @@ WITH sfdc_lead AS (
 
     SELECT
       marketo_lead_id,
-      email                                                                             AS email_address,
-      first_name,
-      last_name,
-      IFF(company_name = '[[unknown]]', NULL, company_name)                             AS company_name,
-      job_title,
-      it_job_title_hierarchy,
-      country,
-      mobile_phone,
-      is_lead_inactive,
-      is_contact_inactive,
-      IFF(sales_segmentation = 'Unknown', NULL, sales_segmentation)                     AS sales_segmentation,
-      is_email_bounced                                                                  AS is_marketo_email_bounced,
-      email_bounced_date                                                                AS marketo_email_bounced_date,
-      is_unsubscribed                                                                   AS is_marketo_unsubscribed,
-      compliance_segment_value                                                          AS marketo_compliance_segment_value,
-      is_pql_marketo,
-      is_paid_tier_marketo,
-      is_ptpt_contact_marketo,
-      (ROW_NUMBER() OVER (PARTITION BY email ORDER BY updated_at DESC))                 AS record_number
+      email                                                                                                                 AS email_address,
+      first_name                                                                                                            AS first_name,
+      last_name                                                                                                             AS last_name,
+      IFF(company_name = '[[unknown]]', NULL, company_name)                                                                 AS company_name,
+      job_title                                                                                                             AS job_title,
+      it_job_title_hierarchy                                                                                                AS it_job_title_hierarchy,
+      country                                                                                                               AS country,
+      mobile_phone                                                                                                          AS mobile_phone,
+      is_lead_inactive                                                                                                      AS is_lead_inactive,
+      is_contact_inactive                                                                                                   AS is_contact_inactive,
+      IFF(sales_segmentation = 'Unknown', NULL, sales_segmentation)                                                         AS sales_segmentation,
+      is_email_bounced                                                                                                      AS is_marketo_email_bounced,
+      email_bounced_date                                                                                                    AS marketo_email_bounced_date,
+      is_unsubscribed                                                                                                       AS is_marketo_unsubscribed,
+      compliance_segment_value                                                                                              AS marketo_compliance_segment_value,
+      is_pql_marketo                                                                                                        AS is_pql_marketo,
+      is_paid_tier_marketo                                                                                                  AS is_paid_tier_marketo,
+      is_ptpt_contact_marketo                                                                                               AS is_ptpt_contact_marketo,
+      (ROW_NUMBER() OVER (PARTITION BY email ORDER BY updated_at DESC))                                                     AS record_number
 
     FROM marketo
     WHERE email IS NOT NULL
@@ -253,8 +251,6 @@ WITH sfdc_lead AS (
         ELSE gitlab_dotcom.it_job_title_hierarchy
       END                                                                                                                AS it_job_title_hierarchy,
       COALESCE(zuora.country, marketo_lead.country, sfdc.country, customer_db.country)                                   AS country,
-      sfdc.parent_crm_account_sales_segment                                                                              AS sfdc_parent_sales_segment,
-      COALESCE(sfdc.parent_crm_account_tsp_region, sfdc.tsp_region, sfdc.crm_person_region)                              AS sfdc_parent_crm_account_tsp_region,
       IFF(marketo_lead.email_address IS NOT NULL, TRUE, FALSE)                                                           AS is_marketo_lead,
       COALESCE(marketo_lead.is_marketo_email_bounced, FALSE)                                                             AS is_marketo_email_hard_bounced,
       marketo_lead.marketo_email_bounced_date                                                                            AS marketo_email_hard_bounced_date,
