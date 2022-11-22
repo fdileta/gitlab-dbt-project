@@ -11,40 +11,14 @@
 }}
 {{ 
     simple_cte([
-    ('prep_snowplow_structured_event_all_source', 'prep_snowplow_structured_event_all_source')
+    ('prep_snowplow_structured_event_all_source', 'prep_snowplow_structured_event_all_source'),
+    ('dim_behavior_website_page', 'dim_behavior_website_page'),
+    ('dim_behavior_browser', 'dim_behavior_browser'),
+    ('dim_behavior_operating_system', 'dim_behavior_operating_system')
     ])
 }}
 
-, dim_behavior_website_page AS (
-
-    SELECT 
-      dim_behavior_website_page.dim_behavior_website_page_sk,
-      dim_behavior_website_page.clean_url_path,
-      dim_behavior_website_page.page_url_host,
-      dim_behavior_website_page.app_id,
-      dim_behavior_website_page.page_url,
-      dim_behavior_website_page.page_url_path
-    FROM {{ ref('dim_behavior_website_page') }}
-
-), dim_behavior_browser AS (
-
-    SELECT 
-      dim_behavior_browser.dim_behavior_browser_sk,
-      dim_behavior_browser.browser_name,
-      dim_behavior_browser.browser_major_version,
-      dim_behavior_browser.browser_minor_version,
-      dim_behavior_browser.browser_language
-    FROM {{ ref('dim_behavior_browser') }}
-
-), dim_behavior_operating_system AS (
-
-    SELECT 
-      dim_behavior_operating_system.dim_behavior_operating_system_sk,
-      dim_behavior_operating_system.os_name,
-      dim_behavior_operating_system.os_timezone
-    FROM {{ ref('dim_behavior_operating_system') }}
-
-), dim_behavior_event AS (
+, dim_behavior_event AS (
 
     SELECT
       dim_behavior_event_sk,
