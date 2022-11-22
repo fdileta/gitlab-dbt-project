@@ -35,7 +35,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
             target_name = model
             option = "INCLUDE_QUERY_ID"
         else:
-            target_name = f"{timestamp}.csv"
+            target_name = f"{model}/{inc_end}.csv"
             option = "SINGLE"
 
         copy_command_tmp = """
