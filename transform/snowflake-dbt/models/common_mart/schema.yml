@@ -335,11 +335,11 @@ models:
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
-      description: '{{ doc("stage_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("stage_name") }}'
     - name: section_name
-      description: '{{ doc("section_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("section_name") }}'
     - name: group_name
-      description: '{{ doc("group_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("group_name") }}'
     - name: is_smau
       description: '{{ doc("is_smau") }}'
     - name: is_gmau
@@ -566,11 +566,11 @@ models:
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
-      description: '{{ doc("stage_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("stage_name") }}'
     - name: section_name
-      description: '{{ doc("section_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("section_name") }}'
     - name: group_name
-      description: '{{ doc("group_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("group_name") }}'
     - name: is_smau
       description: '{{ doc("is_smau") }}'
     - name: is_gmau
@@ -691,11 +691,11 @@ models:
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
-      description: '{{ doc("stage_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("stage_name") }}'
     - name: section_name
-      description: '{{ doc("section_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("section_name") }}'
     - name: group_name
-      description: '{{ doc("group_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("group_name") }}'
     - name: is_smau
       description: '{{ doc("is_smau") }}'
     - name: is_gmau
@@ -820,11 +820,11 @@ models:
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
-      description: '{{ doc("stage_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("stage_name") }}'
     - name: section_name
-      description: '{{ doc("section_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("section_name") }}'
     - name: group_name
-      description: '{{ doc("group_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("group_name") }}'
     - name: is_smau
       description: '{{ doc("is_smau") }}'
     - name: is_gmau
@@ -945,11 +945,11 @@ models:
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
-      description: '{{ doc("stage_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("stage_name") }}'
     - name: section_name
-      description: '{{ doc("section_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("section_name") }}'
     - name: group_name
-      description: '{{ doc("group_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("group_name") }}'
     - name: is_smau
       description: '{{ doc("is_smau") }}'
     - name: is_gmau
@@ -1070,11 +1070,11 @@ models:
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
-      description: '{{ doc("stage_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("stage_name") }}'
     - name: section_name
-      description: '{{ doc("section_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("section_name") }}'
     - name: group_name
-      description: '{{ doc("group_name") }}' responsible for the metric, as defined in the metric definition YAML file
+      description: '{{ doc("group_name") }}'
     - name: is_smau
       description: '{{ doc("is_smau") }}'
     - name: is_gmau

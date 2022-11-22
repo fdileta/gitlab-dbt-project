@@ -102,7 +102,7 @@ The name tied to the event
 
 {% docs stage_name %}
 
-The name of the product stage (ex. secure, plan, create, etc)
+The name of the product stage (ex. secure, plan, create, etc) associated with the event (gitlab.com db data) or metric (Service Ping data). For Service Ping metrics, this is defined in the metric definition YAML file.
 
 {% enddocs %}
 
@@ -580,7 +580,7 @@ Comma-separated list of collected data categories corresponding to the installat
 
 {% enddocs %}
 
-{% docs ping_created_date_month %}
+{% docs ping_created_date_week %}
 
 The first day of the calendar week when the ping was created
 
