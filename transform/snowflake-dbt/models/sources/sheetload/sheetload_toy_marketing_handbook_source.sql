@@ -5,7 +5,7 @@ WITH source AS (
     job,
     marital,
     education,
-    default,
+    "DEFAULT" AS is_default,
     balance::int AS balance,
     housing,
     loan,
