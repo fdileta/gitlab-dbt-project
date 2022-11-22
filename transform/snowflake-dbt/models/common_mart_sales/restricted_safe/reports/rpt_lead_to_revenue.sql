@@ -160,6 +160,7 @@
     SELECT DISTINCT
       person_base.email_hash,
       person_base.email_domain_type,
+      person_base.is_valuable_signup,
       person_base.true_inquiry_date,
       person_base.mql_date_lastest_pt,
       person_base.status,
@@ -188,6 +189,7 @@
       person_base.worked_date,
       person_base.worked_date_pt,
       person_base.email_domain,
+      person_base.is_valuable_signup,
       person_base.was_converted_lead,
       person_base.source_buckets,
       person_base.crm_partner_id,
@@ -386,6 +388,7 @@
     cohort_base.lead_source,    
     cohort_base.status AS crm_person_status,
     cohort_base.email_domain_type,
+    cohort_base.is_valuable_signup,
     cohort_base.is_mql,
     cohort_base.account_demographics_sales_segment,
     cohort_base.account_demographics_geo,
@@ -417,6 +420,7 @@
     cohort_base.worked_date,
     cohort_base.worked_date_pt,
     cohort_base.email_domain,
+    cohort_base.is_valuable_signup,
     cohort_base.was_converted_lead,
     cohort_base.source_buckets,
     cohort_base.crm_partner_id,
@@ -637,7 +641,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@rkohnke",
-    updated_by="@rkohnke",
+    updated_by="@degan",
     created_date="2022-07-20",
-    updated_date="2022-11-09",
+    updated_date="2022-11-22",
   ) }}
