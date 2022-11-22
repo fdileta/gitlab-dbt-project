@@ -61,7 +61,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
         return copy_command
 
 
-def copy_data(model, sensitive, timestamp, inc_start, inc_end, stage):
+def copy_data(model, sensitive, timestamp, inc_start, inc_end, stage, single):
     """
     run copy command to copy data from snowflake
     """
@@ -73,7 +73,7 @@ def copy_data(model, sensitive, timestamp, inc_start, inc_end, stage):
     try:
         connection = engine.connect()
         copy_command = get_copy_command(
-            model, sensitive, timestamp, inc_start, inc_end, stage
+            model, sensitive, timestamp, inc_start, inc_end, stage, single
         )
         logging.info(f"running copy command {copy_command}")
         connection.execute(copy_command).fetchone()
