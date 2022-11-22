@@ -312,7 +312,7 @@ The value associated with the metric path. In most models, metrics with a value 
 
 {% docs monthly_metric_value %}
 
-For 28 day metrics, this is the metric value that comes directly from the Service Ping. For all-time metrics, this is the monthly metric value that is computed using the monthly_all_time_metric_calc macro. The macro calculates an installation-level MoM difference in metric value, attempting to create a monthly version of an all-time counter.
+For 28 day metrics, this is the metric value that comes directly from the ping payload. For all-time metrics, this is a calculation using the monthly_all_time_metric_calc macro. The macro calculates an installation-level MoM difference in metric value, attempting to create a monthly version of an all-time counter.
 
 {% enddocs %}
 

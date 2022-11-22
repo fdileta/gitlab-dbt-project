@@ -763,7 +763,7 @@ models:
     - name: ping_instance_metric_id
       tests:
         - not_null
-        #- unique
+        - unique
       description: The unique composite ID for the mart_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
     - name: dim_ping_date_id
       description: '{{ doc("dim_ping_date_id") }}'
@@ -888,7 +888,7 @@ models:
     - name: ping_instance_metric_id
       tests:
         - not_null
-        #- unique
+        - unique
       description: The unique composite ID for the mart_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
     - name: dim_ping_date_id
       description: '{{ doc("dim_ping_date_id") }}'
@@ -1013,7 +1013,7 @@ models:
     - name: ping_instance_metric_id
       tests:
         - not_null
-        #- unique
+        - unique
       description: The unique composite ID for the mart_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
     - name: dim_ping_date_id
       description: '{{ doc("dim_ping_date_id") }}'
