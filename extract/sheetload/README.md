@@ -12,6 +12,9 @@ Loading a Google Sheet:
   - Share the sheet with the required service account - [Email Address to share with](https://docs.google.com/document/d/1m8kky3DPv2yvH63W4NDYFURrhUwRiMKHI-himxn1r7k/edit?usp=sharing) (GitLab Internal)
 	  - As of 11/22/2022, the service account is automatically granted access, so you just need to double-check
   - Save the file in either the [Sheetload or Boneyard folders](https://drive.google.com/open?id=1F5jKClNEsQstngbrh3UYVzoHAqPTf-l0). 
+	  - Use `Sheetload` folder if  the data needs to be modeled downstream and/or regularly loaded.
+	  - Use `Boneyard` folder for direct ad-hoc accesss, more info in [handbook](https://about.gitlab.com/handbook/business-technology/data-team/platform/pipelines/#boneyard).
+  - Naming conventions
 	  - The filename should start with either `sheetload.<remaining_file_name>` or `boneyard.<remaining_file_name>`, i.e 'sheetload.data_certifications'
 		  - Note: the file will be located and loaded based on its name. Sheets will be either uploaded `raw.sheetload` schema or `analytics.boneyard`.
 	  - Name the tab however you'd like
