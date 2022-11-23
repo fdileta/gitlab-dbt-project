@@ -189,6 +189,7 @@ setup_dbt:
       paths:
         - $CI_PROJECT_DIR/transform/snowflake-dbt/dbt_packages/*
       expire_in: 1 week
+      untracked: true
 
 test_artifacts:
   <<: *snowflake_dbt_jobs
