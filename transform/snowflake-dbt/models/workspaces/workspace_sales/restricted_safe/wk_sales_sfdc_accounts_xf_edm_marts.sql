@@ -42,7 +42,7 @@ SELECT
     mart.crm_account_type                                    AS account_type,
     mart.crm_account_industry                                AS industry,
     mart.crm_account_sub_industry                            AS sub_industry,
-    mart.parent_crm_account_industry_hierarchy,
+    mart.parent_crm_account_industry,
     mart.account_tier,
     mart.customer_since_date,
     mart.carr_this_account,
@@ -144,7 +144,6 @@ SELECT
     mart.last_activity_date,
     mart.dbt_updated_at                                             AS _last_dbt_run,
     mart.technical_account_manager,
-    mart.parent_crm_account_name                                    AS ultimate_parent_account_name,
 
     sfdc_record_type.record_type_name,
     sfdc_record_type.business_process_id,
