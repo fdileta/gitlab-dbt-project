@@ -21,7 +21,7 @@ WITH events AS (
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
-      uploaded_at
+      derived_tstamp
     FROM events
     WHERE page_urlpath IS NOT NULL
 
@@ -37,7 +37,7 @@ WITH events AS (
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
-      uploaded_at
+      derived_tstamp
     FROM events
     WHERE refr_urlpath IS NOT NULL
 
@@ -221,12 +221,12 @@ WITH events AS (
          THEN 1
        ELSE 0
       END AS is_url_interacting_with_security,
-      min(uploaded_at)                                                              AS min_event_timestamp,
-      max(uploaded_at)                                                              AS max_event_timestamp
+      MIN(derived_tstamp)                                                              AS min_event_timestamp,
+      MAX(derived_tstamp)                                                              AS max_event_timestamp
     FROM page
     {% if is_incremental() %}
 
-    WHERE uploaded_at > (SELECT max(max_event_timestamp) FROM {{ this }})
+    WHERE derived_tstamp > (SELECT max(max_event_timestamp) FROM {{ this }})
 
     {% endif %}
     {{ dbt_utils.group_by(n=14) }}
