@@ -235,7 +235,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_number_of_developers                                                              AS crm_account_zoom_info_number_of_developers,
       sfdc_account.zoom_info_total_funding                                                                     AS crm_account_zoom_info_total_funding,
       sfdc_account.forbes_2000_rank                                                                            AS forbes_2000_rank,
-      sfdc_account.parent_account_industry_hierarchy                                                           AS parent_account_industry_hierarchy,
+      sfdc_account.parent_account_industry_hierarchy                                                           AS parent_crm_account_industry,
       sfdc_account.sales_development_rep                                                                       AS sales_development_rep,
 	  sfdc_account.admin_manual_source_number_of_employees                                                     AS admin_manual_source_number_of_employees, 
       sfdc_account.admin_manual_source_account_address                                                         AS admin_manual_source_account_address,      
