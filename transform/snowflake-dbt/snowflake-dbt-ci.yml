@@ -195,7 +195,7 @@ setup_dbt:
 test_artifacts:
   <<: *snowflake_dbt_jobs
   script:
-    - ls $CI_PROJECT_DIR/transform/snowflake-dbt/dbt_packages
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models +dim_subscription || FAILED=true
   dependencies:
     - setup_dbt
 
