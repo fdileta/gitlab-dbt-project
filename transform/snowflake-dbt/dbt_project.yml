@@ -221,7 +221,7 @@ models:
         +materialized: table
         +schema: google_analytics_360
 
-       google_search_console:
+      google_search_console:
         +materialized: table
         +schema: google_search_console 
 
