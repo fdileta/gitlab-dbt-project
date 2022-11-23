@@ -194,24 +194,6 @@ Account Name coming from SFDC
 
 {% enddocs %}
 
-{% docs parent_crm_account_name%}
-
-Ultimate Parent Account Name coming from SFDC
-
-{% enddocs %}
-
-{% docs parent_crm_account_billing_country%}
-
-Billing Country of the Ultimate Parent from SFDC
-
-{% enddocs %}
-
-{% docs parent_crm_account_sales_segment%}
-
-Segment of the Ultimate Parent Account from SFDC. Sales Segments are explained here: https://about.gitlab.com/handbook/sales/field-operations/gtm-resources/#segmentation
-
-{% enddocs %}
-
 {% docs technical_account_manager %}
 
 Name of the Technical Account Manager of the subscription
@@ -221,18 +203,6 @@ Name of the Technical Account Manager of the subscription
 {% docs parent_crm_account_industry%}
 
 Industry of the Ultimate Parent Account from SFDC
-
-{% enddocs %}
-
-{% docs parent_crm_account_owner_team%}
-
-Owner Team of the Ultimate Parent Account from SFDC
-
-{% enddocs %}
-
-{% docs parent_crm_account_sales_territory%}
-
-Territory of the Ultimate Parent Account from SFDC
 
 {% enddocs %}
 

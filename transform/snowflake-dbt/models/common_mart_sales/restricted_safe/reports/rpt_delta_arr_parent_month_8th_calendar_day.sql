@@ -32,7 +32,6 @@ WITH dim_product_detail AS (
       rpt_arr_snapshot.arr_month,
       rpt_arr_snapshot.fiscal_quarter_name_fy,
       rpt_arr_snapshot.fiscal_year,
-      COALESCE(dim_crm_account.parent_crm_account_name, dim_crm_account_snapshot.parent_crm_account_name) AS parent_crm_account_name,
       COALESCE(dim_crm_account.dim_parent_crm_account_id, dim_crm_account_snapshot.dim_parent_crm_account_id) AS dim_parent_crm_account_id,
       rpt_arr_snapshot.product_tier_name AS product_category,
       rpt_arr_snapshot.product_delivery_type AS delivery,
@@ -56,7 +55,6 @@ WITH dim_product_detail AS (
 ), max_min_month AS (
 
     SELECT
-      parent_crm_account_name,
       dim_parent_crm_account_id,
       MIN(arr_month)                      AS date_month_start,
       --add 1 month to generate churn month
@@ -67,7 +65,6 @@ WITH dim_product_detail AS (
 ), base AS (
 
     SELECT
-      parent_crm_account_name,
       dim_parent_crm_account_id,
       dim_date.date_actual         AS arr_month,
       dim_date.fiscal_quarter_name_fy,
@@ -84,7 +81,6 @@ WITH dim_product_detail AS (
 
     SELECT
       base.arr_month,
-      base.parent_crm_account_name,
       base.dim_parent_crm_account_id,
       ARRAY_AGG(DISTINCT product_category) WITHIN GROUP (ORDER BY product_category ASC)      AS product_category,
       ARRAY_AGG(DISTINCT delivery) WITHIN GROUP (ORDER BY delivery ASC)                      AS delivery,
@@ -173,7 +169,6 @@ WITH dim_product_detail AS (
       {{ dbt_utils.surrogate_key(['type_of_arr_change.arr_month', 'type_of_arr_change.dim_parent_crm_account_id']) }}
                                                                     AS primary_key,
       type_of_arr_change.arr_month,
-      type_of_arr_change.parent_crm_account_name,
       type_of_arr_change.dim_parent_crm_account_id,
       type_of_arr_change.product_category,
       type_of_arr_change.previous_product_category                  AS previous_month_product_category,

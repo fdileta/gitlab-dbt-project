@@ -30,11 +30,7 @@
       dim_crm_account.crm_account_name,
       dim_crm_account.crm_account_billing_country,
       dim_crm_account.dim_parent_crm_account_id,
-      dim_crm_account.parent_crm_account_sales_segment,
-      dim_crm_account.parent_crm_account_billing_country,
       dim_crm_account.parent_crm_account_industry,
-      dim_crm_account.parent_crm_account_owner_team,
-      dim_crm_account.parent_crm_account_sales_territory,
       dim_date.date_actual,
       dim_date.first_day_of_month,
       dim_date.fiscal_quarter_name_fy,
@@ -84,11 +80,7 @@
       crm_account_name,
       crm_account_billing_country,
       dim_parent_crm_account_id,
-      parent_crm_account_billing_country,
       parent_crm_account_industry,
-      parent_crm_account_owner_team,
-      parent_crm_account_sales_segment,
-      parent_crm_account_sales_territory,
 
       -- product info
       license_md5,

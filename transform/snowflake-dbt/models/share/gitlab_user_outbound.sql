@@ -77,7 +77,6 @@ WITH namespaces AS (
       ELSE 0 
     END                                                                                              AS internal_value2,
     dim_crm_account.crm_account_name                                                                 AS company_name, 
-    dim_crm_account.parent_crm_account_name                                                          AS parent_company_name,
     CASE 
       WHEN email_id IS NULL 
       THEN 'missing' 
