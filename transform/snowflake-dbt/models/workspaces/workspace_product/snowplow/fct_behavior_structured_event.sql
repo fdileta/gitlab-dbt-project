@@ -61,6 +61,8 @@
 
     SELECT 
       prep_snowplow_structured_event_all_source.*,
+      'struct'                                                                    AS event,
+      'event'                                                                     AS event_name,
       {{ clean_url('prep_snowplow_structured_event_all_source.page_url_path') }}  AS clean_url_path
     FROM prep_snowplow_structured_event_all_source
     WHERE derived_tstamp > DATEADD(MONTH, -25, CURRENT_DATE)
@@ -78,7 +80,7 @@
       dim_behavior_operating_system.dim_behavior_operating_system_sk,
       structured_events_w_clean_url.gsc_namespace_id AS dim_namespace_id,
       structured_events_w_clean_url.gsc_project_id AS dim_project_id,
-      dim_behavior_event.dim_behavior_event_sk,
+      {{ dbt_utils.surrogate_key(['event', 'event_name', 'platform', 'environment', 'event_category', 'event_action', 'event_label', 'event_property']) }} AS dim_behavior_event_sk,
 
       -- Time Attributes
       structured_events_w_clean_url.dvce_created_tstamp,
@@ -118,12 +120,6 @@
     LEFT JOIN dim_behavior_operating_system
       ON structured_events_w_clean_url.os_name = dim_behavior_operating_system.os_name
         AND structured_events_w_clean_url.os_timezone = dim_behavior_operating_system.os_timezone
-    LEFT JOIN dim_behavior_event
-      ON structured_events_w_clean_url.event_action = dim_behavior_event.event_action
-        AND structured_events_w_clean_url.event_category = dim_behavior_event.event_category
-        AND structured_events_w_clean_url.event_label = dim_behavior_event.event_label
-        AND structured_events_w_clean_url.event_property = dim_behavior_event.event_property
-        AND structured_events_w_clean_url.gsc_environment = dim_behavior_event.environment
     WHERE DATE_TRUNC(MONTH, behavior_at) >= DATEADD(MONTH, -24, DATE_TRUNC(MONTH, CURRENT_DATE))
     {% if is_incremental() %}
       AND behavior_at >= (SELECT MAX(behavior_at) FROM {{ this }})
