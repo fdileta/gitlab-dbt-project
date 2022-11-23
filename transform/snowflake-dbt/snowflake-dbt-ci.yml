@@ -181,6 +181,7 @@
 
 setup_dbt:
   <<: *snowflake_dbt_jobs
+  stage: ⚙️ dbt Build
   script:
   - *deps_and_seed
   - echo "Complete"
@@ -193,20 +194,10 @@ setup_dbt:
 
 test_artifacts:
   <<: *snowflake_dbt_jobs
-  stage: ⚙️ dbt Build
   script:
     - ls $CI_PROJECT_DIR/transform/snowflake-dbt/dbt_packages
   dependencies:
     - setup_dbt
-
-test_artifacts_2:
-  <<: *snowflake_dbt_jobs
-  stage: ⚙️ dbt Build
-  script:
-    - ls $CI_PROJECT_DIR/transform/snowflake-dbt
-  dependencies:
-    - setup_dbt
-
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
