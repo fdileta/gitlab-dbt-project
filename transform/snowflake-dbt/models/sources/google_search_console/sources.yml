@@ -14,4 +14,4 @@ sources:
      identifier: false
  
    tables:
-     - name: keyword_page_report
+     - name: KEYWORD_PAGE_REPORT
