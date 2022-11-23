@@ -300,7 +300,7 @@ The ID of the Service Ping creation date, easily joined to `dim_date`
 
 {% docs metrics_path  %}
 
-The unique JSON key path of identifier of the metric in the Service Ping payload. This appears as `key_path` in the metric definition YAML files
+The unique JSON key path of the identifier of the metric in the Service Ping payload. This appears as `key_path` in the metric definition YAML files
 
 {% enddocs %}
 
@@ -330,7 +330,7 @@ The unique identifier of the ping. This appears as `id` in the ping payload.
 
 {% docs dim_instance_id %}
 
-The identifier of the instance, easily joined to `dim_installation`. This id is store in the database of the installation and appears as `uuid` in the ping payload.
+The identifier of the instance, easily joined to `dim_installation`. This id is stored in the database of the installation and appears as `uuid` in the ping payload.
 
 {% enddocs %}
 
@@ -552,7 +552,7 @@ The sales territory of the ultimate parent account from SFDC
 
 {% docs technical_account_manager %}
 
-The name of the technical account manager of the subscription
+The name of the technical account manager of the CRM account
 
 {% enddocs %}
 
