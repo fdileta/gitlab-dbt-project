@@ -24,6 +24,18 @@ WITH final AS (
 
       ----ultimate parent crm account info
       prep_crm_account.parent_crm_account_industry,
+      prep_crm_account.parent_crm_account_demographics_sales_segment,
+      prep_crm_account.parent_crm_account_demographics_geo,
+      prep_crm_account.parent_crm_account_demographics_region,
+      prep_crm_account.parent_crm_account_demographics_area,
+      prep_crm_account.parent_crm_account_demographics_territory,
+      prep_crm_account.parent_crm_account_demographics_max_family_employee,
+      prep_crm_account.parent_crm_account_demographics_upa_country,
+      prep_crm_account.parent_crm_account_demographics_upa_state,
+      prep_crm_account.parent_crm_account_demographics_upa_city,
+      prep_crm_account.parent_crm_account_demographics_upa_street,
+      prep_crm_account.parent_crm_account_demographics_upa_postal_code,
+
 
       --descriptive attributes
       prep_crm_account.crm_account_name,
