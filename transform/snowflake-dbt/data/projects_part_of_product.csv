@@ -1,4 +1,4 @@
-project_path,project_id, owner
+project_path,project_id,owner
 gitlab-org/build/CNG,4359271
 gitlab-org/charts/auto-deploy-app,11915984
 gitlab-org/charts/deploy-image-helm-base,7453181
@@ -280,7 +280,7 @@ gitlab-org/ruby/gems/tanuki_emoji,27628435
 gitlab-org/opstrace/opstrace,32149347
 gitlab-org/opstrace/opstrace-ui,32189602
 gitlab-org/analytics-section/product-intelligence/snowplow-pseudonymization,28496898
-gitlab-org/analytics-section/product-intelligence/metric-dictionary,27919014, @timzallmann
+gitlab-org/analytics-section/product-intelligence/metric-dictionary,27919014,@timzallmann
 gitlab-org/modelops/applied-ml/review-recommender/recommendation-engine,31203840
 gitlab-org/modelops/applied-ml/review-recommender/recommender-bot-service,32318686
 gitlab-org/modelops/applied-ml/review-recommender/gcp-postgres,32823351
@@ -288,5 +288,5 @@ gitlab-org/modelops/applied-ml/review-recommender/extracteur,31202357
 gitlab-org/modelops/applied-ml/review-recommender/etl,31202862
 gitlab-org/modelops/applied-ml/review-recommender/recommender-ci,31203942
 gitlab-org/modelops/anti-abuse/pipeline-validation-service,24631368
-gitlab-org/gitlab-web-ide,35104827, @oregand
+gitlab-org/gitlab-web-ide,35104827,@oregand
 gitlab-org/terraform-provider-gitlab,40916776
