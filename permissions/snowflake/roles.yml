@@ -475,6 +475,7 @@ roles:
             - gitlab_data_yaml
             - google_ads
             - google_analytics_360
+            - google_search_console
             - netsuite
             - mailgun
             - marketo
@@ -1769,6 +1770,21 @@ roles:
                 read:
                     - prep.google_analytics_360.*
                     - raw.google_analytics_360_fivetran.*
+
+    - google_search_console:
+        privileges:
+            databases:
+                read:
+                    - prep
+                    - raw
+            schemas:
+                read:
+                    - prep.google_search_console
+                    - raw.google_search_console
+            tables:
+                read:
+                    - prep.google_search_console.*
+                    - raw.google_search_console.* 
 
     - grafana:
         warehouses:
