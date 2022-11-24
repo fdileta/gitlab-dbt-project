@@ -624,6 +624,7 @@
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page_raw,
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_salesforce_campaign,
+	rpt_sfdc_bizible_tp_opp_linear_blended.campaign_rep_role_name,
     rpt_sfdc_bizible_tp_opp_linear_blended.touchpoint_segment,
     rpt_sfdc_bizible_tp_opp_linear_blended.pipe_name
   FROM cohort_base
@@ -651,5 +652,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-07-20",
-    updated_date="2022-11-21",
+    updated_date="2022-11-24",
   ) }}

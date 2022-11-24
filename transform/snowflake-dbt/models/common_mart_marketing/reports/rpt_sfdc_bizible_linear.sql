@@ -60,6 +60,7 @@
       mart_crm_attribution_touchpoint.bizible_landing_page,
       mart_crm_attribution_touchpoint.bizible_referrer_page,
       mart_crm_attribution_touchpoint.bizible_marketing_channel,
+	  mart_crm_attribution_touchpoint.campaign_rep_role_name,
       CASE
         WHEN mart_crm_attribution_touchpoint.dim_parent_campaign_id = '7014M000001dn8MQAQ' THEN 'Paid Social.LinkedIn Lead Gen'
         WHEN mart_crm_attribution_touchpoint.bizible_ad_campaign_name = '20201013_ActualTechMedia_DeepMonitoringCI' THEN 'Sponsorship'
@@ -109,7 +110,7 @@
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id =      campaigns_per_opp.dim_crm_opportunity_id
     LEFT JOIN mart_crm_opportunity ON
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id = mart_crm_opportunity.dim_crm_opportunity_id
-    {{ dbt_utils.group_by(n=55) }}
+    {{ dbt_utils.group_by(n=56) }}
 
 )
 
@@ -118,5 +119,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-01-25",
-    updated_date="2022-11-04"
+    updated_date="2022-11-24"
 ) }}

@@ -98,6 +98,7 @@
       mart_crm_touchpoint.bizible_form_url_raw,
       mart_crm_touchpoint.bizible_landing_page_raw,
       mart_crm_touchpoint.bizible_referrer_page_raw,
+	  mart_crm_touchpoint.campaign_rep_role_name,
       mart_crm_touchpoint.inquiry_date,
       rpt_crm_person_with_opp.true_inquiry_date,
       mart_crm_touchpoint.mql_date_first,
@@ -163,7 +164,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@rkohnke",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2022-01-25",
-    updated_date="2022-10-11"
+    updated_date="2022-11-24"
 ) }}
