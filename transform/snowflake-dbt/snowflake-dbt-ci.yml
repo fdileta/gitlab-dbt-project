@@ -1,5 +1,5 @@
 .snowflake_dbt_jobs: &snowflake_dbt_jobs
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.14
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:ci_dbt_image
   stage: ⚙️ dbt Run
   before_script:
     - cd transform/snowflake-dbt/
@@ -202,12 +202,13 @@ test_artifacts:
 artifact_download:
   <<: *snowflake_dbt_jobs
   script:
-    - apt-get install -y zip unzip
+    - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD
+    - apt install p7zip-full -y
     - 'curl --location --output artifacts.zip --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/main/download?job=setup_dbt"'
+    - 7z x artifacts.zip
     - ls
     - unzip ./artifacts.zip -d /artifacts
     - ls
-    - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD
 
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
