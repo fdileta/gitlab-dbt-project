@@ -178,7 +178,6 @@
       dim_crm_account.crm_account_focus_account,
       dim_crm_account.crm_account_zi_technologies,
       dim_crm_account.is_jihu_account,
-      dim_crm_account.fy22_new_logo_target_list,
 
       -- Flags
       fct_crm_opportunity.is_won,

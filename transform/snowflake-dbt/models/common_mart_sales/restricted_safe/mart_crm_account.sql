@@ -99,7 +99,6 @@
       dim_crm_account.health_number,
       dim_crm_account.health_score_color,
       dim_crm_account.partner_account_iban_number,
-      dim_crm_account.fy22_new_logo_target_list,
       dim_crm_account.gitlab_com_user,
       dim_crm_account.crm_account_zi_technologies,
       dim_crm_account.crm_account_zoom_info_website,
