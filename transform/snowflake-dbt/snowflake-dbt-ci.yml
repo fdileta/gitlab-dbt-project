@@ -202,7 +202,7 @@ test_artifacts:
 artifact_download:
   <<: *snowflake_dbt_jobs
   script:
-    - sudo apt-get install -y zip unzip
+    - apt-get install -y zip unzip
     - 'curl --location --output artifacts.zip --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/main/download?job=setup_dbt"'
     - ls
     - unzip artifacts.zip
