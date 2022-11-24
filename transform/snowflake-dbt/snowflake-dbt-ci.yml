@@ -205,7 +205,7 @@ artifact_download:
     - apt-get install -y zip unzip
     - 'curl --location --output artifacts.zip --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/main/download?job=setup_dbt"'
     - ls
-    - unzip artifacts.zip
+    - unzip ./artifacts.zip -d /artifacts
     - ls
     - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD
 
