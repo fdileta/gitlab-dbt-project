@@ -94,19 +94,19 @@ WITH structured_event_renamed AS (
     SELECT
 
       -- Primary Key
-      structured_events_w_clean_url.event_id   AS behavior_structured_event_pk,
+      structured_events_w_clean_url.event_id                                                                                                                   AS behavior_structured_event_pk,
 
       -- Foreign Keys
       dim_behavior_website_page.dim_behavior_website_page_sk,
-      {{ dbt_utils.surrogate_key(['browser_name', 'browser_major_version', 'browser_minor_version', 'browser_language']) }} AS dim_behavior_browser_sk,
-      {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}                                                             AS dim_behavior_operating_system_sk,
-      structured_events_w_clean_url.gsc_namespace_id                                                                        AS dim_namespace_id,
-      structured_events_w_clean_url.gsc_project_id                                                                          AS dim_project_id,
+      {{ dbt_utils.surrogate_key(['browser_name', 'browser_major_version', 'browser_minor_version', 'browser_language']) }}                                    AS dim_behavior_browser_sk,
+      {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}                                                                                                AS dim_behavior_operating_system_sk,
+      structured_events_w_clean_url.gsc_namespace_id                                                                                                           AS dim_namespace_id,
+      structured_events_w_clean_url.gsc_project_id                                                                                                             AS dim_project_id,
       {{ dbt_utils.surrogate_key(['event', 'event_name', 'platform', 'gsc_environment', 'event_category', 'event_action', 'event_label', 'event_property']) }} AS dim_behavior_event_sk,
 
       -- Time Attributes
       structured_events_w_clean_url.dvce_created_tstamp,
-      structured_events_w_clean_url.derived_tstamp                                     AS behavior_at,
+      structured_events_w_clean_url.derived_tstamp                                                                                                             AS behavior_at,
 
       -- Degenerate Dimensions (Event Attributes)
       structured_events_w_clean_url.v_tracker,
