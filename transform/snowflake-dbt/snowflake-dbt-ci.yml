@@ -204,7 +204,7 @@ artifact_download:
   script:
     - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD
     - apt install p7zip-full -y
-    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/master/download?job=setup_dbt"'
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/main/download?job=setup_dbt"'
     - 7z x artifacts.zip
     - ls
     - unzip ./artifacts.zip -d /artifacts
