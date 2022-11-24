@@ -69,7 +69,6 @@ WITH date_details AS (
   -- has_tam__c
   -- PUBLIC_SECTOR_ACCOUNT__C,
   -- PUBSEC_TYPE__C,
-  -- POTENTIAL_ARR_LAM__C
   ), mart_crm_account AS (
 
     SELECT acc.*,

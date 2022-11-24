@@ -166,7 +166,6 @@
       fct_crm_account.count_active_ce_users,
       fct_crm_account.count_open_opportunities,
       fct_crm_account.count_using_ce,
-      fct_crm_account.potential_arr_lam,
       fct_crm_account.parent_crm_account_lam,
       fct_crm_account.parent_crm_account_lam_dev_count,
       fct_crm_account.carr_this_account,

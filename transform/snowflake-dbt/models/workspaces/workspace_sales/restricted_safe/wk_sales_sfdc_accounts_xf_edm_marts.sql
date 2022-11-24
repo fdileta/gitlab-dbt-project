@@ -56,7 +56,6 @@ SELECT
     mart.is_sdr_target_account,
     --lam
     mart.parent_crm_account_lam_dev_count                    AS lam_dev_count,
-    mart.potential_arr_lam,
     mart.is_jihu_account,
     mart.partners_signed_contract_date,
     mart.partner_account_iban_number,
