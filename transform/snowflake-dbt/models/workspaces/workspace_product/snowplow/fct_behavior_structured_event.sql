@@ -36,6 +36,7 @@ WITH structured_event_renamed AS (
       page_urlscheme::VARCHAR                   AS page_url_scheme,
       page_urlhost::VARCHAR                     AS page_url_host,
       page_urlpath::VARCHAR                     AS page_url_path,
+      {{ clean_url('page_url_path') }}          AS clean_url_path,
       page_urlfragment::VARCHAR                 AS page_url_fragment,
       mkt_medium::VARCHAR                       AS marketing_medium,
       mkt_source::VARCHAR                       AS marketing_source,
@@ -82,58 +83,51 @@ WITH structured_event_renamed AS (
       dim_behavior_website_page.app_id
     FROM {{ ref('dim_behavior_website_page') }}
 
-), structured_events_w_clean_url AS (
-
-    SELECT 
-      structured_event_renamed.*,
-      {{ clean_url('structured_event_renamed.page_url_path') }}  AS clean_url_path
-    FROM structured_event_renamed
-
 ), structured_events_w_dim AS (
 
     SELECT
 
       -- Primary Key
-      structured_events_w_clean_url.event_id                                                                                                                   AS behavior_structured_event_pk,
+      structured_event_renamed.event_id                                                                                                                   AS behavior_structured_event_pk,
 
       -- Foreign Keys
       dim_behavior_website_page.dim_behavior_website_page_sk,
       {{ dbt_utils.surrogate_key(['browser_name', 'browser_major_version', 'browser_minor_version', 'browser_language']) }}                                    AS dim_behavior_browser_sk,
       {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}                                                                                                AS dim_behavior_operating_system_sk,
-      structured_events_w_clean_url.gsc_namespace_id                                                                                                           AS dim_namespace_id,
-      structured_events_w_clean_url.gsc_project_id                                                                                                             AS dim_project_id,
+      structured_event_renamed.gsc_namespace_id                                                                                                           AS dim_namespace_id,
+      structured_event_renamed.gsc_project_id                                                                                                             AS dim_project_id,
       {{ dbt_utils.surrogate_key(['event', 'event_name', 'platform', 'gsc_environment', 'event_category', 'event_action', 'event_label', 'event_property']) }} AS dim_behavior_event_sk,
 
       -- Time Attributes
-      structured_events_w_clean_url.dvce_created_tstamp,
-      structured_events_w_clean_url.derived_tstamp                                                                                                             AS behavior_at,
+      structured_event_renamed.dvce_created_tstamp,
+      structured_event_renamed.derived_tstamp AS behavior_at,
 
       -- Degenerate Dimensions (Event Attributes)
-      structured_events_w_clean_url.v_tracker,
-      structured_events_w_clean_url.session_index,
-      structured_events_w_clean_url.app_id,
-      structured_events_w_clean_url.session_id,
-      structured_events_w_clean_url.user_snowplow_domain_id,
-      structured_events_w_clean_url.contexts,
-      structured_events_w_clean_url.page_url,
-      structured_events_w_clean_url.page_url_path,
-      structured_events_w_clean_url.page_url_scheme,
-      structured_events_w_clean_url.page_url_host,
-      structured_events_w_clean_url.page_url_fragment,
+      structured_event_renamed.v_tracker,
+      structured_event_renamed.session_index,
+      structured_event_renamed.app_id,
+      structured_event_renamed.session_id,
+      structured_event_renamed.user_snowplow_domain_id,
+      structured_event_renamed.contexts,
+      structured_event_renamed.page_url,
+      structured_event_renamed.page_url_path,
+      structured_event_renamed.page_url_scheme,
+      structured_event_renamed.page_url_host,
+      structured_event_renamed.page_url_fragment,
 
       -- Degenerate Dimensions (Gitlab Standard Context Attributes)
-      structured_events_w_clean_url.gsc_google_analytics_client_id,
-      structured_events_w_clean_url.gsc_pseudonymized_user_id,
-      structured_events_w_clean_url.gsc_environment,
-      structured_events_w_clean_url.gsc_extra,
-      structured_events_w_clean_url.gsc_plan,
-      structured_events_w_clean_url.gsc_source
+      structured_event_renamed.gsc_google_analytics_client_id,
+      structured_event_renamed.gsc_pseudonymized_user_id,
+      structured_event_renamed.gsc_environment,
+      structured_event_renamed.gsc_extra,
+      structured_event_renamed.gsc_plan,
+      structured_event_renamed.gsc_source
 
-    FROM structured_events_w_clean_url
+    FROM structured_event_renamed
     LEFT JOIN dim_behavior_website_page
-      ON structured_events_w_clean_url.clean_url_path = dim_behavior_website_page.clean_url_path
-        AND structured_events_w_clean_url.page_url_host = dim_behavior_website_page.page_url_host
-        AND structured_events_w_clean_url.app_id = dim_behavior_website_page.app_id
+      ON structured_event_renamed.clean_url_path = dim_behavior_website_page.clean_url_path
+        AND structured_event_renamed.page_url_host = dim_behavior_website_page.page_url_host
+        AND structured_event_renamed.app_id = dim_behavior_website_page.app_id
 
 )
 
@@ -142,5 +136,5 @@ WITH structured_event_renamed AS (
     created_by="@michellecooper",
     updated_by="@chrissharp",
     created_date="2022-09-01",
-    updated_date="2022-11-01"
+    updated_date="2022-11-24"
 ) }}
