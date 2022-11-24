@@ -199,6 +199,11 @@ test_artifacts:
   dependencies:
     - setup_dbt
 
+artifact_download:
+  <<: *snowflake_dbt_jobs
+  script:
+    - 'curl --location --output artifacts.zip --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.example.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/main/download?job=setup_dbt"'
+
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   variables:
