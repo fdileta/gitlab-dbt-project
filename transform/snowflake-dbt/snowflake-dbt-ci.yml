@@ -207,6 +207,7 @@ artifact_download:
     - ls
     - unzip artifacts.zip
     - ls
+    - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD
 
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
