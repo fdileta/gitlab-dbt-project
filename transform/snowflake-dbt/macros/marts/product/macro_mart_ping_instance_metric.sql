@@ -240,12 +240,7 @@
 
       -- account metadata
       crm_account_name,
-      parent_crm_account_name,
-      parent_crm_account_billing_country,
-      parent_crm_account_sales_segment,
       parent_crm_account_industry,
-      parent_crm_account_owner_team,
-      parent_crm_account_sales_territory,
       technical_account_manager,
 
       ping_created_at,
