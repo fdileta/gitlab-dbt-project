@@ -107,7 +107,7 @@
     LEFT JOIN linear_base ON
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id = linear_base.dim_crm_opportunity_id
     LEFT JOIN  campaigns_per_opp ON
-    mart_crm_attribution_touchpoint.dim_crm_opportunity_id =      campaigns_per_opp.dim_crm_opportunity_id
+    mart_crm_attribution_touchpoint.dim_crm_opportunity_id = campaigns_per_opp.dim_crm_opportunity_id
     LEFT JOIN mart_crm_opportunity ON
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id = mart_crm_opportunity.dim_crm_opportunity_id
     {{ dbt_utils.group_by(n=56) }}

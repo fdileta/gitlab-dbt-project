@@ -79,6 +79,7 @@
       mart_crm_touchpoint.lead_source,
       mart_crm_touchpoint.bizible_count_lead_creation_touch,
       mart_crm_touchpoint.campaign_name,
+	  mart_crm_touchpoint.dim_campaign_id,
       mart_crm_touchpoint.type AS campaign_type,
       CASE
         WHEN mart_crm_touchpoint.dim_campaign_id = '7014M000001dn8MQAQ' THEN 'Paid Social.LinkedIn Lead Gen'
