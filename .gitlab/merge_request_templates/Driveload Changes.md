@@ -82,7 +82,6 @@ Run the following CI Jobs on the MR:
 ## Final Steps
 * [ ]  Assign MR to project maintainer for review (iterate until model is complete).
 * [ ]  Data Team project maintainers/owners to merge in dbt models 
-* [ ]  Ensure the driveload process runs before the dbt model is created. This may require triggering the driveload airflow DAG manually. If not, the dbt model creation will fail.
 * [ ]  Trigger the driveload airflow DAG manually in case of a created/changed downstream dbt model or if the data needs to brought in urgently. 
 * [ ]  Submitter to query in Sisense for table: ``` SELECT * FROM [new-dbt-model-name] LIMIT 10 ```.
 
