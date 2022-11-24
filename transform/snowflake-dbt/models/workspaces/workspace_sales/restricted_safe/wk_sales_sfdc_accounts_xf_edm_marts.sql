@@ -32,7 +32,6 @@ SELECT
     mart.gitlab_com_user,
     mart.account_manager,
     mart.account_owner,
-    mart.crm_account_owner_team                              AS account_owner_team,
     mart.business_development_rep,
     mart.dedicated_service_engineer,
     --sales_development_rep,  --missing

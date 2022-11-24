@@ -40,7 +40,6 @@ WITH mart_user_request AS (
         crm_account_next_renewal_month,
         crm_account_health_score_color,
         technical_account_manager,
-        crm_account_owner_team,
         strategic_account_leader,
         customer_reach,
         crm_account_arr,
@@ -113,8 +112,6 @@ FROM mart_user_request
                                                                                              AS crm_account_health_score_color_array,
         ARRAY_AGG(DISTINCT technical_account_manager) WITHIN GROUP (ORDER BY technical_account_manager)
                                                                                              AS crm_account_tam_array,
-        ARRAY_AGG(DISTINCT crm_account_owner_team) WITHIN GROUP (ORDER BY crm_account_owner_team)
-                                                                                             AS crm_account_owner_team_array,
         ARRAY_AGG(DISTINCT strategic_account_leader) WITHIN GROUP (ORDER BY strategic_account_leader)
                                                                                              AS crm_account_strategic_account_leader_array,
 

@@ -42,7 +42,6 @@ WITH mart_user_request AS (
         crm_account_health_score_color,
         parent_crm_account_sales_segment,
         technical_account_manager,
-        crm_account_owner_team,
         strategic_account_leader,
         customer_reach,
         crm_account_arr,
