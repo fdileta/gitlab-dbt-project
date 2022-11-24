@@ -480,15 +480,6 @@ WITH date_details AS (
 
       sfdc_opportunity_xf.sales_qualified_source,
 
-      ------------------------------------------------------------------------------------------------------
-      ------------------------------------------------------------------------------------------------------
-
-      -- account driven fields
-      sfdc_accounts_xf.tsp_region,
-      sfdc_accounts_xf.tsp_sub_region,
-      sfdc_accounts_xf.ultimate_parent_sales_segment,
-      sfdc_accounts_xf.tsp_max_hierarchy_sales_segment,
-
       opportunity_owner.name                                     AS opportunity_owner,
       
       sfdc_accounts_xf.ultimate_parent_id, -- same is ultimate_parent_account_id?

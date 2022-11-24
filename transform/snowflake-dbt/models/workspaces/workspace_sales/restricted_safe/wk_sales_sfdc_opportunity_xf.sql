@@ -214,7 +214,6 @@ we can delete this connection and use the mart table directly.
 
       -- NF: why do we need these fields now?
       sfdc_opportunity_xf.division_sales_segment_stamped,
-      sfdc_opportunity_xf.tsp_max_hierarchy_sales_segment,
       sfdc_opportunity_xf.division_sales_segment,
       sfdc_opportunity_xf.ultimate_parent_sales_segment,
       sfdc_opportunity_xf.sales_segment,
