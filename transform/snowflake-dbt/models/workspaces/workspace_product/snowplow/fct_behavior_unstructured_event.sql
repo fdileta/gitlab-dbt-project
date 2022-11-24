@@ -8,11 +8,8 @@
 ) }}
 
 {{ simple_cte([
-    ('events', 'prep_snowplow_unstructured_events_all'),
-    ('dim_event', 'dim_behavior_event'),
+    ('events', 'prep_snowplow_unnested_events_all'),
     ('dim_page', 'dim_behavior_website_page'),
-    ('dim_behavior_browser', 'dim_behavior_browser'),
-    ('dim_behavior_operating_system', 'dim_behavior_operating_system')
     ])
 }}
 
@@ -21,12 +18,18 @@
     SELECT
       event_id,
       derived_tstamp                                    AS behavior_at,
-      event_name,
+      event                                             AS event,
+      event_name                                        AS event_name,
+      se_action                                         AS event_action,
+      se_category                                       AS event_category,
+      se_label                                          AS event_label,
+      se_property                                       AS event_property,
+      platform                                          AS platform,
       gsc_pseudonymized_user_id,
-      {{ clean_url('page_url_path') }}                  AS clean_url_path,
-      page_url_host,
+      {{ clean_url('page_urlpath') }}                   AS clean_url_path,
+      page_urlhost                                      AS page_url_host,
       app_id,
-      session_id,
+      domain_sessionid                                  AS session_id,
       lc_targeturl                                      AS link_click_target_url,
       sf_formid                                         AS submit_form_id,
       cf_formid                                         AS change_form_id,
@@ -34,14 +37,16 @@
       cf_elementid                                      AS change_form_element_id,
       ff_elementid                                      AS focus_form_element_id,
       ff_nodename                                       AS focus_form_node_name,
-      browser_name,
-      browser_major_version,
-      browser_minor_version,
-      browser_language,
+      br_family                                         AS browser_name,
+      br_name                                           AS browser_major_version,
+      br_version                                        AS browser_minor_version,
+      br_lang                                           AS browser_language,
       os_name,
-      os_timezone
+      os_timezone,
+      gsc_environment                                   AS environment
     FROM events
-    WHERE derived_tstamp >= DATEADD(MONTH, -25, CURRENT_DATE)
+    WHERE event = 'unstruct'
+    AND derived_tstamp >= DATEADD(MONTH, -25, CURRENT_DATE)
 
     {% if is_incremental() %}
 
@@ -63,10 +68,10 @@
       unstruct_event.session_id,
 
       -- Surrogate Keys
-      dim_event.dim_behavior_event_sk,
+      {{ dbt_utils.surrogate_key(['event', 'event_name', 'platform', 'environment', 'event_category', 'event_action', 'event_label', 'event_property']) }} AS dim_behavior_event_sk,
       dim_page.dim_behavior_website_page_sk,
-      dim_behavior_browser.dim_behavior_browser_sk,
-      dim_behavior_operating_system.dim_behavior_operating_system_sk,
+      {{ dbt_utils.surrogate_key(['browser_name', 'browser_major_version', 'browser_minor_version', 'browser_language']) }}                                AS dim_behavior_browser_sk,
+      {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}                                                                                            AS dim_behavior_operating_system_sk,
 
       --Time Attributes
       behavior_at,
@@ -83,20 +88,10 @@
       focus_form_element_id,
       focus_form_node_name
     FROM unstruct_event
-    INNER JOIN dim_event 
-      ON unstruct_event.event_name = dim_event.event_name
-    INNER JOIN dim_page 
+    LEFT JOIN dim_page 
       ON unstruct_event.clean_url_path = dim_page.clean_url_path 
         AND unstruct_event.page_url_host = dim_page.page_url_host
         AND unstruct_event.app_id = dim_page.app_id
-    LEFT JOIN dim_behavior_browser
-      ON unstruct_event.browser_name = dim_behavior_browser.browser_name
-        AND unstruct_event.browser_major_version = dim_behavior_browser.browser_major_version
-        AND unstruct_event.browser_minor_version = dim_behavior_browser.browser_minor_version
-        AND unstruct_event.browser_language = dim_behavior_browser.browser_language
-    LEFT JOIN dim_behavior_operating_system
-      ON unstruct_event.os_name = dim_behavior_operating_system.os_name
-        AND unstruct_event.os_timezone = dim_behavior_operating_system.os_timezone
       
 )
 
