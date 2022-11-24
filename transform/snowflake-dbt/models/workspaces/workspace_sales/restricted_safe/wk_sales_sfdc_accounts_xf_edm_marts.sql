@@ -29,7 +29,6 @@ SELECT
     mart.dim_crm_person_primary_contact_id                   AS primary_contact_id,
     mart.record_type_id,
     mart.partner_vat_tax_id,
-    mart.federal_account,
     mart.gitlab_com_user,
     mart.account_manager,
     mart.account_owner,

@@ -33,7 +33,6 @@ renamed AS (
 
 
     -- key people GL side
-    federal_account__c AS federal_account,
     gitlab_com_user__c AS gitlab_com_user,
     account_manager__c AS account_manager,
     account_owner_calc__c AS account_owner,
@@ -109,7 +108,6 @@ renamed AS (
     account_demographics_upa_postal_code__c AS account_demographics_upa_postal_code,
 
     -- present state info
-    health__c AS health_score,
     gs_health_score__c AS health_number,
     gs_health_score_color__c AS health_score_color,
 
