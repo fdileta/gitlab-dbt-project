@@ -26,7 +26,7 @@ models:
           - unique
 
   - name: fct_behavior_website_page_view
-    description: TBD
+    description: Page views are a subset of Snowplow events and are fired by the Javascript tracker.
     columns:
       - name: fct_behavior_website_page_view_sk
         tests:
@@ -34,10 +34,10 @@ models:
           - unique
 
   - name: prep_snowplow_structured_event_all_source
-    description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of strutured events if the model is not run incrementally.
+    description: Model combining all monthly partitions of Snowplow structured events. This will take a sample of structured events if the model is not run incrementally.
 
   - name: fct_behavior_link_click
-    description: Fact table containing details of links clicked.
+    description: A derived fact from fct_behavior_unstructured_event containing only link_click event types.
     columns: 
       - name: fct_behavior_unstructured_sk
         tests:
@@ -52,10 +52,67 @@ models:
           - not_null
           - unique
 
+  - name: fct_behavior_structured_event
+    description: Atomic fact table for structured events.
+
+  - name: fct_behavior_structured_event_experiment
+    description: Derived fact table for structured events related to experiments.
+    columns:
+      - name: behavior_structured_event_pk
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_behavior_structured_event_redis_hll_counters
+    description: Derived fact table for structured events related to redis hll metrics.
+    columns:
+      - name: behavior_structured_event_pk
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_behavior_structured_event_without_assignment
+    description: Derived fact table for structured events without assignment events.
+    columns:
+      - name: behavior_structured_event_pk
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_behavior_structured_event_without_assignment_190
+    description: Derived fact table for structured events without assignment events filtered to the last 190 days.
+    columns:
+      - name: behavior_structured_event_pk
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_behavior_structured_event_without_assignment_400
+    description: Derived fact table for structured events without assignment events fitlered to the last 400 days.
+    columns:
+      - name: behavior_structured_event_pk
+        tests:
+          - not_null
+          - unique
+
   - name: fct_behavior_unstructured_event
-    description: atomic fact table for unstructured events
+    description: Atomic fact table for unstructured events.
     columns:
       - name: fct_behavior_unstructured_sk
         tests:
           - not_null
           - unique
+
+  - name: prep_snowplow_unnested_events_all
+    description: This is the primary events view which is the union of the Fishtown and GitLab tables across all snowplow_YYYY_MM schemas. All of the unstructured events are unpacked - [link click tracking](https://github.com/snowplow/snowplow/wiki/2-Specific-event-tracking-with-the-Javascript-tracker#39-link-click-tracking), [form tracking](https://github.com/snowplow/snowplow/wiki/2-Specific-event-tracking-with-the-Javascript-tracker#3101-enableformtracking), and [time tracking](https://github.com/snowplow/snowplow/wiki/2-Specific-event-tracking-with-the-Javascript-tracker#timing).
+
+  - name: prep_snowplow_unstructured_events_all
+    description: This a view over all snowplow_YYYY_MM schemas for unstructured events.
+    columns:
+      - name: event_id
+        tests:
+          - not_null
+          - unique
+
+
+
