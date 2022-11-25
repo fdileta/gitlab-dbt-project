@@ -3,7 +3,7 @@ WITH source AS (
    SELECT *
    FROM {{source('google_search_console','keyword_page_report')}}
  
-),final AS(
+), final AS(
  
 SELECT   
    COUNTRY::TEXT AS COUNTRY,
