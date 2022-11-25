@@ -400,6 +400,8 @@ sources:
           error_after: {count: 15, period: day}
       - name: csv_issue_imports
         identifier: gitlab_db_csv_issue_imports
+      - name: fork_network_members 
+        identifier: gitlab_db_fork_network_members
       - name: gitlab_pgp_export
         identifier: gitlab_pgp_export
         loaded_at_field: DATEADD(sec, _updated_at, '1970-01-01')

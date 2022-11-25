@@ -7,6 +7,7 @@ The following tables are moved from incremental to full (SCD) load and moved und
 | `bulk_import_entities` | `ID` | [gitlab_dotcom_bulk_import_entities_dedupe_source](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_bulk_import_entities_dedupe_source) |
 | `clusters_integration_prometheus` | `CLUSTER_ID` | [gitlab_dotcom_clusters_integration_prometheus_dedupe_source](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_clusters_integration_prometheus_dedupe_source) |
 | `group_import_states` | `GROUP_ID` | [gitlab_dotcom_group_import_states_dedupe_source](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_group_import_states_dedupe_source) |
+| `fork_network_members` | `ID` | [gitlab_dotcom_fork_network_members_dedupe_source](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_fork_network_members_dedupe_source)|
 
 Model name should be **not** changed as per `instance_sql_metrics` algorithm based on the `*_dedupe_source` table names.
 
