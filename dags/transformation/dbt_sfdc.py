@@ -1,6 +1,6 @@
 """
 ## Info about DAG
-This DAG is responsible for doing incremental model refresh for both product, non product model,workspace model followed by dbt-test and dbt-result from Monday to Saturday.
+This DAG is responsible for running a six-hourly refresh on Salesforce opportunity models from Monday to Saturday.
 """
 
 import os
