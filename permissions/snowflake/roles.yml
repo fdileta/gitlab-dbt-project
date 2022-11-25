@@ -2280,6 +2280,20 @@ roles:
                     - prep.saas_usage_ping.*
                     - raw.version_db.*
 
+    - workato:
+        warehouses:
+            - loading
+        privileges:
+            databases:
+                read:
+                    - prod
+            schemas:
+                read:
+                    - prod.pumps_sensitive
+            tables:
+                read:
+                    - prod.pumps_sensitive.pump_marketing_contact
+
     - workday:
         warehouses:
             - dev_xs
@@ -5261,6 +5275,12 @@ users:
         can_login: yes
         member_of:
             - webrahim
+
+    - workato:
+        can_login: yes
+        member_of:
+            - workato
+
 
     - zzhang:
         can_login: yes
