@@ -321,7 +321,7 @@ data_science_ssh_key_cmd = """
     mkdir ~/.ssh/ &&
     touch ~/.ssh/id_rsa && touch ~/.ssh/config &&
     echo "$GITLAB_ANALYTICS_PRIVATE_TOKEN" > ~/.ssh/id_rsa && chmod 0400 ~/.ssh/id_rsa &&
-    echo "$GITLAB_ANALYTICS_PRIVATE_TOKEN" > ~/.ssh/config"""
+    echo "$GIT_DATA_TESTS_CONFIG" > ~/.ssh/config"""
 
 clone_repo_cmd = f"""
     {data_test_ssh_key_cmd} &&
