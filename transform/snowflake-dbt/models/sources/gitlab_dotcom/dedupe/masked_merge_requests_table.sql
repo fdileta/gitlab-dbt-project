@@ -34,4 +34,4 @@ FROM {{ source('gitlab_dotcom', 'merge_requests') }}
 WHERE updated_at >= (SELECT MAX(updated_at) FROM {{this}})
 
 {% endif %}
-LIMIT 10000000
+LIMIT 1000000
