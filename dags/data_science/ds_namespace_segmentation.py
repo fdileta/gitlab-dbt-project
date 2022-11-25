@@ -58,7 +58,7 @@ dag = DAG(
 )
 
 # Task 1
-ptc_scoring_command = f"""
+namespace_seg_scoring_command = f"""
     {clone_data_science_namespace_segmentation_repo_cmd} &&
     cd namespace-segmentation/prod &&
     papermill scoring_code.ipynb -p is_local_development False
@@ -77,6 +77,6 @@ KubernetesPodOperator(
         GITLAB_ANALYTICS_PRIVATE_TOKEN,
     ],
     env_vars=pod_env_vars,
-    arguments=[ptc_scoring_command],
+    arguments=[namespace_seg_scoring_command],
     dag=dag,
 )
