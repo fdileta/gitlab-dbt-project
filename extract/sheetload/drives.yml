@@ -64,3 +64,8 @@ folders:
     folder_name: marketing_press_sov
     table_name: marketing_press_sov
     table_replace_append: 0
+  - name: booking_to_billing_monthly_reconciliation
+    owner: '@chrissharp'
+    folder_name: booking_to_billing_monthly_reconciliation
+    table_name: booking_to_billing_monthly_reconciliation
+    table_replace_append: 1

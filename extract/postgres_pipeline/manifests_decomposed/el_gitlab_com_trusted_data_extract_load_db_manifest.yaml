@@ -873,14 +873,6 @@ tables:
         FROM merge_request_diffs
         WHERE DATE(created_at) > current_date - interval '8' day
         GROUP BY 1,2,3
-        UNION ALL
-        SELECT 'gitlab_db_experiment_subjects' AS table_name
-        , DATE(created_at) as created_date
-        , DATE(updated_at) as updated_date
-        , count(*) as number_of_records
-        FROM experiment_subjects
-        WHERE DATE(created_at) > current_date - interval '8' day
-        GROUP BY 1,2,3
   cluster_15:
     dbt_source_model: true
     export_schema: 'gitlab_dotcom'

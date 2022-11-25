@@ -87,8 +87,9 @@ dag = DAG(
     "dbt_full_refresh_weekly",
     description="This DAG runs weekly on sunday running full refresh of all the model",
     default_args=default_args,
-    schedule_interval="45 8 * * SUN",
+    schedule_interval="45 8 * * SUN#1",
 )
+
 dag.doc_md = __doc__
 
 # dbt-full-refresh
