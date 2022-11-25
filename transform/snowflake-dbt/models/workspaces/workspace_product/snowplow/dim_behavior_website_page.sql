@@ -4,7 +4,7 @@
 ) }}
 
 {{ simple_cte([
-    ('events', 'snowplow_unnested_events_all')
+    ('events', 'prep_snowplow_unnested_events_all')
     ])
 }}
 
