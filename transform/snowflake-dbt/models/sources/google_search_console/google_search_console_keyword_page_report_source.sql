@@ -1,25 +1,25 @@
 WITH source AS (
   
    SELECT *
-   FROM {{source('google_search_console','keyword_page_report')}}
+   FROM {{ source('google_search_console','keyword_page_report') }}
  
-), final AS(
+), final AS (
  
-SELECT   
-   COUNTRY::TEXT AS COUNTRY,
-   DATE::DATE AS DATE,
-   DEVICE::TEXT AS DEVICE,
-   PAGE::TEXT AS PAGE,
-   QUERY::TEXT AS QUERY,
-   SEARCH_TYPE::TEXT AS SEARCH_TYPE,
-   SITE::TEXT AS SITE,
-   CLICKS::FLOAT AS CLICKS,
-   IMPRESSIONS::FLOAT AS IMPRESSIONS,
-   CTR::FLOAT AS CTR,
-   POSITION::FLOAT AS POSITION,
-   _FIVETRAN_SYNCED::TIMESTAMP_TZ AS _FIVETRAN_SYNCED
-FROM source
+    SELECT   
+      country::TEXT                    AS country,
+      date::DATE                       AS date,
+      device::TEXT                     AS device,
+      page::TEXT                       AS page,
+      query::TEXT                      AS query,
+      search_type::TEXT                AS search_type,
+      site::TEXT                       AS site,
+      clicks::FLOAT                    AS clicks,
+      impressions::FLOAT               AS impressions,
+      ctr::FLOAT                       AS ctr,
+      position::FLOAT                  AS position,
+      _fivetran_synced::TIMESTAMP_TZ   AS _fivetran_synced
+    FROM source
 )
- 
+
 SELECT *
 FROM final
