@@ -14,7 +14,7 @@ WITH structured_event_renamed AS (
     SELECT
     
       event_id::VARCHAR                         AS event_id,
-      v_tracker::VARCHAR                        AS v_tracker,
+      v_tracker::VARCHAR                        AS tracker_version,
       se_action::VARCHAR                        AS event_action,
       se_category::VARCHAR                      AS event_category,
       se_label::VARCHAR                         AS event_label,
@@ -89,7 +89,7 @@ WITH structured_event_renamed AS (
       structured_event_renamed.derived_tstamp       AS behavior_at,
 
       -- Degenerate Dimensions (Event Attributes)
-      structured_event_renamed.v_tracker,
+      structured_event_renamed.tracker_version,
       structured_event_renamed.session_index,
       structured_event_renamed.app_id,
       structured_event_renamed.session_id,
