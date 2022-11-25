@@ -5281,7 +5281,6 @@ users:
         member_of:
             - workato
 
-
     - zzhang:
         can_login: yes
         member_of:
