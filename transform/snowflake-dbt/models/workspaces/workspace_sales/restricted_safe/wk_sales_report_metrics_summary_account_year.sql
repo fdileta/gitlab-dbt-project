@@ -29,7 +29,12 @@ WITH date_details AS (
       AND snapshot_date.day_of_fiscal_year_normalised = (SELECT DISTINCT day_of_fiscal_year_normalised
                                                           FROM date_details
                                                           WHERE date_actual = DATEADD(day, -2, CURRENT_DATE))
+ ), mart_available_to_renew AS (
 
+    SELECT *
+    FROM {{ref('mart_available_to_renew')}}
+    --FROM prod.restricted_safe_common_mart_finance.mart_available_to_renew
+    
  ), dim_subscription AS (
 
     SELECT
@@ -70,13 +75,15 @@ WITH date_details AS (
   -- PUBLIC_SECTOR_ACCOUNT__C,
   -- PUBSEC_TYPE__C,
   -- POTENTIAL_ARR_LAM__C
+  -- BILLINGSTATE
   ), mart_crm_account AS (
 
     SELECT acc.*,
-        raw.has_tam__c AS has_tam_flag,
-        raw.public_sector_account__c AS public_sector_account_flag,
-        raw.pubsec_type__c          AS pubsec_type,
-        raw.potential_arr_lam__c    AS potential_lam_arr
+        raw.has_tam__c                AS has_tam_flag,
+        raw.public_sector_account__c  AS public_sector_account_flag,
+        raw.pubsec_type__c            AS pubsec_type,
+        raw.potential_arr_lam__c      AS potential_lam_arr,
+        raw.billingstate              AS account_billing_state
     --FROM prod.restricted_safe_common_mart_sales.mart_crm_account acc
     FROM {{ref('mart_crm_account')}} acc
     LEFT JOIN raw_account raw
@@ -123,50 +130,45 @@ WITH date_details AS (
 
   ), nfy_atr_base AS (
 
-    SELECT
-      o.account_id,
-      -- e.g. We want to show ATR on the previous FY
-      d.fiscal_year - 1   AS report_fiscal_year,
-      SUM(o.arr_basis)    AS nfy_sfdc_atr
-    FROM sfdc_opportunity_xf AS o
-    LEFT JOIN date_details AS d
-      ON o.subscription_start_date = d.date_actual  -- NF: Should this be subscription start date? or quote start day? Ask Olga
-    WHERE o.sales_type = 'Renewal'
-      AND stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
-      AND amount <> 0
-      GROUP BY 1, 2
+    SELECT 
+        dim_crm_account_id      AS account_id,
+        report_dates.report_fiscal_year,
+        SUM(arr)                AS nfy_atr
+    FROM mart_available_to_renew atr
+    CROSS JOIN report_dates
+    WHERE is_available_to_renew = 1
+    AND renewal_type = 'Non-MYB'
+    AND atr.fiscal_year = report_dates.report_fiscal_year + 1
+    GROUP BY 1,2
+    
+), last_12m_atr_base AS (
 
-  ), fy_atr_base AS (
+    SELECT dim_crm_account_id   AS account_id,
+        report_dates.report_fiscal_year,
+        COUNT(DISTINCT atr.renewal_month) AS count_unique_months,
+    
+        SUM(arr)                AS last_12m_atr
+    FROM mart_available_to_renew atr
+    CROSS JOIN report_dates
+    WHERE is_available_to_renew = 1
+    AND renewal_type = 'Non-MYB'
+    AND atr.renewal_month < report_dates.report_month_date
+    AND atr.renewal_month >= DATEADD(month,-12,report_dates.report_month_date)
+    GROUP BY 1,2
+    
+), fy_atr_base AS (
 
-    SELECT
-      o.account_id,
-      -- e.g. We want to show ATR on the previous FY
-      d.fiscal_year       AS report_fiscal_year,
-      SUM(o.arr_basis)    AS fy_sfdc_atr
-    FROM sfdc_opportunity_xf AS o
-    LEFT JOIN date_details AS d
-      ON o.subscription_start_date = d.date_actual
-    WHERE o.sales_type = 'Renewal'
-      AND stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
-      AND amount <> 0
-      GROUP BY 1, 2
+    SELECT dim_crm_account_id   AS account_id,
+        report_dates.report_fiscal_year,
+        COUNT(DISTINCT atr.renewal_month) AS count_unique_months,
+        SUM(arr)                AS fy_atr
+    FROM mart_available_to_renew atr
+    CROSS JOIN report_dates
+    WHERE is_available_to_renew = 1
+    AND renewal_type = 'Non-MYB'
+    AND atr.fiscal_year = report_dates.report_fiscal_year
+    GROUP BY 1,2
 
-   ), last_12m_atr_base AS (
-    --ttm_atr_base
-
-    SELECT
-      o.account_id,
-      -- e.g. We want to show ATR on the previous FY
-      d.report_fiscal_year        AS report_fiscal_year,
-      SUM(o.arr_basis)            AS last_12m_atr      --ttm_atr
-    FROM sfdc_opportunity_xf o
-    CROSS JOIN report_dates d
-    WHERE o.sales_type = 'Renewal'
-        AND o.subscription_start_date BETWEEN DATEADD(month, -12,DATE_TRUNC('month',d.report_month_date))
-        AND DATE_TRUNC('month',d.report_month_date)
-        AND o.stage_name NOT IN ('9-Unqualified','10-Duplicate','00-Pre Opportunity')
-        AND o.amount <> 0
-    GROUP BY 1, 2
 
 -- Rolling 1 year Net ARR
 ), net_arr_last_12m AS (
@@ -595,6 +597,7 @@ WITH date_details AS (
     dim_account.forbes_2000_rank        AS account_forbes_rank,
     a.billing_country                   AS account_country,
     a.billing_postal_code               AS account_zip_code,
+    mart_crm_account.account_billing_state AS account_state,
 
     
     -- Account demographics fields
@@ -653,9 +656,9 @@ WITH date_details AS (
     a.health_number                               AS account_health_number,
 
     -- atr for current fy
-    COALESCE(fy_atr_base.fy_sfdc_atr,0)           AS fy_sfdc_atr,
+    COALESCE(fy_atr_base.fy_atr,0)           AS fy_atr,
     -- next fiscal year atr base reported at fy
-    COALESCE(nfy_atr_base.nfy_sfdc_atr,0)         AS nfy_sfdc_atr,
+    COALESCE(nfy_atr_base.nfy_atr,0)         AS nfy_atr,
     -- last 12 months ATR
     COALESCE(last_12m_atr_base.last_12m_atr,0)    AS last_12m_atr,
 
@@ -812,8 +815,11 @@ WITH date_details AS (
     
      -- LAM Dev Count Category
     CASE 
-        WHEN upa_account.parent_crm_account_lam_dev_count < 250
-            THEN '1. <250'
+        WHEN upa_account.parent_crm_account_lam_dev_count < 100
+            THEN '0. <100'    
+        WHEN upa_account.parent_crm_account_lam_dev_count >= 100
+            AND upa_account.parent_crm_account_lam_dev_count < 250
+            THEN '1. [100-250)'
         WHEN upa_account.parent_crm_account_lam_dev_count >= 250
             AND upa_account.parent_crm_account_lam_dev_count < 500
             THEN '2. [250-500)'
@@ -834,8 +840,11 @@ WITH date_details AS (
     END AS lam_dev_count_bin_name,
     
     CASE 
-        WHEN upa_account.parent_crm_account_lam_dev_count < 250
+        WHEN upa_account.parent_crm_account_lam_dev_count < 100
             THEN 0
+        WHEN upa_account.parent_crm_account_lam_dev_count >= 100
+            AND upa_account.parent_crm_account_lam_dev_count < 250
+            THEN 100
         WHEN upa_account.parent_crm_account_lam_dev_count >= 250
             AND upa_account.parent_crm_account_lam_dev_count < 500
             THEN 250
@@ -853,7 +862,7 @@ WITH date_details AS (
             THEN 3500
         WHEN upa_account.parent_crm_account_lam_dev_count >= 5000
             THEN 5000
-    END AS lam_dev_count_bin_rank,    
+    END AS lam_dev_count_bin_rank,      
     
     -- Public Sector
     CASE
@@ -933,6 +942,7 @@ SELECT
     account_user_region     AS virtual_upa_region,
     account_user_area       AS virtual_upa_area,
     account_country         AS virtual_upa_country,
+    account_state           AS virtual_upa_state,
     account_zip_code        AS virtual_upa_zip_code,
     account_industry        AS virtual_upa_industry,
     account_owner_name      AS virtual_upa_owner_name,
@@ -959,6 +969,7 @@ SELECT
     upa.virtual_upa_region,
     upa.virtual_upa_area,
     upa.virtual_upa_country,
+    upa.virtual_upa_state,
     upa.virtual_upa_zip_code,
     upa.virtual_upa_industry,
     upa.virtual_upa_owner_name,
@@ -1081,6 +1092,13 @@ QUALIFY level = 1
             THEN new_upa.virtual_upa_country 
         ELSE acc.upa_ad_country
     END                                     AS upa_ad_country,
+
+    CASE 
+        WHEN new_upa.upa_id IS NOT NULL 
+            THEN new_upa.virtual_upa_state 
+        ELSE acc.upa_ad_state
+    END                                     AS upa_ad_state,
+
     CASE 
         WHEN new_upa.upa_id IS NOT NULL 
             THEN new_upa.virtual_upa_zip_code 
@@ -1144,9 +1162,9 @@ QUALIFY level = 1
     SUM(acc.has_technical_account_manager_flag) AS count_technical_account_managers,
 
     -- atr for current fy
-    SUM(acc.fy_sfdc_atr)  AS fy_sfdc_atr,
+    SUM(acc.fy_atr)  AS fy_atr,
     -- next fiscal year atr base reported at fy
-    SUM(acc.nfy_sfdc_atr) AS nfy_sfdc_atr,
+    SUM(acc.nfy_atr) AS nfy_atr,
 
     -- arr by fy
     SUM(acc.arr) AS arr,
@@ -1240,7 +1258,7 @@ QUALIFY level = 1
     LEFT JOIN final_virtual_upa new_upa
         ON new_upa.account_id = acc.account_id
         AND new_upa.report_fiscal_year = acc.report_fiscal_year
-  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 
 )
 , final AS (
