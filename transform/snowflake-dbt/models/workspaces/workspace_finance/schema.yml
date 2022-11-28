@@ -1122,3 +1122,5 @@ models:
         description: Rate of exchange between the transaction and base currency
       - name: effective_date
         description: When the exchange rate was effective
+  - name: driveload_booking_to_billing_monthly_reconciliation
+    description: Output of Finance's analysis determining timing differences between bookings and billings
