@@ -238,7 +238,8 @@ WITH map_merged_crm_account AS (
       CASE
         WHEN is_paid_in_full = FALSE THEN months_of_future_billings * zuora_rate_plan_charge.mrr
         ELSE 0
-      END                                                               AS estimated_total_future_billings
+      END                                                               AS estimated_total_future_billings,
+      0                                                                 AS is_manual_charge
 
     FROM zuora_rate_plan
     INNER JOIN zuora_rate_plan_charge
@@ -336,7 +337,8 @@ WITH map_merged_crm_account AS (
       CASE
         WHEN is_paid_in_full = FALSE THEN months_of_future_billings * manual_charges_prep.mrr
         ELSE 0
-      END                                                                         AS estimated_total_future_billings
+      END                                                                                   AS estimated_total_future_billings,
+      1                                                                                     AS is_manual_charge
     FROM manual_charges_prep
     INNER JOIN active_zuora_subscription
       ON manual_charges_prep.subscription_name = active_zuora_subscription.subscription_name
