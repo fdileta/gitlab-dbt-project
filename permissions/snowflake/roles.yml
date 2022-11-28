@@ -89,11 +89,6 @@ databases:
     - jstark_prep:
         shared: no
 
-    - judume_prod:
-        shared: no
-    - judume_prep:
-        shared: no
-
     - juwong_prod:
         shared: no
     - juwong_prep:
@@ -3170,47 +3165,6 @@ roles:
             - dev_xs
             - dev_xl
 
-    - judume:
-        member_of:
-            - data_team_analyst
-            - analyst_sales
-            - restricted_safe
-        warehouses:
-            - dev_xs
-            - dev_m
-        owns:
-            databases:
-                - judume_prep
-                - judume_prod
-            schemas:
-                - judume_prep.*
-                - judume_prod.*
-            tables:
-                - judume_prep.*.*
-                - judume_prod.*.*
-        privileges:
-            databases:
-                read:
-                    - judume_prep
-                    - judume_prod
-                write:
-                    - judume_prep
-                    - judume_prod
-            schemas:
-                read:
-                    - judume_prep.*
-                    - judume_prod.*
-                write:
-                    - judume_prep.*
-                    - judume_prod.*
-            tables:
-                read:
-                    - judume_prep.*.*
-                    - judume_prod.*.*
-                write:
-                    - judume_prep.*.*
-                    - judume_prod.*.*
-
     - juwong:
         member_of:
             - engineer
@@ -4882,9 +4836,8 @@ users:
             - jstemmer
 
     - judume:
-        can_login: yes
-        member_of:
-            - judume
+        can_login: no
+        member_of: []
 
     - juwong:
         can_login: yes
