@@ -20,6 +20,7 @@ SELECT
     account_user_region     AS virtual_upa_region,
     account_user_area       AS virtual_upa_area,
     account_country         AS virtual_upa_country,
+    account_state           AS virtual_upa_state,
     account_zip_code        AS virtual_upa_zip_code,
     account_industry        AS virtual_upa_industry,
     account_owner_name            AS virtual_upa_owner_name,
@@ -46,6 +47,7 @@ SELECT
     upa.virtual_upa_region,
     upa.virtual_upa_area,
     upa.virtual_upa_country,
+    upa.virtual_upa_state,
     upa.virtual_upa_zip_code,
     upa.virtual_upa_industry,
     upa.virtual_upa_owner_name,
@@ -168,6 +170,7 @@ QUALIFY level = 1
             THEN new_upa.virtual_upa_country 
         ELSE acc.upa_ad_country
     END                                     AS upa_ad_country,
+
     CASE 
         WHEN new_upa.upa_id IS NOT NULL 
             THEN new_upa.virtual_upa_zip_code 
@@ -231,9 +234,9 @@ QUALIFY level = 1
     SUM(acc.has_technical_account_manager_flag) AS count_technical_account_managers,
 
     -- atr for current fy
-    SUM(acc.fy_sfdc_atr)  AS fy_sfdc_atr,
+    SUM(acc.fy_atr)  AS fy_atr,
     -- next fiscal year atr base reported at fy
-    SUM(acc.nfy_sfdc_atr) AS nfy_sfdc_atr,
+    SUM(acc.nfy_atr) AS nfy_atr,
 
     -- arr by fy
     SUM(acc.arr) AS arr,
