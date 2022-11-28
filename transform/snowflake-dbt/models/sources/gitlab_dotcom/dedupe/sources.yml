@@ -181,6 +181,8 @@ sources:
         freshness:
           warn_after: {count: 7, period: day}
           error_after: {count: 15, period: day}
+      - name: fork_network_members
+        identifier: gitlab_db_fork_network_members
       - name: gitlab_subscription_histories
         identifier: gitlab_db_gitlab_subscription_histories
       - name: gitlab_subscriptions
