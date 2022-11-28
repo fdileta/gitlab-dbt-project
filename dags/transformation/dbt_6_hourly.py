@@ -1,6 +1,6 @@
 """
 ## Info about DAG
-This DAG is responsible for running a six-hourly refresh on Salesforce opportunity models from Monday to Saturday.
+This DAG is responsible for running a six-hourly refresh on models tagged with the "6_hourly" label from Monday to Saturday.
 """
 
 import os
@@ -88,10 +88,10 @@ secrets_list = [
 
 # Create the DAG
 dag = DAG(
-    "dbt_salesforce_opportunity_6_hourly",
-    description="This DAG is responsible for refreshing Salesforce opportunity data at minute 0 past every 6th hour.",
+    "dbt_6_hourly",
+    description="This DAG is responsible for refreshing models at minute 0 past every 6th hour.",
     default_args=default_args,
-    schedule_interval="0 */6 * * *",
+    schedule_interval="0 */6 * * 1-6",
 )
 dag.doc_md = __doc__
 
@@ -115,7 +115,7 @@ def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
 
 dbt_evaluate_run_date_task = ShortCircuitOperator(
     task_id="evaluate_dbt_run_date",
-    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "0 */6 * * * SUN#1"),
+    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "0 */6 * * 1-6"),
     dag=dag,
 )
 
@@ -124,7 +124,7 @@ dbt_sfdc_opportunity_models_command = f"""
     {pull_commit_hash} &&
     {dbt_install_deps_cmd} &&
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
-    dbt --no-use-colors run --profiles-dir profile --target prod --include tag:sfdc_6; ret=$?;
+    dbt --no-use-colors run --profiles-dir profile --target prod --include tag:6_hourly; ret=$?;
     montecarlo import dbt-run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
@@ -134,7 +134,7 @@ dbt_sfdc_opportunity_models_task = KubernetesPodOperator(
     **gitlab_defaults,
     image=DBT_IMAGE,
     task_id="dbt-sfdc-opportunity_models_command",
-    name="dbt-salesforce-opportunity-models-run",
+    name="dbt-six-hourly-models-run",
     secrets=secrets_list,
     env_vars=pod_env_vars,
     arguments=[dbt_sfdc_opportunity_models_command],
