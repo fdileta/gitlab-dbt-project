@@ -7,6 +7,8 @@ models:
           combination_of_columns:
             - dim_crm_account_id
             - snapshot_month
+  - name: monthly_stage_usage_by_account_ultimate
+    description: monthly_stage_usage_by_account filtered to only show Ultimate namespaces / instances.
   - name: monthly_stage_usage_by_namespace
     description: Product stage usage metrics for free and paid ultimate parent namespaces by month
     columns:

@@ -1122,7 +1122,9 @@ models:
         description: Rate of exchange between the transaction and base currency
       - name: effective_date
         description: When the exchange rate was effective
-  - name: rpt_arr_no_manual_adjustment_for_sfdc_reconciliation
+  - name: driveload_booking_to_billing_monthly_reconciliation
+    description: Output of Finance's analysis determining timing differences between bookings and billings
+ - name: rpt_arr_no_manual_adjustment_for_sfdc_reconciliation
     description: Report view of [mart_arr](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.mart_arr) without the manual true up adjustments added from Zuora Revenue. This report is used exclusively for the montly Salesforce reconciliation process and is not to be used for financial reporting since it does not include the manually adjusted true up charges.
     columns:
       - name: primary_key
