@@ -2725,12 +2725,6 @@ roles:
                     - degan_prep.*.*
                     - degan_prod.*.*
 
-    - dfelton:
-        member_of:
-            - securityadmin
-        warehouses:
-            - dev_xs
-
     - dgupta:
         member_of:
             - adaptive
@@ -4831,9 +4825,8 @@ users:
             - degan
 
     - dfelton:
-        can_login: yes
-        member_of:
-            - dfelton
+        can_login: no
+        member_of: []
 
     - dgupta:
         can_login: yes
