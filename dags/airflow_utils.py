@@ -8,6 +8,8 @@ from airflow.models import Variable
 from airflow.operators.slack_operator import SlackAPIPostOperator
 from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
 
+from kube_secrets import GITLAB_ANALYTICS_PRIVATE_TOKEN
+
 SSH_REPO = "git@gitlab.com:gitlab-data/analytics.git"
 HTTP_REPO = "https://gitlab.com/gitlab-data/analytics.git"
 DATA_IMAGE = "registry.gitlab.com/gitlab-data/data-image/data-image:v0.0.27"
@@ -18,20 +20,11 @@ ANALYST_IMAGE = "registry.gitlab.com/gitlab-data/data-image/analyst-image:v1.0.1
 SALES_ANALYTICS_NOTEBOOKS_PATH = "analytics/sales_analytics_notebooks"
 
 DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO = ("git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git")
-DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = ("https://gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git")
+DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = ("https://gitlab_analytics:$GITLAB_ANALYTICS_PRIVATE_TOKEN@gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git")
 
 
 def get_data_science_project_command(model_http_path, model_ssh_path, model_folder):
     return f"""
-    {data_science_ssh_key_cmd} &&
-    if [[ -z "$GIT_COMMIT" ]]; then
-        export GIT_COMMIT="HEAD"
-    fi
-    if [[ -z "$GITLAB_ANALYTICS_PRIVATE_TOKEN" ]]; then
-        export REPO="{model_http_path}";
-        else
-        export REPO="{model_ssh_path}";
-    fi &&
     echo "git clone -b main --single-branch --depth 1 $REPO" &&
     git clone -b main --single-branch --depth 1 $REPO &&
     echo "checking out commit $GIT_COMMIT" &&
@@ -315,12 +308,6 @@ data_test_ssh_key_cmd = """
     mkdir ~/.ssh/ &&
     touch ~/.ssh/id_rsa && touch ~/.ssh/config &&
     echo "$GIT_DATA_TESTS_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0400 ~/.ssh/id_rsa &&
-    echo "$GIT_DATA_TESTS_CONFIG" > ~/.ssh/config"""
-
-data_science_ssh_key_cmd = """
-    mkdir ~/.ssh/ &&
-    touch ~/.ssh/id_rsa && touch ~/.ssh/config &&
-    echo "$GITLAB_ANALYTICS_PRIVATE_TOKEN" > ~/.ssh/id_rsa && chmod 0400 ~/.ssh/id_rsa &&
     echo "$GIT_DATA_TESTS_CONFIG" > ~/.ssh/config"""
 
 clone_repo_cmd = f"""
