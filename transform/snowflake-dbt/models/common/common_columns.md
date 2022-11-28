@@ -670,12 +670,6 @@ Data quality boolean flag set to True if the license from Service Ping exist in 
 
 {% enddocs %}
 
-{% docs main_edition_product_tier %}
-
-The product tier of the ping, inferred from the edition and the plan saved in the license (Core, Starter, Premium, Ultimate). `Core` is synonymous with `Free`
-
-{% enddocs %}
-
 {% docs ping_created_date %}
 
 The date when the ping was created (YYYY-MM-DD)
