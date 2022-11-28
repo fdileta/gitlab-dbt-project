@@ -64,11 +64,6 @@ databases:
     - eneuberger_prep:
         shared: no
 
-    - ian_prod:
-        shared: no
-    - ian_prep:
-        shared: no
-
     - iweeks_prod:
         shared: no
     - iweeks_prep:
@@ -2914,47 +2909,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - ian:
-        member_of:
-            - data_team_analyst
-            - analyst_sales
-            - restricted_safe
-        warehouses:
-            - dev_xs
-            - dev_m
-        owns:
-            databases:
-                - ian_prep
-                - ian_prod
-            schemas:
-                - ian_prep.*
-                - ian_prod.*
-            tables:
-                - ian_prep.*.*
-                - ian_prod.*.*
-        privileges:
-            databases:
-                read:
-                    - ian_prep
-                    - ian_prod
-                write:
-                    - ian_prep
-                    - ian_prod
-            schemas:
-                read:
-                    - ian_prep.*
-                    - ian_prod.*
-                write:
-                    - ian_prep.*
-                    - ian_prod.*
-            tables:
-                read:
-                    - ian_prep.*.*
-                    - ian_prod.*.*
-                write:
-                    - ian_prep.*.*
-                    - ian_prod.*.*
-
     - isharan:
         member_of:
             - data_team_analyst
@@ -4880,10 +4834,10 @@ users:
         can_login: yes
         member_of:
             - hselim
+        
     - ian:
-        can_login: yes
-        member_of:
-            - ian
+        can_login: no
+        member_of: []
 
     - isharan:
         can_login: yes
