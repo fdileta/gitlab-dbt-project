@@ -331,7 +331,7 @@ models:
     - name: is_staging
       description: '{{ doc("is_staging") }}'
     - name: is_trial
-      description: '{{ doc("is_trial") }}'
+      description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
@@ -449,7 +449,7 @@ models:
     - name: is_staging
       description: '{{ doc("is_staging") }}'
     - name: is_trial
-      description: '{{ doc("is_trial") }}'
+      description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: instance_user_count
@@ -562,7 +562,7 @@ models:
     - name: is_staging
       description: '{{ doc("is_staging") }}'
     - name: is_trial
-      description: '{{ doc("is_trial") }}'
+      description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
@@ -687,7 +687,7 @@ models:
     - name: is_staging
       description: '{{ doc("is_staging") }}'
     - name: is_trial
-      description: '{{ doc("is_trial") }}'
+      description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
@@ -816,7 +816,7 @@ models:
     - name: is_staging
       description: '{{ doc("is_staging") }}'
     - name: is_trial
-      description: '{{ doc("is_trial") }}'
+      description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
@@ -941,7 +941,7 @@ models:
     - name: is_staging
       description: '{{ doc("is_staging") }}'
     - name: is_trial
-      description: '{{ doc("is_trial") }}'
+      description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
@@ -1066,7 +1066,7 @@ models:
     - name: is_staging
       description: '{{ doc("is_staging") }}'
     - name: is_trial
-      description: '{{ doc("is_trial") }}'
+      description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
       description: '{{ doc("umau_value") }}'
     - name: stage_name
