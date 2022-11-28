@@ -43,19 +43,6 @@
     *
     FROM email_classification
 
--- ), closest_provider  ????????? AS (
-
---     SELECT
---         user_snapshots.user_id AS user_id,
---         identity.identity_provider AS identity_provider
---     FROM user_snapshots                                                       
---     LEFT JOIN identity
---     ON user_snapshots.user_id = identity.user_id
---     WHERE 
---         identity.user_id IS NOT NULL
---     QUALIFY ROW_NUMBER() OVER(PARTITION BY user_snapshots.user_id 
---         ORDER BY TIMEDIFF(MILLISECONDS,users_source.created_at,COALESCE(identity.created_at,{{var('infinity_future')}})) ASC) = 1
-
 ),identity_snapshot_spined AS (
 
     SELECT
@@ -63,10 +50,11 @@
         identities_snapshots.*
     FROM 
         identities_snapshots
-        INNER JOIN snapshot_dates
+    INNER JOIN snapshot_dates
         ON snapshot_dates.date_actual >= identities_snapshots.dbt_valid_from
         AND snapshot_dates.date_actual < {{ coalesce_to_infinity('identities_snapshots.dbt_valid_to') }}
 
+-- Get Identity Row with Closest Created_At Date/Time to User Created_At Date/Time
 ),closest_provider_spined AS (
 
     SELECT
@@ -75,7 +63,7 @@
         identity_snapshot_spined.provider AS identity_provider
     FROM 
         user_spined
-        LEFT JOIN identity_snapshot_spined
+    LEFT JOIN identity_snapshot_spined
         ON user_spined.user_id = identity_snapshot_spined.user_id
         AND user_spined.spined_date_id = identity_snapshot_spined.spined_date_id
 
@@ -89,7 +77,10 @@
     SELECT 
         preferences_snapshots.user_id AS user_id,
         snapshot_dates.date_id AS spined_date_id,
-        COALESCE(preferences_snapshots.setup_for_company::VARCHAR,'Unknown') AS setup_for_company
+        
+        preferences_snapshots.setup_for_company::VARCHAR AS setup_for_company
+        --COALESCE(preferences_snapshots.setup_for_company::VARCHAR,'Unknown') AS setup_for_company
+   
     FROM preferences_snapshots
     INNER JOIN snapshot_dates
         ON snapshot_dates.date_actual >= preferences_snapshots.dbt_valid_from
@@ -115,6 +106,7 @@
         ON snapshot_dates.date_actual >= details_snapshots.dbt_valid_from
         AND snapshot_dates.date_actual < {{ coalesce_to_infinity('details_snapshots.dbt_valid_to') }}
 
+
 ), max_leads_snapshots AS (
 
     SELECT 
@@ -136,10 +128,16 @@
     SELECT 
         max_leads_snapshots.user_id,
         snapshot_dates.date_id AS spined_date_id,
-        COALESCE(MAX(max_leads_snapshots.is_for_business_use)::VARCHAR,'Unknown') AS for_business_use,
-        COALESCE(MAX(max_leads_snapshots.employees_bucket)::VARCHAR,'Unknown') AS employee_count,
-        COALESCE(MAX(max_leads_snapshots.country)::VARCHAR,'Unknown') AS country,
-        COALESCE(MAX(max_leads_snapshots.state)::VARCHAR,'Unknown') AS state
+        MAX(max_leads_snapshots.is_for_business_use)::VARCHAR AS for_business_use,
+        MAX(max_leads_snapshots.employees_bucket)::VARCHAR AS employee_count,
+        MAX(max_leads_snapshots.country)::VARCHAR AS country,
+        MAX(max_leads_snapshots.state)::VARCHAR AS state
+
+        -- COALESCE(MAX(max_leads_snapshots.is_for_business_use)::VARCHAR,'Unknown') AS for_business_use,
+        -- COALESCE(MAX(max_leads_snapshots.employees_bucket)::VARCHAR,'Unknown') AS employee_count,
+        -- COALESCE(MAX(max_leads_snapshots.country)::VARCHAR,'Unknown') AS country,
+        -- COALESCE(MAX(max_leads_snapshots.state)::VARCHAR,'Unknown') AS state
+
     FROM max_leads_snapshots
     INNER JOIN snapshot_dates
         ON snapshot_dates.date_actual >= max_leads_snapshots.dbt_valid_from
@@ -185,15 +183,53 @@
         closest_provider.identity_provider,
 
         -- Expanded Attributes  (Not Found = Joined Row Not found for the Attribute)
-        user_spined.role_description,
-        user_spined.last_activity_date,              
-        user_spined.last_sign_in_date,               
-        COALESCE(preferences_spined.setup_for_company,'Not Found') AS setup_for_company,               
-        COALESCE(details_spined.jobs_to_be_done,'Not Found') AS jobs_to_be_done,
-        COALESCE(leads_spined.for_business_use,'Not Found') AS for_business_use,                 
-        COALESCE(leads_spined.employee_count,'Not Found') AS employee_count,
-        COALESCE(leads_spined.country,'Not Found') AS country,
-        COALESCE(leads_spined.state,'Not Found') AS state
+        COALESCE(user_spined.role_description,'Unknown') AS role_description,
+        COALESCE(user_spined.last_activity_date,'Unknown') AS last_activity_date,              
+        COALESCE(user_spined.last_sign_in_date,'Unknown') AS last_sign_in_date,
+
+        CASE
+            WHEN preferences_spined.user_id IS NULL THEN 'Not Found'
+            WHEN preferences_spined.setup_for_company IS NULL THEN 'Unknown'
+            ELSE preferences_spined.setup_for_company
+        END AS setup_for_company,
+
+        CASE
+            WHEN details_spined.user_id IS NULL THEN 'Not Found'
+            WHEN details_spined.jobs_to_be_done IS NULL THEN 'Unknown'
+            ELSE details_spined.jobs_to_be_done
+        END AS jobs_to_be_done,
+
+        CASE
+            WHEN leads_spined.user_id IS NULL THEN 'Not Found'
+            WHEN leads_spined.for_business_use IS NULL THEN 'Unknown'
+            ELSE leads_spined.for_business_use
+        END AS for_business_use,
+
+           CASE
+            WHEN leads_spined.user_id IS NULL THEN 'Not Found'
+            WHEN leads_spined.employee_count IS NULL THEN 'Unknown'
+            ELSE leads_spined.employee_count
+        END AS employee_count,
+
+           CASE
+            WHEN leads_spined.user_id IS NULL THEN 'Not Found'
+            WHEN leads_spined.country IS NULL THEN 'Unknown'
+            ELSE leads_spined.country
+        END AS country,
+
+           CASE
+            WHEN leads_spined.user_id IS NULL THEN 'Not Found'
+            WHEN leads_spined.state IS NULL THEN 'Unknown'
+            ELSE leads_spined.state
+        END AS state
+        
+        
+        -- COALESCE(preferences_spined.setup_for_company,'Not Found') AS setup_for_company,               
+        -- COALESCE(details_spined.jobs_to_be_done,'Not Found') AS jobs_to_be_done,
+        -- COALESCE(leads_spined.for_business_use,'Not Found') AS for_business_use,                 
+        -- COALESCE(leads_spined.employee_count,'Not Found') AS employee_count,
+        -- COALESCE(leads_spined.country,'Not Found') AS country,
+        -- COALESCE(leads_spined.state,'Not Found') AS state
 
     FROM user_spined
 
