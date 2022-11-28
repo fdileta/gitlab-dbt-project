@@ -2523,17 +2523,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - amartin:
-        member_of:
-            - analyst_finance
-            - bamboohr_analytics
-            - customers_db
-            - analyst_marketing
-            - data_team_analyst
-            - restricted_safe
-        warehouses:
-            - dev_xs
-
     - aperez:
         member_of:
             - analyst_people
@@ -2541,13 +2530,6 @@ roles:
             - bi_tool_eval_read
             - restricted_safe
             - workday
-        warehouses:
-            - dev_xs
-
-    - ashaikh:
-        member_of:
-            - data_team_analyst
-            - analyst_core
         warehouses:
             - dev_xs
 
@@ -4776,9 +4758,8 @@ users:
             - alu
 
     - amartin:
-        can_login: yes
-        member_of:
-            - amartin
+        can_login: no
+        member_of: []
 
     - aperez:
         can_login: yes
@@ -4786,9 +4767,8 @@ users:
             - aperez
 
     - ashaikh:
-        can_login: yes
-        member_of:
-            - ashaikh
+        can_login: no
+        member_of: []
 
     - bi_tool_eval:
         can_login: yes
