@@ -19,7 +19,14 @@ def manifest_reader(file_path: str) -> Dict[str, Dict]:
     return manifest_dict
 
 def build_table_name(table_name:str,table_prefix:str = None,table_suffix:str = None) -> str:
-        return table_prefix+table_name+table_suffix
+        if table_prefix is None and table_suffix is None:
+            return table_name
+        elif table_prefix is None and table_suffix is not None:
+            return table_name+table_suffix
+        elif table_prefix is not None and table_suffix is None:
+            return table_prefix+table_name
+        else:
+            return table_prefix+table_name+table_suffix
 
 def create_backup_table(backup_schema_name:str,table_name:str,table_prefix:str,raw_schema:str,raw_database:str) -> bool:
     table_suffix="_"+datetime.now().strftime("%Y%m%d")
@@ -30,6 +37,7 @@ def create_backup_table(backup_schema_name:str,table_name:str,table_prefix:str,r
         bkp_table_name=build_table_name(table_name,table_suffix)
         original_table_name=build_table_name(table_name)
     create_backup_table=f"CREATE TABLE {raw_database}.{backup_schema_name}.{bkp_table_name} CLONE {raw_database}.{raw_schema}.{original_table_name};"
+    logging.info(f'create_backup_table')
     snowflake_engine.query_executor(create_backup_table)
     return True
 
@@ -60,6 +68,7 @@ def main(file_path: str = 't_gitlab_com_scd_advance_metadata_manifest.yml') -> N
     manifest_dict.update({'raw_database' : env.copy()["SNOWFLAKE_LOAD_DATABASE"]})
     #iterate through each table and check if it exist 
     for table in scd_tables_list:
+        logging.info(f'Proceeding with table {table} for deduplication')
         deduplicate_scd_tables(manifest_dict,table)
 
 
