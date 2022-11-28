@@ -2909,15 +2909,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - isharan:
-        member_of:
-            - data_team_analyst
-            - analyst_core
-            - restricted_safe
-            - bi_tool_eval_db
-        warehouses:
-            - dev_xs
-
     - iweeks:
         member_of:
             - adaptive
@@ -4840,9 +4831,8 @@ users:
         member_of: []
 
     - isharan:
-        can_login: yes
-        member_of:
-            - isharan
+        can_login: no
+        member_of: []
 
     - iweeks:
         can_login: yes
