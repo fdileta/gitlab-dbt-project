@@ -4354,19 +4354,6 @@ roles:
                     - srehm_prep.*.*
                     - srehm_prod.*.*
 
-    - statimatla:
-        member_of:
-            - adaptive
-            - analyst_finance
-            - bamboohr_analytics
-            - customers_db
-            - analyst_marketing
-            - data_team_analyst
-            - restricted_safe
-            - xactly
-        warehouses:
-            - dev_xs
-
     - stitch:
         warehouses:
             - loading
@@ -5052,9 +5039,8 @@ users:
             - srehm
 
     - statimatla:
-        can_login: yes
-        member_of:
-            - statimatla
+        can_login: no
+        member_of: []
 
     - stitch:
         can_login: yes
