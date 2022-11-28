@@ -37,38 +37,6 @@ tables:
       , email
       , phone_number
       FROM customers
-  eula_requests:
-    advanced_metadata: true
-    export_db: EXPORT_DB
-    export_schema: 'customers'
-    export_table: 'eula_requests'
-    export_table_primary_key: id
-    import_db: CUSTOMERS_DB
-    import_query: |-
-      SELECT id
-      , customer_id
-      , subscription_id
-      , accepted_at
-      , created_at
-      , updated_at
-      , eula_type
-      , subscription_name
-      , eula_id
-      FROM eula_requests
-  eulas:
-    advanced_metadata: true
-    export_db: EXPORT_DB
-    export_schema: 'customers'
-    export_table: 'eulas'
-    export_table_primary_key: id
-    import_db: CUSTOMERS_DB
-    import_query: |-
-      SELECT id
-      , name
-      , content
-      , created_at
-      , updated_at
-      FROM eulas
   leads:
     advanced_metadata: true
     export_db: EXPORT_DB
@@ -123,6 +91,22 @@ tables:
       , license_starts_on
       , zuora_subscription_name
       FROM license_seat_links
+  license_versions:
+    advanced_metadata: true
+    export_db: EXPORT_DB
+    export_schema: 'customers'
+    export_table: 'license_versions'
+    export_table_primary_key: item_id
+    import_db: CUSTOMERS_DB
+    import_query: |-
+      SELECT item_id
+      , created_at
+      , item_type
+      , event
+      , whodunnit
+      , object
+      , object_changes
+      FROM license_versions
   licenses:
     advanced_metadata: true
     export_db: EXPORT_DB
@@ -153,6 +137,7 @@ tables:
       , zuora_subscription_name
       , license_file_md5
       , creator_id
+      , license_file_sha256
       FROM licenses
   orders:
     advanced_metadata: true

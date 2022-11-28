@@ -1,3 +1,5 @@
+{{ config(materialized='table') }}
+
 WITH dim_billing_account_api_sandbox AS (
 
   SELECT *

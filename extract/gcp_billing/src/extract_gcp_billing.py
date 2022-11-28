@@ -15,7 +15,7 @@ from gitlabdata.orchestration_utils import (
 config_dict = env.copy()
 
 
-def get_billing_data_query(start_date: str) -> str:
+def get_billing_data_query(start_time: str, end_time: str) -> str:
     """
     sql to run in bigquery for daily partition
     """
@@ -40,7 +40,7 @@ def get_billing_data_query(start_date: str) -> str:
           cost_type,
           DATE(_PARTITIONTIME)
         FROM gitlab_com_billing.gcp_billing_export_v1_017B02_778F9C_493B83
-        WHERE DATE(_PARTITIONTIME)= '{start_date}'
+        WHERE export_time between '{start_time}' and '{end_time}'
     """
 
 
@@ -78,10 +78,13 @@ if __name__ == "__main__":
     bq = BigQueryClient(credentials)
 
     start_time = config_dict["START_TIME"]
+    end_time = config_dict["END_TIME"]
 
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    sql_statement = get_billing_data_query(start_time)
+    sql_statement = get_billing_data_query(start_time, end_time)
+
+    logging.info(sql_statement)
 
     df_result = bq.get_dataframe_from_sql(
         sql_statement,

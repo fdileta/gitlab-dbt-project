@@ -9,3 +9,7 @@ Propensity to contract and churn scores created by ML algorithms.
 {% docs ptpt_scores_source %}
 Propensity to purchase from trial scores created by ML algorithms. 
 {% enddocs %}
+
+{% docs namespace_segmentation_scores_source %}
+Namespace segmentation trial scores created by ML algorithms. 
+{% enddocs %}

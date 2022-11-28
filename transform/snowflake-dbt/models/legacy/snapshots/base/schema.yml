@@ -1,6 +1,10 @@
 version: 2
 
 models:
+  - name: bizible_attribution_touchpoint_snapshots_source
+    description: Attibtution touchpoints from Bizible loaded into Salesforce.
+  - name: bizible_touchpoint_snapshots_source
+    description: Attibtution touchpoints from Bizible loaded into Salesforce.
   - name: comp_band_loc_factor_base
     description: This model captures percent over comp band data from the sheetload_employee_location_factor snapshotted model. This sheetload is active between 2019.10  - 2020.05.20.
   - name: customers_db_customers_snapshots_base
@@ -135,22 +139,6 @@ models:
           - not_null
       - name: valid_to
 
-  - name: sfdc_account_snapshots_base_clean
-    description: This is the clean base model for snapshots of the salesforce account table for 2019-10-01 and forward. This exists to make the UDF work.
-  - name: sfdc_account_snapshots_base
-    description: This is a view on the clean base model for snapshots of the salesforce account table for 2019-10-01 and forward.
-    columns:
-      - name: unique_key
-        tests:
-          - not_null
-          - unique
-      - name: account_snapshot_id
-        tests:
-          - not_null
-      - name: id
-          - not_null
-      - name: valid_from
-          - not_null
   - name: sfdc_account_snapshots_source
     description: This is the source model for snapshots of the salesforce account table for cleaning and renaming.
     tests:
@@ -181,6 +169,10 @@ models:
         description: The country of the company matched by the Zoom Info enrichment process.
       - name: is_excluded_from_zoom_info_enrich
         description: A flag to indicate if the account should be included in the Zoom Info enrichment process.
+  - name: sfdc_bizible_attribution_touchpoint_snapshots_source
+    description: Attibtution touchpoints from Bizible loaded into Salesforce.
+  - name: sfdc_bizible_touchpoint_snapshots_source
+    description: Attibtution touchpoints from Bizible loaded into Salesforce.
   - name: sfdc_opportunity_snapshots_base
     description: This is the base model for snapshots of the salesforce opportunity table for 2019-10-01 and forward.
     columns:

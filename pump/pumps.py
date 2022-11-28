@@ -7,7 +7,7 @@ from gitlabdata.orchestration_utils import snowflake_engine_factory
 from sqlalchemy.engine import Engine
 
 
-def get_copy_command(model, sensitive, timestamp, inc_start, inc_end):
+def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage):
     """
     Generate a copy command based on data passed from pumps.yml
     """
@@ -32,7 +32,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end):
             query = "SELECT * " + from_statement + where_statement
 
         copy_command_tmp = """
-        COPY INTO @RAW.PUBLIC.S3_DATA_PUMP/{model}
+        COPY INTO @RAW.PUBLIC.{stage}/{model}
         FROM ({query} LIMIT 1000000)
         FILE_FORMAT = (TYPE = CSV, NULL_IF = (), FIELD_OPTIONALLY_ENCLOSED_BY = '"', COMPRESSION=NONE)
         HEADER = TRUE
@@ -40,6 +40,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end):
       """
 
         copy_command = copy_command_tmp.format(
+            stage=stage.upper(),
             model=model,
             query=query,
         )
@@ -50,7 +51,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end):
         return copy_command
 
 
-def copy_data(model, sensitive, timestamp, inc_start, inc_end):
+def copy_data(model, sensitive, timestamp, inc_start, inc_end, stage):
     """
     run copy command to copy data from snowflake
     """
@@ -61,8 +62,10 @@ def copy_data(model, sensitive, timestamp, inc_start, inc_end):
 
     try:
         connection = engine.connect()
-        copy_command = get_copy_command(model, sensitive, timestamp, inc_start, inc_end)
-        logging.info("running copy command {copy_command}")
+        copy_command = get_copy_command(
+            model, sensitive, timestamp, inc_start, inc_end, stage
+        )
+        logging.info(f"running copy command {copy_command}")
         connection.execute(copy_command).fetchone()
     except:
         logging.info("Failed to run copy command...")

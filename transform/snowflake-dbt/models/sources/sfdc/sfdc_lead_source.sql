@@ -37,6 +37,7 @@ renamed AS (
     hasoptedoutofemail AS has_opted_out_email,
     emailbounceddate AS email_bounced_date,
     emailbouncedreason AS email_bounced_reason,
+    behavior_score__c AS behavior_score,
     leadsource AS lead_source,
     lead_from__c AS lead_from,
     lead_source_type__c AS lead_source_type,
@@ -62,6 +63,10 @@ renamed AS (
     zi_contact_city__c AS zoominfo_contact_city,
     zi_company_city__c AS zoominfo_company_city,
     zi_industry__c AS zoominfo_company_industry,
+    zi_phone_number__c AS zoominfo_phone_number, 
+    zi_mobile_phone_number__c AS zoominfo_mobile_phone_number, 
+    zi_do_not_call_direct_phone__c AS zoominfo_do_not_call_direct_phone,
+    zi_do_not_call_mobile_phone__c AS zoominfo_do_not_call_mobile_phone,
     buying_process_for_procuring_gitlab__c AS buying_process,
     core_check_in_notes__c AS core_check_in_notes,
     industry AS industry,
@@ -106,6 +111,15 @@ renamed AS (
     sequence_step_type2__c AS sequence_step_type,
     actively_being_sequenced__c::BOOLEAN AS is_actively_being_sequenced,
     gaclientid__c AS ga_client_id,
+    employee_buckets__c AS employee_bucket,
+    fo_initial_mql__c AS is_first_order_initial_mql,
+    fo_mql__c AS is_first_order_mql,
+    is_first_order_person__c AS is_first_order_person,
+    true_initial_mql_date__c AS true_initial_mql_date,
+    true_mql_date__c AS true_mql_date,
+    last_transfer_date_time__c AS last_transfer_date_time,
+	time_from_last_transfer_to_sequence__c AS time_from_last_transfer_to_sequence,
+	time_from_mql_to_last_transfer__c AS time_from_mql_to_last_transfer,
 
 
     {{ sfdc_source_buckets('leadsource') }}
@@ -163,11 +177,14 @@ renamed AS (
     cognism_city__c as cognism_city,
     cognism_state__c as cognism_state,
     cognism_country__c as cognism_country,
+    cognism_number_of_employees__c AS cognism_employee_count,
 
     --LeanData
     leandata__matched_account_billing_state__c as leandata_matched_account_billing_state,
     leandata__matched_account_billing_postal_code__c as leandata_matched_account_billing_postal_code,
     leandata__matched_account_billing_country__c as leandata_matched_account_billing_country,
+    leandata__matched_account_employees__c AS leandata_matched_account_employee_count,
+    lean_data_matched_account_sales_segment__c AS leandata_matched_account_sales_segment,
 
 
     --metadata

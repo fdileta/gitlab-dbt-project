@@ -127,6 +127,7 @@ tables:
       , approvals_required
       , name
       , rule_type
+      , report_type
       FROM approval_project_rules
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
@@ -278,6 +279,7 @@ tables:
       , updated_at
       , project_id
       , name
+      , created_by_user_id
       FROM cluster_agents
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
@@ -580,26 +582,6 @@ tables:
       FROM events
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
-  experiment_subjects:
-    dbt_source_model: true
-    export_schema: 'gitlab_com'
-    export_table: 'experiment_subjects'
-    export_table_primary_key: id
-    import_db: GITLAB_DB
-    import_query: |-
-      SELECT id
-      , experiment_id
-      , user_id
-      , namespace_id AS group_id
-      , project_id
-      , variant
-      , created_at
-      , updated_at
-      , converted_at
-      , context
-      FROM experiment_subjects
-      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
-        AND '{END_TIMESTAMP}'::timestamp
   external_status_checks:
     dbt_source_model: true
     export_schema: 'gitlab_com'
@@ -757,6 +739,20 @@ tables:
       , sprint_id
       , health_status
       FROM issues
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
+  jira_connect_subscriptions:
+    export_schema: "gitlab_com"
+    export_table: jira_connect_subscriptions
+    export_table_primary_key: id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT id
+      , jira_connect_installation_id
+      , namespace_id
+      , created_at
+      , updated_at
+      FROM jira_connect_subscriptions
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
   jira_imports:
@@ -947,7 +943,7 @@ tables:
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
   merge_request_metrics:
-    additional_filtering: AND first_comment_at NOT IN ('2746-07-23 18:16:42.925+00 BC','2746-07-23 18:16:42.925+00 BC','2746-07-23 18:16:42.925+00 BC','2746-07-23 18:16:42.925+00 BC')
+    additional_filtering: AND COALESCE(first_comment_at,'3000-01-01 00:00:00.000'::TIMESTAMP) >= '2000-01-01 00:00:00.000'::TIMESTAMP
     dbt_source_model: true
     export_schema: 'gitlab_com'
     export_table: 'merge_request_metrics'
@@ -1393,7 +1389,7 @@ tables:
       , mirror
       , mirror_user_id
       , shared_runners_enabled
-      , build_coverage_regex
+      , NULL AS build_coverage_regex
       , build_allow_git_fetch
       , build_timeout
       , mirror_trigger_builds
@@ -1458,6 +1454,41 @@ tables:
       , updated_at
       , code_owner_approval_required
       FROM protected_branches
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
+  protected_branch_merge_access_levels:
+    dbt_source_model: true
+    export_schema: 'gitlab_com'
+    export_table: 'protected_branch_merge_access_levels'
+    export_table_primary_key: id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT id
+      , protected_branch_id
+      , access_level
+      , created_at
+      , updated_at
+      , user_id
+      , group_id 
+      FROM protected_branch_merge_access_levels
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
+  protected_branch_push_access_levels:
+    dbt_source_model: true
+    export_schema: 'gitlab_com'
+    export_table: 'protected_branch_push_access_levels'
+    export_table_primary_key: id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT id
+      , protected_branch_id
+      , access_level
+      , created_at
+      , updated_at
+      , user_id
+      , group_id
+      , deploy_key_id 
+      FROM protected_branch_push_access_levels
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
   protected_environment_approval_rules:
@@ -1684,6 +1715,22 @@ tables:
       FROM saml_group_links
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
+  security_orchestration_policy_configurations:
+    export_schema: "gitlab_com"
+    export_table:   security_orchestration_policy_configurations
+    export_table_primary_key: id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT id
+      , project_id
+      , security_policy_management_project_id
+      , created_at
+      , updated_at
+      , configured_at
+      , namespace_id
+      FROM security_orchestration_policy_configurations
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
   security_scans:
     export_schema: "gitlab_com"
     export_table: security_scans
@@ -1787,7 +1834,7 @@ tables:
       , updated_at
       , start_date
       , due_date
-      , project_id
+      , NULL AS project_id
       , group_id
       , iid
       , cached_markdown_version
@@ -1949,7 +1996,7 @@ tables:
       , setup_for_company
       , render_whitespace_in_code
       , tab_width
-      , experience_level
+      , NULL as experience_level
       , view_diffs_file_by_file
       , id
       , gitpod_enabled
@@ -2098,7 +2145,7 @@ tables:
       , created_at
       , updated_at
       , type
-      , service_id
+      , integration_id
       FROM web_hooks
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp

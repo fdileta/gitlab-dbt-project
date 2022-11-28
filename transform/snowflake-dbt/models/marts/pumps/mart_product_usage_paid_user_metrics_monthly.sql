@@ -7,7 +7,7 @@
 
 {{ simple_cte([
     ('monthly_saas_metrics','fct_saas_product_usage_metrics_monthly'),
-    ('monthly_sm_metrics','fct_product_usage_wave_1_3_metrics_monthly'),
+    ('monthly_sm_metrics','fct_ping_instance_metric_wave_monthly'),
     ('billing_accounts','dim_billing_account'),
     ('location_country', 'dim_location_country'),
     ('subscriptions', 'dim_subscription'),
@@ -72,44 +72,44 @@
       monthly_sm_metrics.dim_subscription_id,
       NULL                                                                         AS dim_namespace_id,
       NULL                                                                         AS namespace_name,
-      monthly_sm_metrics.uuid,
+      monthly_sm_metrics.dim_instance_id                                           AS uuid,
       monthly_sm_metrics.hostname,
-      {{ get_keyed_nulls('billing_accounts.dim_billing_account_id') }}              AS dim_billing_account_id,
-      {{ get_keyed_nulls('billing_accounts.dim_crm_account_id') }}                      AS dim_crm_account_id,
+      {{ get_keyed_nulls('billing_accounts.dim_billing_account_id') }}             AS dim_billing_account_id,
+      {{ get_keyed_nulls('billing_accounts.dim_crm_account_id') }}                 AS dim_crm_account_id,
       monthly_sm_metrics.dim_subscription_id_original,
       subscriptions.subscription_name,
       subscriptions.subscription_status,
-      most_recent_subscription_version.subscription_status AS subscription_status_most_recent_version,
+      most_recent_subscription_version.subscription_status                         AS subscription_status_most_recent_version,
       subscriptions.term_start_date,
       subscriptions.term_end_date,
       most_recent_subscription_version.subscription_start_date,
       most_recent_subscription_version.subscription_end_date,
       monthly_sm_metrics.snapshot_date_id,
       monthly_sm_metrics.ping_created_at,
-      monthly_sm_metrics.dim_usage_ping_id,
+      monthly_sm_metrics.dim_ping_instance_id                                      AS dim_usage_ping_id,
       monthly_sm_metrics.instance_type,
       monthly_sm_metrics.cleaned_version,
       location_country.country_name,
       location_country.iso_2_country_code,
       location_country.iso_3_country_code,
-      'Self-Managed'                                                                AS delivery_type,
+      'Self-Managed'                                                               AS delivery_type,
       -- Wave 1
       DIV0(
         monthly_sm_metrics.billable_user_count, 
         COALESCE(
           zuora_licenses_per_subscription.license_user_count, 
           monthly_sm_metrics.license_user_count)
-      )                                                                             AS license_utilization,
+      )                                                                            AS license_utilization,
       monthly_sm_metrics.billable_user_count,
       monthly_sm_metrics.active_user_count,
       monthly_sm_metrics.max_historical_user_count,
       COALESCE(
         zuora_licenses_per_subscription.license_user_count, 
-        monthly_sm_metrics.license_user_count)                                      AS license_user_count,
+        monthly_sm_metrics.license_user_count)                                     AS license_user_count,
       IFF(
         zuora_licenses_per_subscription.license_user_count IS NOT NULL, 
         'Zuora',
-        'Service Ping')                                                             AS license_user_count_source,
+        'Service Ping')                                                            AS license_user_count_source,
       -- Wave 2 & 3
       monthly_sm_metrics.umau_28_days_user,
       monthly_sm_metrics.action_monthly_active_users_project_repo_28_days_user,
@@ -137,7 +137,7 @@
       monthly_sm_metrics.user_container_scanning_jobs_28_days_user,
       monthly_sm_metrics.object_store_packages_enabled,
       monthly_sm_metrics.projects_with_packages_all_time_event,
-      monthly_sm_metrics.projects_with_packages_28_days_user,
+      monthly_sm_metrics.projects_with_packages_28_days_event,
       monthly_sm_metrics.deployments_28_days_user,
       monthly_sm_metrics.releases_28_days_user,
       monthly_sm_metrics.epics_28_days_user,
@@ -246,7 +246,7 @@
       monthly_sm_metrics.active_project_runners_all_time_event,
       monthly_sm_metrics.gitaly_version,
       monthly_sm_metrics.gitaly_servers_all_time_event,
-      -- Wave 6
+      -- Wave 6.0
       monthly_sm_metrics.api_fuzzing_scans_all_time_event,
       monthly_sm_metrics.api_fuzzing_scans_28_days_event,
       monthly_sm_metrics.coverage_fuzzing_scans_all_time_event,
@@ -261,6 +261,23 @@
       monthly_sm_metrics.dast_scans_28_days_event,
       monthly_sm_metrics.sast_scans_all_time_event,
       monthly_sm_metrics.sast_scans_28_days_event,
+      -- Wave 6.1
+      monthly_sm_metrics.packages_pushed_registry_all_time_event,
+      monthly_sm_metrics.packages_pulled_registry_all_time_event,
+      monthly_sm_metrics.compliance_dashboard_view_28_days_user,
+      monthly_sm_metrics.audit_screen_view_28_days_user,
+      monthly_sm_metrics.instance_audit_screen_view_28_days_user,
+      monthly_sm_metrics.credential_inventory_view_28_days_user,
+      monthly_sm_metrics.compliance_frameworks_pipeline_all_time_event,
+      monthly_sm_metrics.compliance_frameworks_pipeline_28_days_event,
+      monthly_sm_metrics.groups_streaming_destinations_all_time_event,
+      monthly_sm_metrics.groups_streaming_destinations_28_days_event,
+      monthly_sm_metrics.audit_event_destinations_all_time_event,
+      monthly_sm_metrics.audit_event_destinations_28_days_event,
+      monthly_sm_metrics.projects_status_checks_all_time_event,
+      monthly_sm_metrics.external_status_checks_all_time_event,
+      monthly_sm_metrics.paid_license_search_28_days_user,
+      monthly_sm_metrics.last_activity_28_days_user,
       -- Data Quality Flag
       monthly_sm_metrics.is_latest_data
     FROM monthly_sm_metrics
@@ -348,7 +365,7 @@
       monthly_saas_metrics.user_container_scanning_jobs_28_days_user,
       monthly_saas_metrics.object_store_packages_enabled,
       monthly_saas_metrics.projects_with_packages_all_time_event,
-      monthly_saas_metrics.projects_with_packages_28_days_user,
+      monthly_saas_metrics.projects_with_packages_28_days_event,
       monthly_saas_metrics.deployments_28_days_user,
       monthly_saas_metrics.releases_28_days_user,
       monthly_saas_metrics.epics_28_days_user,
@@ -457,7 +474,7 @@
       monthly_saas_metrics.active_project_runners_all_time_event,
       monthly_saas_metrics.gitaly_version,
       monthly_saas_metrics.gitaly_servers_all_time_event,
-      -- Wave 6
+      -- Wave 6.0
       monthly_saas_metrics.api_fuzzing_scans_all_time_event,
       monthly_saas_metrics.api_fuzzing_scans_28_days_event,
       monthly_saas_metrics.coverage_fuzzing_scans_all_time_event,
@@ -472,6 +489,23 @@
       monthly_saas_metrics.dast_scans_28_days_event,
       monthly_saas_metrics.sast_scans_all_time_event,
       monthly_saas_metrics.sast_scans_28_days_event,
+      -- Wave 6.1
+      monthly_saas_metrics.packages_pushed_registry_all_time_event,
+      monthly_saas_metrics.packages_pulled_registry_all_time_event,
+      monthly_saas_metrics.compliance_dashboard_view_28_days_user,
+      monthly_saas_metrics.audit_screen_view_28_days_user,
+      monthly_saas_metrics.instance_audit_screen_view_28_days_user,
+      monthly_saas_metrics.credential_inventory_view_28_days_user,
+      monthly_saas_metrics.compliance_frameworks_pipeline_all_time_event,
+      monthly_saas_metrics.compliance_frameworks_pipeline_28_days_event,
+      monthly_saas_metrics.groups_streaming_destinations_all_time_event,
+      monthly_saas_metrics.groups_streaming_destinations_28_days_event,
+      monthly_saas_metrics.audit_event_destinations_all_time_event,
+      monthly_saas_metrics.audit_event_destinations_28_days_event,
+      monthly_saas_metrics.projects_status_checks_all_time_event,
+      monthly_saas_metrics.external_status_checks_all_time_event,
+      monthly_saas_metrics.paid_license_search_28_days_user,
+      monthly_saas_metrics.last_activity_28_days_user,
       -- Data Quality Flag
       monthly_saas_metrics.is_latest_data
     FROM monthly_saas_metrics
@@ -521,7 +555,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@ischweickartDD",
-    updated_by="@snalamaru",
+    updated_by="@mdrussell",
     created_date="2021-06-11",
-    updated_date="2022-06-28"
+    updated_date="2022-08-26"
 ) }}

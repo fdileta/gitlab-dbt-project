@@ -1,5 +1,11 @@
 import logging
 import os
+import csv
+
+from typing import Dict
+
+from dateutil import rrule
+from datetime import datetime, timedelta
 
 from gitlabdata.orchestration_utils import (
     query_dataframe,
@@ -7,10 +13,6 @@ from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
     bizible_snowflake_engine_factory,
 )
-from typing import Dict
-
-from dateutil import rrule
-from datetime import datetime, timedelta
 
 
 class BizibleSnowFlakeExtractor:
@@ -37,11 +39,9 @@ class BizibleSnowFlakeExtractor:
         """
         table_name = full_table_name.split(".")[-1]
         if len(date_column) > 0:
-            snowflake_query_max_date = f"""
-                            SELECT 
-                                max({date_column}) as last_modified_date
-                            FROM "BIZIBLE".{table_name} 
-                        """
+            snowflake_query_max_date = f"""SELECT 
+                        max({date_column}) as last_modified_date
+                    FROM "BIZIBLE".{table_name}"""
             df = query_dataframe(self.snowflake_engine, snowflake_query_max_date)
 
             last_modified_date_list = df["last_modified_date"].to_list()
@@ -58,6 +58,27 @@ class BizibleSnowFlakeExtractor:
 
         return {table_name: {}}
 
+    def write_query_to_csv(self, engine, file_name, query):
+        """
+            Small function using the built-in CSV class rather than pandas.
+        :param engine:
+        :param file_name:
+        :param query:
+        :return:
+        """
+        connection = engine.connect()
+        results = connection.execute(query)
+        columns = results.keys()
+        fetched_rows = results.fetchall()
+        f = open(file_name, "w")
+        out = csv.writer(f, delimiter="|")
+        out.writerow([r for r in columns])
+
+        for r in fetched_rows:
+            out.writerow([c for c in r])
+
+        connection.close()
+
     def upload_query(self, table_name: str, file_name: str, query: str) -> None:
         """
 
@@ -69,21 +90,17 @@ class BizibleSnowFlakeExtractor:
         :type query:
         """
         logging.info(f"Running {query}")
-        df = query_dataframe(self.bizible_engine, query)
-
-        logging.info(f"Creating {file_name}")
-        df.to_csv(file_name, index=False, sep="|")
+        self.write_query_to_csv(self.bizible_engine, file_name, query)
 
         logging.info(f"Processing {file_name} to {table_name}")
         snowflake_stage_load_copy_remove(
             file_name,
-            f"BIZIBLE.BIZIBLE_LOAD",
+            "BIZIBLE.BIZIBLE_LOAD",
             f"BIZIBLE.{table_name.lower()}",
             self.snowflake_engine,
             "csv",
             file_format_options="trim_space=true field_optionally_enclosed_by = '0x22' SKIP_HEADER = 1 field_delimiter = '|' ESCAPE_UNENCLOSED_FIELD = None",
         )
-        logging.info(f"Processed {file_name}")
 
         logging.info(f"To delete {file_name}")
         os.remove(file_name)
@@ -103,17 +120,19 @@ class BizibleSnowFlakeExtractor:
         :type date_column:
         """
         end_date = datetime.now()
+        time_increments = 1
         for dt in rrule.rrule(
-            rrule.HOURLY, dtstart=last_modified_date, until=end_date, interval=2
+            rrule.HOURLY,
+            dtstart=last_modified_date,
+            until=end_date,
+            interval=time_increments,
         ):
             query_start_date = dt
-            query_end_date = dt + timedelta(hours=2)
+            query_end_date = dt + timedelta(hours=time_increments)
 
-            query = f"""
-            SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
-            WHERE {date_column} >= '{query_start_date}' 
-            AND {date_column} < '{query_end_date}'
-            """
+            query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
+                WHERE {date_column} >= '{query_start_date}' 
+                AND {date_column} < '{query_end_date}'"""
 
             file_name = f"{table_name}_{str(dt.year)}-{str(dt.month)}-{str(dt.day)}-{str(dt.hour)}.csv"
 
@@ -129,8 +148,7 @@ class BizibleSnowFlakeExtractor:
         :type table_name:
         """
         query = f"""
-        SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
-        """
+        SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}"""
 
         file_name = f"{table_name}.csv"
         self.upload_query(table_name, file_name, query)
@@ -150,8 +168,7 @@ class BizibleSnowFlakeExtractor:
         """
         query = f"""
         SELECT COUNT(*) as record_count FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
-        WHERE {date_column} >= '{last_modified_date}' 
-        """
+        WHERE {date_column} >= '{last_modified_date}'"""
 
         record_count = query_dataframe(self.bizible_engine, query)[
             "record_count"
@@ -173,8 +190,7 @@ class BizibleSnowFlakeExtractor:
         """
         query = f"""
         SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
-        WHERE {date_column} >= '{last_modified_date}' 
-        """
+        WHERE {date_column} >= '{last_modified_date}'"""
 
         file_name = f"{table_name}.csv"
         self.upload_query(table_name, file_name, query)
