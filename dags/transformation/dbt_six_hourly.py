@@ -1,6 +1,6 @@
 """
 ## Info about DAG
-This DAG is responsible for running a six-hourly refresh on models tagged with the "6_hourly" label from Monday to Saturday.
+This DAG is responsible for running a six-hourly refresh on models tagged with the "six_hourly" label from Monday to Saturday.
 """
 
 import os
@@ -88,7 +88,7 @@ secrets_list = [
 
 # Create the DAG
 dag = DAG(
-    "dbt_6_hourly",
+    "dbt_six_hourly",
     description="This DAG is responsible for refreshing models at minute 0 past every 6th hour.",
     default_args=default_args,
     schedule_interval="0 */6 * * 1-6",
@@ -120,24 +120,24 @@ dbt_evaluate_run_date_task = ShortCircuitOperator(
 )
 
 # run sfdc_opportunity models on large warehouse
-dbt_sfdc_opportunity_models_command = f"""
+dbt_six_hourly_models_command = f"""
     {pull_commit_hash} &&
     {dbt_install_deps_cmd} &&
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
-    dbt --no-use-colors run --profiles-dir profile --target prod --include tag:6_hourly; ret=$?;
+    dbt --no-use-colors run --profiles-dir profile --target prod --include tag:six_hourly; ret=$?;
     montecarlo import dbt-run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
 """
 
-dbt_sfdc_opportunity_models_task = KubernetesPodOperator(
+dbt_six_hourly_models_task = KubernetesPodOperator(
     **gitlab_defaults,
     image=DBT_IMAGE,
-    task_id="dbt-sfdc-opportunity_models_command",
+    task_id="dbt_six_hourly_models_command",
     name="dbt-six-hourly-models-run",
     secrets=secrets_list,
     env_vars=pod_env_vars,
-    arguments=[dbt_sfdc_opportunity_models_command],
+    arguments=[dbt_six_hourly_models_command],
     dag=dag,
 )
 
@@ -164,6 +164,6 @@ dbt_results = KubernetesPodOperator(
 
 (
     dbt_evaluate_run_date_task
-    >> dbt_sfdc_opportunity_models_task
+    >> dbt_six_hourly_models_task
     >> dbt_results
 )
