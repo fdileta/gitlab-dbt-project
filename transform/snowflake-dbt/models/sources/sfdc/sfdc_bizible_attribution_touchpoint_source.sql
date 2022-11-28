@@ -25,7 +25,7 @@ WITH source AS (
 
       -- attribution weights
       bizible2__attribution_first_touch__c    AS bizible_weight_first_touch,
-      bizible2__attribution_lead_creation_touch__c  
+      bizible2__attribution_lead_conversion_touch__c  
                                               AS bizible_weight_lead_creation_touch,
       bizible2__attribution_custom_model__c   AS bizible_weight_full_path,
       bizible2__attribution_u_shaped__c       AS bizible_weight_u_shaped,
