@@ -94,6 +94,39 @@ models:
       tests:
         - not_null
         - unique
+      description: The unique composite ID for the rpt_ping_metric_first_last_versions model consisting of metrics_path, ping_edition, and version_is_prerelease
+    - name: metrics_path
+      description: '{{ doc("metrics_path") }}'
+    - name: ping_edition
+      description: '{{ doc("ping_edition") }}'
+    - name: version_is_prerelease
+      description: '{{ doc("version_is_prerelease") }}'
+    - name: first_major_minor_version_id_with_counter
+      description: '{{ doc("first_major_minor_version_id_with_counter") }}'
+    - name: first_major_minor_version_with_counter
+      description: '{{ doc("first_major_minor_version_with_counter") }}'
+    - name: first_major_version_with_counter
+      description: '{{ doc("first_major_version_with_counter") }}'
+    - name: first_minor_version_with_counter
+      description: '{{ doc("first_minor_version_with_counter") }}'
+    - name: last_major_minor_version_id_with_counter
+      description: '{{ doc("last_major_minor_version_id_with_counter") }}'
+    - name: last_major_minor_version_with_counter
+      description: '{{ doc("last_major_minor_version_with_counter") }}'
+    - name: last_major_version_with_counter
+      description: '{{ doc("last_major_version_with_counter") }}'
+    - name: last_minor_version_with_counter
+      description: '{{ doc("last_minor_version_with_counter") }}'
+    - name: dim_installation_count
+      description: '{{ doc("dim_installation_count") }}'
+    - name: created_by
+      description: '{{ doc("created_by") }}'
+    - name: updated_by
+      description: '{{ doc("updated_by") }}'
+    - name: model_created_date
+      description: '{{ doc("model_created_date") }}'
+    - name: model_updated_date
+      description: '{{ doc("model_updated_date") }}'
 
 - name: rpt_ping_latest_subscriptions_monthly
   description: ' {{ doc("rpt_ping_latest_subscriptions_monthly") }} '
@@ -102,8 +135,37 @@ models:
       tests:
         - not_null
         - unique
+      description: The unique composite ID for the rpt_ping_latest_subscriptions_monthly model consisting of ping_created_date_month, latest_subscription_id, dim_installation_id, ping_edition, and version_is_prerelease
     - name: ping_created_date_month
-      description: The month when the ping was created (YYYY-MM-01)
+      description: '{{ doc("ping_created_date_month") }}'
+    - name: dim_installation_id
+      description: '{{ doc("dim_installation_id") }}'
+    - name: latest_subscription_id
+      description: '{{ doc("latest_subscription_id") }}'
+    - name: ping_edition
+      description: '{{ doc("ping_edition") }}'
+    - name: version_is_prerelease
+      description: '{{ doc("version_is_prerelease") }}'
+    - name: major_minor_version_id
+      description: The major_minor_version_id of the last ping sent from the installation that month
+    - name: instance_user_count
+      description: '{{ doc("instance_user_count") }}'
+    - name: licensed_user_count
+      description: '{{ doc("licensed_user_count_rpt_model") }}'
+    - name: ping_count
+      description: '{{ doc("ping_count") }}'
+    - name: has_sent_pings
+      description: '{{ doc("has_sent_pings") }}'
+    - name: is_missing_charge_subscription
+      description: '{{ doc("is_missing_charge_subscription") }}'
+    - name: created_by
+      description: '{{ doc("created_by") }}'
+    - name: updated_by
+      description: '{{ doc("updated_by") }}'
+    - name: model_created_date
+      description: '{{ doc("model_created_date") }}'
+    - name: model_updated_date
+      description: '{{ doc("model_updated_date") }}'
 
 - name: rpt_ping_subscriptions_on_versions_estimate_factors_monthly
   description: ' {{ doc("rpt_ping_subscriptions_on_versions_estimate_factors_monthly") }} '
@@ -112,9 +174,9 @@ models:
       tests:
         - not_null
         - unique
-      description: the unique composite ID for the rpt_ping_instance_metric_adoption_monthly model consisting of reporting_month, metrics_path, and estimation_grain
-    - name: ping_created_at_month
-      description: The month when the ping was created
+      description: The unique composite ID for the rpt_ping_instance_metric_adoption_monthly model consisting of reporting_month, metrics_path, and estimation_grain
+    - name: ping_created_date_month
+      description: '{{ doc("ping_created_date_month") }}'
     - name: reporting_count
       description: The number of seats/subscriptions that reported on a version with the metric
     - name: not_reporting_count
@@ -167,55 +229,53 @@ models:
         - unique
       description: the unique composite ID for the rpt_ping_metric_totals_w_estimates_monthly model consisting of reporting_month, metrics_path, estimation_grain, ping_edition_product_tier, and service_ping_delivery_type
     - name: metrics_path
-      description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+      description: '{{ doc("metrics_path") }}'
     - name: ping_created_date_month
-      description: The month when the ping was created (YYYY-MM-01)
+      description: '{{ doc("ping_created_date_month") }}'
     - name: ping_delivery_type
-      description: How the product is delivered to the installation (Self-Managed, SaaS)
+      description: '{{ doc("ping_delivery_type") }}'
     - name: ping_edition
-      description: The edition of GitLab on the installation (EE, CE)
+      description: '{{ doc("ping_edition") }}'
     - name: ping_product_tier
-      description: The product tier of the ping, inferred from the edition and the plan saved in the license (Core, Starter Premium, Ultimate)
+      description: '{{ doc("ping_product_tier") }}'
     - name: ping_edition_product_tier
-      description: A combination of the ping_edition and the ping_product_tier (EE - Self-Managed - Free, EE - Self-Managed - Premium, EE - Self-Managed - Ultimate)
+      description: '{{ doc("ping_edition_product_tier") }}'
     - name: stage_name
-      description: The name of the product stage responsible for the metric
+      description: '{{ doc("stage_name") }}'
     - name: section_name
-      description: The name of the product section responsible for the metric
+      description: '{{ doc("section_name") }}'
     - name: group_name
-      description: The name of the product group responsible for the metric
+      description: '{{ doc("group_name") }}'
     - name: is_smau
-      description: Boolean flag set to True if the metric is one of the counters chosen for the stage's SMAU calculation
+      description: '{{ doc("is_smau") }}'
     - name: is_gmau
-      description: Boolean flag set to True if the metric is one of the counters chosen for the group's GMAU calculation
+      description: '{{ doc("is_gmau") }}'
     - name: is_paid_gmau
-      description: Boolean flag set to True if the metric is one of the counters chosen for the group's paid GMAU calculation
+      description: '{{ doc("is_paid_gmau") }}'
     - name: is_umau
-      description: Boolean flag set to True if the metric is one of the counters chosen for UMAU calculation
+      description: '{{ doc("is_umau") }}'
     - name: reporting_count
-      description: The number of seats/subscriptions that met the condition (ex. reported the metric)
+      description: '{{ doc("reporting_count_estimation_model") }}'
     - name: not_reporting_count
-      description: The number of seats/subscriptions that did not meet the condition (ex. report the metric)
+      description: '{{ doc("not_reporting_count_estimation_model") }}'
     - name: percent_reporting
-      description: The percentage of the measure (subscriptions or seats) meeting the condition (ex. reporting the metric)
+      description: '{{ doc("percent_reporting_estimation_model") }}'
     - name: estimation_grain
-      description: The estimation methodology being used, made up of a condition (ex. reporting a metric) and a measure (ex. subscription count)
+      description: '{{ doc("estimation_grain") }}'
     - name: total_usage_with_estimate
-      description: Total usage, including the estimate
+      description: '{{ doc("total_usage_with_estimate") }}'
     - name: estimated_usage
-      description: Estimated usage based on recorded data and estimation grain/methodology
+      description: '{{ doc("estimated_usage") }}'
     - name: recorded_usage
-      description: Actual recorded usage
+      description: '{{ doc("recorded_usage_estimation_model") }}'
     - name: created_by
-      description: The GitLab handle of the original model creator
+      description: '{{ doc("created_by") }}'
     - name: updated_by
-      description: The GitLab handle of the most recent model editor
+      description: '{{ doc("updated_by") }}'
     - name: model_created_date
-      description: Manually input ISO date of when model was original created
+      description: '{{ doc("model_created_date") }}'
     - name: model_updated_date
-      description: Manually input ISO date of when model was updated
-    - name: dbt_updated_at
-    - name: dbt_created_at
+      description: '{{ doc("model_updated_date") }}'
 
 
 - name: rpt_ping_subscriptions_reported_counts_monthly
