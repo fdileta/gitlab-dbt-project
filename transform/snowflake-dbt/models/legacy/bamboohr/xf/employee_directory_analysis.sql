@@ -52,7 +52,7 @@ cleaned AS (
     CASE
       WHEN date_actual < '2020-06-09'
         THEN FALSE
-      WHEN date_actual >= '2020-06-09' AND sales_geo_differential = 'n/a - Comp Calc'
+      WHEN date_actual >= '2020-06-09' AND LOWER(sales_geo_differential) = 'n/a - comp calc'
         THEN FALSE
       ELSE TRUE
     END AS exclude_from_location_factor

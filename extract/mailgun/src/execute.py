@@ -2,12 +2,14 @@
 import datetime
 import json
 import sys
+import time
 from email import utils
 from logging import info, basicConfig, getLogger, error
 from os import environ as env
 from typing import Dict, List
 
 import requests
+from requests.exceptions import SSLError
 from fire import Fire
 
 from gitlabdata.orchestration_utils import (
@@ -62,7 +64,14 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
 
         while True:
             if page_token:
-                response = requests.get(page_token, auth=("api", api_key))
+                try:
+                    response = requests.get(page_token, auth=("api", api_key))
+                except SSLError:
+                    # Not a particularly cultured retry, but handles SSL errors sometimes experienced here and has
+                    # no risk of infinite loops.
+                    error("SSL error received, waiting 30 seconds before retrying")
+                    time.sleep(30)
+                    response = requests.get(page_token, auth=("api", api_key))
                 try:
                     data = response.json()
                 except json.decoder.JSONDecodeError:
@@ -131,7 +140,7 @@ def load_event_logs(event: str, full_refresh: bool = False):
 
     # Stay under snowflakes max column size.
     file_count = 0
-    for group in chunker(results, 10000):
+    for group in chunker(results, 8000):
         file_count = file_count + 1
         file_name = f"{event}_{file_count}.json"
 

@@ -1,21 +1,32 @@
 ## SheetLoad - Spreadsheet & CSV Loader Utility
-
 <img src="https://gitlab.com/meltano/analytics/uploads/d90d572dbc2b1b2c32ce987d581314da/sheetload_logo.png" alt="SheetLoadLogo" width="600"/>
 
 Google Sheets and CSVs can be loaded into the data warehouse using `extract/sheetload/sheetload.py`. CSVs stored in GCS or S3 can be uploaded. A Google Sheet or S3-stored CSV will only be loaded if there has been a change between the current and existing data in the warehouse (unless otherwise specified). CSV files stored in GCS will always force a full reload.
 
-If you are unsure what SheetLoad is or are requesting the inclusion of a data source into Snowflake/Periscope, please see the handbook page [Using SheetLoad](https://about.gitlab.com/handbook/business-ops/data-team/platform/#using-sheetload) and the corresponding [Issue Template](https://gitlab.com/gitlab-data/analytics/blob/master/.gitlab/issue_templates/CSV%20or%20GSheets%20Data%20Upload.md).
+If you are unsure what SheetLoad is or are requesting the inclusion of a data source into Snowflake/Periscope, please see the handbook page [Using SheetLoad](https://about.gitlab.com/handbook/business-technology/data-team/platform/pipelines/#sheetload) and the corresponding [Issue Template](https://gitlab.com/gitlab-data/analytics/blob/master/.gitlab/issue_templates/CSV%20or%20GSheets%20Data%20Upload.md).
 
 ##### All commands should be run from within a `data-image` container. Run `make data-image` from the top-level of the `analytics` repo to use one.
 
 Loading a Google Sheet:
 
   - Share the sheet with the required service account - [Email Address to share with](https://docs.google.com/document/d/1m8kky3DPv2yvH63W4NDYFURrhUwRiMKHI-himxn1r7k/edit?usp=sharing) (GitLab Internal)
-  - Files are stored in either the [Sheetload or Boneyard folders](https://drive.google.com/open?id=1F5jKClNEsQstngbrh3UYVzoHAqPTf-l0)
-  - All sheets will be uploaded to either the `raw.sheetload` schema or `analytics.boneyard` schema depending on the file name
-  - The file will be located and loaded based on its name. The names of the sheets shared with the runner must be unique
-  - Add new sheets to config.yml file
-  - Run the command `python3 sheetload.py sheets <path/to/yml/file>`
+	  - As of 11/22/2022, the service account is automatically granted access, so you just need to double-check
+  - Save the file in either the [Sheetload or Boneyard folders](https://drive.google.com/open?id=1F5jKClNEsQstngbrh3UYVzoHAqPTf-l0). 
+	  - Use `Sheetload` folder if  the data needs to be modeled downstream and/or regularly loaded.
+	  - Use `Boneyard` folder for direct ad-hoc accesss, more info in [handbook](https://about.gitlab.com/handbook/business-technology/data-team/platform/pipelines/#boneyard).
+  - Naming conventions
+	  - The filename should start with either `sheetload.<remaining_file_name>` or `boneyard.<remaining_file_name>`, i.e 'sheetload.data_certifications'
+		  - Note: the file will be located and loaded based on its name. Sheets will be either uploaded `raw.sheetload` schema or `analytics.boneyard`.
+	  - Name the tab however you'd like
+	  - Double checks
+		  - Make sure the name of the new sheet is unique (not already used)
+		  - Make sure the uploaded sheet 'file type' is 'Google Sheets', as the process does not recognize other file types
+  - Add new sheets to `sheets.yml` file
+	  - In the yml file, the `name` section should match the filename in Google Sheets, minus the 'sheetload.' prefix, i.e 'data_certifications'
+	  - The `tabs` section should match the tab(s) in Google Sheets exactly
+  - Run the python script from `/analytics/extract/sheetload` directory
+	  -  To run all sheets: `python3 sheetload.py sheets --sheet_file sheets.yml`
+	  -  To run a specific sheet: `python3 sheetload.py sheets --sheet_file sheets.yml --table_name <sheet_name>`
   - Logging from the script will tell you table successes/failures and the number of rows uploaded to each table.
 
  

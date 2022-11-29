@@ -774,6 +774,15 @@ models:
           - not_null
           - unique
 
+  - name: gitlab_dotcom_fork_network_members_source
+    description: A base model for Gitlab.com fork_network_members.
+    columns:
+      - name: id
+        tags: ["tdf","gitlab_dotcom"]
+        tests:
+          - not_null
+          - unique
+
   - name: gitlab_dotcom_gitlab_subscription_histories_source
     description: A log table tracking all changes to a gitlab_subscription.
     columns:
