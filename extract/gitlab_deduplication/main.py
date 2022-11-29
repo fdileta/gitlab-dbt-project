@@ -8,6 +8,8 @@ from typing import Dict
 from gitlabdata.orchestration_utils import (snowflake_engine_factory,
     query_executor,)
 
+snowflake_engine = snowflake_engine_factory(env, "LOADER")
+
 def manifest_reader(file_path: str) -> Dict[str, Dict]:
     """
     Read a yaml manifest file into a dictionary and return it.
@@ -38,7 +40,7 @@ def create_backup_table(backup_schema_name:str,table_name:str,table_prefix:str,r
         original_table_name=build_table_name(table_name)
     create_backup_table=f"CREATE TABLE {raw_database}.{backup_schema_name}.{bkp_table_name} CLONE {raw_database}.{raw_schema}.{original_table_name};"
     logging.info(f'create_backup_table')
-    snowflake_engine.query_executor(create_backup_table)
+    query_executor(snowflake_engine, create_backup_table)
     return True
 
 
