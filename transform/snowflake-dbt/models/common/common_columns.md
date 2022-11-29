@@ -594,7 +594,7 @@ Comma-separated list of collected data categories corresponding to the installat
 
 {% docs ping_created_date_week %}
 
-The first day of the calendar week when the ping was created (YYYY-MM-BOW)
+The first day of the calendar week when the ping was created (YYYY-MM-DOW)
 
 {% enddocs %}
 
