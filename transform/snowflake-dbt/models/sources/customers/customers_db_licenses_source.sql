@@ -28,7 +28,7 @@ WITH source AS (
       trial::BOOLEAN                             AS is_trial,
       zuora_subscription_name::VARCHAR           AS zuora_subscription_name,
       REPLACE(license_file_md5::VARCHAR, '-')    AS license_md5,
-      REPLACE(license_file_sha256::VARCHAR, '-') AS license_file_sha256
+      REPLACE(license_file_sha256::VARCHAR, '-') AS license_file_sha256,
       creator_id::NUMBER                         AS creator_id
     FROM source
 
