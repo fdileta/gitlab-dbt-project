@@ -25,6 +25,15 @@ DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = ("https://gitlab_analytics:$GITLAB_ANALYT
 
 def get_data_science_project_command(model_http_path, model_ssh_path, model_folder):
     return f"""
+    {data_test_ssh_key_cmd} &&
+    if [[ -z "$GIT_COMMIT" ]]; then
+        export GIT_COMMIT="HEAD"
+    fi
+    if [[ -z "$GIT_DATA_TESTS_PRIVATE_KEY" ]]; then
+        export REPO="{model_http_path}";
+        else
+        export REPO="{model_ssh_path}";
+    fi &&
     echo "git clone -b main --single-branch --depth 1 $REPO" &&
     git clone -b main --single-branch --depth 1 $REPO &&
     echo "checking out commit $GIT_COMMIT" &&
