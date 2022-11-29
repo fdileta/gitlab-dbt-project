@@ -10,21 +10,9 @@ unique identifier of a ping
 
 {% enddocs %}
 
-{% docs host_id%}
-
-Unique Identifier of a host
-
-{% enddocs %}
-
 {% docs license_id%}
 
 Unique Identifier of a license
-
-{% enddocs %}
-
-{% docs license_md5%}
-
-Unique md5 File of a license
 
 {% enddocs %}
 
