@@ -66,11 +66,10 @@
 
 {% enddocs %}
 
-
 {% docs rpt_ping_metric_first_last_versions %}
 
-**Description:**  First and Last Versions for Ping Metrics by Edition and Prerelease
-- This table provides First and Last Application Versions along with Installation Counts by Metric, Ping Edition and Prerelease.    
+**Description:**  First and Last Versions for Ping Metrics by Edition and Prerelease. For xMAU/PI reporting, this model is used to determine the version in which a metric was introduced.
+- This table provides First and Last Application Versions along with Installation Counts by Metric, Ping Edition and Prerelease.
 
 **Data Grain:**
 - metrics_path
@@ -78,13 +77,13 @@
 - version_is_prerelease
 
 **Filters:**
-- Metrics from GitLab Service Pings will not be considered
+- Metrics from GitLab.com (SaaS) Service Pings will not be considered
 - `Forwarded` - Only 28 Day and All-Time metrics  
 - `Forwarded` - Only Metrics from the 'Last Ping of the Month' pings 
 
 **Business Logic in this Model:** 
-- `First Versions` - The earliest version found for each Metrics_Path, Ping_Edition and Version_Is_Prerelease 
-- `Last Versions` - The latest version found for each Metrics_Path, Ping_Edition and Version_Is_Prerelease 
+- `First Versions` - The earliest (minimum) version found for each Metrics_Path, Ping_Edition and Version_Is_Prerelease 
+- `Last Versions` - The latest (maximum) version found for each Metrics_Path, Ping_Edition and Version_Is_Prerelease 
 - `is_last_ping_of_month` = last ping (Instance_id and Host_id) sent for the Month
 - `major_minor_version` = major_version || '.' || minor_version 
 - `major_minor_version_id` = major_version * 100 + minor_version
@@ -99,21 +98,27 @@
 
 {% docs rpt_ping_latest_subscriptions_monthly %}
 
-**Description:**  Self-Managed Service Pings with Latest Subscriptions, ARR Charges and Ping Counts by Installation, Month
-- Latest Subscription, Version, ARR, MRR and Ping Count information in included. 
+**Description:**  Self-Managed subscriptions by month and installation (if the subscription sent a ping that month). For xMAU/PI reporting, this model is used to determine the total number of active Self-Managed subscriptions on a given month and what percent of subscriptions sent a ping from a given version. It can also be used to determine what percent of subscriptions sent a ping on a given month, etc. 
+- The version an installation is reporting on (major_minor_version_id), seat count (licensed_user_count), and count of pings sent that month (ping_count) are also included.
 
 **Data Grain:**
 - ping_created_date_month
-- dim_installation_id
+- latest_subscription_id
+- dim_installation_id (only populated if subscription sent a ping that month)
 
-**Filters:**
+_Important caveat:_ The grain of this model is slightly different depending on whether a subscription sent a ping that month. It is advised to look at the `MAX()` value, grouped by `latest_subscription_id`.
+- If a subscription sent a ping that month, there is 1 record per subscription per installation reporting. (Note: a subscription can be associated with > 1 installation, so a single subscription could have multiple records for a given month)
+- If a subscription did not send a ping that month, there is 1 record per subscription
+
+**Filters applied to model:**
 - Include `ping_delivery_type = 'Self-Managed'`
 
 **Business Logic in this Model:**
-- MRR, ARR and Licensed_User_Count is limited to:
+- Seat count (licensed_user_count) is limited to:
   - product_delivery_type = `Self-Managed` 
   - subscription_status IN (`Active`,`Cancelled`)
   - product_tier_name <> `Storage`
+- Unpaid subscriptions (ex: OSS, EDU) are _included_ in this model
 
 **Other Comments:**
 - Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
@@ -261,7 +266,7 @@
 
 {% docs rpt_ping_metric_totals_w_estimates_monthly %}
 
-**Description:**  Usage totals and estimations for Reported and Non-Reported Instances by Month, Metric, Edition, Estimate Grain, Product Tier and Delivery Type     
+**Description:**  Total, recorded, and estimated usage for Usage totals and estimations for Reported and Non-Reported Instances by Month, Metric, Edition, Estimate Grain, Product Tier and Delivery Type, This model is used for xMAU/PI reporting.
 
 **Data Grain:**
 - ping_created_date_month
@@ -272,7 +277,7 @@
 - ping_delivery_type
 
 **Filters:**
-- Include metrics for 28 Day timeframes
+- Include metrics for 28 Day and All-Time timeframes
 - `Forwarded` - Include Metrics from the 'Last Ping of the Month' pings
 
 **Business Logic in this Model:**
