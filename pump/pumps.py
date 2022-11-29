@@ -39,8 +39,6 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
             target_name = f"{model}/{file_stamp}.csv"
             option = "SINGLE"
         
-        global tmp_copy_command
-
         tmp_copy_command = f"""
             COPY INTO @RAW.PUBLIC.{stage}/{target_name}
             FROM ({query} LIMIT 1000000)
