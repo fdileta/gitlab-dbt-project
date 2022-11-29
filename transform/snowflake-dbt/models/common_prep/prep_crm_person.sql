@@ -57,7 +57,7 @@ WITH biz_person AS (
       contact_email_hash                            AS email_hash,
       email_domain,
       email_domain_type,
-      IFF(email_domain_type = 'Business email domain') AS is_valuable_signup,
+      email_domain_type = 'Business email domain' AS is_valuable_signup,
 
       --keys
       master_record_id,
@@ -172,7 +172,7 @@ WITH biz_person AS (
       lead_email_hash                            AS email_hash,
       email_domain,
       email_domain_type,
-      IFF(email_domain_type = 'Business email domain') AS is_valuable_signup,
+      email_domain_type = 'Business email domain' AS is_valuable_signup,
 
       --keys
       master_record_id,
