@@ -969,6 +969,11 @@ The following Columns have a Varchar Data Type and are set up to handle Missing 
 * country
 * state
 
+**Business Logic in this Model:**
+- `spined_date` - every date between dbt_valid_from and dbt_valid_to timeframes.  
+  - spined_date has a time of '00:00:00' which is less than a dbt_valid_from date with a time greater than 00:00:00, ie 2022-11-14 09:01:37.494.  In this case the spined_date for this snapshot record will be 2022-11-15.  
+
+
 {% enddocs %}
 
 {% docs dim_ci_runner %}
