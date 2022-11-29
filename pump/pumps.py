@@ -39,7 +39,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
             target_name = f"{model}/{file_stamp}.csv"
             option = "SINGLE"
 
-        copy_command = f"""
+        tmp_copy_command = f"""
         COPY INTO @RAW.PUBLIC.{stage}/{target_name}
         FROM ({query} LIMIT 1000000)
         FILE_FORMAT = (TYPE = CSV, NULL_IF = (), FIELD_OPTIONALLY_ENCLOSED_BY = '"', COMPRESSION=NONE)
@@ -51,7 +51,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
     except:
         logging.info("Failed to get copy command...")
     finally:
-        return copy_command
+        return tmp_copy_command
 
 
 def copy_data(model, sensitive, timestamp, inc_start, inc_end, stage, single):
