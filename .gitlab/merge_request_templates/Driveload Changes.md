@@ -75,14 +75,14 @@ Run the following CI Jobs on the MR:
   * Pass the variable SCHEMA_NAME with the value `driveload`
 * [ ] `Extract: driveload`
 * [ ] `⚙️ dbt Run: specify_raw_model`
-    * Pass `DBT_MODELS` as key and `sources.driveload` for value (alternatively, you can pass `sources.driveload_file_name_source`)
+    * Pass `DBT_MODELS` as key and `driveload` for value (alternatively, you can pass `driveload_file_name_source`)
 * [ ] In the case there is staging model, run `⚙️ dbt Run: specify_model`
-    * Pass `DBT_MODELS` as key and `staging.driveload` for value (alternatively, you can pass `staging.driveload_file_name`)
+    * Pass `DBT_MODELS` as key and `driveload` for value (alternatively, you can pass `driveload_file_name`)
 
 ## Final Steps
 * [ ]  Assign MR to project maintainer for review (iterate until model is complete).
 * [ ]  Data Team project maintainers/owners to merge in dbt models 
-* [ ]  If not urgent, data will be availble within 24 hours. If urgent, Data Engineer to run full refresh and inform when available.
+* [ ]  Trigger the driveload airflow DAG manually in case of a created/changed downstream dbt model or if the data needs to brought in urgently. 
 * [ ]  Submitter to query in Sisense for table: ``` SELECT * FROM [new-dbt-model-name] LIMIT 10 ```.
 
 

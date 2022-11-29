@@ -35,6 +35,14 @@ models:
         tests:
           - not_null
 
+  - name: prep_cluster_agent
+    description: Prep table to select the kubernetes with agents and add aditional information such as the ultimate_namespace_id.
+    columns:
+      - name: cluster_agent_id
+        tests:
+          - not_null
+          - unique
+
   - name: prep_dim_subscription_snapshot_base
     description: Base model for the dim_subscription snapshot data
     columns:
@@ -1722,3 +1730,24 @@ models:
         description: The value associated with the metric path
       - name: has_timed_out
         description: A flag to denote that it has timed out
+
+  - name: prep_billing_account_user
+    description: Zuora Billing users
+    columns:
+      - name: zuora_user_id
+        description: Unique identifier of a Zuora Billing user
+        tests:
+          - not_null
+          - unique
+      - name: email
+        description: email account associated with a Zuora Billing user
+      - name: first_name
+        description: First name of Zuora Billing user
+      - name: last_name
+        description: Last name of Zuora Billing user
+      - name: user_name
+        description: User name displayed in the UI for Zuora Billing user
+      - name: created_date
+        description: Date the Zuora Billing user was created
+      - name: is_integration_user
+        description: A flag indentifying integration users based on Zuora Billing user last names.

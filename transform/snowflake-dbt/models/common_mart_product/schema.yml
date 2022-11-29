@@ -560,3 +560,21 @@ models:
           - dbt_utils.at_least_one
       - name: is_latest_data
         description: Flags the row with the most recently received data from Usage Ping
+
+  - name: mart_ping_instance_metric_health_score_self_managed
+    description: '{{ doc("mart_ping_instance_metric_health_score_self_managed") }}'
+    columns:
+      - name: dim_ping_instance_id
+        tests:
+          - not_null
+          - unique
+
+  - name: mart_ping_namespace_metric_health_score_saas
+    description: '{{ doc("mart_ping_namespace_metric_health_score_saas") }}'
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - reporting_month
+            - dim_subscription_id_original
+            - dim_namespace_id
+            

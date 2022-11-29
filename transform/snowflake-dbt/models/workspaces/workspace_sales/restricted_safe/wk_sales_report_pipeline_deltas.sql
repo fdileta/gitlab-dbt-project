@@ -193,9 +193,9 @@ WITH sfdc_opportunity_xf AS (
 
     SELECT 
       deltas.*,
-      users.user_email AS opportunity_owner_email, 
+      users.user_email AS opportunity_owner_email,
+      users.is_rep_flag,
       oppty.sales_qualified_source,
-      oppty.order_type_stamped,
       oppty.opportunity_category,
       oppty.sales_type,
       oppty.owner_id AS opportuniy_owner_id,
@@ -224,12 +224,31 @@ WITH sfdc_opportunity_xf AS (
       oppty.key_segment_geo_area,
       oppty.sales_team_cro_level,
 
+      -- JK 2022-11-01: adding report_opportunity_user_ aggregation levels
+      oppty.report_opportunity_user_segment,
+      oppty.report_opportunity_user_region,
+      oppty.report_opportunity_user_geo,
+      oppty.report_opportunity_user_area,
+
       -- NF: This code replicates the reporting structured of FY22, to keep current tools working
       oppty.sales_team_rd_asm_level,
 
       oppty.sales_team_vp_level,
       oppty.sales_team_avp_rd_level,
-      oppty.sales_team_asm_level
+      oppty.sales_team_asm_level,
+
+      -- JK 2022-11-01: adding the following fields for Tableau Pilot Dashboard
+      oppty.close_fiscal_quarter_date                 AS current_close_fiscal_quarter_date,
+      oppty.close_fiscal_quarter_name                 AS current_close_fiscal_quarter_name,
+      oppty.pipeline_created_fiscal_quarter_date      AS current_pipeline_created_fiscal_quarter_date,
+      oppty.pipeline_created_fiscal_quarter_name      AS current_pipeline_created_fiscal_quarter_name,
+      oppty.pipeline_created_date                     AS current_pipeline_created_date,
+      oppty.forecast_category_name                    AS current_forecast_category_name,
+      oppty.opportunity_category                      AS current_opportunity_category,
+      oppty.sales_type                                AS current_sales_type,
+      oppty.order_type_stamped                        AS current_order_type,
+      oppty.sales_qualified_source                    AS current_sales_qualified_source,
+      oppty.stage_name                                AS current_stage_name                                     
 
     FROM deltas_consolidated AS deltas
     LEFT JOIN sfdc_opportunity_xf AS oppty

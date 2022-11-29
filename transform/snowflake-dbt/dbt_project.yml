@@ -221,15 +221,15 @@ models:
         +materialized: table
         +schema: google_analytics_360
 
+      google_search_console:
+        +materialized: table
+        +schema: google_search_console 
+
       greenhouse:
         +schema: greenhouse
 
       handbook:
         +schema: handbook
-
-      keyhole_twitter:
-        +schema: keyhole_twitter
-        +tags: ["keyhole_twitter", "social", "sources"]
 
       license:
         +schema: license_db
@@ -464,9 +464,6 @@ models:
           +schema: sensitive
           secure: true
 
-      keyhole_twitter:
-        +tags: [ "keyhole_twitter", "social" ]
-
       license:
         +materialized: view
 
@@ -662,6 +659,7 @@ models:
 snapshots:
   +post-hook:
     - "{{ mask_model() }}"
+    - "alter table {{ this }} set DATA_RETENTION_TIME_IN_DAYS = 30"
   +query_tag: dbt
   gitlab_snowflake:
     target_database: "{{ env_var('SNOWFLAKE_SNAPSHOT_DATABASE') }}" #RAW in production

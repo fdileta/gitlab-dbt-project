@@ -83,8 +83,8 @@ config_dict = {
         "cloudsql_instance_name": None,
         "dag_name": "el_gitlab_com",
         "env_vars": {"HOURS": "96"},
-        "extract_schedule_interval": "0 */6 * * *",
-        "incremental_backfill_interval": "0 2 * * *",
+        "extract_schedule_interval": "30 2,14 */1 * *",
+        "incremental_backfill_interval": "30 2 * * *",
         "secrets": [
             GITLAB_COM_DB_USER,
             GITLAB_COM_DB_PASS,
@@ -101,8 +101,8 @@ config_dict = {
         "cloudsql_instance_name": None,
         "dag_name": "el_gitlab_com_ci",
         "env_vars": {"HOURS": "96"},
-        "extract_schedule_interval": "0 */6 * * *",
-        "incremental_backfill_interval": "0 2 * * *",
+        "extract_schedule_interval": "30 2,14 */1 * *",
+        "incremental_backfill_interval": "30 2 * * *",
         "secrets": [
             GITLAB_COM_CI_DB_NAME,
             GITLAB_COM_CI_DB_HOST,
@@ -119,7 +119,7 @@ config_dict = {
         "cloudsql_instance_name": None,
         "dag_name": "el_gitlab_com_scd",
         "env_vars": {},
-        "extract_schedule_interval": "0 1 */1 * *",
+        "extract_schedule_interval": "30 3,15 */1 * *",
         "secrets": [
             GITLAB_COM_DB_USER,
             GITLAB_COM_DB_PASS,
@@ -135,7 +135,7 @@ config_dict = {
         "cloudsql_instance_name": None,
         "dag_name": "el_gitlab_com_ci_scd",
         "env_vars": {},
-        "extract_schedule_interval": "0 3 */1 * *",
+        "extract_schedule_interval": "00 4,16 */1 * *",
         "secrets": [
             GITLAB_COM_CI_DB_NAME,
             GITLAB_COM_CI_DB_HOST,

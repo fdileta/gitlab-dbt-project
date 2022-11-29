@@ -137,6 +137,7 @@ tables:
       , zuora_subscription_name
       , license_file_md5
       , creator_id
+      , license_file_sha256
       FROM licenses
   orders:
     advanced_metadata: true

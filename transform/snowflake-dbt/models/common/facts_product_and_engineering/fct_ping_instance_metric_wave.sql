@@ -10,7 +10,7 @@
 
 {{ simple_cte([
     ('fct_ping_instance', 'fct_ping_instance'),
-    ('gainsight_wave_2_3_metrics','gainsight_wave_2_3_metrics'),
+    ('gainsight_wave_2_3_metrics','health_score_metrics'),
     ('dim_ping_instance','dim_ping_instance')
 
 ]) }}
@@ -101,7 +101,7 @@
 {{ dbt_audit(
     cte_ref="pivoted",
     created_by="@snalamaru",
-    updated_by="@jpeguero",
+    updated_by="@mdrussell",
     created_date="2022-07-06",
-    updated_date="2022-08-25"
+    updated_date="2022-10-21"
 ) }}

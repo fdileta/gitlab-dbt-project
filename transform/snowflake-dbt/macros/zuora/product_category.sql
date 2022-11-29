@@ -64,6 +64,7 @@ CASE
                                     , 'Dedicated Engineer - 3 Month'
                                     , 'Dedicated Engineer - 6 Month (w/ Security Clearance)'
                                     , 'Dedicated Engineer - 6 Month'
+                                    , 'GitLab System Administration Training - Remote'
                                     )
     THEN 'Support'
   WHEN LOWER({{product_column}}) LIKE 'gitlab geo%'

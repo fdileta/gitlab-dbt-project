@@ -90,4 +90,5 @@ WHERE rlike(email_address, '^[A-Z0-9.+_%-]+@[A-Z0-9.-]+\\.[A-Z]+$','i')
     OR ( is_paid_tier_change = TRUE
       AND sfdc_record_id IS NOT NULL
     )
+    OR is_ptpt_contact_change = TRUE
   )

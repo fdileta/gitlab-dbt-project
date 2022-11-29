@@ -18,6 +18,7 @@
       fct_crm_account.merged_to_account_id,
       fct_crm_account.record_type_id,
       fct_crm_account.crm_account_owner_id,
+      fct_crm_account.proposed_crm_account_owner_id,
       fct_crm_account.technical_account_manager_id,
       fct_crm_account.master_record_id,
       fct_crm_account.dim_crm_person_primary_contact_id,
@@ -25,6 +26,7 @@
       --account people
       dim_crm_account.crm_account_owner,
       dim_crm_account.account_owner,
+      dim_crm_account.proposed_crm_account_owner,
       dim_crm_account.technical_account_manager,
 
       --crm account owner attributes
@@ -143,6 +145,10 @@
       dim_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       dim_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
       dim_crm_account.forbes_2000_rank,
+      dim_crm_account.parent_account_industry_hierarchy,
+      dim_crm_account.sales_development_rep,
+	  dim_crm_account.admin_manual_source_number_of_employees,
+      dim_crm_account.admin_manual_source_account_address,
 
       --degenerative dimensions
       dim_crm_account.is_sdr_target_account,
@@ -203,7 +209,9 @@
       fct_crm_account.potential_users,
       fct_crm_account.number_of_licenses_this_account,
       fct_crm_account.crm_account_zoom_info_number_of_developers,
+      fct_crm_account.crm_account_zoom_info_total_funding,
       fct_crm_account.decision_maker_count_linkedin,
+      fct_crm_account.number_of_employees,
 
       --metadata
       fct_crm_account.created_by_id,
@@ -227,7 +235,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2022-08-10",
-    updated_date="2022-09-27"
+    updated_date="2022-11-02"
 ) }}

@@ -27,6 +27,13 @@ WITH date_details AS (
       crm_id
     FROM {{ ref('zuora_account_source') }}
 
+), zuora_user AS (
+
+    SELECT
+      zuora_user_id,
+      is_integration_user
+    FROM {{ ref('prep_billing_account_user') }}
+
 ), joined AS (
 
     SELECT
@@ -51,8 +58,11 @@ WITH date_details AS (
       zuora_subscription.renewal_term,
       zuora_subscription.renewal_term_period_type,
       zuora_subscription.eoa_starter_bronze_offer_accepted,
-      IFF(zuora_subscription.created_by_id IN ('2c92a0107bde3653017bf00cd8a86d5a','2c92a0fd55822b4d015593ac264767f2'), -- All Self-Service / Web direct subscriptions are identified by these created_by_ids
-          'Self-Service', 'Sales-Assisted')                                     AS subscription_sales_type,
+      CASE 
+        WHEN zuora_user.is_integration_user = 1
+          THEN 'Self-Service'
+        ELSE 'Sales-Assisted'
+      END                                                                       AS subscription_sales_type,
       zuora_subscription.namespace_name,
       zuora_subscription.namespace_id,
       invoice_owner.account_name                                                AS invoice_owner_account,
@@ -112,13 +122,15 @@ WITH date_details AS (
       ON zuora_subscription.term_start_date = term_start_date.date_day 
     LEFT JOIN date_details term_end_date 
       ON zuora_subscription.term_end_date = term_end_date.date_day
+    LEFT JOIN zuora_user
+      ON zuora_subscription.created_by_id = zuora_user.zuora_user_id
 
 )
 
 {{ dbt_audit(
     cte_ref="joined",
     created_by="@ischweickartDD",
-    updated_by="@michellecooper",
+    updated_by="@chrissharp",
     created_date="2021-01-07",
-    updated_date="2022-07-07"
+    updated_date="2022-11-04"
 ) }}

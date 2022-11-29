@@ -181,6 +181,8 @@ sources:
         freshness:
           warn_after: {count: 7, period: day}
           error_after: {count: 15, period: day}
+      - name: fork_network_members
+        identifier: gitlab_db_fork_network_members
       - name: gitlab_subscription_histories
         identifier: gitlab_db_gitlab_subscription_histories
       - name: gitlab_subscriptions
@@ -283,6 +285,10 @@ sources:
         freshness: null #https://gitlab.com/gitlab-data/analytics/-/issues/10835
       - name: protected_branches
         identifier: gitlab_db_protected_branches
+      - name: protected_branch_merge_access_levels
+        identifier: gitlab_db_protected_branch_merge_access_levels
+      - name: protected_branch_push_access_levels
+        identifier: gitlab_db_protected_branch_push_access_levels
       - name: protected_environment_approval_rules
         identifier: gitlab_db_protected_environment_approval_rules
         freshness: null
@@ -442,6 +448,8 @@ sources:
         identifier: gitlab_db_project_incident_management_settings
       - name: remote_mirrors
         identifier: gitlab_db_remote_mirrors
+      - name: security_orchestration_policy_configurations
+        identifier: gitlab_db_security_orchestration_policy_configurations
       - name: security_scans
         identifier: gitlab_db_security_scans
       - name: sentry_issues
