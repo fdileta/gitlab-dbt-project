@@ -46,7 +46,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
         HEADER = TRUE
         {option} = TRUE
         ;
-      """
+        """
 
         copy_command = copy_command_tmp.format(
             stage=stage.upper(),
@@ -73,11 +73,11 @@ def copy_data(model, sensitive, timestamp, inc_start, inc_end, stage, single):
 
     try:
         connection = engine.connect()
-        s3_copy_command = get_copy_command(
+        copy_command = get_copy_command(
             model, sensitive, timestamp, inc_start, inc_end, stage, single
         )
-        logging.info(f"running copy command {s3_copy_command}")
-        connection.execute(s3_copy_command).fetchone()
+        logging.info(f"running copy command {copy_command}")
+        connection.execute(copy_command).fetchone()
     except:
         logging.info("Failed to run copy command...")
         raise
