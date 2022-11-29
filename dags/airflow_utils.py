@@ -31,7 +31,7 @@ def get_data_science_project_command(model_http_path, model_ssh_path, model_fold
     if [[ -z "$GITLAB_ANALYTICS_PRIVATE_TOKEN" ]]; then
         export REPO="{model_http_path}";
         else
-        export REPO="{model_ssh_path}";
+        export REPO="{model_http_path}";
     fi &&
     echo "git clone -b main --single-branch --depth 1 $REPO" &&
     git clone -b main --single-branch --depth 1 $REPO &&
