@@ -43,3 +43,4 @@ successful_ci_pipeline_creation,verify,FALSE,pipeline_execution,FALSE,ops,FALSE
 terraform_reports,configure,FALSE,configure,FALSE,ops,FALSE
 todos,plan,FALSE,project_management,FALSE,dev,FALSE
 users_created,manage,FALSE,access,FALSE,dev,FALSE
+kubernetes_with_agent,configure,FALSE,configure,FALSE,ops,FALSE
