@@ -54,11 +54,17 @@
       fct_crm_attribution_touchpoint.bizible_count_custom_model,
       fct_crm_attribution_touchpoint.bizible_count_u_shaped,
       fct_crm_attribution_touchpoint.bizible_count_w_shaped,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_first_touch) AS first_net_arr,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_w_shaped) AS w_net_arr,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_u_shaped) AS u_net_arr,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_attribution_percent_full_path) AS full_net_arr,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_custom_model) AS custom_net_arr,
+	  fct_crm_attribution_touchpoint.bizible_weight_full_path,
+      fct_crm_attribution_touchpoint.bizible_weight_custom_model,
+      fct_crm_attribution_touchpoint.bizible_weight_first_touch,
+      fct_crm_attribution_touchpoint.bizible_weight_lead_conversion,
+      fct_crm_attribution_touchpoint.bizible_weight_u_shaped,
+      fct_crm_attribution_touchpoint.bizible_weight_w_shaped,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_weight_first_touch) AS first_net_arr,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_weight_w_shaped) AS w_net_arr,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_weight_u_shaped) AS u_net_arr,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_weight_full_path) AS full_net_arr,
+      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_weight_custom_model) AS custom_net_arr,
       (fct_crm_opportunity.net_arr / fct_crm_attribution_touchpoint.campaigns_per_opp) AS net_arr_per_campaign,
       fct_crm_attribution_touchpoint.bizible_revenue_full_path,
       fct_crm_attribution_touchpoint.bizible_revenue_custom_model,
@@ -307,7 +313,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2020-02-18",
-    updated_date="2022-10-05"
+    updated_date="2022-11-29"
 ) }}
