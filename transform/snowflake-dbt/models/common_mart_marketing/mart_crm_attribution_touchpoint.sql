@@ -283,7 +283,7 @@
     --linear attribution Net_Arr of an opp / all touches (count_touches) for each opp - weighted by the number of touches in the given bucket (campaign,channel,etc)
 
     SELECT
-      dim_crm_opportunity_id,
+      dim_crm_opportunity_id, 
       net_arr,
       COUNT(dim_crm_touchpoint_id) AS touchpoints_per_opportunity,
       net_arr/touchpoints_per_opportunity AS weighted_linear_net_arr

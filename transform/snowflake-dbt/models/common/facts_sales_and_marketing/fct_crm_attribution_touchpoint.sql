@@ -78,7 +78,6 @@ WITH bizible_attribution_touchpoints AS (
       bizible_attribution_touchpoints.bizible_revenue_u_shaped,
       bizible_attribution_touchpoints.bizible_revenue_w_shaped
 
-
     FROM bizible_attribution_touchpoints
     LEFT JOIN crm_person
       ON bizible_attribution_touchpoints.bizible_contact = crm_person.sfdc_record_id
