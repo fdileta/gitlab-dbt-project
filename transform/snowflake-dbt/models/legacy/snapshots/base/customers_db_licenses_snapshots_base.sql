@@ -30,7 +30,7 @@ WITH source AS (
       updated_at::TIMESTAMP                      AS updated_at,
       "DBT_VALID_FROM"::TIMESTAMP                AS valid_from,
       "DBT_VALID_TO"::TIMESTAMP                  AS valid_to,
-      REPLACE(license_file_sha256::VARCHAR, '-') AS license_file_sha256
+      REPLACE(license_file_sha256::VARCHAR, '-') AS license_sha256
     FROM source
 
 )
