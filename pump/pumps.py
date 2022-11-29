@@ -42,13 +42,15 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
         global tmp_copy_command
 
         tmp_copy_command = f"""
-        COPY INTO @RAW.PUBLIC.{stage}/{target_name}
-        FROM ({query} LIMIT 1000000)
-        FILE_FORMAT = (TYPE = CSV, NULL_IF = (), FIELD_OPTIONALLY_ENCLOSED_BY = '"', COMPRESSION=NONE)
-        HEADER = TRUE
-        {option} = TRUE
-        ;
+            COPY INTO @RAW.PUBLIC.{stage}/{target_name}
+            FROM ({query} LIMIT 1000000)
+            FILE_FORMAT = (TYPE = CSV, NULL_IF = (), FIELD_OPTIONALLY_ENCLOSED_BY = '"', COMPRESSION=NONE)
+            HEADER = TRUE
+            {option} = TRUE
+            ;
         """
+
+        logging.info(tmp_copy_command)
 
     except:
         logging.info("Failed to get copy command...")
