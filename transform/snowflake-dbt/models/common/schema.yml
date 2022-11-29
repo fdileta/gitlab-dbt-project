@@ -5000,6 +5000,9 @@ models:
         tests:
           - not_null
           - unique
+          - relationships:
+              to: ref('dim_quote')
+              field: dim_quote_id
 
   - name: fct_revenue_contract_hold
     description: '{{ doc("fct_revenue_contract_hold") }}'
