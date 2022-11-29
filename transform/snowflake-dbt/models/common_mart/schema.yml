@@ -286,8 +286,6 @@ models:
       description: '{{ doc("metrics_path") }}'
     - name: metric_value
       description: '{{ doc("metric_value") }}'
-    - name: monthly_metric_value
-      description: '{{ doc("monthly_metric_value") }}'
     - name: has_timed_out
       description: '{{ doc("has_timed_out") }}'
     - name: dim_ping_instance_id
@@ -388,6 +386,10 @@ models:
       description: '{{ doc("ping_created_date_month") }}'
     - name: is_last_ping_of_month
       description: '{{ doc("is_last_ping_of_month") }}'
+    - name: ping_created_date_week
+      description: '{{ doc("ping_created_date_week") }}'
+    - name: is_last_ping_of_week
+      description: '{{ doc("is_last_ping_of_week") }}'
     - name: created_by
       description: '{{ doc("created_by") }}'
     - name: updated_by
@@ -642,8 +644,6 @@ models:
       description: '{{ doc("metrics_path") }}'
     - name: metric_value
       description: '{{ doc("metric_value") }}'
-    - name: monthly_metric_value
-      description: '{{ doc("monthly_metric_value") }}'
     - name: has_timed_out
       description: '{{ doc("has_timed_out") }}'
     - name: dim_ping_instance_id
@@ -771,8 +771,6 @@ models:
       description: '{{ doc("metrics_path") }}'
     - name: metric_value
       description: '{{ doc("metric_value") }}'
-    - name: monthly_metric_value
-      description: '{{ doc("monthly_metric_value") }}'
     - name: has_timed_out
       description: '{{ doc("has_timed_out") }}'
     - name: dim_ping_instance_id
@@ -873,6 +871,10 @@ models:
       description: '{{ doc("ping_created_date_month") }}'
     - name: is_last_ping_of_month
       description: '{{ doc("is_last_ping_of_month") }}'
+    - name: ping_created_date_week
+      description: '{{ doc("ping_created_date_week") }}'
+    - name: is_last_ping_of_week
+      description: '{{ doc("is_last_ping_of_week") }}'
     - name: created_by
       description: '{{ doc("created_by") }}'
     - name: updated_by
@@ -896,8 +898,6 @@ models:
       description: '{{ doc("metrics_path") }}'
     - name: metric_value
       description: '{{ doc("metric_value") }}'
-    - name: monthly_metric_value
-      description: '{{ doc("monthly_metric_value") }}'
     - name: has_timed_out
       description: '{{ doc("has_timed_out") }}'
     - name: dim_ping_instance_id
@@ -998,6 +998,10 @@ models:
       description: '{{ doc("ping_created_date_month") }}'
     - name: is_last_ping_of_month
       description: '{{ doc("is_last_ping_of_month") }}'
+    - name: ping_created_date_week
+      description: '{{ doc("ping_created_date_week") }}'
+    - name: is_last_ping_of_week
+      description: '{{ doc("is_last_ping_of_week") }}'
     - name: created_by
       description: '{{ doc("created_by") }}'
     - name: updated_by
@@ -1021,8 +1025,6 @@ models:
       description: '{{ doc("metrics_path") }}'
     - name: metric_value
       description: '{{ doc("metric_value") }}'
-    - name: monthly_metric_value
-      description: '{{ doc("monthly_metric_value") }}'
     - name: has_timed_out
       description: '{{ doc("has_timed_out") }}'
     - name: dim_ping_instance_id
@@ -1123,6 +1125,10 @@ models:
       description: '{{ doc("ping_created_date_month") }}'
     - name: is_last_ping_of_month
       description: '{{ doc("is_last_ping_of_month") }}'
+    - name: ping_created_date_week
+      description: '{{ doc("ping_created_date_week") }}'
+    - name: is_last_ping_of_week
+      description: '{{ doc("is_last_ping_of_week") }}'
     - name: created_by
       description: '{{ doc("created_by") }}'
     - name: updated_by
