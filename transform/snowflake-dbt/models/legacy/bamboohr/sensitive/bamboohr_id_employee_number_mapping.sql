@@ -2,7 +2,7 @@ WITH source AS (
   
     SELECT *
     FROM {{ ref ('blended_employee_mapping_source') }}
-    WHERE uploaded_row_number_desc = 1
+    WHERE uploaded_row_number_desc = 1 and sort_order = 1
 
 ), intermediate AS (
 
