@@ -203,13 +203,9 @@ artifact_download:
   <<: *snowflake_dbt_jobs
   script:
     - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD
-    - apt install p7zip-full -y
-    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/main/download?job=setup_dbt"'
-    - 7z x artifacts.zip
-    - ls
-    - unzip ./artifacts.zip -d /artifacts
-    - ls
-
+    - echo $CI_PROJECT_ID
+    - echo $CI_COMMIT_BRANCH
+    - python3 -m python_gitlab_artifacts_api download_pipeline_artifacts --project_id $CI_PROJECT_ID --branch_name $CI_COMMIT_BRANCH --stage_name setup_dbt
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
