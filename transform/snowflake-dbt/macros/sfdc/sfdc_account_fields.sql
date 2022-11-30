@@ -181,6 +181,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.account_type                                                                                AS crm_account_type,
       sfdc_account.industry                                                                                    AS crm_account_industry,
       sfdc_account.sub_industry                                                                                AS crm_account_sub_industry,
+      sfdc_account.tsp_territory                                                                               AS crm_account_sales_territory,
       sfdc_account.account_owner                                                                               AS crm_account_owner,
       sfdc_account.partner_vat_tax_id                                                                          AS partner_vat_tax_id,
       sfdc_account.account_manager                                                                             AS account_manager,
