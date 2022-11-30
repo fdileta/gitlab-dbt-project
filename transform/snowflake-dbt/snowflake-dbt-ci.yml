@@ -201,9 +201,12 @@ test_artifacts:
 
 artifact_download:
   <<: *snowflake_dbt_jobs
+  variables:
+    LOGURU_COLORIZE: "true"
   script:
     - echo $CI_PROJECT_ID
     - echo $CI_COMMIT_REF_NAME
+    - export GITLAB_ACCESS_TOKEN=$CI_JOB_TOKEN
     - python3 -m gitlab_artifacts_downloader.gitlab_artifacts_downloader download_pipeline_artifacts --project_id $CI_PROJECT_ID --branch_name $CI_COMMIT_REF_NAME --stage_name setup_dbt
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
