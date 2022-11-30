@@ -33,7 +33,7 @@ final AS (
     uploaded_at AS created_at,
     uploaded_at AS updated_at,
     uuid,
-    NULL, --currently missing from the Automated Service Ping, will be added later
+    NULL AS historical_max_users, --currently missing from the Automated Service Ping, will be added later
     edition,
     NULL AS raw_usage_data_id,
     NULL AS raw_usage_data_payload,
@@ -51,7 +51,7 @@ final AS (
     run_results['license_trial']::BOOLEAN AS license_trial,
     run_results['source_license_id']::NUMBER AS source_license_id,
     run_results['installation_type']::VARCHAR AS installation_type,
-    NULL, --currently missing from the Automated Service Ping, will be added later
+    NULL AS database_version, --currently missing from the Automated Service Ping, will be added later
     run_results['license_plan']::VARCHAR AS license_plan,
     run_results['database']['adapter']::VARCHAR AS database_adapter,
     CONCAT(
