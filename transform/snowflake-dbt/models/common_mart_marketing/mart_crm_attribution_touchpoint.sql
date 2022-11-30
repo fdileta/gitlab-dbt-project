@@ -292,7 +292,7 @@
       dim_crm_opportunity_id,
       net_arr,
       COUNT(dim_crm_touchpoint_id) AS touchpoints_per_opportunity,
-      net_arr/touchpoints_per_opportunity AS weighted_linear_net_arr
+      net_arr/NULLIF(touchpoints_per_opportunity,0) AS weighted_linear_net_arr
     FROM  joined
     GROUP BY 1,2
 
@@ -301,7 +301,7 @@
     SELECT
       joined.*,
       linear_base.touchpoints_per_opportunity,
-      (joined.opps_per_touchpoint / linear_base.touchpoints_per_opportunity) AS l_weight,
+      (joined.opps_per_touchpoint / NULLIF(linear_base.touchpoints_per_opportunity,0)) AS l_weight,
       (joined.net_arr * l_weight) AS linear_net_arr
     FROM joined
     LEFT JOIN linear_base 
