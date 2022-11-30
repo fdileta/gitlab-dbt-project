@@ -11,6 +11,21 @@ with find_current_campaigns as (
     from
     find_current_campaigns
     where is_latest
+), find_current_ad_groups as (
+    select
+    ad_group_history.*,
+    max(updated_at) over (PARTITION by id order by updated_at desc) as latest_update,
+    latest_update = updated_at as is_latest
+    from
+    raw.google_ads.ad_group_history
+), current_ad_group as (
+    select
+    find_current_ad_groups.*,
+    max(updated_at) over (PARTITION by id order by updated_at desc) as latest_update,
+    latest_update = updated_at as is_latest
+    from
+    find_current_ad_groups
+    where is_latest
 ), find_current_ads as (
     select
     AD_HISTORY.*,
@@ -39,9 +54,9 @@ with find_current_campaigns as (
     where is_latest
 )
 select
-    /* Campaign */
+    /* Campaign Info */
     
-    AD_GROUP_HOURLY_STATS.campaign_id,
+    current_campaigns.id                             as campaign_id,
     current_campaigns.ad_serving_optimization_status as campaign_ad_serving_optimization_status,
     current_campaigns.advertising_channel_subtype    as campaign_advertising_channel_subtype,
     current_campaigns.advertising_channel_type       as campaign_advertising_channel_type,
@@ -55,35 +70,13 @@ select
     current_campaigns.end_date                       as campaign_end_date,
     current_campaigns.start_date                     as campaign_start_date,
     
-    /* Ad Group */
+--     /* Ad Group Info */
     
-    AD_GROUP_HOURLY_STATS.date                               as date,
-    AD_GROUP_HOURLY_STATS.hour,
-    AD_GROUP_HOURLY_STATS.id                                 as ad_group_id,
-    AD_GROUP_HOURLY_STATS.campaign_base_campaign             as ad_group_campaign_base_campaign,
-    AD_GROUP_HOURLY_STATS.click_type                         as ad_group_click_type,
-    AD_GROUP_HOURLY_STATS.conversions                        as ad_group_conversions,
-    AD_GROUP_HOURLY_STATS.interactions                       as ad_group_interactions,
-    AD_GROUP_HOURLY_STATS.average_cpm                        as ad_group_average_cpm,
-    AD_GROUP_HOURLY_STATS.device                             as ad_group_device,
-    AD_GROUP_HOURLY_STATS.active_view_impressions            as ad_group_active_view_impressions,
-    AD_GROUP_HOURLY_STATS.clicks                             as ad_group_clicks,
-    AD_GROUP_HOURLY_STATS.active_view_measurable_impressions as ad_group_active_view_measurable_impressions,
-    AD_GROUP_HOURLY_STATS.cost_per_conversion                as ad_group_cost_per_conversion,
-    AD_GROUP_HOURLY_STATS.active_view_measurability          as ad_group_active_view_measurability,
-    AD_GROUP_HOURLY_STATS.average_cpc                        as ad_group_average_cpc,
-    AD_GROUP_HOURLY_STATS.ctr                                as ad_group_conversions_value,
-    AD_GROUP_HOURLY_STATS.conversions_value                  as ad_group_conversions_value,
-    AD_GROUP_HOURLY_STATS.average_cost                       as ad_group_average_cost,
-    AD_GROUP_HOURLY_STATS.interaction_rate                   as ad_group_interaction_rate,
-    AD_GROUP_HOURLY_STATS.impressions                        as ad_group_impressions,
-    AD_GROUP_HOURLY_STATS.active_view_viewability            as ad_group_active_view_viewability,
-    AD_GROUP_HOURLY_STATS.active_view_cpm,
-    AD_GROUP_HOURLY_STATS.active_view_ctr,
-    AD_GROUP_HOURLY_STATS.active_view_measurable_cost_micros,
-    AD_GROUP_HOURLY_STATS.base_ad_group,
-    AD_GROUP_HOURLY_STATS.conversions_from_interactions_rate,
-    AD_GROUP_HOURLY_STATS.cost_micros,
+--     current_ad_group.AD_ROTATION_MODE,
+--     current_ad_group.CAMPAIGN_NAME,
+--     current_ad_group.NAME           as ad_group_name,
+--     current_ad_group.STATUS         as ad_group_status,
+--     current_ad_group.TYPE           as ad_group_type,
     
     /* Ad Info */
     current_ads.action_items        as ad_action_items,
@@ -95,6 +88,22 @@ select
     current_ads.status              as ad_status,
     current_ads.type                as ad_type,
     
+    
+    /* Ad Stats */
+    AD_STATS.date,
+    AD_STATS.DEVICE,
+    AD_STATS.CONVERSIONS,
+    AD_STATS.interactions,
+    AD_STATS.IMPRESSIONS,
+    AD_STATS.CLICKS,
+    AD_STATS.CONVERSIONS_VALUE,
+    AD_STATS.VIDEO_VIEWS,
+    AD_STATS.ACTIVE_VIEW_MEASURABLE_IMPRESSIONS,
+    AD_STATS.ACTIVE_VIEW_MEASURABLE_COST_MICROS,
+    AD_STATS.ACTIVE_VIEW_MEASURABILITY,
+    AD_STATS.COST_MICROS,
+    
+    
     /* Ad Text */
     current_ad_text.DESCRIPTION     as ad_text_DESCRIPTION,
     current_ad_text.DESCRIPTION_2   as ad_text_DESCRIPTION_2,
@@ -105,7 +114,8 @@ select
     current_ad_text.path_2          as ad_text_part_2
     
 from
-raw.google_ads.AD_GROUP_HOURLY_STATS
-    join current_ads on AD_GROUP_HOURLY_STATS.id = current_ads.AD_GROUP_ID
-    left join current_campaigns on AD_GROUP_HOURLY_STATS.campaign_id = current_campaigns.id 
+raw.google_ads.AD_STATS
+    join current_ads on AD_STATS.ad_id = current_ads.ID and AD_STATS.ad_group_id = current_ads.ad_group_id
     left join current_ad_text on current_ads.id = current_ad_text.ad_id and current_ads.AD_GROUP_ID = current_ad_text.AD_GROUP_ID
+    left join current_campaigns on AD_STATS.campaign_id = current_campaigns.id 
+    left join current_ad_group on ad_stats.ad_group_id = current_ad_group.id 
