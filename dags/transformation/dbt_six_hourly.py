@@ -125,7 +125,6 @@ dbt_six_hourly_models_command = f"""
     {dbt_install_deps_cmd} &&
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
     dbt --no-use-colors run --profiles-dir profile --target prod --include tag:six_hourly; ret=$?;
-    montecarlo import dbt-run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
 """
@@ -146,7 +145,6 @@ dbt_results_cmd = f"""
     {pull_commit_hash} &&
     {dbt_install_deps_cmd} &&
     dbt --no-use-colors run --profiles-dir profile --target prod --models sources.dbt+ ; ret=$?;
-    montecarlo import dbt-run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
 """
