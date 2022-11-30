@@ -33,7 +33,7 @@
       AND (prep_charge.effective_end_month > dim_date.date_actual
         OR prep_charge.effective_end_month IS NULL)
       AND dim_date.day_of_month = 1
-    WHERE subscription_status NOT IN ('Draft')
+    WHERE subscription_status != 'Draft'
       AND charge_type = 'Recurring'
       /* This excludes Education customers (charge name EDU or OSS) with free subscriptions.
          Pull in seats from Paid EDU Plans with no ARR */
