@@ -173,7 +173,6 @@
       sfdc_opportunity.growth_type,
       sfdc_opportunity.opportunity_deal_size,
       sfdc_opportunity.closed_buckets,
-	  sfdc_opportunity.record_type_name,
 
       -- channel fields
       sfdc_opportunity.lead_source,
@@ -276,5 +275,5 @@
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2020-11-30",
-    updated_date="2022-11-21"
+    updated_date="2022-11-30"
 ) }}
