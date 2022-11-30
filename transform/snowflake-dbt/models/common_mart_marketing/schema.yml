@@ -7,7 +7,6 @@ models:
         - name: dim_crm_touchpoint_id
           tests:
               - not_null
-              - unique
         - name: sdr_sales_segment
           description: Sales segment of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
         - name: sdr_region
@@ -54,10 +53,6 @@ models:
         - name: dim_crm_touchpoint_id
           tests:
               - not_null
-              - unique:
-                config:
-                  error_if: ">5"
-                  warn_if: ">1"
         - name: sdr_sales_segment
           description: Sales segment of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
         - name: sdr_region
