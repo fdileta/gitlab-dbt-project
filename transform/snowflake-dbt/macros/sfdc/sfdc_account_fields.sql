@@ -138,7 +138,6 @@ WITH map_merged_crm_account AS (
       {%- endif %}
       --primary key
       sfdc_account.account_id                                                                                  AS dim_crm_account_id,
-                                                                                                               AS valid_from,
 
       --surrogate keys
       ultimate_parent_account.account_id                                                                       AS dim_parent_crm_account_id,
