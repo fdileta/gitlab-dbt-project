@@ -140,7 +140,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.account_id                                                                                  AS dim_crm_account_id,
 
       --surrogate keys
-      ultimate_parent_account.account_id                                                                       AS dim_parent_crm_account_id,
+      sfdc_account.ultimate_parent_account_id                                                                  AS dim_parent_crm_account_id,
       sfdc_account.owner_id                                                                                    AS dim_crm_user_id,
       map_merged_crm_account.dim_crm_account_id                                                                AS merged_to_account_id,
       sfdc_account.record_type_id                                                                              AS record_type_id,
@@ -412,8 +412,6 @@ WITH map_merged_crm_account AS (
     LEFT JOIN ptc_scores
       ON sfdc_account.account_id = ptc_scores.account_id 
         AND ptc_scores.is_current = TRUE
-    LEFT JOIN ultimate_parent_account
-      ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
     LEFT OUTER JOIN sfdc_users AS technical_account_manager
       ON sfdc_account.technical_account_manager_id = technical_account_manager.user_id
     LEFT JOIN sfdc_users AS account_owner
@@ -425,9 +423,6 @@ WITH map_merged_crm_account AS (
     LEFT JOIN sfdc_users AS last_modified_by
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
     {%- elif model_type == 'snapshot' %}
-    LEFT JOIN ultimate_parent_account
-      ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
-        AND sfdc_account.snapshot_id = ultimate_parent_account.snapshot_id
     LEFT OUTER JOIN sfdc_users AS technical_account_manager
       ON sfdc_account.technical_account_manager_id = technical_account_manager.user_id
         AND sfdc_account.snapshot_id = technical_account_manager.snapshot_id
@@ -438,9 +433,9 @@ WITH map_merged_crm_account AS (
       ON proposed_account_owner.user_id = sfdc_account.proposed_account_owner
         AND proposed_account_owner.snapshot_id = sfdc_account.snapshot_id
     LEFT JOIN lam_corrections
-      ON ultimate_parent_account.account_id = lam_corrections.dim_parent_crm_account_id
+      ON sfdc_account.ultimate_parent_account_id = lam_corrections.dim_parent_crm_account_id
         AND sfdc_account.snapshot_id = lam_corrections.snapshot_id
-        AND parent_crm_account_sales_segment = lam_corrections.dim_parent_crm_account_sales_segment
+        AND parent_crm_account_demographics_sales_segment = lam_corrections.dim_parent_crm_account_sales_segment
     LEFT JOIN sfdc_users AS created_by
       ON sfdc_account.created_by_id = created_by.user_id
         AND sfdc_account.snapshot_id = created_by.snapshot_id
