@@ -49,9 +49,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
             {option} = TRUE
             ;
         """
-
-        logging.info(tmp_copy_command)
-
+        
     except:
         logging.info("Failed to get copy command...")
         raise
