@@ -65,7 +65,7 @@
       (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_weight_u_shaped) AS u_net_arr,
       (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_weight_full_path) AS full_net_arr,
       (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_weight_custom_model) AS custom_net_arr,
-      (fct_crm_opportunity.net_arr / fct_crm_attribution_touchpoint.campaigns_per_opp) AS net_arr_per_campaign,
+      (fct_crm_opportunity.net_arr / NULLIF(fct_crm_attribution_touchpoint.campaigns_per_opp,0)) AS net_arr_per_campaign,
       fct_crm_attribution_touchpoint.bizible_revenue_full_path,
       fct_crm_attribution_touchpoint.bizible_revenue_custom_model,
       fct_crm_attribution_touchpoint.bizible_revenue_first_touch,
@@ -244,7 +244,7 @@
       fct_crm_opportunity.count_crm_attribution_touchpoints                AS crm_attribution_touchpoints_per_opp,
       fct_crm_opportunity.weighted_linear_iacv,
       fct_crm_opportunity.count_campaigns                                  AS count_campaigns_per_opp,
-      (fct_crm_opportunity.iacv / fct_crm_opportunity.count_campaigns)     AS iacv_per_campaign,
+      (fct_crm_opportunity.iacv / NULLIF(fct_crm_opportunity.count_campaigns,0))     AS iacv_per_campaign,
 
       -- bizible influenced
        CASE
@@ -315,5 +315,5 @@
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-02-18",
-    updated_date="2022-11-29"
+    updated_date="2022-11-30"
 ) }}
