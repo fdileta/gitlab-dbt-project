@@ -23,6 +23,5 @@ WITH source AS (
 
 )
 
-
 SELECT *
 FROM joined
