@@ -28,12 +28,12 @@ cleaned AS (
 final AS (
   SELECT
     run_id AS id,
-    -- run_results['source_ip']::VARCHAR AS source_ip, --currently missing from the Automated Service Ping, will be added later
+    NULL AS source_ip, --currently missing from the Automated Service Ping, will be added later
     recorded_at,
     uploaded_at AS created_at,
     uploaded_at AS updated_at,
     uuid,
-    -- run_results['historical_max_users']::VARCHAR AS historical_max_users, --currently missing from the Automated Service Ping, will be added later
+    NULL, --currently missing from the Automated Service Ping, will be added later
     edition,
     NULL AS raw_usage_data_id,
     NULL AS raw_usage_data_payload,
@@ -51,7 +51,7 @@ final AS (
     run_results['license_trial']::BOOLEAN AS license_trial,
     run_results['source_license_id']::NUMBER AS source_license_id,
     run_results['installation_type']::VARCHAR AS installation_type,
-    -- run_results['database_version']::VARCHAR AS database_version, --currently missing from the Automated Service Ping, will be added later
+    NULL, --currently missing from the Automated Service Ping, will be added later
     run_results['license_plan']::VARCHAR AS license_plan,
     run_results['database']['adapter']::VARCHAR AS database_adapter,
     CONCAT(
@@ -76,7 +76,7 @@ final AS (
     run_results['prometheus_metrics_enabled']::BOOLEAN AS prometheus_metrics_enabled,
     1::NUMBER AS gitaly_clusters,
     PARSE_JSON(run_results['usage_activity_by_stage']) AS usage_activity_by_stage,
-    -- run_results['gitaly_servers']::NUMBER AS gitaly_servers, --currently missing from the Automated Service Ping, will be added later
+    NULL AS gitaly_servers, --currently missing from the Automated Service Ping, will be added later
     PARSE_JSON(run_results['usage_activity_by_stage_monthly']) AS usage_activity_by_stage_monthly,
     't'::VARCHAR AS gitpod_enabled, -- matching the data type of prep_ping_instance
     run_results['gitaly']['version']::VARCHAR AS gitaly_version,
