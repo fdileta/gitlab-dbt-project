@@ -176,7 +176,7 @@ WITH snapshot_dates AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@jpeguero",
+    updated_by="@michellecooper",
     created_date="2021-06-28",
-    updated_date="2022-07-12"
+    updated_date="2022-11-29"
 ) }}
