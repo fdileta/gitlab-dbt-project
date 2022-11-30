@@ -958,6 +958,7 @@ Snapshot table with Spined Dates that contains all Gitlab.com Users.
 Missing Column Values:
 * Unknown - Value is Null in source data
 * Not Found - Row Not found in source data
+
 The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:
 * role
 * last_activity_date             
