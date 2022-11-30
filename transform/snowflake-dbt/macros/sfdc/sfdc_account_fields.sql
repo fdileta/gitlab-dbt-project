@@ -155,10 +155,6 @@ WITH map_merged_crm_account AS (
       proposed_account_owner.name                                                                              AS proposed_crm_account_owner,
       technical_account_manager.name                                                                           AS technical_account_manager,
 
-      ----ultimate parent crm account info
-      
-      sfdc_account.parent_account_industry                                                                     AS parent_crm_account_industry,
-
       --descriptive attributes
       sfdc_account.account_name                                                                                AS crm_account_name,
       sfdc_account.account_demographics_sales_segment                                                          AS parent_crm_account_demographics_sales_segment,
@@ -173,6 +169,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.account_demographics_upa_street                                                             AS parent_crm_account_demographics_upa_street,
       sfdc_account.account_demographics_upa_postal_code                                                        AS parent_crm_account_demographics_upa_postal_code,
       sfdc_account.account_demographics_employee_count                                                         AS crm_account_demographics_employee_count,
+      sfdc_account.parent_account_industry_hierarchy                                                           AS parent_crm_account_industry,
       sfdc_account.gtm_strategy                                                                                AS crm_account_gtm_strategy,
       CASE
         WHEN LOWER(sfdc_account.gtm_strategy) IN ('account centric', 'account based - net new', 'account based - expand') THEN 'Focus Account'
@@ -234,7 +231,6 @@ WITH map_merged_crm_account AS (
       sfdc_account.zoom_info_number_of_developers                                                              AS crm_account_zoom_info_number_of_developers,
       sfdc_account.zoom_info_total_funding                                                                     AS crm_account_zoom_info_total_funding,
       sfdc_account.forbes_2000_rank                                                                            AS forbes_2000_rank,
-      sfdc_account.parent_account_industry_hierarchy                                                           AS parent_crm_account_industry,
       sfdc_account.sales_development_rep                                                                       AS sales_development_rep,
 	  sfdc_account.admin_manual_source_number_of_employees                                                     AS admin_manual_source_number_of_employees, 
       sfdc_account.admin_manual_source_account_address                                                         AS admin_manual_source_account_address,      
