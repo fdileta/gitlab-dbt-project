@@ -204,7 +204,7 @@ artifact_download:
   script:
     - echo $CI_PROJECT_ID
     - echo $CI_COMMIT_REF_NAME
-    - python3 python_gitlab_artifacts_api download_pipeline_artifacts --project_id $CI_PROJECT_ID --branch_name $CI_COMMIT_REF_NAME --stage_name setup_dbt
+    - python3 -m gitlab_artifacts_downloader download_pipeline_artifacts --project_id $CI_PROJECT_ID --branch_name $CI_COMMIT_REF_NAME --stage_name setup_dbt
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
