@@ -70,13 +70,10 @@ select
     current_campaigns.end_date                       as campaign_end_date,
     current_campaigns.start_date                     as campaign_start_date,
     
---     /* Ad Group Info */
-    
---     current_ad_group.AD_ROTATION_MODE,
---     current_ad_group.CAMPAIGN_NAME,
---     current_ad_group.NAME           as ad_group_name,
---     current_ad_group.STATUS         as ad_group_status,
---     current_ad_group.TYPE           as ad_group_type,
+    /* Ad Group Info */
+    current_ad_group.NAME           as ad_group_name,
+    current_ad_group.STATUS         as ad_group_status,
+    current_ad_group.TYPE           as ad_group_type,
     
     /* Ad Info */
     current_ads.action_items        as ad_action_items,
