@@ -160,7 +160,6 @@
     SELECT DISTINCT
       person_base.email_hash,
       person_base.email_domain_type,
-      person_base.is_valuable_signup,
       person_base.true_inquiry_date,
       person_base.mql_date_lastest_pt,
       person_base.status,
@@ -420,7 +419,6 @@
     cohort_base.worked_date,
     cohort_base.worked_date_pt,
     cohort_base.email_domain,
-    cohort_base.is_valuable_signup,
     cohort_base.was_converted_lead,
     cohort_base.source_buckets,
     cohort_base.crm_partner_id,
@@ -643,5 +641,5 @@
     created_by="@rkohnke",
     updated_by="@degan",
     created_date="2022-07-20",
-    updated_date="2022-11-22",
+    updated_date="2022-11-29",
   ) }}
