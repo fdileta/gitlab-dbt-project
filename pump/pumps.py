@@ -1,5 +1,6 @@
 import logging
 import sys
+from datetime import datetime
 from os import environ as env
 
 from fire import Fire
@@ -35,6 +36,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
             target_name = model
             option = "INCLUDE_QUERY_ID"
         else:
+            inc_end = datetime.fromisoformat(inc_end)
             file_stamp = inc_end.strftime("%Y_%m_%d__%H%M%S")
             target_name = f"{model}/{file_stamp}.csv"
             option = "SINGLE"
@@ -52,6 +54,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
 
     except:
         logging.info("Failed to get copy command...")
+        raise
     finally:
         return tmp_copy_command
 
