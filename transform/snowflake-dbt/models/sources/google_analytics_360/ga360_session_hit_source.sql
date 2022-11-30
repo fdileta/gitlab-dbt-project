@@ -11,7 +11,8 @@ WITH source AS (
       visitor_id::VARCHAR                          AS visitor_id,
 
       --Info
-      visit_start_time::TIMESTAMP                  AS visit_start_at,
+      visit_start_time::TIMESTAMP                  AS visit_start_time,
+      DATE(visit_start_time)::DATE                 AS session_date, 
       hit_number::NUMBER                           AS hit_number,
       DATEADD('millisecond', time, visit_start_at) AS hit_at,
       is_entrance::BOOLEAN                         AS is_entrance,
