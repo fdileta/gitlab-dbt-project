@@ -295,7 +295,7 @@ WITH biz_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-11-29"
+    updated_date="2022-11-01"
 ) }}
