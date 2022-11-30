@@ -202,10 +202,9 @@ test_artifacts:
 artifact_download:
   <<: *snowflake_dbt_jobs
   script:
-    - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA...HEAD
     - echo $CI_PROJECT_ID
-    - echo $CI_COMMIT_BRANCH
-    - python3 -m python_gitlab_artifacts_api download_pipeline_artifacts --project_id $CI_PROJECT_ID --branch_name $CI_COMMIT_BRANCH --stage_name setup_dbt
+    - echo $CI_COMMIT_REF_NAME
+    - python3 -m python_gitlab_artifacts_api.python_gitlab_artifacts_api download_pipeline_artifacts --project_id $CI_PROJECT_ID --branch_name $CI_COMMIT_REF_NAME --stage_name setup_dbt
 
 ➕🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
