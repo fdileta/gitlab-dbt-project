@@ -92,7 +92,8 @@ final AS (
     run_results['grafana_link_enabled']::BOOLEAN AS is_grafana_link_enabled,
     'gitlab'::VARCHAR AS container_registry_vendor,
     PARSE_JSON(run_results['analytics_unique_visits']) AS analytics_unique_visits,
-    run_results['container_registry_server']['version']::VARCHAR AS container_registry_version
+    run_results['container_registry_server']['version']::VARCHAR AS container_registry_version,
+    'automated' AS ping_type
   FROM cleaned
 )
 
