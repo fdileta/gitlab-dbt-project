@@ -1,5 +1,5 @@
 import time
-from logging import error
+from logging import error, info
 
 import numpy as np
 import pandas as pd
