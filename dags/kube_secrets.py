@@ -153,6 +153,14 @@ GIT_DATA_TESTS_CONFIG = Secret(
     "env", "GIT_DATA_TESTS_CONFIG", "airflow", "GIT_DATA_TESTS_CONFIG"
 )
 
+# data science repos:
+GIT_DATA_SCIENCE_PRIVATE_KEY = Secret(
+    "env", "GIT_DATA_SCIENCE_PRIVATE_KEY", "airflow", "GIT_DATA_SCIENCE_PRIVATE_KEY"
+)
+GIT_DATA_SCIENCE_CONFIG = Secret(
+    "env", "GIT_DATA_SCIENCE_CONFIG", "airflow", "GIT_DATA_SCIENCE_CONFIG"
+)
+
 # graphite
 GRAPHITE_HOST = Secret("env", "GRAPHITE_HOST", "airflow", "GRAPHITE_HOST")
 GRAPHITE_PASSWORD = Secret("env", "GRAPHITE_PASSWORD", "airflow", "GRAPHITE_PASSWORD")

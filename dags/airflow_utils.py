@@ -22,16 +22,22 @@ SALES_ANALYTICS_NOTEBOOKS_PATH = "analytics/sales_analytics_notebooks"
 DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO = ("git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git")
 DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = ("gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git")
 
+data_science_ssh_key_cmd = """
+    mkdir ~/.ssh/ &&
+    touch ~/.ssh/id_rsa && touch ~/.ssh/config &&
+    echo "$GIT_DATA_SCIENCE_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0400 ~/.ssh/id_rsa &&
+    echo "$GIT_DATA_SCIENCE_CONFIG" > ~/.ssh/config"""
 
 def get_data_science_project_command(model_http_path, model_ssh_path, model_folder):
     return f"""
+    {data_science_ssh_key_cmd} &&
     if [[ -z "$GIT_COMMIT" ]]; then
         export GIT_COMMIT="HEAD"
     fi
-    if [[ -z "$GITLAB_ANALYTICS_PRIVATE_TOKEN" ]]; then
+    if [[ -z "$GIT_DATA_SCIENCE_PRIVATE_KEY" ]]; then
         export REPO="{model_http_path}";
         else
-        export REPO="{model_http_path}";
+        export REPO="{model_ssh_path}";
     fi &&
     echo "git clone -b main --single-branch --depth 1 $REPO" &&
     git clone -b main --single-branch --depth 1 $REPO &&
