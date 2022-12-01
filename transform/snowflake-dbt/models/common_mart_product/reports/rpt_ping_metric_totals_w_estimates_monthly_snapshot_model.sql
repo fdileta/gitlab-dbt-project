@@ -1,7 +1,7 @@
 {{ config(
     materialized='incremental',
     unique_key='rpt_ping_metric_totals_w_estimates_monthly_snapshot_id',
-    tags=["edm_snapshot", "product"]
+    tags=["mnpi_exception","edm_snapshot", "product"]
 ) }}
 
 
