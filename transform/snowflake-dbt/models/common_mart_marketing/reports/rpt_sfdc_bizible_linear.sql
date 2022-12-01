@@ -44,7 +44,7 @@
       mart_crm_attribution_touchpoint.dim_crm_account_id,
       mart_crm_attribution_touchpoint.crm_account_name,
       mart_crm_attribution_touchpoint.crm_account_gtm_strategy,
-      (mart_crm_attribution_touchpoint.net_arr / campaigns_per_opp.campaigns_per_opp) AS net_arr_per_campaign,
+      (mart_crm_attribution_touchpoint.net_arr / NULLIF(campaigns_per_opp.campaigns_per_opp,0)) AS net_arr_per_campaign,
       linear_base.count_touches,
       mart_crm_attribution_touchpoint.bizible_touchpoint_date,
       mart_crm_attribution_touchpoint.bizible_touchpoint_position,
@@ -95,13 +95,13 @@
       SUM(mart_crm_attribution_touchpoint.bizible_attribution_percent_full_path) AS full_weight,
       SUM(mart_crm_attribution_touchpoint.bizible_count_custom_model) AS custom_weight,
       COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) AS l_touches,
-      (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / linear_base.count_touches) AS l_weight,
+      (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / NULLIF(linear_base.count_touches,0)) AS l_weight,
       (mart_crm_attribution_touchpoint.net_arr * first_weight) AS first_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * w_weight) AS w_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * u_weight) AS u_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * full_weight) AS full_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * custom_weight) AS custom_net_arr,
-      (mart_crm_attribution_touchpoint.net_arr * (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / linear_base.count_touches)) AS linear_net_arr
+      (mart_crm_attribution_touchpoint.net_arr * (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / NULLIF(linear_base.count_touches,0))) AS linear_net_arr
     FROM
     mart_crm_attribution_touchpoint
     LEFT JOIN linear_base ON
@@ -119,5 +119,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-01-25",
-    updated_date="2022-11-28"
+    updated_date="2022-12-01"
 ) }}
