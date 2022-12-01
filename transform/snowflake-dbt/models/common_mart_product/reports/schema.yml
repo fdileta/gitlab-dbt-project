@@ -1014,3 +1014,19 @@ models:
       description: Flags if there is either Subscription Seats data or Usage Ping data present in the given month for a given subscription
     - name: is_latest_data
       description: Flags the row with the most recently received data from Usage Ping
+
+- name: rpt_event_xmau_metric_monthly_snapshot_model
+  description: Simpler incremental version of the rpt_event_xmau_metric_monthly snapshot model
+  columns:
+      - name: primary_key
+        tests:
+          - not_null
+        tags: ["edm_snapshot", "product"]
+
+- name: rpt_ping_metric_totals_w_estimates_monthly_snapshot_model
+  description: Simpler incremental version of the rpt_ping_metric_totals_w_estimates_monthly snapshot model
+  columns:
+      - name: primary_key
+        tests:
+          - not_null
+        tags: ["edm_snapshot", "product"]
