@@ -29,6 +29,7 @@ WITH tiers AS (
 
       -- Descriptive information
       license.license_md5,
+      license.license_sha256,
       license.subscription_name,
       license.environment,
       license.license_user_count,
@@ -51,7 +52,7 @@ WITH tiers AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@snalamaru",
-    updated_by="@jpeguero",
+    updated_by="@rbacovic",
     created_date="2021-01-08",
-    updated_date="2021-09-22"
+    updated_date="2021-12-01"
 ) }}
