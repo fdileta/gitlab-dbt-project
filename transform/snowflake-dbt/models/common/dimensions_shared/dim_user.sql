@@ -23,7 +23,7 @@ WITH prep_user AS (
       notification_email_domain_classification,
       email_domain,
       email_domain_classification,
-      email_domain_classification is null as is_valuable_signup,
+      IFF(email_domain_classification IS NULL,TRUE,FALSE) AS is_valuable_signup,
       public_email_domain,
       public_email_domain_classification,
       commit_email_domain,
