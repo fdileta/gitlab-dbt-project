@@ -20,7 +20,7 @@ ANALYST_IMAGE = "registry.gitlab.com/gitlab-data/data-image/analyst-image:v1.0.1
 SALES_ANALYTICS_NOTEBOOKS_PATH = "analytics/sales_analytics_notebooks"
 
 DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO = ("git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git")
-DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = ("gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git")
+DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = ("https://gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git")
 
 data_science_ssh_key_cmd = """
     mkdir ~/.ssh/ &&
