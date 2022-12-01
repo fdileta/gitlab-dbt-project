@@ -29,7 +29,7 @@ WITH events AS (
 
     SELECT DISTINCT 
       app_id,
-      IFNULL(refr_urlhost,'') || refr_urlpath                                       AS page_url,
+      refr_urlhost || refr_urlpath                                                  AS page_url,
       refr_urlpath                                                                  AS page_url_path,
       {{ clean_url('refr_urlpath') }}                                               AS clean_url_path,
       refr_urlhost                                                                  AS page_url_host,
