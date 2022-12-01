@@ -1021,7 +1021,7 @@ models:
       - name: primary_key
         tests:
           - not_null
-        tags: ["edm_snapshot", "product"]
+        tags: ["mnpi_exception","edm_snapshot", "product"]
 
 - name: rpt_ping_metric_totals_w_estimates_monthly_snapshot_model
   description: Simpler incremental version of the rpt_ping_metric_totals_w_estimates_monthly snapshot model
@@ -1029,4 +1029,4 @@ models:
       - name: primary_key
         tests:
           - not_null
-        tags: ["edm_snapshot", "product"]
+        tags: ["mnpi_exception","edm_snapshot", "product"]
