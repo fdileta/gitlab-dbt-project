@@ -17,40 +17,40 @@
 
     SELECT
       event_id,
-      derived_tstamp                                    AS behavior_at,
-      event                                             AS event,
-      event_name                                        AS event_name,
-      se_action                                         AS event_action,
-      se_category                                       AS event_category,
-      se_label                                          AS event_label,
-      se_property                                       AS event_property,
-      platform                                          AS platform,
+      behavior_at,
+      event,
+      event_name,
+      event_action,
+      event_category,
+      event_label,
+      event_property,
+      platform,
       gsc_pseudonymized_user_id,
-      {{ clean_url('page_urlpath') }}                   AS clean_url_path,
-      page_urlhost                                      AS page_url_host,
+      clean_url_path,
+      page_url_host,
       app_id,
-      domain_sessionid                                  AS session_id,
-      lc_targeturl                                      AS link_click_target_url,
-      sf_formid                                         AS submit_form_id,
-      cf_formid                                         AS change_form_id,
-      cf_type                                           AS change_form_type,
-      cf_elementid                                      AS change_form_element_id,
-      ff_elementid                                      AS focus_form_element_id,
-      ff_nodename                                       AS focus_form_node_name,
-      br_family                                         AS browser_name,
-      br_name                                           AS browser_major_version,
-      br_version                                        AS browser_minor_version,
-      br_lang                                           AS browser_language,
+      session_id,
+      link_click_target_url,
+      submit_form_id,
+      change_form_id,
+      change_form_type,
+      change_form_element_id,
+      focus_form_element_id,
+      focus_form_node_name,
+      browser_name,
+      browser_major_version,
+      browser_minor_version,
+      browser_language,
       os_name,
       os_timezone,
-      gsc_environment                                   AS environment
+      environment
     FROM events
     WHERE event = 'unstruct'
-    AND derived_tstamp >= DATEADD(MONTH, -25, CURRENT_DATE)
+    AND behavior_at >= DATEADD(MONTH, -25, CURRENT_DATE)
 
     {% if is_incremental() %}
 
-    AND derived_tstamp > (SELECT max(behavior_at) FROM {{ this }})
+    AND behavior_at > (SELECT max(behavior_at) FROM {{ this }})
 
     {% endif %}
 )
@@ -100,5 +100,5 @@
     created_by="@chrissharp",
     updated_by="@chrissharp",
     created_date="2022-09-27",
-    updated_date="2022-09-27"
+    updated_date="2022-12-01"
 ) }}
