@@ -5,7 +5,7 @@
 
 {{ 
     simple_cte([
-    ('page_views', 'snowplow_page_views_all'),
+    ('page_views', 'prep_snowplow_page_views_all'),
     ('dim_website_page', 'dim_behavior_website_page')
     ])
 }}
