@@ -7,12 +7,7 @@ WITH browser_information AS (
 
   SELECT DISTINCT
     -- surrogate key
-    {{ dbt_utils.surrogate_key([
-        'browser_name',
-        'browser_major_version',
-        'browser_minor_version',
-        'browser_language'
-        ]) }}                   AS dim_behavior_browser_sk,
+    dim_behavior_browser_sk,
 
     -- natural key
     browser_name,

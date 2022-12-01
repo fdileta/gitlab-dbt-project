@@ -68,10 +68,10 @@
       unstruct_event.session_id,
 
       -- Surrogate Keys
-      {{ dbt_utils.surrogate_key(['event', 'event_name', 'platform', 'environment', 'event_category', 'event_action', 'event_label', 'event_property']) }} AS dim_behavior_event_sk,
+      unstruct_event.dim_behavior_event_sk,
       dim_page.dim_behavior_website_page_sk,
-      {{ dbt_utils.surrogate_key(['browser_name', 'browser_major_version', 'browser_minor_version', 'browser_language']) }}                                AS dim_behavior_browser_sk,
-      {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}                                                                                            AS dim_behavior_operating_system_sk,
+      unstruct_event.dim_behavior_browser_sk,
+      unstruct_event.dim_behavior_operating_system_sk,
 
       --Time Attributes
       behavior_at,
