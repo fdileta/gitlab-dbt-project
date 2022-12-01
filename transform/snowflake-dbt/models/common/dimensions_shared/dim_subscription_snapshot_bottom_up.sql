@@ -128,6 +128,7 @@ WITH snapshot_dates AS (
           THEN DATE_TRUNC('month',DATEADD('month', zuora_subscription_spined.current_term, zuora_subscription_spined.subscription_end_date::DATE))
         ELSE NULL
       END                                                                       AS second_active_renewal_month,
+      zuora_subscription_spined.cancelled_date,
 
       --Lineage and Cohort Information
       subscription_lineage.subscription_lineage,
@@ -175,7 +176,7 @@ WITH snapshot_dates AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@jpeguero",
+    updated_by="@michellecooper",
     created_date="2021-06-28",
-    updated_date="2022-07-12"
+    updated_date="2022-11-29"
 ) }}
