@@ -27,7 +27,7 @@ WITH snapshot_dates AS (
     SELECT
       snapshot_dates.date_id     AS snapshot_id,
       snapshot_dates.date_actual AS snapshot_date,
-      rpt_event_xmau_metric_monthly.*
+      rpt_ping_metric_totals_w_estimates_monthly.*
     FROM rpt_ping_metric_totals_w_estimates_monthly
     INNER JOIN snapshot_dates
     ON snapshot_dates.date_actual >= rpt_ping_metric_totals_w_estimates_monthly.dbt_valid_from
@@ -43,11 +43,9 @@ WITH snapshot_dates AS (
 )
 
 
-SELECT *
-FROM final
 
 {{ dbt_audit(
-    cte_ref="results",
+    cte_ref="final",
     created_by="@snalamaru",
     updated_by="@snalamaru",
     created_date="2022-11-03",
