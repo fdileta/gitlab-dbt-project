@@ -9,7 +9,7 @@ WITH snapshot_dates AS (
 
     SELECT *
     FROM {{ ref('dim_date') }}
-    WHERE date_actual >= '2022-11-10'
+    WHERE date_actual >= '2022-12-01'
     AND date_actual <= CURRENT_DATE {% if is_incremental() %}
 
     -- this filter will only be applied on an incremental run
