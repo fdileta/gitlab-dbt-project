@@ -19,11 +19,7 @@
       event_id,
       behavior_at,
       event,
-      event_name,
-      event_action,
-      event_category,
-      event_label,
-      event_property,
+      dim_behavior_event_sk,
       platform,
       gsc_pseudonymized_user_id,
       clean_url_path,
@@ -37,12 +33,8 @@
       change_form_element_id,
       focus_form_element_id,
       focus_form_node_name,
-      browser_name,
-      browser_major_version,
-      browser_minor_version,
-      browser_language,
-      os_name,
-      os_timezone,
+      dim_behavior_browser_sk,
+      dim_behavior_operating_system_sk,
       environment
     FROM events
     WHERE event = 'unstruct'
