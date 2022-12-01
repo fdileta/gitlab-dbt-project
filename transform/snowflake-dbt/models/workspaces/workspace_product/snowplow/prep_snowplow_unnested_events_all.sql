@@ -13,7 +13,7 @@ WITH unioned_view AS (
 
 SELECT
   event_id                            AS event_id,
-  derived_tstamp                      AS behavior_at,
+  derived_tstamp::TIMESTAMP           AS behavior_at,
   event                               AS event,
   event_name                          AS event_name,
   se_action                           AS event_action,
@@ -42,9 +42,10 @@ SELECT
   gsc_environment                     AS environment,
   v_tracker                           AS tracker_version,
   TRY_PARSE_JSON(contexts)::VARIANT   AS contexts,
-  dvce_created_tstamp                 AS dvce_created_tstamp,
+  dvce_created_tstamp::TIMESTAMP      AS dvce_created_tstamp,
+  collector_tstamp::TIMESTAMP         AS collector_tstamp,
   domain_userid                       AS user_snowplow_domain_id,
-  domain_sessionidx                   AS session_index,
+  domain_sessionidx::INT              AS session_index,
   (page_urlhost || page_urlpath)      AS page_url,
   page_urlscheme                      AS page_url_scheme,
   page_urlpath                        AS page_url_path,
@@ -60,6 +61,6 @@ SELECT
   os_family                           AS os,
   os_manufacturer                     AS os_manufacturer,
   dvce_type                           AS device_type,
-  dvce_ismobile                       AS is_device_mobile,
+  dvce_ismobile::BOOLEAN              AS is_device_mobile,
   refr_medium                         AS referrer_medium
 FROM unioned_view
