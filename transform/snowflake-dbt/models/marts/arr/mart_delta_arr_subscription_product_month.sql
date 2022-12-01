@@ -50,7 +50,7 @@
       --add 1 month to generate churn month
       DATEADD('month',1,MAX(arr_month))   AS date_month_end
     FROM mart_arr
-    {{ dbt_utils.group_by(n=8) }}
+    {{ dbt_utils.group_by(n=7) }}
 
 ), base AS (
 
@@ -91,7 +91,7 @@
       ON base.arr_month = mart_arr.arr_month
       AND base.subscription_id = mart_arr.subscription_id
       AND base.product_category = mart_arr.product_category
-    {{ dbt_utils.group_by(n=9) }}
+    {{ dbt_utils.group_by(n=8) }}
 
 ), prior_month AS (
 
