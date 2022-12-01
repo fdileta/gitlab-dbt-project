@@ -13,7 +13,7 @@ WITH crm_person AS (
       sfdc_record_type,
       email_hash,
       email_domain,
-      IFF(email_domain_type = 'Business email domain',1,0) AS is_valuable_signup,
+      IFF(email_domain_type = 'Business email domain',TRUE,FALSE) AS is_valuable_signup,
       email_domain_type,
 
       --keys
