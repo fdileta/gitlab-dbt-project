@@ -154,7 +154,7 @@
       dim_sales_qualified_source.sales_qualified_source_name,
       dim_sales_qualified_source.sales_qualified_source_grouped,
       dim_sales_qualified_source.sqs_bucket_engagement,
-	  fct_crm_opportunity.record_type_name,
+	  dim_crm_opportunity.record_type_name,
 
        -- Account fields
       dim_crm_account.crm_account_name,
