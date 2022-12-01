@@ -176,7 +176,6 @@ renamed AS (
     NULLIF(zi_c_domestic_parent_state::VARCHAR, '')                                  AS domestic_parent_state,
     NULLIF(zi_c_domestic_parent_country::VARCHAR, '')                                AS domestic_parent_country,
     NULLIF(zi_c_domestic_parent_location_id::VARCHAR, '')                            AS domestic_parent_location_id,
-    NULLIF(zi_c_domestic_parent_location_id::VARCHAR, '')                            AS domestic_parent_location_id,
     NULLIF(zi_es_ultimate_parent_location_id::VARCHAR, '')                           AS everstring_global_parent_location_id,
     NULLIF(zi_c_ultimate_parent_name::VARCHAR, '')                                   AS global_parent_name,
     NULLIF(zi_c_ultimate_parent_url::VARCHAR, '')                                    AS global_parent_url,
