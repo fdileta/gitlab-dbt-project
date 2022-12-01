@@ -25,8 +25,8 @@ DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = ("https://gitlab.com/gitlab-data/data-sci
 data_science_ssh_key_cmd = """
     mkdir ~/.ssh/ &&
     touch ~/.ssh/id_rsa && touch ~/.ssh/config &&
-    echo "$GIT_DATA_SCIENCE_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0400 ~/.ssh/id_rsa &&
-    echo "$GIT_DATA_SCIENCE_CONFIG" > ~/.ssh/config"""
+    echo "$GIT_DATA_TESTS_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0400 ~/.ssh/id_rsa &&
+    echo "$GIT_DATA_TESTS_CONFIG" > ~/.ssh/config"""
 
 def get_data_science_project_command(model_http_path, model_ssh_path, model_folder):
     return f"""
@@ -34,7 +34,7 @@ def get_data_science_project_command(model_http_path, model_ssh_path, model_fold
     if [[ -z "$GIT_COMMIT" ]]; then
         export GIT_COMMIT="HEAD"
     fi
-    if [[ -z "$GIT_DATA_SCIENCE_PRIVATE_KEY" ]]; then
+    if [[ -z "$GIT_DATA_TESTS_PRIVATE_KEY" ]]; then
         export REPO="{model_http_path}";
         else
         export REPO="{model_ssh_path}";
