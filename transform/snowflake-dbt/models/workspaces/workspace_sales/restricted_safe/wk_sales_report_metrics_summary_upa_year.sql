@@ -15,7 +15,7 @@ SELECT
     upa_user_geo,
     account_id              AS virtual_upa_id,
     account_name            AS virtual_upa_name,
-    account_user_segment    AS virtual_upa_segment,
+    upa_ad_segment          AS virtual_upa_segment,
     account_user_geo        AS virtual_upa_geo,
     account_user_region     AS virtual_upa_region,
     account_user_area       AS virtual_upa_area,
