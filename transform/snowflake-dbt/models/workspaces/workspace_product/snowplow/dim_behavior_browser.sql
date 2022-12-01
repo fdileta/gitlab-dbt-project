@@ -22,13 +22,13 @@ WITH browser_information AS (
     -- attributes
     browser_engine,
     browser_language,
-    MAX(derived_tstamp)         AS max_timestamp
+    MAX(behavior_at)            AS max_timestamp
   FROM {{ ref('prep_snowplow_unnested_events_all') }}
   WHERE true
 
   {% if is_incremental() %}
     
-  AND derived_tstamp > (SELECT MAX(max_timestamp) FROM {{this}})
+  AND behavior_at > (SELECT MAX(max_timestamp) FROM {{this}})
     
   {% endif %}
 
