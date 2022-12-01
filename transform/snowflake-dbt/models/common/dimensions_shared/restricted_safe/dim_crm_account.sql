@@ -95,7 +95,6 @@ WITH final AS (
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
       prep_crm_account.forbes_2000_rank,
-      prep_crm_account.parent_account_industry_hierarchy,
       prep_crm_account.sales_development_rep,
       prep_crm_account.admin_manual_source_number_of_employees,
       prep_crm_account.admin_manual_source_account_address,
