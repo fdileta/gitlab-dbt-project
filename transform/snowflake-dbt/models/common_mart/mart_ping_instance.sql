@@ -1,6 +1,6 @@
 {{ config(
     tags=["product", "mnpi_exception"],
-    materialized = "incremental",
+    materialized = "table",
     unique_key = "ping_instance_id"
 ) }}
 
@@ -148,7 +148,8 @@
         dim_ping_instance.is_last_ping_of_month                                                                                         AS is_last_ping_of_month,
         fct_ping_instance_metric.dim_location_country_id                                                                                AS dim_location_country_id,
         dim_location.country_name                                                                                                       AS country_name,
-        dim_location.iso_2_country_code                                                                                                 AS iso_2_country_code
+        dim_location.iso_2_country_code                                                                                                 AS iso_2_country_code,
+        dim_ping_instance.collected_data_categories                                                                                     AS collected_data_categories
       FROM fct_ping_instance_metric
       INNER JOIN dim_date
         ON fct_ping_instance_metric.dim_ping_date_id = dim_date.date_id
@@ -201,6 +202,7 @@
 
       --metadata instance
       instance_user_count,
+      collected_data_categories,
 
       --metadata subscription
       original_subscription_name_slugify,
@@ -233,7 +235,7 @@
 {{ dbt_audit(
     cte_ref="sorted",
     created_by="@icooper-acp",
-    updated_by="@snalamaru",
+    updated_by="@tpoole1",
     created_date="2022-03-11",
-    updated_date="2022-05-20"
+    updated_date="2022-10-13"
 ) }}

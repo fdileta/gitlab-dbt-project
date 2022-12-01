@@ -54,6 +54,14 @@ This model assumes that only one priority is placed in a given description or no
 
 {% enddocs %}
 
+{% docs prep_ptpt_scores_by_user %}
+
+Takes the scores from ptpt_scores, transforms it to user / email address grain and uses the latest score date available.
+
+The scores of this model are then used in mart_marketing_contact and the marketing pump to later be synced with Marketo and SFDC.
+
+{% enddocs %}
+
 {% docs prep_sfdc_account %}
 
 SFDC Account Prep table, used to clean and dedupe fields from a common source for use in further downstream dimensions.
@@ -200,16 +208,6 @@ The grain of the table is quote_id.
 Creates a License Prep table for representing generated licenses and associated metadata for shared dimension and references in facts.
 
 The grain of the table is license_id.
-
-{% enddocs %}
-
-{% docs prep_usage_ping_subscription_mapped_gmau %}
-
-This data model contains the values of each GMAU metric for **Self-Managed** instances with a non-null `license_md5`. Rows missing a `dim_subscription_id` indicate that either no matching license was found in `map_license_subscription_account`, or no `dim_subscription_id` exists in `map_license_subscription_account` associated with the given `license_md5`.
-
-This data model is used for the Customer Health Dashboards.
-
-Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
 
 {% enddocs %}
 
@@ -371,29 +369,12 @@ This curent version is for Sales team only.
 Ideally, the purpose of this data model is to unpack all the metrics from the `raw_usage_data_payload` column, strips all the sensitive data out, and has one value for each metric in that column.
 {% enddocs %}
 
-
-{% docs prep_usage_ping_saas_dates %}
-This data model is a prep model that contains the dates of the usage pings for the self-managed instances that powers our SaaS GitLab.com data model.
-{% enddocs %}
-
 {% docs prep_usage_ping_subscription_mapped %}
 This data model is a prep model that depends on prep_usage_ping and supports the creation of dim_usage_ping that will replace PROD.legacy.version_usage_data, dim_usage_pings, version_usage_data_source, and version_raw_usage_data_source in the future.
 
 This curent version is for Sales team only.
 
 Ideally, the purpose of this data model is to identify the usage pings that can be mapped to a subscription.
-{% enddocs %}
-
-{% docs prep_usage_ping_subscription_mapped_wave_2_3_metrics %}
-The purpose of this data model is to identify the usage pings that can be mapped to a subscription and to unpack an initial set ([wave 2-3](https://gitlab.com/gitlab-data/analytics/-/blob/master/transform/snowflake-dbt/macros/version/sales_wave_2_3_metrics.sql)) of priority metrics from the `raw_usage_data_payload` column, strip all the sensitive data out, and then report one value for each metric in that column.
-
-This data model is a prep model that depends on prep_usage_ping and supports the creation of dim_usage_ping that will replace `prod.legacy.version_usage_data`, `dim_usage_pings`, `version_usage_data_source`, and `version_raw_usage_data_source` in the future.
-
-This current version is for Sales team only.
-
-Ideally, the purpose of this data model is to identify the usage pings that can be mapped to a subscription and to unpack all the metrics from the `raw_usage_data_payload` column, strips all the sensitive data out, and has one value for each metric in that column.
-
-The metric list identifed can be found in the macro [`sales_wave_2_3_metrics`](https://gitlab.com/gitlab-data/analytics/-/blob/master/transform/snowflake-dbt/macros/version/sales_wave_2_3_metrics.sql).
 {% enddocs %}
 
 {% docs prep_gainsight_source_model_counts %}

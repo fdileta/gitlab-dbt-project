@@ -143,6 +143,7 @@
       dim_crm_opportunity.churn_contraction_type,
       dim_crm_opportunity.churn_contraction_net_arr_bucket,
       dim_crm_opportunity.dim_crm_user_id AS owner_id,
+      dim_crm_opportunity.resale_partner_name,
       dim_deal_path.deal_path_name,
       dim_order_type.order_type_name                                       AS order_type,
       dim_order_type.order_type_grouped,
@@ -183,6 +184,8 @@
       dim_crm_account.crm_account_zi_technologies,
       dim_crm_account.is_jihu_account,
       dim_crm_account.fy22_new_logo_target_list,
+      dim_crm_account.admin_manual_source_number_of_employees,
+      dim_crm_account.admin_manual_source_account_address,
 
       -- Flags
       fct_crm_opportunity.is_won,
@@ -297,16 +300,16 @@
       dim_crm_opportunity.sales_team_asm_level,
       dim_crm_opportunity.account_owner_team_stamped_cro_level,
       LOWER(
-      dim_crm_account_user_hierarchy_live_sales_segment.crm_user_sales_segment
+        dim_crm_opportunity.crm_account_owner_sales_segment
       ) AS account_owner_user_segment,
       LOWER(
-        dim_crm_account_user_hierarchy_live_geo.crm_user_geo
+        dim_crm_opportunity.crm_account_owner_geo
       ) AS account_owner_user_geo,
       LOWER(
-        dim_crm_account_user_hierarchy_live_region.crm_user_region
+        dim_crm_opportunity.crm_account_owner_region
       ) AS account_owner_user_region,
       LOWER(
-        dim_crm_account_user_hierarchy_live_area.crm_user_area
+        dim_crm_opportunity.crm_account_owner_area
       ) AS account_owner_user_area,
 
       -- Channel fields
@@ -431,6 +434,11 @@
       stage_5_negotiating_date.first_day_of_fiscal_quarter            AS stage_5_negotiating_fiscal_quarter_date,
       stage_5_negotiating_date.fiscal_quarter_name_fy                 AS stage_5_negotiating_fiscal_quarter_name,
       stage_5_negotiating_date.fiscal_year                            AS stage_5_negotiating_fiscal_year,
+      stage_6_awaiting_signature_date.date_actual                     AS stage_6_awaiting_signature_date_date,
+      stage_6_awaiting_signature_date.first_day_of_month              AS stage_6_awaiting_signature_date_month,
+      stage_6_awaiting_signature_date.first_day_of_fiscal_quarter     AS stage_6_awaiting_signature_date_fiscal_quarter_date,
+      stage_6_awaiting_signature_date.fiscal_quarter_name_fy          AS stage_6_awaiting_signature_date_fiscal_quarter_name,
+      stage_6_awaiting_signature_date.fiscal_year                     AS stage_6_awaiting_signature_date_fiscal_year,
       stage_6_closed_won_date.date_actual                             AS stage_6_closed_won_date,
       stage_6_closed_won_date.first_day_of_month                      AS stage_6_closed_won_month,
       stage_6_closed_won_date.first_day_of_fiscal_quarter             AS stage_6_closed_won_fiscal_quarter_date,
@@ -476,11 +484,11 @@
       arr_created_date.first_day_of_fiscal_quarter                    AS pipeline_created_fiscal_quarter_date,
       arr_created_date.fiscal_quarter_name_fy                         AS pipeline_created_fiscal_quarter_name,
       arr_created_date.fiscal_year                                    AS pipeline_created_fiscal_year,
-      created_date.date_actual                                        AS net_arr_created_date,
-      created_date.first_day_of_month                                 AS net_arr_created_month,
-      created_date.first_day_of_fiscal_quarter                        AS net_arr_created_fiscal_quarter_date,
-      created_date.fiscal_quarter_name_fy                             AS net_arr_created_fiscal_quarter_name,
-      created_date.fiscal_year                                        AS net_arr_created_fiscal_year,
+      arr_created_date.date_actual                                    AS net_arr_created_date,
+      arr_created_date.first_day_of_month                             AS net_arr_created_month,
+      arr_created_date.first_day_of_fiscal_quarter                    AS net_arr_created_fiscal_quarter_date,
+      arr_created_date.fiscal_quarter_name_fy                         AS net_arr_created_fiscal_quarter_name,
+      arr_created_date.fiscal_year                                    AS net_arr_created_fiscal_year,
       fct_crm_opportunity.days_in_0_pending_acceptance,
       fct_crm_opportunity.days_in_1_discovery,
       fct_crm_opportunity.days_in_2_scoping,
@@ -511,7 +519,7 @@
       fct_crm_opportunity.open_4plus_net_arr,
       fct_crm_opportunity.booked_net_arr,
       fct_crm_opportunity.churned_contraction_net_arr,
-      fct_crm_opportunity.pipeline_calculated_deal_count,
+      fct_crm_opportunity.calculated_deal_count,
       fct_crm_opportunity.booked_churned_contraction_deal_count,
       fct_crm_opportunity.booked_churned_contraction_net_arr,
       fct_crm_opportunity.arr,
@@ -582,6 +590,8 @@
       ON fct_crm_opportunity.stage_4_proposal_date_id = stage_4_proposal_date.date_id
     LEFT JOIN dim_date stage_5_negotiating_date
       ON fct_crm_opportunity.stage_5_negotiating_date_id = stage_5_negotiating_date.date_id
+    LEFT JOIN dim_date stage_6_awaiting_signature_date
+      ON fct_crm_opportunity.stage_6_awaiting_signature_date_id = stage_6_awaiting_signature_date.date_id
     LEFT JOIN dim_date stage_6_closed_won_date
       ON fct_crm_opportunity.stage_6_closed_won_date_id = stage_6_closed_won_date.date_id
     LEFT JOIN dim_date stage_6_closed_lost_date
@@ -608,9 +618,9 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@chrissharp",
+    updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-08-31"
+    updated_date="2022-11-10"
   ) }}
 
 

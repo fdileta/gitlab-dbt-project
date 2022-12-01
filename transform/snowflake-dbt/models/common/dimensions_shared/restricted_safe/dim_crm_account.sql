@@ -18,6 +18,7 @@ WITH final AS (
 
       --account people
       prep_crm_account.crm_account_owner,
+      prep_crm_account.proposed_crm_account_owner,
       prep_crm_account.account_owner,
       prep_crm_account.technical_account_manager,
 
@@ -113,6 +114,8 @@ WITH final AS (
       prep_crm_account.zoom_info_company_city,
       prep_crm_account.zoom_info_company_state_province,
       prep_crm_account.zoom_info_company_country,
+      prep_crm_account.account_phone,
+      prep_crm_account.zoominfo_account_phone,
       prep_crm_account.abm_tier,
       prep_crm_account.health_score,
       prep_crm_account.health_number,
@@ -130,6 +133,10 @@ WITH final AS (
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
       prep_crm_account.forbes_2000_rank,
+      prep_crm_account.parent_account_industry_hierarchy,
+      prep_crm_account.sales_development_rep,
+      prep_crm_account.admin_manual_source_number_of_employees,
+      prep_crm_account.admin_manual_source_account_address,
 
       --measures (maintain for now to not break reporting)
       prep_crm_account.parent_crm_account_lam,
@@ -179,7 +186,13 @@ WITH final AS (
       prep_crm_account.last_modified_by_name,
       prep_crm_account.last_modified_date,
       prep_crm_account.last_activity_date,
-      prep_crm_account.is_deleted
+      prep_crm_account.is_deleted,
+      prep_crm_account.pte_score,
+      prep_crm_account.pte_decile,
+      prep_crm_account.pte_score_group,
+      prep_crm_account.ptc_score,
+      prep_crm_account.ptc_decile,
+      prep_crm_account.ptc_score_group
     FROM {{ ref('prep_crm_account') }}
 
 )
@@ -187,9 +200,9 @@ WITH final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@msendal",
-    updated_by="@j_kim",
+    updated_by="@rkohnke",
     created_date="2020-06-01",
-    updated_date="2022-08-31"
+    updated_date="2022-11-10"
 ) }}
 
 

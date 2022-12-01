@@ -1,20 +1,6 @@
 {{ config(alias='sfdc_opportunity_xf_edm_marts') }}
 
-WITH sfdc_opportunity AS (
-
-    SELECT opportunity_id,
-          opportunity_category,
-          product_category
-    FROM {{ref('sfdc_opportunity')}}
-    --FROM  prod.restricted_safe_legacy.sfdc_opportunity
-
-), legacy_sfdc_opportunity_xf AS (
-
-    SELECT *
-    --FROM prod.restricted_safe_legacy.sfdc_opportunity_xf
-    FROM {{ref('sfdc_opportunity_xf')}}
-
-), edm_opty AS (
+WITH edm_opty AS (
 
     SELECT *
     --FROM prod.restricted_safe_common_mart_sales.mart_crm_opportunity
@@ -29,8 +15,8 @@ WITH sfdc_opportunity AS (
 ), sfdc_accounts_xf AS (
 
     SELECT *
-    FROM {{ref('sfdc_accounts_xf')}}
-    --FROM prod.restricted_safe_legacy.sfdc_accounts_xf
+    FROM {{ref('wk_sales_sfdc_accounts_xf')}}
+    -- FROM PROD.restricted_safe_workspace_sales.sfdc_accounts_xf
 
 ), date_details AS (
 
@@ -74,9 +60,9 @@ WITH sfdc_opportunity AS (
     edm_opty.merged_crm_opportunity_id,
     ----------------------------------------------------------
     ----------------------------------------------------------
-    --edm_opty.dim_crm_user_id                          AS owner_id,
     edm_opty.owner_id,
-    edm_opty.opportunity_owner,
+    -- edm_opty.opportunity_owner,
+    opportunity_owner.name                         AS opportunity_owner,
     edm_opty.opportunity_owner_department,
     edm_opty.opportunity_owner_manager,
     edm_opty.opportunity_owner_role,
@@ -146,9 +132,7 @@ WITH sfdc_opportunity AS (
     edm_opty.stage_3_technical_evaluation_date,
     edm_opty.stage_4_proposal_date,
     edm_opty.stage_5_negotiating_date,
-    
-    sfdc_opportunity_xf.stage_6_awaiting_signature_date,
-    
+    edm_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
     edm_opty.stage_6_closed_won_date,
     edm_opty.stage_6_closed_lost_date,
     edm_opty.cp_champion,
@@ -175,24 +159,17 @@ WITH sfdc_opportunity AS (
 
     ----------------------------------------------------------
     ----------------------------------------------------------
-    -- NF: why do we need these fields now?
-    sfdc_opportunity_xf.sales_segment, -- drop?
-
-    ----------------------------------------------------------
-    ----------------------------------------------------------
     -- Channel Org. fields
     edm_opty.deal_path_name                             AS deal_path,
     edm_opty.dr_partner_deal_type,
     edm_opty.dr_partner_engagement_name                 AS dr_partner_engagement, 
-    edm_opty.partner_account                            AS partner_account_id,
+    edm_opty.partner_account,
     edm_opty.partner_account_name,
     edm_opty.dr_status,
     edm_opty.distributor,
     edm_opty.influence_partner,
-
     edm_opty.partner_track,
     edm_opty.partner_gitlab_program,
-
     edm_opty.is_public_sector_opp,
     edm_opty.is_registration_from_portal,
     edm_opty.calculated_discount,
@@ -200,10 +177,8 @@ WITH sfdc_opportunity AS (
     edm_opty.partner_discount_calc,
     edm_opty.comp_channel_neutral,
     edm_opty.fulfillment_partner                      AS resale_partner_id,
-    
     resale_account.account_name                       AS resale_partner_name,
-    
-    edm_opty.platform_partner                         AS platform_partner_id,
+    edm_opty.platform_partner,
 
     ----------------------------------------------------------
     ----------------------------------------------------------
@@ -224,14 +199,11 @@ WITH sfdc_opportunity AS (
     edm_opty.account_demographics_area,
     edm_opty.account_demographics_territory,
 
-    edm_opty.account_demographics_segment             AS upa_demographics_segment,
-    edm_opty.account_demographics_geo                 AS upa_demographics_geo,
-    edm_opty.account_demographics_region              AS upa_demographics_region,
-    edm_opty.account_demographics_area                AS upa_demographics_area,
-    edm_opty.account_demographics_territory           AS upa_demographics_territory,
-    
-    ----------------------------------------------------------
-    ----------------------------------------------------------
+    upa.account_demographics_sales_segment           AS upa_demographics_segment,
+    upa.account_demographics_geo                     AS upa_demographics_geo,
+    upa.account_demographics_region                  AS upa_demographics_region,
+    upa.account_demographics_area                    AS upa_demographics_area,
+    upa.account_demographics_territory               AS upa_demographics_territory,
 
     edm_opty.sales_qualified_source_name             AS sales_qualified_source,
     edm_opty.stage_category,
@@ -243,10 +215,14 @@ WITH sfdc_opportunity AS (
     CAST(edm_opty.is_won AS INTEGER)                 AS is_won,
     edm_opty.is_lost,
     edm_opty.is_open,
-    edm_opty.is_duplicate                            AS is_duplicate_flag,
-    edm_opty.is_closed,
+    edm_opty.is_duplicate                            AS is_duplicate_flag,    
+    CASE edm_opty.is_closed 
+      WHEN TRUE THEN 1 
+      ELSE 0 
+    END                                              AS is_closed,
+    edm_opty.is_closed                               AS stage_is_closed,
+    edm_opty.is_active                               AS stage_is_active,
     edm_opty.is_renewal,
-
 
     -- date fields helpers -- revisit
     edm_opty.close_fiscal_quarter_name,
@@ -340,7 +316,7 @@ WITH sfdc_opportunity AS (
     edm_opty.stage_name_4plus,
     edm_opty.deal_category,
     edm_opty.deal_group,
-    edm_opty.pipeline_calculated_deal_count                                  AS calculated_deal_count,
+    edm_opty.calculated_deal_count                                  AS calculated_deal_count,
 
     ----------------------------------------------------------------
     -- NF 2022-01-28 This is probably TO BE DEPRECATED too, need to align with Channel ops
@@ -368,12 +344,6 @@ WITH sfdc_opportunity AS (
     -- 20201021 NF: This should be replaced by a table that keeps track of excluded deals for forecasting purposes
     edm_opty.is_excluded_from_pipeline_created                                AS is_excluded_flag,
 
-    ----------------------------------------------------------------
-    ----------------------------------------------------------------
-    -- NF 20220727 These next fields are needed for custom logic down the line
-    -- sfdc_opportunity_xf.incremental_acv,
-    -- sfdc_opportunity_xf.net_incremental_acv,
-    sfdc_opportunity_xf.is_deleted,
     -----------------------------------------------
 
     edm_opty.report_opportunity_user_segment,
@@ -401,21 +371,21 @@ WITH sfdc_opportunity AS (
 
     -- NF 2022-02-17 These keys are used in the pipeline metrics models and on the X-Ray dashboard to link gSheets with
     -- different aggregation levels
-    edm_opty.key_sqs,
-    edm_opty.key_ot,
-    edm_opty.key_segment,
-    edm_opty.key_segment_sqs,
-    edm_opty.key_segment_ot,
-    edm_opty.key_segment_geo,
-    edm_opty.key_segment_geo_sqs,
-    edm_opty.key_segment_geo_ot,
-    edm_opty.key_segment_geo_region,
-    edm_opty.key_segment_geo_region_sqs,
-    edm_opty.key_segment_geo_region_ot,
-    edm_opty.key_segment_geo_region_area,
-    edm_opty.key_segment_geo_region_area_sqs,
-    edm_opty.key_segment_geo_region_area_ot,
-    edm_opty.key_segment_geo_area,
+    LOWER(edm_opty.key_sqs)                             AS key_sqs,
+    LOWER(edm_opty.key_ot)                              AS key_ot,
+    LOWER(edm_opty.key_segment)                         AS key_segment,
+    LOWER(edm_opty.key_segment_sqs)                     AS key_segment_sqs,
+    LOWER(edm_opty.key_segment_ot)                      AS key_segment_ot,
+    LOWER(edm_opty.key_segment_geo)                     AS key_segment_geo,
+    LOWER(edm_opty.key_segment_geo_sqs)                 AS key_segment_geo_sqs,
+    LOWER(edm_opty.key_segment_geo_ot)                  AS key_segment_geo_ot,
+    LOWER(edm_opty.key_segment_geo_region)              AS key_segment_geo_region,
+    LOWER(edm_opty.key_segment_geo_region_sqs)          AS key_segment_geo_region_sqs,
+    LOWER(edm_opty.key_segment_geo_region_ot)           AS key_segment_geo_region_ot,
+    LOWER(edm_opty.key_segment_geo_region_area)         AS key_segment_geo_region_area,
+    LOWER(edm_opty.key_segment_geo_region_area_sqs)     AS key_segment_geo_region_area_sqs,
+    LOWER(edm_opty.key_segment_geo_region_area_ot)      AS key_segment_geo_region_area_ot,
+    LOWER(edm_opty.key_segment_geo_area)                AS key_segment_geo_area,
     edm_opty.sales_team_cro_level,
     edm_opty.sales_team_rd_asm_level,
     edm_opty.sales_team_vp_level,
@@ -431,33 +401,36 @@ WITH sfdc_opportunity AS (
     edm_opty.is_booked_net_arr                      AS is_booked_net_arr_flag,
     edm_opty.is_eligible_churn_contraction          AS is_eligible_churn_contraction_flag,
     edm_opty.created_and_won_same_quarter_net_arr,
-    edm_opty.churn_contraction_net_arr_bucket       AS churn_contracton_net_arr_bucket,  --typo in wk sales
+    edm_opty.churn_contraction_net_arr_bucket       AS churn_contracton_net_arr_bucket,  --typo in wk sales keeping it until the full migration
+    edm_opty.churn_contraction_net_arr_bucket,
     edm_opty.reason_for_loss_calc,
-    edm_opty.is_sao                                 AS is_eligible_sao_flag
+    CASE edm_opty.is_sao 
+      WHEN TRUE THEN 1 
+      ELSE 0 
+    END                                             AS is_eligible_sao_flag,
 
+    opportunity_owner.is_rep_flag
+    
 
-    FROM legacy_sfdc_opportunity_xf AS sfdc_opportunity_xf
+    FROM edm_opty
     -- Date helpers
     INNER JOIN sfdc_accounts_xf AS account
-      ON account.account_id = sfdc_opportunity_xf.account_id
+      ON account.account_id = edm_opty.dim_crm_account_id
+    INNER JOIN sfdc_accounts_xf AS upa
+      ON upa.account_id = edm_opty.dim_parent_crm_account_id
     INNER JOIN date_details AS created_date_detail
-      ON created_date_detail.date_actual = sfdc_opportunity_xf.created_date::DATE
-        -- not all fields are in opportunity xf
-    INNER JOIN sfdc_opportunity
-      ON sfdc_opportunity.opportunity_id = sfdc_opportunity_xf.opportunity_id
+      ON created_date_detail.date_actual = edm_opty.created_date::DATE
     INNER JOIN sfdc_users_xf AS opportunity_owner
-      ON opportunity_owner.user_id = sfdc_opportunity_xf.owner_id
-    INNER JOIN edm_opty
-      ON edm_opty.dim_crm_opportunity_id = sfdc_opportunity_xf.opportunity_id
+      ON opportunity_owner.user_id = edm_opty.owner_id
     LEFT JOIN date_details AS start_date
-      ON sfdc_opportunity_xf.subscription_start_date::DATE = start_date.date_actual
+      ON edm_opty.subscription_start_date::DATE = start_date.date_actual
     LEFT JOIN sfdc_accounts_xf AS resale_account
-      ON resale_account.account_id = sfdc_opportunity_xf.fulfillment_partner
+      ON resale_account.account_id = edm_opty.fulfillment_partner
     -- NF 20210906 remove JiHu opties from the models
-    WHERE sfdc_opportunity_xf.is_jihu_account = 0
+    WHERE edm_opty.is_jihu_account = 0
         AND account.ultimate_parent_account_id NOT IN ('0016100001YUkWVAA1')            -- remove test account
-        AND sfdc_opportunity_xf.account_id NOT IN ('0014M00001kGcORQA0')                -- remove test account
-        AND sfdc_opportunity_xf.is_deleted = 0
+        AND edm_opty.dim_crm_account_id NOT IN ('0014M00001kGcORQA0')                -- remove test account
+        AND edm_opty.is_deleted = 0
 
 
 ), churn_metrics AS (

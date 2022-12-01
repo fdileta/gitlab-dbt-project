@@ -108,7 +108,7 @@
       ping_instance_wave_sm.user_container_scanning_jobs_28_days_user,
       ping_instance_wave_sm.object_store_packages_enabled,
       ping_instance_wave_sm.projects_with_packages_all_time_event,
-      ping_instance_wave_sm.projects_with_packages_28_days_user,
+      ping_instance_wave_sm.projects_with_packages_28_days_event,
       ping_instance_wave_sm.deployments_28_days_user,
       ping_instance_wave_sm.releases_28_days_user,
       ping_instance_wave_sm.epics_28_days_user,
@@ -298,7 +298,7 @@
 {{ dbt_audit(
     cte_ref="joined",
     created_by="@snalamaru",
-    updated_by="@snalamaru",
+    updated_by="@mdrussell",
     created_date="2022-07-21",
-    updated_date="2022-08-08"
+    updated_date="2022-08-26"
 ) }}

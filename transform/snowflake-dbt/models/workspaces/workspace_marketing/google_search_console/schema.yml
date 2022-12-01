@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: google_search_console_keyword_page_report
+    description: '{{ doc("google_search_console_keyword_page_report_docs") }}'

@@ -7,7 +7,8 @@
     ('dim_bizible_marketing_channel_path','dim_bizible_marketing_channel_path'),
     ('dim_sales_segment','dim_sales_segment'),
     ('fct_crm_person','fct_crm_person'),
-    ('dim_date','dim_date')
+    ('dim_date','dim_date'),
+    ('dim_crm_user', 'dim_crm_user')
 ]) }}
 
 , final AS (
@@ -16,8 +17,11 @@
       fct_crm_person.dim_crm_person_id,
       dim_crm_person.dim_crm_user_id,
       dim_crm_person.dim_crm_account_id,
+      dim_crm_person.sfdc_record_id,
       mql_date_first.date_id                   AS mql_date_first_id,
       mql_date_first.date_day                  AS mql_date_first,
+      initial_mql_date_first.date_id           AS initial_mql_date_first_id,
+      initial_mql_date_first.date_day          AS initial_mql_date_first,
       legacy_mql_date_first.date_id            AS legacy_mql_date_first_id,
       legacy_mql_date_first.date_day           AS legacy_mql_date_first,
       fct_crm_person.mql_datetime_first,
@@ -26,6 +30,11 @@
       mql_date_first.first_day_of_month        AS mql_month_first,
       mql_date_first_pt.first_day_of_month     AS mql_month_first_pt,
       mql_date_latest.date_day                 AS mql_date_lastest,
+       initial_mql_date_first_pt.date_day      AS initial_mql_date_first_pt,
+      initial_mql_date_first.first_day_of_month
+                                               AS initial_mql_month_first,
+      initial_mql_date_first_pt.first_day_of_month
+                                               AS initial_mql_month_first_pt,
       legacy_mql_date_first_pt.date_day        AS legacy_mql_date_first_pt,
       legacy_mql_date_first.first_day_of_month AS legacy_mql_month_first,
       legacy_mql_date_first_pt.first_day_of_month
@@ -54,7 +63,7 @@
       contact_created_date.first_day_of_month  AS contact_created_month,
       contact_created_date_pt.first_day_of_month
                                                AS contact_created_month_pt,
-      true_inquiry_date                        AS true_inquiry_date,
+      fct_crm_person.true_inquiry_date         AS true_inquiry_date,
       inquiry_date.date_day                    AS inquiry_date,
       inquiry_date_pt.date_day                 AS inquiry_date_pt,
       inquiry_date.first_day_of_month          AS inquiry_month,
@@ -104,6 +113,7 @@
       dim_crm_person.email_hash,
       dim_crm_person.status,
       dim_crm_person.lead_source,
+      dim_crm_person.was_converted_lead,
       dim_crm_person.source_buckets,
       dim_crm_person.crm_partner_id,
       dim_crm_person.prospect_share_status,
@@ -122,6 +132,10 @@
       dim_bizible_marketing_channel_path.bizible_marketing_channel_path_name,
       dim_sales_segment.sales_segment_name,
       dim_sales_segment.sales_segment_grouped,
+      dim_crm_user.sdr_sales_segment,
+      dim_crm_user.sdr_region,
+      dim_crm_person.person_score,
+      dim_crm_person.behavior_score,
       dim_crm_person.marketo_last_interesting_moment,
       dim_crm_person.marketo_last_interesting_moment_date,
       dim_crm_person.outreach_step_number,
@@ -130,6 +144,9 @@
       dim_crm_person.matched_account_sdr_assigned,
       dim_crm_person.matched_account_type,
       dim_crm_person.matched_account_gtm_strategy,
+      dim_crm_person.is_first_order_initial_mql,
+      dim_crm_person.is_first_order_mql,
+      dim_crm_person.is_first_order_person,
       dim_crm_person.account_demographics_sales_segment,
       dim_crm_person.account_demographics_sales_segment_grouped,
       dim_crm_person.account_demographics_geo,
@@ -144,6 +161,19 @@
       dim_crm_person.account_demographics_upa_city,
       dim_crm_person.account_demographics_upa_street,
       dim_crm_person.account_demographics_upa_postal_code,
+      dim_crm_person.cognism_employee_count,
+      dim_crm_person.leandata_matched_account_employee_count,
+      dim_crm_person.leandata_matched_account_sales_segment,
+      dim_crm_person.employee_bucket,
+      dim_crm_person.zoominfo_phone_number, 
+      dim_crm_person.zoominfo_mobile_phone_number,
+      dim_crm_person.zoominfo_do_not_call_direct_phone,
+      dim_crm_person.zoominfo_do_not_call_mobile_phone,
+      dim_crm_person.zoominfo_company_employee_count,
+      fct_crm_person.last_transfer_date_time,
+      fct_crm_person.time_from_last_transfer_to_sequence,
+      fct_crm_person.time_from_mql_to_last_transfer,
+      fct_crm_person.zoominfo_contact_id,
       fct_crm_person.is_mql,
       fct_crm_person.is_inquiry,
       CASE
@@ -186,6 +216,10 @@
       ON fct_crm_person.mql_date_latest_id = mql_date_latest.date_id
     LEFT JOIN dim_date AS mql_date_latest_pt
       ON fct_crm_person.mql_date_latest_pt_id = mql_date_latest_pt.date_id
+    LEFT JOIN dim_date AS initial_mql_date_first
+      ON fct_crm_person.initial_mql_date_first_id = initial_mql_date_first.date_id
+    LEFT JOIN dim_date AS initial_mql_date_first_pt
+      ON fct_crm_person.initial_mql_date_first_pt_id = initial_mql_date_first_pt.date_id
     LEFT JOIN dim_date AS legacy_mql_date_first
       ON fct_crm_person.legacy_mql_date_first_id = legacy_mql_date_first.date_id
     LEFT JOIN dim_date AS legacy_mql_date_first_pt
@@ -222,13 +256,15 @@
       ON fct_crm_person.worked_date_id = worked_date.date_id
     LEFT JOIN dim_date AS worked_date_pt
       ON fct_crm_person.worked_date_pt_id = worked_date_pt.date_id
+    LEFT JOIN dim_crm_user 
+      ON fct_crm_person.dim_crm_user_id = dim_crm_user.dim_crm_user_id
 
 )
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@lisvinueza",
+    updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-08-26",
+    updated_date="2022-11-01",
   ) }}  

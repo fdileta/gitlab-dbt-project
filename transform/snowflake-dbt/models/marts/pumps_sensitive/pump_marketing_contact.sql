@@ -1,5 +1,5 @@
 {{ config(
-    tags=["mnpi_exception"]
+    tags=["product", "mnpi_exception"]
 ) }}
 
 SELECT
@@ -70,13 +70,25 @@ SELECT
   pql_namespace_creator_job_description,
   is_pql,
 
+  is_member_of_public_ultimate_parent_namespace,
+  is_member_of_private_ultimate_parent_namespace,
+
+  --Ptpt fields
+  is_ptpt_contact,
+  ptpt_namespace_id,
+  ptpt_score_group,
+  ptpt_insights,
+  ptpt_score_date,
+  ptpt_past_score_group,
+
   -- METADATA COLUMNS FOR USE IN PUMP (NOT INTEGRATION)
   last_changed
 
 FROM {{ ref('mart_marketing_contact' )}}
 WHERE rlike(email_address, '^[A-Z0-9.+_%-]+@[A-Z0-9.-]+\\.[A-Z]+$','i')
-  AND ( is_pql = TRUE
-    OR ( is_paid_tier = TRUE
+  AND ( is_pql_change = TRUE
+    OR ( is_paid_tier_change = TRUE
       AND sfdc_record_id IS NOT NULL
     )
+    OR is_ptpt_contact_change = TRUE
   )

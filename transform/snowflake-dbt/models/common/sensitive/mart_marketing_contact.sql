@@ -1,3 +1,7 @@
+{{ config(
+    tags=["product"]
+) }}
+    
 {{ simple_cte ([
   ('marketing_contact', 'dim_marketing_contact'),
   ('marketing_contact_order', 'bdg_marketing_contact_order'),
@@ -12,7 +16,8 @@
   ('fct_event_user_daily', 'fct_event_user_daily'),
   ('map_gitlab_dotcom_xmau_metrics', 'map_gitlab_dotcom_xmau_metrics'),
   ('services', 'gitlab_dotcom_integrations_source'),
-  ('project', 'prep_project')
+  ('project', 'prep_project'),
+  ('ptpt_scores_by_user', 'prep_ptpt_scores_by_user')
 ]) }}
 
 -------------------------- Start of PQL logic: --------------------------
@@ -290,7 +295,7 @@
       usage_user_license_management_jobs_28_days_user,
       usage_user_secret_detection_jobs_28_days_user,
       usage_projects_with_packages_all_time_event,
-      usage_projects_with_packages_28_days_user,
+      usage_projects_with_packages_28_days_event,
       usage_deployments_28_days_user,
       usage_releases_28_days_user,
       usage_epics_28_days_user,
@@ -326,7 +331,7 @@
       SUM(usage_user_license_management_jobs_28_days_user)                                          AS usage_user_license_management_jobs_28_days_user,
       SUM(usage_user_secret_detection_jobs_28_days_user)                                            AS usage_user_secret_detection_jobs_28_days_user,
       SUM(usage_projects_with_packages_all_time_event)                                              AS usage_projects_with_packages_all_time_event,
-      SUM(usage_projects_with_packages_28_days_user)                                                AS usage_projects_with_packages_28_days_user,
+      SUM(usage_projects_with_packages_28_days_event)                                               AS usage_projects_with_packages_28_days_event,
       SUM(usage_deployments_28_days_user)                                                           AS usage_deployments_28_days_user,
       SUM(usage_releases_28_days_user)                                                              AS usage_releases_28_days_user,
       SUM(usage_epics_28_days_user)                                                                 AS usage_epics_28_days_user,
@@ -387,7 +392,7 @@
       CASE 
         WHEN MAX(CASE 
                   WHEN marketing_contact_order.is_individual_namespace = 1 
-                    THEN marketing_contact_order.is_saas_trial 
+                    THEN marketing_contact_order.is_saas_trial AND marketing_contact_order.trial_end_date >= CURRENT_DATE
                   ELSE NULL 
                 END) >= 1 THEN TRUE 
         ELSE FALSE 
@@ -428,7 +433,7 @@
         WHEN MAX(CASE 
                   WHEN marketing_contact_order.is_group_namespace = 1
                     AND marketing_contact_order.marketing_contact_role = 'Group Namespace Member'
-                    THEN marketing_contact_order.is_saas_trial 
+                    THEN marketing_contact_order.is_saas_trial AND marketing_contact_order.trial_end_date >= CURRENT_DATE
                   ELSE NULL 
                 END) >= 1 THEN TRUE 
         ELSE FALSE 
@@ -475,7 +480,7 @@
                     AND marketing_contact_order.marketing_contact_role IN (
                                                                           'Group Namespace Owner'
                                                                          ) 
-                    THEN marketing_contact_order.is_saas_trial 
+                    THEN marketing_contact_order.is_saas_trial AND marketing_contact_order.trial_end_date >= CURRENT_DATE
                   ELSE NULL 
                 END) >= 1 THEN TRUE 
         ELSE FALSE 
@@ -531,7 +536,7 @@
                                                                           'Customer DB Owner'
                                                                           , 'Zuora Billing Contact'
                                                                          ) 
-                    THEN marketing_contact_order.is_saas_trial 
+                    THEN marketing_contact_order.is_saas_trial AND marketing_contact_order.trial_end_date >= CURRENT_DATE
                   ELSE NULL 
                 END) >= 1 THEN TRUE 
         ELSE FALSE 
@@ -614,20 +619,36 @@
           THEN TRUE
         ELSE FALSE
       END                                                                                        AS has_free_namespace_with_public_project,
+      CASE
+        WHEN MAX(marketing_contact_order.is_ultimate_parent_namespace_public) = TRUE
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                        AS is_member_of_public_ultimate_parent_namespace,
+      CASE
+        WHEN MAX(marketing_contact_order.is_ultimate_parent_namespace_private) = TRUE
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                        AS is_member_of_private_ultimate_parent_namespace,
+      ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_public = TRUE, marketing_contact_order.dim_namespace_id, NULL))
+                                                                                                 AS public_ultimate_parent_namespaces,
+      ARRAY_AGG(DISTINCT IFF(marketing_contact_order.is_ultimate_parent_namespace_private = TRUE, marketing_contact_order.dim_namespace_id, NULL))
+                                                                                                 AS private_ultimate_parent_namespaces,
       ARRAY_AGG(
-                DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
-                  IFNULL(marketing_contact_order.saas_product_tier, '') || IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Role') 
-               )                                                                                 AS role_tier_text,
-      ARRAY_AGG(
-                DISTINCT IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
-                  IFNULL(marketing_contact_order.namespace_path, CASE 
-                                          WHEN marketing_contact_order.self_managed_product_tier IS NOT NULL
-                                            THEN 'Self-Managed' 
-                                          ELSE '' 
-                                        END)  || ' | ' || 
-                  IFNULL(marketing_contact_order.saas_product_tier, '') || 
-                  IFNULL(marketing_contact_order.self_managed_product_tier, ''), 'No Namespace')
-               )                                                                                 AS role_tier_namespace_text
+                DISTINCT
+                CASE
+                  WHEN marketing_contact_order.is_ultimate_parent_namespace = FALSE
+                    THEN NULL
+                  ELSE IFNULL(marketing_contact_order.marketing_contact_role || ': ' || 
+                    IFNULL(marketing_contact_order.namespace_path, CASE 
+                                            WHEN marketing_contact_order.self_managed_product_tier IS NOT NULL
+                                              THEN 'Self-Managed' 
+                                            ELSE '' 
+                                          END)  || ' | ' || 
+                    IFNULL(marketing_contact_order.saas_product_tier, '') || 
+                    IFNULL(marketing_contact_order.self_managed_product_tier, ''),
+                    
+                    'No Namespace') END
+               )                                                                                 AS role_tier_ultimate_namespace_text
 
     FROM marketing_contact
     LEFT JOIN  marketing_contact_order
@@ -677,6 +698,9 @@
       IFF(is_saas_delivery
         OR is_self_managed_delivery,
         TRUE, FALSE)                                        AS is_paid_tier,
+      marketing_contact.is_paid_tier_marketo,
+      IFF(is_paid_tier = TRUE OR (is_paid_tier = FALSE AND marketing_contact.is_paid_tier_marketo = TRUE), TRUE, FALSE)
+                                                            AS is_paid_tier_change,
       subscription_aggregate.min_subscription_start_date,
       subscription_aggregate.max_subscription_end_date,
       paid_subscription_aggregate.nbr_of_paid_subscriptions,
@@ -734,6 +758,9 @@
       marketing_contact.customer_db_created_date,
       marketing_contact.customer_db_confirmed_date,
       IFF(latest_pql.email IS NOT NULL, TRUE, FALSE) AS is_pql,
+      marketing_contact.is_pql_marketo,
+      IFF(is_pql = TRUE OR (is_pql = FALSE AND marketing_contact.is_pql_marketo = TRUE), TRUE, FALSE)
+                                            AS is_pql_change,
       latest_pql.pql_namespace_id,
       latest_pql.pql_namespace_name,
       latest_pql.pql_namespace_name_masked,
@@ -754,6 +781,19 @@
       marketing_contact.zuora_active_state,
       marketing_contact.wip_is_valid_email_address,
       marketing_contact.wip_invalid_email_address_reason,
+
+      -- Propensity to purchase trials fields
+      IFF(ptpt_scores_by_user.namespace_id IS NOT NULL, TRUE, FALSE)
+                                                  AS is_ptpt_contact,
+      IFF(is_ptpt_contact = TRUE OR (is_ptpt_contact = FALSE AND marketing_contact.is_ptpt_contact_marketo = TRUE), TRUE, FALSE)
+                                                  AS is_ptpt_contact_change,
+      ptpt_scores_by_user.namespace_id            AS ptpt_namespace_id,
+      ptpt_scores_by_user.score_group             AS ptpt_score_group,
+      ptpt_scores_by_user.insights                AS ptpt_insights,
+      ptpt_scores_by_user.score_date              AS ptpt_score_date,
+      ptpt_scores_by_user.past_score_group        AS ptpt_past_score_group,
+      ptpt_scores_by_user.past_score_date         AS ptpt_past_score_date,
+
       usage_metrics.usage_umau_28_days_user,
       usage_metrics.usage_action_monthly_active_users_project_repo_28_days_user,
       usage_metrics.usage_merge_requests_28_days_user,
@@ -776,7 +816,7 @@
       usage_metrics.usage_user_license_management_jobs_28_days_user,
       usage_metrics.usage_user_secret_detection_jobs_28_days_user,
       usage_metrics.usage_projects_with_packages_all_time_event,
-      usage_metrics.usage_projects_with_packages_28_days_user,
+      usage_metrics.usage_projects_with_packages_28_days_event,
       usage_metrics.usage_deployments_28_days_user,
       usage_metrics.usage_releases_28_days_user,
       usage_metrics.usage_epics_28_days_user,
@@ -800,6 +840,8 @@
       ON services_by_email.email = marketing_contact.email_address
     LEFT JOIN users_role_by_email
       ON users_role_by_email.email = marketing_contact.email_address
+    LEFT JOIN ptpt_scores_by_user
+      ON ptpt_scores_by_user.dim_marketing_contact_id = marketing_contact.dim_marketing_contact_id
 )
 
 {{ hash_diff(
@@ -892,7 +934,7 @@
       'usage_user_license_management_jobs_28_days_user',
       'usage_user_secret_detection_jobs_28_days_user',
       'usage_projects_with_packages_all_time_event',
-      'usage_projects_with_packages_28_days_user',
+      'usage_projects_with_packages_28_days_event',
       'usage_deployments_28_days_user',
       'usage_releases_28_days_user',
       'usage_epics_28_days_user',
@@ -905,7 +947,19 @@
       'pql_nbr_integrations_installed',
       'pql_integrations_installed',
       'pql_namespace_creator_job_description',
-      'is_pql'
+      'is_pql',
+      'is_paid_tier',
+      'is_pql_change',
+      'is_paid_tier_change',
+      'is_ptpt_contact',
+      'is_ptpt_contact_change',
+      'ptpt_namespace_id',
+      'ptpt_score_group',
+      'ptpt_insights',
+      'ptpt_score_date',
+      'ptpt_past_score_group',
+      'is_member_of_public_ultimate_parent_namespace',
+      'is_member_of_private_ultimate_parent_namespace'
       ]
 ) }}
 
@@ -914,7 +968,5 @@
     created_by="@trevor31",
     updated_by="@jpeguero",
     created_date="2021-02-09",
-    updated_date="2022-08-18"
+    updated_date="2022-10-24"
 ) }}
-
-

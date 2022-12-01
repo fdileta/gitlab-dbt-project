@@ -10,6 +10,7 @@ WITH final AS (
       prep_crm_account.merged_to_account_id,
       prep_crm_account.record_type_id,
       prep_crm_account.crm_account_owner_id,
+      prep_crm_account.proposed_crm_account_owner_id,
       prep_crm_account.technical_account_manager_id,
       prep_crm_account.master_record_id,
       prep_crm_account.dim_crm_person_primary_contact_id,
@@ -50,7 +51,9 @@ WITH final AS (
       prep_crm_account.potential_users,
       prep_crm_account.number_of_licenses_this_account,
       prep_crm_account.crm_account_zoom_info_number_of_developers,
+      prep_crm_account.crm_account_zoom_info_total_funding,
       prep_crm_account.decision_maker_count_linkedin,
+      prep_crm_account.number_of_employees,
 
       --metadata
       prep_crm_account.created_by_id,
@@ -65,7 +68,7 @@ WITH final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@j_kim",
+    updated_by="@michellecooper",
     created_date="2022-08-10",
-    updated_date="2022-08-31"
+    updated_date="2022-11-02"
 ) }}

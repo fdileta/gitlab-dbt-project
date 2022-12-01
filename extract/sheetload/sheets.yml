@@ -329,3 +329,11 @@ sheets:
     owner: '@hselim'
     tabs:
       - xactly_credit_sheetload
+  - name: sales_analytics_tableau_rls_users
+    owner: '@j_kim'
+    tabs: 
+      - sales_analytics_tableau_rls_users
+  - name: sales_analytics_tableau_rls_roles
+    owner: '@j_kim'
+    tabs: 
+      - sales_analytics_tableau_rls_roles

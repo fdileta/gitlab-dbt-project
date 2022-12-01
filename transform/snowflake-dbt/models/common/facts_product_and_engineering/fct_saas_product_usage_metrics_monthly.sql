@@ -96,7 +96,7 @@
       "usage_activity_by_stage_monthly.secure.user_container_scanning_jobs"                     AS user_container_scanning_jobs_28_days_user,
       "object_store.packages.enabled"                                                           AS object_store_packages_enabled,
       "counts.projects_with_packages"                                                           AS projects_with_packages_all_time_event,
-      "usage_activity_by_stage_monthly.package.projects_with_packages"                          AS projects_with_packages_28_days_user,
+      "usage_activity_by_stage_monthly.package.projects_with_packages"                          AS projects_with_packages_28_days_event,
       "usage_activity_by_stage_monthly.release.deployments"                                     AS deployments_28_days_user,
       "usage_activity_by_stage_monthly.release.releases"                                        AS releases_28_days_user,
       "usage_activity_by_stage_monthly.plan.epics"                                              AS epics_28_days_user,
@@ -267,5 +267,5 @@
     created_by="@ischweickartDD",
     updated_by="@mdrussell",
     created_date="2021-06-02",
-    updated_date="2022-07-27"
+    updated_date="2022-08-26"
 ) }}

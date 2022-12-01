@@ -80,6 +80,7 @@ WITH source AS (
       pull_mirror_available_overridden::BOOLEAN                                   AS pull_mirror_available_overridden,
       mirror_overwrites_diverged_branches::BOOLEAN                                AS mirror_overwrites_diverged_branches,
       external_authorization_classification_label,
+      project_namespace_id::NUMBER AS project_namespace_id,
       dbt_valid_from::TIMESTAMP                                                   AS valid_from,
       dbt_valid_to::TIMESTAMP                                                     AS valid_to
     FROM source

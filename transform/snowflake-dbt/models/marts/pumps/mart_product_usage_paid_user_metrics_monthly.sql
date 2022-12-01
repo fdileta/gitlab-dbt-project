@@ -137,7 +137,7 @@
       monthly_sm_metrics.user_container_scanning_jobs_28_days_user,
       monthly_sm_metrics.object_store_packages_enabled,
       monthly_sm_metrics.projects_with_packages_all_time_event,
-      monthly_sm_metrics.projects_with_packages_28_days_user,
+      monthly_sm_metrics.projects_with_packages_28_days_event,
       monthly_sm_metrics.deployments_28_days_user,
       monthly_sm_metrics.releases_28_days_user,
       monthly_sm_metrics.epics_28_days_user,
@@ -268,6 +268,7 @@
       monthly_sm_metrics.audit_screen_view_28_days_user,
       monthly_sm_metrics.instance_audit_screen_view_28_days_user,
       monthly_sm_metrics.credential_inventory_view_28_days_user,
+      monthly_sm_metrics.compliance_frameworks_pipeline_all_time_event,
       monthly_sm_metrics.compliance_frameworks_pipeline_28_days_event,
       monthly_sm_metrics.groups_streaming_destinations_all_time_event,
       monthly_sm_metrics.groups_streaming_destinations_28_days_event,
@@ -276,6 +277,7 @@
       monthly_sm_metrics.projects_status_checks_all_time_event,
       monthly_sm_metrics.external_status_checks_all_time_event,
       monthly_sm_metrics.paid_license_search_28_days_user,
+      monthly_sm_metrics.last_activity_28_days_user,
       -- Data Quality Flag
       monthly_sm_metrics.is_latest_data
     FROM monthly_sm_metrics
@@ -363,7 +365,7 @@
       monthly_saas_metrics.user_container_scanning_jobs_28_days_user,
       monthly_saas_metrics.object_store_packages_enabled,
       monthly_saas_metrics.projects_with_packages_all_time_event,
-      monthly_saas_metrics.projects_with_packages_28_days_user,
+      monthly_saas_metrics.projects_with_packages_28_days_event,
       monthly_saas_metrics.deployments_28_days_user,
       monthly_saas_metrics.releases_28_days_user,
       monthly_saas_metrics.epics_28_days_user,
@@ -494,6 +496,7 @@
       monthly_saas_metrics.audit_screen_view_28_days_user,
       monthly_saas_metrics.instance_audit_screen_view_28_days_user,
       monthly_saas_metrics.credential_inventory_view_28_days_user,
+      monthly_saas_metrics.compliance_frameworks_pipeline_all_time_event,
       monthly_saas_metrics.compliance_frameworks_pipeline_28_days_event,
       monthly_saas_metrics.groups_streaming_destinations_all_time_event,
       monthly_saas_metrics.groups_streaming_destinations_28_days_event,
@@ -502,6 +505,7 @@
       monthly_saas_metrics.projects_status_checks_all_time_event,
       monthly_saas_metrics.external_status_checks_all_time_event,
       monthly_saas_metrics.paid_license_search_28_days_user,
+      monthly_saas_metrics.last_activity_28_days_user,
       -- Data Quality Flag
       monthly_saas_metrics.is_latest_data
     FROM monthly_saas_metrics
@@ -553,5 +557,5 @@
     created_by="@ischweickartDD",
     updated_by="@mdrussell",
     created_date="2021-06-11",
-    updated_date="2022-07-20"
+    updated_date="2022-08-26"
 ) }}
