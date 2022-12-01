@@ -47,7 +47,6 @@ with mrr_totals_levelled AS (
 
 SELECT finals.ultimate_parent_account_id as parent_account_id,
        finals.ultimate_parent_account_id as salesforce_account_id,
-       parent_crm_account_name as parent_account_name,
        dateadd('year', 1, finals.original_mrr_month) AS retention_month, --THIS IS THE RETENTION MONTH, NOT THE MRR MONTH!!
        original_mrr,
        net_retention_mrr,

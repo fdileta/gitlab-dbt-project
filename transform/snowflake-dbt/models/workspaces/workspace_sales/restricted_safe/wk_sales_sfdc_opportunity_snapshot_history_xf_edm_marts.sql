@@ -398,7 +398,6 @@ WITH date_details AS (
       
       -- double check regarding parent crm account = ultimate parent account?
       edm_snapshot_opty.dim_parent_crm_account_id                AS ultimate_parent_account_id,
-      edm_snapshot_opty.parent_crm_account_name                  AS ultimate_parent_account_name,
       edm_snapshot_opty.is_jihu_account,
       edm_snapshot_opty.account_owner_user_segment,
       edm_snapshot_opty.account_owner_user_geo,
