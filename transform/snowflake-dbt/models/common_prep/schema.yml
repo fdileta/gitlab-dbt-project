@@ -613,6 +613,12 @@ models:
           - not_null
           - unique
         tags: ["tdf", "common", "gainsight"]
+      - name: license_sha256
+        description: The license_sha256 hash of the license file. Use this field to join to fct_usage_ping_payloads.
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "common", "gainsight"]
       - name: dim_subscription_id
         description: The unique identifier of a version of a subscription.
       - name: subscription_name
