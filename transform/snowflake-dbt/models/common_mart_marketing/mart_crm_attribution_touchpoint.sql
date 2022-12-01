@@ -72,6 +72,7 @@
       fct_crm_attribution_touchpoint.bizible_revenue_lead_conversion,
       fct_crm_attribution_touchpoint.bizible_revenue_u_shaped,
       fct_crm_attribution_touchpoint.bizible_revenue_w_shaped,
+      dim_crm_touchpoint.bizible_created_date,
 
       -- person info
       fct_crm_attribution_touchpoint.dim_crm_person_id,

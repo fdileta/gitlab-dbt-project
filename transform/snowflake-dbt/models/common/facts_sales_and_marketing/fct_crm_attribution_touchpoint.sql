@@ -84,7 +84,8 @@ WITH bizible_attribution_touchpoints AS (
       bizible_attribution_touchpoints.bizible_revenue_first_touch,
       bizible_attribution_touchpoints.bizible_revenue_lead_conversion,
       bizible_attribution_touchpoints.bizible_revenue_u_shaped,
-      bizible_attribution_touchpoints.bizible_revenue_w_shaped
+      bizible_attribution_touchpoints.bizible_revenue_w_shaped,
+      bizible_attribution_touchpoints.bizible_created_date
 
     FROM bizible_attribution_touchpoints
     LEFT JOIN crm_person
