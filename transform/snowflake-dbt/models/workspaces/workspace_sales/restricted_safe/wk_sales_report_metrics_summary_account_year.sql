@@ -82,8 +82,8 @@ WITH date_details AS (
         raw.has_tam__c                AS has_tam_flag,
         raw.public_sector_account__c  AS public_sector_account_flag,
         raw.pubsec_type__c            AS pubsec_type,
-        raw.potential_arr_lam__c      AS potential_lam_arr,
-        raw.billingstate              AS account_billing_state
+        raw.lam_tier__c               AS potential_lam_arr,
+        raw.billingstatecode          AS account_billing_state
     --FROM prod.restricted_safe_common_mart_sales.mart_crm_account acc
     FROM {{ref('mart_crm_account')}} acc
     LEFT JOIN raw_account raw
@@ -137,7 +137,7 @@ WITH date_details AS (
     FROM mart_available_to_renew atr
     CROSS JOIN report_dates
     WHERE is_available_to_renew = 1
-    AND renewal_type = 'Non-MYB'
+    --AND renewal_type = 'Non-MYB'
     AND atr.fiscal_year = report_dates.report_fiscal_year + 1
     GROUP BY 1,2
     
@@ -151,7 +151,7 @@ WITH date_details AS (
     FROM mart_available_to_renew atr
     CROSS JOIN report_dates
     WHERE is_available_to_renew = 1
-    AND renewal_type = 'Non-MYB'
+    --AND renewal_type = 'Non-MYB'
     AND atr.renewal_month < report_dates.report_month_date
     AND atr.renewal_month >= DATEADD(month,-12,report_dates.report_month_date)
     GROUP BY 1,2
@@ -165,7 +165,7 @@ WITH date_details AS (
     FROM mart_available_to_renew atr
     CROSS JOIN report_dates
     WHERE is_available_to_renew = 1
-    AND renewal_type = 'Non-MYB'
+    --AND renewal_type = 'Non-MYB'
     AND atr.fiscal_year = report_dates.report_fiscal_year
     GROUP BY 1,2
 
@@ -937,7 +937,7 @@ SELECT
     upa_user_geo,
     account_id              AS virtual_upa_id,
     account_name            AS virtual_upa_name,
-    account_user_segment    AS virtual_upa_segment,
+    upa_ad_segment          AS virtual_upa_segment,
     account_user_geo        AS virtual_upa_geo,
     account_user_region     AS virtual_upa_region,
     account_user_area       AS virtual_upa_area,
@@ -1295,6 +1295,7 @@ QUALIFY level = 1
     COALESCE(virtual.virtual_upa_region,acc.upa_user_region)                AS virtual_upa_region,
     COALESCE(virtual.virtual_upa_area,acc.upa_user_area)                    AS virtual_upa_area,
     COALESCE(virtual.virtual_upa_country,acc.upa_ad_country)                AS virtual_upa_country,
+    COALESCE(virtual.virtual_upa_state,acc.upa_ad_state)                    AS virtual_upa_state,
     COALESCE(virtual.virtual_upa_zip_code,acc.upa_ad_zip_code)              AS virtual_upa_zip_code,
     COALESCE(virtual.virtual_upa_industry,acc.upa_industry)                 AS virtual_upa_industry,
     COALESCE(virtual.virtual_upa_owner_name,acc.upa_owner_name)             AS virtual_upa_owner_name,
