@@ -178,7 +178,6 @@
       dim_crm_account.crm_account_name,
       dim_crm_account.crm_account_billing_country,
       dim_crm_account.crm_account_industry,
-      dim_crm_account.crm_account_sales_territory,
       dim_crm_account.crm_account_gtm_strategy,
       dim_crm_account.crm_account_focus_account,
       dim_crm_account.health_number,

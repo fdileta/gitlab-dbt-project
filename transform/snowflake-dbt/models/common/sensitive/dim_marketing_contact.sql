@@ -86,7 +86,7 @@ WITH sfdc_lead AS (
       END                                                                                                                   AS company_name,
       crm_person.title                                                                                                      AS job_title,
       crm_person.it_job_title_hierarchy,
-      crm_person.account_demographics_geo,                                                                                                    AS crm_person_region,
+      crm_person.account_demographics_geo                                                                                   AS crm_person_region,
       CASE
         WHEN sfdc_lead_contact = 'contact' THEN sfdc_contact.mailing_country
         ELSE sfdc_lead.country
@@ -98,7 +98,6 @@ WITH sfdc_lead AS (
       END                                                                                                                   AS sfdc_created_date,
       crm_person.has_opted_out_email                                                                                        AS opted_out_salesforce,
       (ROW_NUMBER() OVER (PARTITION BY email_address ORDER BY sfdc_created_date DESC))                                      AS record_number
-
     FROM crm_person
     LEFT JOIN sfdc_contact
       ON sfdc_contact.contact_id = crm_person.sfdc_record_id
