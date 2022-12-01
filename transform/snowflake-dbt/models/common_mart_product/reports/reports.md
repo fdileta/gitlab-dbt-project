@@ -402,3 +402,18 @@
 - Limits down to last ping of the month for each installation-subscription
 
 {% enddocs %}
+
+{% docs rpt_ping_metric_totals_w_estimates_monthly_snapshot_model %}
+
+Simpler incremental version of the rpt_ping_metric_totals_w_estimates_monthly snapshot model.
+
+{% enddocs %}
+
+{% docs rpt_event_xmau_metric_monthly_snapshot_model %}
+
+Simpler incremental version of the rpt_event_xmau_metric_monthly snapshot model.
+
+{% enddocs %}
+
+
+
