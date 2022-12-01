@@ -72,7 +72,8 @@ WITH source AS (
       bizible2__revenue_u_shaped__c           AS bizible_revenue_u_shaped,
       bizible2__revenue_w_shaped__c           AS bizible_revenue_w_shaped,
 
-      isdeleted::BOOLEAN                      AS is_deleted
+      isdeleted::BOOLEAN                      AS is_deleted,
+      createddate                             AS bizible_created_date
     
     FROM source
 )

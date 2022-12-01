@@ -47,6 +47,7 @@
       fct_crm_touchpoint.bizible_count_first_touch,
       fct_crm_touchpoint.bizible_count_lead_creation_touch,
       fct_crm_touchpoint.bizible_count_u_shaped,
+      dim_crm_touchpoint.bizible_created_date,
 
       -- person info
       fct_crm_touchpoint.dim_crm_person_id,
@@ -329,5 +330,5 @@
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2021-02-18",
-    updated_date="2022-10-05"
+    updated_date="2022-11-29"
 ) }}

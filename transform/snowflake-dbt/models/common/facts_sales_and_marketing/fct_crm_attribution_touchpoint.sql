@@ -76,7 +76,8 @@ WITH bizible_attribution_touchpoints AS (
       bizible_attribution_touchpoints.bizible_revenue_first_touch,
       bizible_attribution_touchpoints.bizible_revenue_lead_conversion,
       bizible_attribution_touchpoints.bizible_revenue_u_shaped,
-      bizible_attribution_touchpoints.bizible_revenue_w_shaped
+      bizible_attribution_touchpoints.bizible_revenue_w_shaped,
+      bizible_attribution_touchpoints.bizible_created_date
 
 
     FROM bizible_attribution_touchpoints
@@ -96,5 +97,5 @@ WITH bizible_attribution_touchpoints AS (
     created_by="@mcooperDD",
     updated_by="@michellecooper",
     created_date="2021-01-21",
-    updated_date="2022-09-12"
+    updated_date="2022-11-29"
 ) }}

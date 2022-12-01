@@ -393,7 +393,9 @@ models:
       - name: dim_crm_touchpoint_id
         tests:
           - not_null
-          - unique
+          - unique:
+              config:
+                where: bizible_created_date <= DATEADD('day', -2, CURRENT_DATE)::DATE
         tags: ["tdf", "common"]
       - name: is_dg_influenced
         description: Flag indicating a touchpoint is influenced by Demand Gen based on its segment being Demand Gen.
@@ -1027,7 +1029,9 @@ models:
       - name: dim_crm_touchpoint_id
         tests:
           - not_null
-          - unique
+          - unique:
+              config:
+                where: bizible_created_date <= DATEADD('day', -2, CURRENT_DATE)::DATE
         tags: ["tdf", "common"]
       - name: opps_per_touchpoint
         description: Count of opportunities associated with a touchpoint.
@@ -1057,7 +1061,9 @@ models:
       - name: dim_crm_touchpoint_id
         tests:
           - not_null
-          - unique
+          - unique:
+              config:
+                where: bizible_created_date <= DATEADD('day', -2, CURRENT_DATE)::DATE
         tags: ["tdf", "common"]
 
   - name: dim_usage_ping_metric
