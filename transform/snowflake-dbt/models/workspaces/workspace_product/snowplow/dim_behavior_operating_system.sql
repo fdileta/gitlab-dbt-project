@@ -7,7 +7,7 @@
 WITH device_information AS (
 
   SELECT
-    {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}   AS dim_behavior_operating_system_sk,
+    dim_behavior_operating_system_sk,
     os,
     os_name,
     os_manufacturer,

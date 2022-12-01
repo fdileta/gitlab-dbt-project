@@ -8,9 +8,10 @@
     ])
 }}
 
-, event_source AS (
+, final AS (
 
     SELECT
+      dim_behavior_event_sk,
       event,
       event_name,
       platform,
@@ -28,28 +29,7 @@
     
     {% endif %}
 
-    {{ dbt_utils.group_by(n=8) }}
-)
-
-, final AS (
-
-    SELECT
-      -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['event', 'event_name', 'platform', 'environment', 'event_category', 'event_action', 'event_label', 'event_property']) }} AS dim_behavior_event_sk,
-
-      -- Natural Keys
-      event,
-      event_name,
-      platform,
-      environment,
-      event_category,
-      event_action,
-      event_label,
-      event_property,
-
-      --Time Attributes for Incremental Load
-      max_timestamp
-    FROM event_source
+    {{ dbt_utils.group_by(n=9) }}
 )
 
 {{ dbt_audit(

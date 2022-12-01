@@ -78,11 +78,11 @@ WITH structured_event_renamed AS (
 
       -- Foreign Keys
       dim_behavior_website_page.dim_behavior_website_page_sk,
-      {{ dbt_utils.surrogate_key(['browser_name', 'browser_major_version', 'browser_minor_version', 'browser_language']) }}                                    AS dim_behavior_browser_sk,
-      {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}                                                                                                AS dim_behavior_operating_system_sk,
+      structured_event_renamed.dim_behavior_browser_sk,
+      structured_event_renamed.dim_behavior_operating_system_sk,
       structured_event_renamed.gsc_namespace_id                                                                                                                AS dim_namespace_id,
       structured_event_renamed.gsc_project_id                                                                                                                  AS dim_project_id,
-      {{ dbt_utils.surrogate_key(['event', 'event_name', 'platform', 'gsc_environment', 'event_category', 'event_action', 'event_label', 'event_property']) }} AS dim_behavior_event_sk,
+      structured_event_renamed.dim_behavior_event_sk,
 
       -- Time Attributes
       structured_event_renamed.dvce_created_tstamp,
