@@ -1,0 +1,13 @@
+selectors:
+  - name: six_hourly_salesforce_opportunity
+    description: "Non-incremental Salesforce opportunity models"
+    definition:
+      union:
+        - intersection:
+            - '@source:salesforce'
+            - 'tag:six_hourly'
+        # - exclude:
+        #     - intersection:
+        #         - 'package:snowplow'
+        #         - 'config.materialized:incremental'
+        #     - export_performance_timing
