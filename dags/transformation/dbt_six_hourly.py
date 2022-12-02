@@ -124,7 +124,7 @@ dbt_six_hourly_models_command = f"""
     {pull_commit_hash} &&
     {dbt_install_deps_cmd} &&
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
-    dbt --no-use-colors run --profiles-dir profile --target prod --include tag:six_hourly; ret=$?;
+    dbt --no-use-colors run --profiles-dir profile --target prod --selector six_hourly_salesforce_opportunity; ret=$?;
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
 """
