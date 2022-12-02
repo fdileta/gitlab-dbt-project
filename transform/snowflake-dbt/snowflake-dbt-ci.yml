@@ -1,5 +1,5 @@
 .snowflake_dbt_jobs: &snowflake_dbt_jobs
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:ci_artifact_downloader
+  image:
   stage: ⚙️ dbt Run
   before_script:
     - cd transform/snowflake-dbt/
@@ -14,14 +14,10 @@
     - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
     - export SNOWFLAKE_SNAPSHOT_DATABASE="SNOWFLAKE"
     - echo $SNOWFLAKE_SNAPSHOT_DATABASE
-    - export CI_PROFILE_TARGET="--profiles-dir profile --target ci"
-    - echo $CI_PROFILE_TARGET
-    - mkdir -p ~/.ssh
-    - touch ~/.ssh/id_rsa
-    - chmod 700 ~/.ssh
-    - echo "$GIT_DATA_TESTS_SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa # decodes key from base64
-    - chmod 0400 ~/.ssh/id_rsa # Makes key read only
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config # Adds gitlab.com as known host
+    - export CI_DBT_IMAGE_DEPLOY_USERNAME = $CI_DBT_IMAGE_DEPLOY_USERNAME
+    - export CI_DBT_IMAGE_DEPLOY_TOKEN = $CI_DBT_IMAGE_DEPLOY_TOKEN
+    - docker login -u ${CI_DBT_IMAGE_DEPLOY_USERNAME} -p ${CI_DBT_IMAGE_DEPLOY_TOKEN} registry.example.com
+    - docker pull registry.gitlab.com/paul_armstrong/ci-dbt-image/ci-dbt-image:first_branch
   after_script:
     - cd $CI_PROJECT_DIR/transform/snowflake-dbt/
     - mkdir -p $CI_PROJECT_DIR/public/dbt/
