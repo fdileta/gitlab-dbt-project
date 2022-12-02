@@ -9,7 +9,8 @@ WITH prep_usage_ping AS (
 
     SELECT * 
     FROM {{ ref('prep_usage_ping') }}
-    WHERE license_md5 IS NULL 
+    WHERE (license_md5 IS NULL OR
+           license_sha256 IS NULL)
 
 ), final AS (
 

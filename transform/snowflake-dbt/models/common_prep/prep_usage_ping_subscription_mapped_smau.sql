@@ -16,7 +16,8 @@ WITH prep_usage_ping AS (
 
     SELECT *
     FROM {{ ref('prep_usage_ping_subscription_mapped') }}
-    WHERE license_md5 IS NOT NULL
+    WHERE (license_md5 IS NOT NULL OR
+           license_sha256 IS NOT NULL)
 
 ), pivoted AS (
 
