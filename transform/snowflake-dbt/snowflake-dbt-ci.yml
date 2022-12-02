@@ -1,5 +1,5 @@
 .snowflake_dbt_jobs: &snowflake_dbt_jobs
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:ci_artifact_downloader
+  image: registry.gitlab.com/paul_armstrong/ci-dbt-image/ci-dbt-image:first_branch
   stage: ⚙️ dbt Run
   before_script:
     - cd transform/snowflake-dbt/
@@ -17,7 +17,6 @@
     - export CI_DBT_IMAGE_DEPLOY_USERNAME = $CI_DBT_IMAGE_DEPLOY_USERNAME
     - export CI_DBT_IMAGE_DEPLOY_TOKEN = $CI_DBT_IMAGE_DEPLOY_TOKEN
     - docker login -u ${CI_DBT_IMAGE_DEPLOY_USERNAME} -p ${CI_DBT_IMAGE_DEPLOY_TOKEN} registry.example.com
-    - docker pull registry.gitlab.com/paul_armstrong/ci-dbt-image/ci-dbt-image:first_branch
   after_script:
     - cd $CI_PROJECT_DIR/transform/snowflake-dbt/
     - mkdir -p $CI_PROJECT_DIR/public/dbt/
