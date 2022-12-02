@@ -14,9 +14,7 @@
     - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
     - export SNOWFLAKE_SNAPSHOT_DATABASE="SNOWFLAKE"
     - echo $SNOWFLAKE_SNAPSHOT_DATABASE
-    - export CI_DBT_IMAGE_DEPLOY_USERNAME = $CI_DBT_IMAGE_DEPLOY_USERNAME
-    - export CI_DBT_IMAGE_DEPLOY_TOKEN = $CI_DBT_IMAGE_DEPLOY_TOKEN
-    - docker login -u ${CI_DBT_IMAGE_DEPLOY_USERNAME} -p ${CI_DBT_IMAGE_DEPLOY_TOKEN} registry.example.com
+    - docker login -u "$CI_DBT_IMAGE_DEPLOY_USERNAME" -p "CI_DBT_IMAGE_DEPLOY_TOKEN" registry.example.com
   after_script:
     - cd $CI_PROJECT_DIR/transform/snowflake-dbt/
     - mkdir -p $CI_PROJECT_DIR/public/dbt/
