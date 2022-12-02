@@ -147,7 +147,7 @@
     SELECT  
         --surrogate_key
         {{ dbt_utils.surrogate_key(['user_spined.user_id','user_spined.spined_date_id']) }}  AS user_snapshot_id,
-        user_spined.spined_date_id,
+        user_spined.spined_date_id AS snapshot_id,
         {{ dbt_utils.surrogate_key(['user_spined.user_id']) }}  AS dim_user_sk,  
         --natural_key
         user_spined.user_id,        
