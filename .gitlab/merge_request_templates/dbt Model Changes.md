@@ -64,6 +64,23 @@ Paste the results of dbt test here, including the command.
 
 **What to do for failed pipelines** See our [handbook page](https://about.gitlab.com/handbook/business-ops/data-team/platform/ci-jobs/#what-to-do-if-a-pipeline-fails) 
 
+#### Performance
+<details>
+<summary><i>Click to toggle Performance</i></summary>
+
+- [ ] Using the [dbt Model Performance runbook](https://gitlab.com/gitlab-data/runbooks/-/blob/main/dbt_performance/model_build_performance.md) retrieve the performance categories for any changed or new models.
+- [ ] Follow the [guidelines](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#guidance-for-checking-model-performance) in the handbook for improving the performance as needed.
+
+<details>
+<summary> Performance Category Table </summary>
+
+| Model Name | Run Time Category | Size Category | Efficiency Category |
+|------------|-------------------|---------------|---------------------|
+|            |                   |               |                     |
+
+</details>
+</details>
+
 #### Auditing
 <details>
 <summary><i>Click to toggle Auditing</i></summary>
