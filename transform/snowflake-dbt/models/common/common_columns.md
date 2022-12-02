@@ -628,12 +628,6 @@ The md5 hash of the license file.
 
 {% enddocs %}
 
-{% docs license_sha256 %}
-
-The 256 hash of the license file.
-
-{% enddocs %}
-
 {% docs license_billable_users %}
 
 The count of active users who can be billed for. Guest users and bots are not included. This value comes from the ping payload.
