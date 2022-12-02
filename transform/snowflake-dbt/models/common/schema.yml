@@ -3470,6 +3470,8 @@ models:
         description: The time frame associated with the metric, as defined in the metric definition YAML file
       - name: license_md5
         description: The md5 hash of the license file.
+      - name: license_sha256
+        description: The sha256 hash of the license file.
       - name: is_license_mapped_to_subscription
         description: Data quality flag to check if the license table has a value in both license_id and subscription_id
       - name: is_license_subscription_id_valid
