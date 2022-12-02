@@ -72,7 +72,7 @@ Paste the results of dbt test here, including the command.
 - [ ] Follow the [guidelines](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#guidance-for-checking-model-performance) in the handbook for improving the performance as needed.
 
 <details>
-<summary> Performance Category Table </summary>
+<summary> Performance Categories Table </summary>
 
 | Model Name | Run Time Category | Size Category | Efficiency Category |
 |------------|-------------------|---------------|---------------------|
