@@ -268,8 +268,8 @@ models:
         description: '{{ doc("zi_is_s_and_p_500") }}'
       - name: is_domestic_hq
         description: '{{ doc("zi_is_domestic_hq") }}'
-      - name: is_global_parent
-        description: '{{ doc("zi_is_global_parent") }}'
+      - name: is_ultimate_parent
+        description: '{{ doc("zi_is_ultimate_parent") }}'
       - name: is_subsidiary
         description: '{{ doc("zi_is_subsidiary") }}'
       - name: is_franchisor
@@ -326,28 +326,28 @@ models:
         description: '{{ doc("zi_domestic_parent_state") }}'
       - name: domestic_parent_country
         description: '{{ doc("zi_domestic_parent_country") }}'
-      - name: global_parent_company_id
-        description: '{{ doc("zi_global_parent_company_id") }}'
-      - name: everstring_global_parent_id
-        description: '{{ doc("zi_everstring_global_parent_id") }}'
-      - name: everstring_global_parent_location_id
-        description: '{{ doc("zi_everstring_global_parent_location_id") }}'
-      - name: global_parent_name
-        description: '{{ doc("zi_global_parent_name") }}'
-      - name: global_parent_url
-        description: '{{ doc("zi_global_parent_url") }}'
-      - name: global_parent_street
-        description: '{{ doc("zi_global_parent_street") }}'
-      - name: global_parent_street_2
-        description: '{{ doc("zi_global_parent_street_2") }}'
-      - name: global_parent_city
-        description: '{{ doc("zi_global_parent_city") }}'
-      - name: global_parent_zip
-        description: '{{ doc("zi_global_parent_zip") }}'
-      - name: global_parent_state
-        description: '{{ doc("zi_global_parent_state") }}'
-      - name: global_parent_country
-        description: '{{ doc("zi_global_parent_country") }}'
+      - name: ultimate_parent_company_id
+        description: '{{ doc("zi_ultimate_parent_company_id") }}'
+      - name: everstring_ultimate_parent_id
+        description: '{{ doc("zi_everstring_ultimate_parent_id") }}'
+      - name: everstring_ultimate_parent_location_id
+        description: '{{ doc("zi_everstring_ultimate_parent_location_id") }}'
+      - name: ultimate_parent_name
+        description: '{{ doc("zi_ultimate_parent_name") }}'
+      - name: ultimate_parent_url
+        description: '{{ doc("zi_ultimate_parent_url") }}'
+      - name: ultimate_parent_street
+        description: '{{ doc("zi_ultimate_parent_street") }}'
+      - name: ultimate_parent_street_2
+        description: '{{ doc("zi_ultimate_parent_street_2") }}'
+      - name: ultimate_parent_city
+        description: '{{ doc("zi_ultimate_parent_city") }}'
+      - name: ultimate_parent_zip
+        description: '{{ doc("zi_ultimate_parent_zip") }}'
+      - name: ultimate_parent_state
+        description: '{{ doc("zi_ultimate_parent_state") }}'
+      - name: ultimate_parent_country
+        description: '{{ doc("zi_ultimate_parent_country") }}'
       - name: franchisor_company_id
         description: '{{ doc("zi_franchisor_company_id") }}'
       - name: everstring_franchisor_id
