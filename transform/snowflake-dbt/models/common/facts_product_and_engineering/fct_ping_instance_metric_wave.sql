@@ -19,7 +19,8 @@
 , fct_ping_instance_metric_with_license  AS (
     SELECT *
     FROM {{ ref('fct_ping_instance_metric') }}
-    WHERE license_md5 IS NOT NULL
+    WHERE (license_md5 IS NOT NULL OR
+           license_sha256 IS NOT NULL)
 )
 
 , final AS (
