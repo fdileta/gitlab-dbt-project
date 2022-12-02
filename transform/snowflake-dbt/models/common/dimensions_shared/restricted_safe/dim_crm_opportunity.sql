@@ -1,5 +1,5 @@
 {{ config(
-    tags=["mnpi", "six_hourly"]
+    tags=["six_hourly"]
 ) }}
 
 WITH prep_crm_opportunity AS (

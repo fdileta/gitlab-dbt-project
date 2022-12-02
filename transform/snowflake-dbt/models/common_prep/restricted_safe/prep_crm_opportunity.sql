@@ -1,5 +1,5 @@
 {{ config(
-    tags=["mnpi", "six_hourly"]
+    tags=["six_hourly"]
 ) }}
 
 {{ sfdc_opportunity_fields('live') }}
