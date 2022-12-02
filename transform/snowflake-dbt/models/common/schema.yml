@@ -393,7 +393,9 @@ models:
       - name: dim_crm_touchpoint_id
         tests:
           - not_null
-          - unique
+          - unique:
+              config:
+                where: bizible_created_date <= DATEADD('day', -2, CURRENT_DATE)::DATE
         tags: ["tdf", "common"]
       - name: is_dg_influenced
         description: Flag indicating a touchpoint is influenced by Demand Gen based on its segment being Demand Gen.
@@ -1027,7 +1029,9 @@ models:
       - name: dim_crm_touchpoint_id
         tests:
           - not_null
-          - unique
+          - unique:
+              config:
+                where: bizible_created_date <= DATEADD('day', -2, CURRENT_DATE)::DATE
         tags: ["tdf", "common"]
       - name: opps_per_touchpoint
         description: Count of opportunities associated with a touchpoint.
@@ -1057,7 +1061,9 @@ models:
       - name: dim_crm_touchpoint_id
         tests:
           - not_null
-          - unique
+          - unique:
+              config:
+                where: bizible_created_date <= DATEADD('day', -2, CURRENT_DATE)::DATE
         tags: ["tdf", "common"]
 
   - name: dim_usage_ping_metric
@@ -3135,82 +3141,169 @@ models:
         tests:
           - not_null
           - unique
-        description: The unique identifier of the ping
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: dim_ping_date_id
-        description: The unique id associated with the dim_ping_instance
+        description: '{{ doc("dim_ping_date_id") }}'
       - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
+        description: '{{ doc("dim_host_id") }}'
       - name: dim_instance_id
-        description: The unique id of an instance (brought in from usage_data source data).
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_date_28_days_earlier
-        description: The date 28 days prior to when the ping was created
-      - name: ping_created_date_year
-        description: The year when the ping was created (YYYY-01-01)
-      - name: ping_created_date_month
-        description: The month when the ping was created (YYYY-MM-01)
-      - name: ping_created_date_week
-        description: The week when the ping was created (YYYY-MM-BOW)
-      - name: ping_created_date
-        description: The date when the ping was created (YYYY-MM-DD)
-      - name: ip_address_hash
-        description: The ip_address_has associated with the instance
-      - name: version
-        description: The version associated with the instance (9., 10., 11., ... 14.)
-      - name: instance_user_count
-        description: The total count of users on the instance
-      - name: license_md5
-        description: The license_md5 associated with the instance
-      - name: historical_max_users
-        description: The max user number the instance has had
-      - name: license_user_count
-        description: The user count for the license
-      - name: license_starts_at
-        description: The date the license starts at
-      - name: license_expires_at
-        description:  The date the license ends on
-      - name: license_add_ons
-        description: The add ones associated with the license
-      - name: dim_instance_id
-        description: The unique identifier of the instance, easily joined to dim_installation. This id is store in the database of the instance and appears as uuid in the ping payload
+        description: '{{ doc("dim_instance_id") }}'
       - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
+        description: '{{ doc("dim_installation_id") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: ping_created_date_28_days_earlier
+        description: '{{ doc("ping_created_date_28_days_earlier") }}'
+      - name: ping_created_date_year
+        description: '{{ doc("ping_created_date_year") }}'
+      - name: ping_created_date_month
+        description: '{{ doc("ping_created_date_month") }}'
+      - name: ping_created_date_week
+        description: '{{ doc("ping_created_date_week") }}'
+      - name: ping_created_date
+        description: '{{ doc("ping_created_date") }}'
+      - name: ip_address_hash
+        description: '{{ doc("ip_address_hash_ping_model") }}'
+      - name: version
+        description: '{{ doc("version_ping_model") }}'
+      - name: instance_user_count
+        description: '{{ doc("instance_user_count") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: historical_max_users
+        description: '{{ doc("historical_max_users") }}'
+      - name: license_user_count
+        description: '{{ doc("license_user_count") }}'
+      - name: license_starts_at
+        description: '{{ doc("license_starts_at") }}'
+      - name: license_expires_at
+        description:  '{{ doc("license_expires_at") }}'
+      - name: license_add_ons
+        description: '{{ doc("license_add_ons") }}'
+      - name: recorded_at
+        description: '{{ doc("recorded_at_ping_model") }}'
+      - name: updated_at
+        description: '{{ doc("updated_at_ping_model") }}'
+      - name: mattermost_enabled
+        description: '{{ doc("mattermost_enabled") }}'
+      - name: ping_edition
+        description: '{{ doc("ping_edition") }}'
       - name: host_name
-        description: The name (URL) of the host
+        description: '{{ doc("host_name") }}'
       - name: product_tier
-        description: The product tier associated with the instance (Premium, Starter, Core, Ultimate)
-      - name: is_staging
-        description: Boolean flag which is set to True if the instance has been identified as a staging instance
+        description: '{{ doc("ping_product_tier") }}'
       - name: is_trial
-        description: Boolean flag which is set to True if the instance has a valid trial license at service ping creation
+        description: '{{ doc("is_trial_ping_model") }}'
       - name: source_license_id
-        description: The unique id of a source license
+        description: '{{ doc("source_license_id") }}'
       - name: installation_type
-        description: The type of installation associated with the instance (i.e. gitlab-development-kit, gitlab-helm-chart, gitlab-omnibus-helm-chart)
+        description: '{{ doc("installation_type") }}'
       - name: license_plan
-        description: The license plan associated with the instance (i.e. Ultimate, Premium)
+        description: '{{ doc("license_plan") }}'
+      - name: database_adapter
+        description: '{{ doc("database_adapter") }}'
       - name: database_version
-        description: The database version associated with the instance (i.e. 9.5.3)
+        description: '{{ doc("database_version") }}'
       - name: git_version
-        description: The version of gitlab the instance is running (i.e. 2.17.0, 2.33.1, 2.23.0)
-      - name: major_version
-        description: The major version of GitLab on the instance. For example, for 13.6.2, major_version is 13. See details here (https://docs.gitlab.com/ee/policy/maintenance.html)
-      - name: minor_version
-        description: The major version of GitLab on the instance. For example, for 13.6.2, minor_version is 6. See details here (https://docs.gitlab.com/ee/policy/maintenance.html)
-      - name: major_minor_version
-        description: The concatenation of major and minor version. For example, for 13.6.2,
+        description: '{{ doc("git_version") }}'
+      - name: gitlab_pages_enabled
+        description: '{{ doc("gitlab_pages_enabled") }}'
+      - name: gitlab_pages_version
+        description: '{{ doc("gitlab_pages_version") }}'
+      - name: container_registry_enabled
+        description: '{{ doc("container_registry_enabled") }}'
+      - name: elasticsearch_enabled
+        description: '{{ doc("elasticsearch_enabled") }}'
+      - name: geo_enabled
+        description: '{{ doc("geo_enabled") }}'
+      - name: gitlab_shared_runners_enabled
+        description: '{{ doc("gitlab_shared_runners_enabled") }}'
+      - name: gravatar_enabled
+        description: '{{ doc("gravatar_enabled") }}'
+      - name: ldap_enabled
+        description: '{{ doc("ldap_enabled") }}'
+      - name: omniauth_enabled
+        description: '{{ doc("omniauth_enabled") }}'
+      - name: reply_by_email_enabled
+        description: '{{ doc("reply_by_email_enabled") }}'
+      - name: signup_enabled
+        description: '{{ doc("signup_enabled") }}'
+      - name: prometheus_metrics_enabled
+        description: '{{ doc("prometheus_metrics_enabled") }}'
+      - name: usage_activity_by_stage
+        description: '{{ doc("usage_activity_by_stage") }}'
+      - name: usage_activity_by_stage_monthly
+        description: '{{ doc("usage_activity_by_stage_monthly") }}'
+      - name: gitaly_clusters
+        description: '{{ doc("gitaly_clusters") }}'
+      - name: gitaly_version
+        description: '{{ doc("gitaly_version") }}'
+      - name: gitaly_servers
+        description: '{{ doc("gitaly_servers") }}'
+      - name: gitaly_filesystems
+        description: '{{ doc("gitaly_filesystems") }}'
+      - name: gitpod_enabled
+        description: '{{ doc("gitpod_enabled") }}'
+      - name: object_store
+        description: '{{ doc("object_store") }}'
+      - name: is_dependency_proxy_enabled
+        description: '{{ doc("is_dependency_proxy_enabled") }}'
+      - name: recording_ce_finished_at
+        description: '{{ doc("recording_ce_finished_at") }}'
+      - name: recording_ee_finished_at
+        description: '{{ doc("recording_ee_finished_at") }}'
+      - name: is_ingress_modsecurity_enabled
+        description: '{{ doc("is_ingress_modsecurity_enabled") }}'
+      - name: topology
+        description: '{{ doc("topology") }}'
+      - name: is_grafana_link_enabled
+        description: '{{ doc("is_grafana_link_enabled") }}'
+      - name: analytics_unique_visits
+        description: '{{ doc("analytics_unique_visits") }}'
+      - name: raw_usage_data_id
+        description: '{{ doc("raw_usage_data_id") }}'
+      - name: container_registry_vendor
+        description: '{{ doc("container_registry_vendor") }}'
+      - name: container_registry_version
+        description: '{{ doc("container_registry_version") }}'
+      - name: cleaned_edition
+        description: '{{ doc("cleaned_edition") }}'
+      - name: cleaned_version
+        description: '{{ doc("cleaned_version") }}'
       - name: version_is_prerelease
-        description: Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details here (https://docs.gitlab.com/ee/policy/maintenance.html)
+        description: '{{ doc("version_is_prerelease") }}'
+      - name: major_version
+        description: '{{ doc("major_version") }}'
+      - name: minor_version
+        description: '{{ doc("minor_version") }}'
+      - name: major_minor_version
+        description: '{{ doc("major_minor_version") }}'
+      - name: major_minor_version_id
+        description: '{{ doc("major_minor_version_id") }}'
+      - name: ping_delivery_type
+        description: '{{ doc("ping_delivery_type") }}'
       - name: is_saas_dedicated
-        description: Boolean flag set to True if the ping_delivery_type is from a Dedicated Implementation
+        description: '{{ doc("is_saas_dedicated") }}'
       - name: is_internal
-        description: Denotes whether the instance is internal
+        description: '{{ doc("is_internal") }}'
+      - name: is_staging
+        description: '{{ doc("is_staging") }}'
+      - name: is_last_ping_of_month
+        description: '{{ doc("is_last_ping_of_month") }}'
+      - name: is_last_ping_of_week
+        description: '{{ doc("is_last_ping_of_week") }}'
+      - name: collected_data_categories
+        description: '{{ doc("collected_data_categories") }}'
       - name: raw_usage_data_payload
-        description: Either the original payload value or a reconstructed value. See https://gitlab.com/gitlab-data/analytics/-/merge_requests/4064/diffs#bc1d7221ae33626053b22854f3ecbbfff3ffe633 for rationale.
-
+        description: '{{ doc("raw_usage_data_payload") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: dim_ping_metric
     description: ' {{ doc("dim_ping_metric") }} '
@@ -3219,44 +3312,57 @@ models:
         tests:
           - not_null
           - unique
+        description: The unique ID of the dim_ping_metric model consisting of metrics_path, created using the dbt surrogate_key macro
       - name: metrics_path
-        description: The path name of metric
+        description: '{{ doc("metrics_path") }}'
+      - name: sql_friendly_path
+        description: Reformatted metrics_path that reflects how the metrics_path would be filtered from the raw payload. The metrics are prepended with `raw_usage_data_payload`, and `.` are replaced with `[]`. (Ex. `usage_activity_by_stage_monthly.plan.assignee_lists` has the value `raw_usage_data_payload['usage_activity_by_stage_monthly']['plan']['assignee_lists']`)
       - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("data_source_ping_metric") }}'
       - name: description
+        description: A description of the metric
       - name: product_category
+        description: '{{ doc("product_category_ping_metric") }}'
       - name: group_name
-        description: The name of the Product group
+        description: '{{ doc("group_name") }}'
       - name: section_name
-        description: The name of the product section
+        description: '{{ doc("section_name") }}'
       - name: stage_name
-        description: The name of the product stage
+        description: '{{ doc("stage_name") }}'
       - name: milestone
+        description: '{{ doc("milestone_ping_metric") }}'
       - name: skip_validation
+        description: This will always be NULL
       - name: metrics_status
+        description: '{{ doc("metrics_status_ping_metric") }}'
       - name: tier
+        description: The tier(s) where the tracked feature is available, formatted as an array containing one or a combination of free, premium or ultimate (ex. `[   "free",   "premium",   "ultimate" ]`)
       - name: time_frame
+        description: '{{ doc("time_frame") }}'
       - name: value_type
+        description: One of `string`, `number`, `boolean`, `object`
       - name: is_gmau
-        description: Boolean field representing if the xmau metric represents a Group Monthly Active user (GMAU) metric
+        description: '{{ doc("is_gmau") }}'
       - name: is_paid_gmau
-        description: Boolean field representing if the xmau metric represents a Paid Group Monthly Active user (GMAU) metric
+        description: '{{ doc("is_paid_gmau") }}'
       - name: is_smau
-        description: Boolean field representing if the xmau metric represents a Stage Monthly Active User (SMAU) metric
+        description: '{{ doc("is_smau") }}'
       - name: is_umau
-        description: Boolean field representing if the xmau metric represents Unique Monthly Active User (UMAU) metric
+        description: '{{ doc("is_umau") }}'
       - name: snapshot_date
+        description: The date the data was extracted from metrics YAML files
       - name: uploaded_at
+        description: The time the data was extracted from metrics YAML files
+      - name: data_by_row
+        description: JSON object with all fields from YAML file
       - name: created_by
-        description: Who created this model
+        description: '{{ doc("created_by") }}'
       - name: updated_by
-        description: Who updated this model last
+        description: '{{ doc("updated_by") }}'
       - name: model_created_date
-        description: The date at which the model was created
+        description: '{{ doc("model_created_date") }}'
       - name: model_updated_date
-        description: The date at which the model code was last updateded
-      - name: dbt_updated_at
-      - name: dbt_created_at
+        description: '{{ doc("model_updated_date") }}'
 
   - name: dim_ping_metric_daily_snapshot
     description: ' {{ doc("dim_ping_metric_daily_snapshot") }} '
@@ -3265,46 +3371,58 @@ models:
         tests:
           - not_null
           - unique
+        description: The unique composite ID of the dim_ping_metric_daily_snapshot model consisting of metrics_path and date_id
       - name: metrics_path
-        description: The path name of metric
+        description: '{{ doc("metrics_path") }}'
+      - name: sql_friendly_path
+        description: Reformatted metrics_path that reflects how the metrics_path would be filtered from the raw payload. The metrics are prepended with `raw_usage_data_payload`, and `.` are replaced with `[]`. (Ex. `usage_activity_by_stage_monthly.plan.assignee_lists` has the value `raw_usage_data_payload['usage_activity_by_stage_monthly']['plan']['assignee_lists']`)
       - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("data_source_ping_metric") }}'
       - name: description
+        description: A description of the metric
       - name: product_category
+        description: '{{ doc("product_category_ping_metric") }}'
       - name: group_name
-        description: The name of the Product group
+        description: '{{ doc("group_name") }}'
       - name: section_name
-        description: The name of the product section
+        description: '{{ doc("section_name") }}'
       - name: stage_name
-        description: The name of the product stage
+        description: '{{ doc("stage_name") }}'
       - name: milestone
+        description: '{{ doc("milestone_ping_metric") }}'
       - name: skip_validation
+        description: This will always be NULL
       - name: metrics_status
+        description: '{{ doc("metrics_status_ping_metric") }}'
       - name: tier
+        description: The tier(s) where the tracked feature is available, formatted as an array containing one or a combination of free, premium, or ultimate
       - name: time_frame
+        description: '{{ doc("time_frame") }}'
       - name: value_type
+        description: One of `string`, `number`, `boolean`, `object`
       - name: is_gmau
-        description: Boolean field representing if the xmau metric represents a Group Monthly Active user (GMAU) metric
+        description: '{{ doc("is_gmau") }}'
       - name: is_paid_gmau
-        description: Boolean field representing if the xmau metric represents a Paid Group Monthly Active user (GMAU) metric
+        description: '{{ doc("is_paid_gmau") }}'
       - name: is_smau
-        description: Boolean field representing if the xmau metric represents a Stage Monthly Active User (SMAU) metric
+        description: '{{ doc("is_smau") }}'
       - name: is_umau
-        description: Boolean field representing if the xmau metric represents Unique Monthly Active User (UMAU) metric
+        description: '{{ doc("is_umau") }}'
+      - name: uploaded_at
+        description: The time the data was extracted from metrics YAML files
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
       - name: valid_from
         description: Timestamp of when this metric path mapping is valid from
       - name: valid_to
         description: Timestamp of when this metric path mapping is valid until
-      - name: created_by
-        description: Who created this model
-      - name: updated_by
-        description: Who updated this model last
-      - name: model_created_date
-        description: The date at which the model was created
-      - name: model_updated_date
-        description: The date at which the model code was last updateded
-      - name: dbt_updated_at
-      - name: dbt_created_at
+
 
   - name: fct_ping_instance_metric
     description: ' {{ doc("fct_ping_instance_metric") }} '
@@ -3312,7 +3430,7 @@ models:
       - name: ping_instance_metric_id
         tests:
           - not_null
-        description: The unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
         description: The unqiue id of a service ping instance in the dim_ping_instance model.
       - name: dim_product_tier_id
@@ -3363,42 +3481,57 @@ models:
       - name: ping_instance_metric_id
         tests:
           - not_null
-        description: The unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the fct_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping insatnce in the dim_ping_instance model.
-      - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
-      - name: dim_location_country_id
-      - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+        description: '{{ doc("metrics_path") }}'
       - name: metric_value
-        description: The value associated with the metric path
-      - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("metric_value") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: time_frame
-        description: The time frame associated with the metric, as defined in the metric definition YAML file
+        description: '{{ doc("has_timed_out") }}'
+      - name: dim_product_tier_id
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
+      - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
+      - name: dim_ping_date_id
+        description: '{{ doc("dim_ping_date_id") }}'
+      - name: dim_instance_id
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_installation_id
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: ping_created_date
+        description: '{{ doc("ping_created_date") }}'
+      - name: umau_value
+        description: '{{ doc("umau_value") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
+      - name: is_license_mapped_to_subscription
+        description: '{{ doc("is_license_mapped_to_subscription") }}'
+      - name: is_license_subscription_id_valid
+        description: '{{ doc("is_license_subscription_id_valid") }}'
+      - name: is_service_ping_license_in_customerDot
+        description: '{{ doc("is_service_ping_license_in_customerDot") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: fct_ping_instance_metric_rolling_13_months
     description: ' {{ doc("fct_ping_instance_metric_rolling_13_months") }} '
@@ -3406,42 +3539,57 @@ models:
       - name: ping_instance_metric_id
         tests:
           - not_null
-        description: The unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the fct_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping insatnce in the dim_ping_instance model.
-      - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
-      - name: dim_location_country_id
-      - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+        description: '{{ doc("metrics_path") }}'
       - name: metric_value
-        description: The value associated with the metric path
-      - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("metric_value") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: time_frame
-        description: The time frame associated with the metric, as defined in the metric definition YAML file
+        description: '{{ doc("has_timed_out") }}'
+      - name: dim_product_tier_id
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
+      - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
+      - name: dim_ping_date_id
+        description: '{{ doc("dim_ping_date_id") }}'
+      - name: dim_instance_id
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_installation_id
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: ping_created_date
+        description: '{{ doc("ping_created_date") }}'
+      - name: umau_value
+        description: '{{ doc("umau_value") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
+      - name: is_license_mapped_to_subscription
+        description: '{{ doc("is_license_mapped_to_subscription") }}'
+      - name: is_license_subscription_id_valid
+        description: '{{ doc("is_license_subscription_id_valid") }}'
+      - name: is_service_ping_license_in_customerDot
+        description: '{{ doc("is_service_ping_license_in_customerDot") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: fct_ping_instance_metric_wave
     description: ' {{ doc("fct_ping_instance_metric") }} '
@@ -4074,52 +4222,63 @@ models:
       - name: ping_instance_id
         tests:
           - not_null
-        description: The unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the fct_ping_instance model consisting of dim_ping_instance_id
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping instance in the dim_ping_instance model.
-      - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
-      - name: dim_location_country_id
-      - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
-      - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: umau_value
-        description: The unique monthly active user value for the instance
+        description: '{{ doc("ping_created_at") }}'
+      - name: dim_product_tier_id
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
+      - name: dim_crm_account_id
+        description: '{{ doc("dim_crm_account_id") }}'
+      - name: dim_parent_crm_account_id
+        description: '{{ doc("dim_parent_crm_account_id") }}'
+      - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
+      - name: dim_ping_date_id
+        description: '{{ doc("dim_ping_date_id") }}'
+      - name: dim_instance_id
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_installation_id
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
       - name: license_md5
-        description: The md5 hash of the license file.
+        description: '{{ doc("license_md5") }}'
       - name: license_billable_users
-        description: The count of active users who can be billed for. Guest users and bots are not included.
+        description: '{{ doc("license_billable_users") }}'
       - name: instance_user_count
-        description:  The total count of users on the instance
-      - name: historical_max_users
-        description: Maximum active user count ever reported over the lifetime of the customer's subcription.
+        description: '{{ doc("instance_user_count") }}'
+      - name: historical_max_user_count
+        description: '{{ doc("historical_max_users") }}'
       - name: license_user_count
-        description: Count of licensed users purchased with the customer's subcription.
+        description: '{{ doc("license_user_count") }}'
       - name: hostname
-        description: The name (URL) of the host
+        description: '{{ doc("host_name") }}'
+      - name: umau_value
+        description: '{{ doc("umau_value") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
+      - name: is_trial
+        description: '{{ doc("is_trial_ping_model") }}'
       - name: product_tier
-        description: The product tier associated with the instance (Premium, Starter, Core, Ultimate)
+        description: '{{ doc("ping_product_tier") }}'
       - name: main_edition_product_tier
-        description: Segmentation for the product tier, including separate records for Core CE and Core EE
+        description: '{{ doc("ping_edition") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
 
   - name: fct_ping_instance_metric_28_day
@@ -4128,44 +4287,59 @@ models:
       - name: ping_instance_metric_id
         tests:
           - not_null
-        description: The unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the fct_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping instance in the dim_ping_instance model.
-      - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
-      - name: dim_location_country_id
-      - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+        description: '{{ doc("metrics_path") }}'
       - name: metric_value
-        description: The value associated with the metric path
-      - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("metric_value") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: time_frame
-        description: The time frame associated with the metric, as defined in the metric definition YAML file
+        description: '{{ doc("has_timed_out") }}'
+      - name: dim_product_tier_id
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
+      - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
+      - name: dim_ping_date_id
+        description: '{{ doc("dim_ping_date_id") }}'
+      - name: dim_instance_id
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_installation_id
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: ping_created_date
+        description: '{{ doc("ping_created_date") }}'
       - name: umau_value
-        description: The unique monthly active user value for the instance
+        description: '{{ doc("umau_value") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
+      - name: is_license_mapped_to_subscription
+        description: '{{ doc("is_license_mapped_to_subscription") }}'
+      - name: is_license_subscription_id_valid
+        description: '{{ doc("is_license_subscription_id_valid") }}'
+      - name: is_service_ping_license_in_customerDot
+        description: '{{ doc("is_service_ping_license_in_customerDot") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: time_frame
+        description: '{{ doc("time_frame") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: fct_ping_instance_metric_7_day
     description: ' {{ doc("fct_ping_instance_metric_7_day") }} '
@@ -4173,44 +4347,59 @@ models:
       - name: ping_instance_metric_id
         tests:
           - not_null
-        description: The unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the fct_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping instance in the dim_ping_instance model.
-      - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
-      - name: dim_location_country_id
-      - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+        description: '{{ doc("metrics_path") }}'
       - name: metric_value
-        description: The value associated with the metric path
-      - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("metric_value") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: time_frame
-        description: The time frame associated with the metric, as defined in the metric definition YAML file
+        description: '{{ doc("has_timed_out") }}'
+      - name: dim_product_tier_id
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
+      - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
+      - name: dim_ping_date_id
+        description: '{{ doc("dim_ping_date_id") }}'
+      - name: dim_instance_id
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_installation_id
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: ping_created_date
+        description: '{{ doc("ping_created_date") }}'
       - name: umau_value
-        description: The unique monthly active user value for the instance
+        description: '{{ doc("umau_value") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
+      - name: is_license_mapped_to_subscription
+        description: '{{ doc("is_license_mapped_to_subscription") }}'
+      - name: is_license_subscription_id_valid
+        description: '{{ doc("is_license_subscription_id_valid") }}'
+      - name: is_service_ping_license_in_customerDot
+        description: '{{ doc("is_service_ping_license_in_customerDot") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: time_frame
+        description: '{{ doc("time_frame") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: fct_ping_instance_metric_monthly
     description: ' {{ doc("fct_ping_instance_metric_monthly") }} '
@@ -4218,91 +4407,111 @@ models:
       - name: ping_instance_metric_id
         tests:
           - not_null
-        description: the unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the fct_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping instance in the dim_ping_instance model.
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
       - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
       - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
+        description: '{{ doc("dim_ping_date_id") }}'
       - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
-      - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
-      - name: metric_value
-        description: The value associated with the metric path
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
       - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
-      - name: has_timed_out
-        description: A flag to denote that it has timed out
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: time_frame
-        description: The time frame associated with the metric, as defined in the metric definition YAML file
-      - name: umau_value
-        description: The unique monthly active user value for the instance
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
+      - name: metrics_path
+        description: '{{ doc("metrics_path") }}'
+      - name: metric_value
+        description: '{{ doc("metric_value") }}'
       - name: monthly_metric_value
         description: '{{ doc("monthly_metric_value") }}'
+      - name: time_frame
+        description: '{{ doc("time_frame") }}'
+      - name: has_timed_out
+        description: '{{ doc("has_timed_out") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: umau_value
+        description: '{{ doc("umau_value") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: fct_ping_instance_metric_weekly
-    description: '{{ doc("fct_ping_instance_metric_weekly") }}'
+    description: ' {{ doc("fct_ping_instance_metric_weekly") }} '
     columns:
       - name: ping_instance_metric_id
         tests:
           - not_null
-        description: the unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the fct_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping insatnce in the dim_ping_instance model.
-      - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
-      - name: dim_location_country_id
-      - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
-      - name: metric_value
-        description: The value associated with the metric path
-      - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("metrics_path") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: time_frame
-        description: The time frame associated with the metric, as defined in the metric definition YAML file
+        description: '{{ doc("has_timed_out") }}'
+      - name: dim_product_tier_id
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
+      - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
+      - name: dim_ping_date_id
+        description: '{{ doc("dim_ping_date_id") }}'
+      - name: dim_instance_id
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_installation_id
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: ping_created_date
+        description: '{{ doc("ping_created_date") }}'
       - name: umau_value
-        description: The unique monthly active user value for the instance
+        description: '{{ doc("umau_value") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
+      - name: is_license_mapped_to_subscription
+        description: '{{ doc("is_license_mapped_to_subscription") }}'
+      - name: is_license_subscription_id_valid
+        description: '{{ doc("is_license_subscription_id_valid") }}'
+      - name: is_service_ping_license_in_customerDot
+        description: '{{ doc("is_service_ping_license_in_customerDot") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: metric_value
+        description: '{{ doc("metric_value") }}'
+      - name: time_frame
+        description: '{{ doc("time_frame") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: fct_ping_instance_metric_all_time
     description: ' {{ doc("fct_ping_instance_metric_all_time") }} '
@@ -4310,44 +4519,59 @@ models:
       - name: ping_instance_metric_id
         tests:
           - not_null
-        description: the unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and flattened_high_level.metrics_path
+        description: The unique composite ID for the fct_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping instance in the dim_ping_instance model.
-      - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
-      - name: dim_location_country_id
-      - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+        description: '{{ doc("metrics_path") }}'
       - name: metric_value
-        description: The value associated with the metric path
-      - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("metric_value") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: time_frame
-        description: The time frame associated with the metric, as defined in the metric definition YAML file
+        description: '{{ doc("has_timed_out") }}'
+      - name: dim_product_tier_id
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
+      - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
+      - name: dim_ping_date_id
+        description: '{{ doc("dim_ping_date_id") }}'
+      - name: dim_instance_id
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_installation_id
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: ping_created_date
+        description: '{{ doc("ping_created_date") }}'
       - name: umau_value
-        description: The unique monthly active user value for the instance
+        description: '{{ doc("umau_value") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
+      - name: is_license_mapped_to_subscription
+        description: '{{ doc("is_license_mapped_to_subscription") }}'
+      - name: is_license_subscription_id_valid
+        description: '{{ doc("is_license_subscription_id_valid") }}'
+      - name: is_service_ping_license_in_customerDot
+        description: '{{ doc("is_service_ping_license_in_customerDot") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: time_frame
+        description: '{{ doc("time_frame") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: fct_performance_indicator_targets
     description: '{{ doc("fct_performance_indicator_targets") }}'

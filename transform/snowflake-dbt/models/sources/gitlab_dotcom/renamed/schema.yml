@@ -142,6 +142,15 @@ models:
         tests:
           - not_null
 
+  - name: gitlab_dotcom_cluster_agents_source
+    description: Source data for the kubernetes cluster with agent by projects.
+    columns:
+      - name: cluster_agent_id
+        tags: ["tdf","gitlab_dotcom"]
+        tests:
+          - not_null
+          - unique
+
   - name: gitlab_dotcom_container_repositories_source
     description: Source data for the link between continuer repositories and projects.
     tags: ["gitlab_dotcom"]
@@ -769,6 +778,15 @@ models:
           - not_null
           - unique
       - name: experiment_name
+        tags: ["tdf","gitlab_dotcom"]
+        tests:
+          - not_null
+          - unique
+
+  - name: gitlab_dotcom_fork_network_members_source
+    description: A base model for Gitlab.com fork_network_members.
+    columns:
+      - name: id
         tags: ["tdf","gitlab_dotcom"]
         tests:
           - not_null
