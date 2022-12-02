@@ -172,5 +172,5 @@ WITH source AS (
     created_by="@kathleentam",
     updated_by="@rbacovic",
     created_date="2021-01-10",
-    updated_date="2021-12-01"
+    updated_date="2022-12-01"
 ) }}
