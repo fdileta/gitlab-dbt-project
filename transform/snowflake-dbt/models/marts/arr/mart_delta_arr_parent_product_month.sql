@@ -57,7 +57,6 @@ WITH dim_billing_account AS (
 ), max_min_month AS (
 
     SELECT
-      parent_crm_account_name,
       dim_parent_crm_account_id,
       product_tier_name,
       product_delivery_type,
@@ -71,7 +70,6 @@ WITH dim_billing_account AS (
 ), base AS (
 
     SELECT
-      parent_crm_account_name,
       dim_parent_crm_account_id,
       product_tier_name,
       product_delivery_type,
@@ -91,7 +89,6 @@ WITH dim_billing_account AS (
 
     SELECT
       base.arr_month,
-      base.parent_crm_account_name,
       base.dim_parent_crm_account_id,
       base.product_tier_name                                                                 AS product_tier_name,
       base.product_delivery_type                                                             AS product_delivery_type,
@@ -176,7 +173,6 @@ WITH dim_billing_account AS (
         'type_of_arr_change.product_tier_name']) }}
                                                                     AS primary_key,
       type_of_arr_change.arr_month,
-      type_of_arr_change.parent_crm_account_name,
       type_of_arr_change.dim_parent_crm_account_id,
       type_of_arr_change.product_tier_name,
       type_of_arr_change.product_delivery_type,
