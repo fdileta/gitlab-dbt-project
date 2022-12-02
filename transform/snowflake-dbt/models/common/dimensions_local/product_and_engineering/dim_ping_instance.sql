@@ -84,7 +84,8 @@ SELECT DISTINCT
   SELECT DISTINCT prep_ping_instance.uuid
   FROM prep_ping_instance
   INNER JOIN prep_license
-    ON prep_ping_instance.license_md5 = prep_license.license_md5
+    ON (prep_ping_instance.license_md5    = prep_license.license_md5 OR
+        prep_ping_instance.license_sha256 = prep_license.license_sha256)
   INNER JOIN prep_charge
     ON prep_license.dim_subscription_id = prep_charge.dim_subscription_id
   INNER JOIN prep_product_detail
@@ -109,6 +110,7 @@ SELECT DISTINCT
       fct_w_month_flag.version                                                                                    AS version,
       fct_w_month_flag.instance_user_count                                                                        AS instance_user_count,
       fct_w_month_flag.license_md5                                                                                AS license_md5,
+      fct_w_month_flag.license_sha256                                                                             AS license_sha256,
       fct_w_month_flag.historical_max_users                                                                       AS historical_max_users,
       fct_w_month_flag.license_user_count                                                                         AS license_user_count,
       fct_w_month_flag.license_starts_at                                                                          AS license_starts_at,
@@ -204,7 +206,7 @@ SELECT DISTINCT
 {{ dbt_audit(
     cte_ref="final",
     created_by="@icooper-acp",
-    updated_by="@tpoole1",
+    updated_by="@rbacovic",
     created_date="2022-03-08",
-    updated_date="2022-10-06"
+    updated_date="2022-12-01"
 ) }}
