@@ -62,7 +62,7 @@ WITH dim_billing_account AS (
       --add 1 month to generate churn month
       DATEADD('month',1,MAX(arr_month))   AS date_month_end
     FROM mart_arr
-    {{ dbt_utils.group_by(n=2) }}
+    {{ dbt_utils.group_by(n=1) }}
 
 ), base AS (
 
