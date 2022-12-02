@@ -107,7 +107,7 @@
       dim_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       dim_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
       dim_crm_account.forbes_2000_rank,
-      dim_crm_account.parent_account_industry,
+      dim_crm_account.parent_crm_account_industry,
       dim_crm_account.sales_development_rep,
 	  dim_crm_account.admin_manual_source_number_of_employees,
       dim_crm_account.admin_manual_source_account_address,

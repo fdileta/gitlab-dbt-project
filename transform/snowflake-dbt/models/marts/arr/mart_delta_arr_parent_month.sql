@@ -93,7 +93,7 @@ WITH dim_billing_account AS (
     LEFT JOIN mart_arr
       ON base.arr_month = mart_arr.arr_month
       AND base.dim_parent_crm_account_id = mart_arr.dim_parent_crm_account_id
-    {{ dbt_utils.group_by(n=3) }}
+    {{ dbt_utils.group_by(n=2) }}
 
 ), prior_month AS (
 
