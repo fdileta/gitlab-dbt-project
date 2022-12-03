@@ -1,11 +1,9 @@
 import logging
-import sys
 from datetime import datetime
 from os import environ as env
 
 from fire import Fire
 from gitlabdata.orchestration_utils import snowflake_engine_factory
-from sqlalchemy.engine import Engine
 
 
 def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, single):
@@ -16,7 +14,7 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
         logging.info("Getting copy command...")
 
         from_statement = "FROM PROD.{schema}.{model}".format(
-            model=model, schema="pumps" if sensitive == False else "pumps_sensitive"
+            model=model, schema="pumps" if sensitive is False else "pumps_sensitive"
         )
 
         where_statement = (
@@ -27,12 +25,12 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
             )
         )
 
-        if timestamp == None:
+        if timestamp is None:
             query = "SELECT * " + from_statement
         else:
             query = "SELECT * " + from_statement + where_statement
 
-        if single == False:
+        if single is False:
             target_name = model
             option = "INCLUDE_QUERY_ID"
         else:
