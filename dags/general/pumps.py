@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from yaml import load, safe_load, YAMLError
+from yaml import safe_load, YAMLError
 
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
@@ -9,8 +9,6 @@ from airflow_utils import (
     clone_repo_cmd,
     gitlab_defaults,
     slack_failed_task,
-    gitlab_pod_env_vars,
-    clone_and_setup_extraction_cmd,
 )
 from kube_secrets import (
     SNOWFLAKE_ACCOUNT,
