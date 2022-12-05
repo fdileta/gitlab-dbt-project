@@ -15,12 +15,12 @@ WITH session_custom_dims AS (
 	  session_custom_dims.*,
 	    
 	  --index names
-	  ga_index_names.name	AS dimension_name,
-	  ga_index_names.scope	AS dimension_scope
+	  ga_index_names.name	AS dimension_name
 	    
 	FROM session_custom_dims
 	LEFT JOIN ga_index_names 
 		ON session_custom_dims.dimension_index = ga_index_names.index
+    WHERE ga_index_names.scope = 'Session'
 
 )
 
