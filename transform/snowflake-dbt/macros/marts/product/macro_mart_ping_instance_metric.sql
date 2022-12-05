@@ -43,7 +43,6 @@
       dim_date.first_day_of_month                                                 AS reporting_month,
       dim_license_id                                                              AS license_id,
       dim_license.license_md5                                                     AS license_md5,
-      dim_license.license_sha256                                                  AS license_sha256,
       dim_license.company                                                         AS license_company_name,
       subscription_source.subscription_name_slugify                               AS original_subscription_name_slugify,
       dim_subscription.dim_subscription_id                                        AS dim_subscription_id,
@@ -129,7 +128,6 @@
         dim_ping_metric.is_paid_gmau                                                                                                    AS is_paid_gmau,
         dim_ping_metric.is_umau                                                                                                         AS is_umau,
         dim_ping_instance.license_md5                                                                                                   AS license_md5,
-        license_subscriptions_w_latest_subscription.license_sha256                                                                      AS license_sha256,
         dim_ping_instance.is_trial                                                                                                      AS is_trial,
         fct_ping_instance_metric.umau_value                                                                                             AS umau_value,
         license_subscriptions_w_latest_subscription.license_id                                                                          AS license_id,
@@ -278,9 +276,9 @@
 {{ dbt_audit(
     cte_ref="sorted",
     created_by="@icooper-acp",
-    updated_by="@rbacovic",
+    updated_by="@iweeks",
     created_date="2022-03-11",
-    updated_date="2022-12-01"
+    updated_date="2022-07-20"
 ) }}
 
 {% endmacro %}
