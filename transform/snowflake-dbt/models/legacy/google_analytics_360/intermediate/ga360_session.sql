@@ -19,6 +19,7 @@ WITH source AS (
 	ON dims.visit_id = source.visit_id 
 		AND dims.visitor_id = source.visitor_id 
 		AND dims.visit_start_time = source.visit_start_time
+	WHERE dims.dimension_scope = 'Session'
 
 )
 
