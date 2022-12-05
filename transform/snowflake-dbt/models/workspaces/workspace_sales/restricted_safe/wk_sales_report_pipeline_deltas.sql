@@ -193,7 +193,8 @@ WITH sfdc_opportunity_xf AS (
 
     SELECT 
       deltas.*,
-      users.user_email AS opportunity_owner_email, 
+      users.user_email AS opportunity_owner_email,
+      users.is_rep_flag,
       oppty.sales_qualified_source,
       oppty.opportunity_category,
       oppty.sales_type,

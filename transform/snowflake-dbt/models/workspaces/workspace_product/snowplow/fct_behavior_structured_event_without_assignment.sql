@@ -30,7 +30,7 @@
       fct_behavior_structured_event.behavior_at,
 
       -- Degenerate Dimensions (Event Attributes)
-      fct_behavior_structured_event.v_tracker,
+      fct_behavior_structured_event.tracker_version,
       fct_behavior_structured_event.session_index,
       fct_behavior_structured_event.app_id,
       fct_behavior_structured_event.session_id,

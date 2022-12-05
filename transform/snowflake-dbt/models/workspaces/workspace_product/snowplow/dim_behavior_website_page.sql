@@ -3,27 +3,35 @@
         unique_key = "dim_behavior_website_page_sk"
 ) }}
 
-WITH events AS (
+{{ simple_cte([
+    ('events', 'prep_snowplow_unnested_events_all')
+    ])
+}}
 
-    SELECT *
-    FROM {{ref('prep_snowplow_unnested_events_all')}}
-    WHERE event IN ('struct', 'page_view', 'unstruct')
-
-), page_url AS (
+, page_url AS (
 
     SELECT DISTINCT 
       app_id,
-      page_url                                                                      AS page_url,
-      page_urlpath                                                                  AS page_url_path,
-      {{ clean_url('page_urlpath') }}                                               AS clean_url_path,
-      page_urlhost                                                                  AS page_url_host,
-      page_urlscheme                                                                AS page_url_scheme,
+      page_url,
+      page_url_host,
+      clean_url_path,
+      page_url_host,
+      page_url_scheme,
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
-      derived_tstamp
+      referrer_medium,
+      min(behavior_at)                                                              AS min_event_timestamp,
+      max(behavior_at)                                                              AS max_event_timestamp
     FROM events
-    WHERE page_urlpath IS NOT NULL
+    WHERE event IN ('struct', 'page_view', 'unstruct')
+      AND page_url IS NOT NULL
+    {% if is_incremental() %}
+
+      AND behavior_at > (SELECT max(max_event_timestamp) FROM {{ this }})
+
+    {% endif %}
+    {{ dbt_utils.group_by(n=10) }}
 
 ), referer_url AS (
 
@@ -37,11 +45,18 @@ WITH events AS (
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
-      derived_tstamp
+      referrer_medium,
+      min(behavior_at)                                                              AS min_event_timestamp,
+      max(behavior_at)                                                              AS max_event_timestamp
     FROM events
-    WHERE refr_urlpath IS NOT NULL
+    WHERE refr_urlhost || refr_urlpath IS NOT NULL
 
-), page AS (
+    {% if is_incremental() %}
+
+      AND behavior_at > (SELECT max(max_event_timestamp) FROM {{ this }})
+
+    {% endif %}
+    {{ dbt_utils.group_by(n=10) }}
 
     SELECT *
     FROM page_url
@@ -238,5 +253,5 @@ WITH events AS (
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-07-22",
-    updated_date="2022-11-21"
+    updated_date="2022-12-05"
 ) }}

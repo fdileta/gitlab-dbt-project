@@ -1,6 +1,8 @@
 {{config({
     "materialized":"incremental",
     "unique_key":"event_id",
+    "full_refresh":false,
+    "on_schema_change":"sync_all_columns",
     "post-hook": ["DELETE FROM {{ this }} WHERE DATE_TRUNC(MONTH, derived_tstamp::DATE) < DATEADD(MONTH, -24, DATE_TRUNC(MONTH,CURRENT_DATE))"]
   })
 }}
@@ -23,7 +25,7 @@ WITH
 
 filtered_table AS (
 
-  SELECT *
+  SELECT event_id
   FROM {{ this }}
   WHERE derived_tstamp::DATE >= DATEADD(DAY, -{{day_limit}}, CURRENT_DATE::DATE)
 
