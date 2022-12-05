@@ -57,6 +57,7 @@ models:
       - name: flaky_reports
       - name: first_flaky_at
       - name: last_flaky_at
+      - name: feature_category
 
   - name: flaky_tests_latest
     description: This is the latest version of all existing flaky tests
@@ -73,6 +74,7 @@ models:
       - name: flaky_reports
       - name: first_flaky_at
       - name: last_flaky_at
+      - name: feature_category
 
   - name: performance_indicators_yaml_latest
     description: This provides all current KPIs and PIs and their current description and target.
