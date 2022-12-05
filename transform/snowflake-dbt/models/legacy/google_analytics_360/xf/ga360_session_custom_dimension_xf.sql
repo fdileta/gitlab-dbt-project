@@ -15,7 +15,8 @@ WITH session_custom_dims AS (
 	  session_custom_dims.*,
 	    
 	  --index names
-	  ga_index_names.name	AS dimension_name
+	  ga_index_names.name	AS dimension_name,
+	  ga_index_names.scope	AS dimension_scope
 	    
 	FROM session_custom_dims
 	LEFT JOIN ga_index_names 
