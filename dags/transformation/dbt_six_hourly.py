@@ -161,7 +161,7 @@ dbt_results = KubernetesPodOperator(
 )
 
 (
-    dbt_evaluate_run_date_task
-    >> dbt_six_hourly_models_task
+    # dbt_evaluate_run_date_task
+    dbt_six_hourly_models_task
     >> dbt_results
 )
