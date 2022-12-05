@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: mart_crm_task
+    description: '{{ doc("mart_crm_task") }}'
+    columns:
+      - name: dim_crm_task_sk
+        tests:
+          - not_null
+          - unique

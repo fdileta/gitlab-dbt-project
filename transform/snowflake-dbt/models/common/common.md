@@ -1465,3 +1465,15 @@ Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team
 Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [dim_subscription](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_subscription) model
 
 {% enddocs %}
+
+{% docs dim_crm_task %}
+
+Dimension model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
+
+{% enddocs %}
+
+{% docs fct_crm_task %}
+
+Fact model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
+
+{% enddocs %}
