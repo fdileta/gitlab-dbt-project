@@ -106,7 +106,7 @@ WITH zuora_product AS (
           THEN 'Self-Managed'
         WHEN LOWER(product_tier_historical) LIKE ANY ('%saas%', 'storage', 'standard', 'basic', 'plus', 'githost')
           THEN 'SaaS'
-        WHEN LOWER(product_tier_historical) = 'SaaS - Other'
+        WHEN product_tier_historical = 'SaaS - Other'
           THEN 'SaaS'
         WHEN product_tier_historical IN (
                                           'Other'
