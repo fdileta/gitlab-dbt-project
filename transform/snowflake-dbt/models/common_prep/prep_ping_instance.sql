@@ -6,7 +6,8 @@
 
 
 {{ simple_cte([
-    ('raw_usage_data', 'version_raw_usage_data_source')
+    ('raw_usage_data', 'version_raw_usage_data_source'),
+    ('automated_service_ping', 'instance_combined_metrics')
     ])
 
 }}
