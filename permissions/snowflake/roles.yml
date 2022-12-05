@@ -2696,6 +2696,7 @@ roles:
         member_of:
             - reporter
             - analyst_marketing
+            - restricted_safe
         warehouses:
             - dev_xs
 
