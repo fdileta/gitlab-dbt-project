@@ -8,7 +8,8 @@ WITH licenses AS (
  
   SELECT *
   FROM {{ ref('customers_db_licenses_source') }}
-  WHERE license_md5 IS NOT NULL
+  WHERE (license_md5 IS NOT NULL OR
+         license_sha256 IS NOT NULL)
     AND is_trial = False
     -- Remove internal test licenses
     AND NOT (email LIKE '%@gitlab.com' AND LOWER(company) LIKE '%gitlab%')
@@ -17,7 +18,8 @@ WITH licenses AS (
 
   SELECT *
   FROM {{ ref('version_usage_data_unpacked') }}
-  WHERE license_md5 IS NOT NULL
+  WHERE (license_md5 IS NOT NULL OR
+         license_sha256 IS NOT NULL)
 
 ), week_spine AS (
 

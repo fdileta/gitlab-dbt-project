@@ -27,6 +27,7 @@
       usage_pings.raw_usage_data_id,
       usage_pings.raw_usage_data_payload,
       usage_pings.license_md5,
+      usage_pings.license_sha256,
       usage_pings.original_edition,
       usage_pings.edition,
       usage_pings.main_edition,
@@ -46,7 +47,8 @@
       map_license_account.dim_parent_crm_account_id
     FROM usage_pings
     LEFT JOIN map_license_account
-      ON usage_pings.license_md5 = map_license_account.license_md5
+      ON (usage_pings.license_md5 = map_license_account.license_md5 OR
+          usage_pings.license_sha256 = map_license_account.license_sha256)
     WHERE usage_pings.product_tier = 'Core'
 
 ), joined AS (
@@ -76,7 +78,7 @@
 {{ dbt_audit(
     cte_ref="joined",
     created_by="@ischweickartDD",
-    updated_by="@ischweickartDD",
+    updated_by="@rbacovic",
     created_date="2021-06-04",
-    updated_date="2021-06-09"
+    updated_date="2022-12-01"
 ) }}
