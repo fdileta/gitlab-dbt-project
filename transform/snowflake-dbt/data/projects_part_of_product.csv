@@ -232,6 +232,7 @@ gitlab-org/gitlab-ui,7071551
 gitlab-org/cluster-integration/cluster-applications,14404642
 gitlab-org/cluster-integration/gitlab-agent,19019153
 gitlab-services/version-gitlab-com,6491770
+gitlab-org/security/cli,38355982
 gitlab-org/security/gitlab-workhorse,15704133
 gitlab-org/security/gitaly,15685912
 gitlab-org/security/gitlab-pages,15685887

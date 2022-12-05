@@ -96,6 +96,7 @@ WITH prep_crm_opportunity AS (
       prep_crm_opportunity.subscription_start_date,
       prep_crm_opportunity.subscription_end_date,
       prep_crm_opportunity.resale_partner_name,
+	  prep_crm_opportunity.record_type_name,
 
       --account people attributes
       prep_crm_opportunity.crm_account_owner_sales_segment,
