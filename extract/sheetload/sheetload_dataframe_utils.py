@@ -71,7 +71,7 @@ def translate_column_names(input: str):
     :param input:
     :return:
     """
-    return input.strip().translate(input.maketrans(" /", "__"))  # can easily add more
+    return input.translate(input.maketrans(" /", "__"),)  # can easily add more
 
 
 def dw_uploader_append_only(
