@@ -2774,6 +2774,12 @@ models:
           - not_null
           - unique
         tags: ["tdf", "common", "gainsight"]
+      - name: license_sha256
+        description: The sha256 hash of the license file. Use this field to join to fct_usage_ping_payloads.
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "common", "gainsight"]
       - name: dim_subscription_id
         description: The unique identifier of a version of a subscription.
       - name: subscription_name
@@ -3139,6 +3145,8 @@ models:
         description: '{{ doc("instance_user_count") }}'
       - name: license_md5
         description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
       - name: historical_max_users
         description: '{{ doc("historical_max_users") }}'
       - name: license_user_count
@@ -3437,6 +3445,8 @@ models:
         description: The time frame associated with the metric, as defined in the metric definition YAML file
       - name: license_md5
         description: The md5 hash of the license file.
+      - name: license_sha256
+        description: The sha256 hash of the license file.
       - name: is_license_mapped_to_subscription
         description: Data quality flag to check if the license table has a value in both license_id and subscription_id
       - name: is_license_subscription_id_valid
