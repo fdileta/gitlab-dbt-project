@@ -47,7 +47,7 @@ WITH prep_usage_ping AS (
 {{ dbt_audit(
     cte_ref="pivoted",
     created_by="@ischweickartDD",
-    updated_by="@michellecooper",
+    updated_by="@rbacovic",
     created_date="2021-03-15",
-    updated_date="2021-04-27"
+    updated_date="2022-12-01"
 ) }}
