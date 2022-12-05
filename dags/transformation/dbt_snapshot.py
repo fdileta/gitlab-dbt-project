@@ -86,7 +86,7 @@ default_args = {
 
 # Create the DAG
 # Runs 3x per day
-dag = DAG("dbt_snapshots", default_args=default_args, schedule_interval="0 */8 * * *")
+dag = DAG("dbt_snapshots", default_args=default_args, schedule_interval="0 7 * * *")
 
 # dbt-snapshot for daily tag
 # manifest only uploaded to MC from this dag
