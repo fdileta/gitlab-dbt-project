@@ -194,11 +194,6 @@ databases:
     - rkohnke_prep:
         shared: no
 
-    - rparker_prod:
-        shared: no
-    - rparker_prep:
-        shared: no
-
     - schaturvedi_prod:
         shared: no
     - schaturvedi_prep:
@@ -4191,45 +4186,6 @@ roles:
                     - rkohnke_prep.*.*
                     - rkohnke_prod.*.*
 
-    - rparker:
-        member_of:
-            - analyst_core
-            - restricted_safe
-        warehouses:
-            - dev_xs
-        owns:
-            databases:
-                - rparker_prep
-                - rparker_prod
-            schemas:
-                - rparker_prep.*
-                - rparker_prod.*
-            tables:
-                - rparker_prep.*.*
-                - rparker_prod.*.*
-        privileges:
-            databases:
-                read:
-                    - rparker_prep
-                    - rparker_prod
-                write:
-                    - rparker_prep
-                    - rparker_prod
-            schemas:
-                read:
-                    - rparker_prep.*
-                    - rparker_prod.*
-                write:
-                    - rparker_prep.*
-                    - rparker_prod.*
-            tables:
-                read:
-                    - rparker_prep.*.*
-                    - rparker_prod.*.*
-                write:
-                    - rparker_prep.*.*
-                    - rparker_prod.*.*
-
     - rrendon:
         member_of:
             - analyst_engineering
@@ -5023,12 +4979,6 @@ users:
         can_login: yes
         member_of:
             - rkohnke
-
-    - rparker:
-        can_login: yes
-        member_of:
-            - rparker
-            - accountadmin
 
     - rrendon:
         can_login: yes
