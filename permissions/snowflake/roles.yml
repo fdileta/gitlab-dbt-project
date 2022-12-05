@@ -4192,6 +4192,12 @@ roles:
         warehouses:
             - dev_xs
 
+    - rwoo:
+        member_of:
+            - dbt_analytics
+        warehouses:
+            - dev_xs
+
     - schaturvedi:
         member_of:
             - engineer
@@ -4984,6 +4990,11 @@ users:
         can_login: yes
         member_of:
             - rrendon
+
+    - rwoo:
+        can_login: yes
+        member_of:
+            - rwoo
 
     - schaturvedi:
         can_login: yes
