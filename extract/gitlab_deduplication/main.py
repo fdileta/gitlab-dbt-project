@@ -1,11 +1,11 @@
-from asyncio.log import logger
+FROM asyncio.log import logger
 import logging
 import yaml
-from os import environ as env
-from datetime import datetime
-from fire import Fire
-from typing import Dict
-from gitlabdata.orchestration_utils import (
+FROM os import environ as env
+FROM datetime import datetime
+FROM fire import Fire
+FROM typing import Dict
+FROM gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
     query_executor,
 )
@@ -61,21 +61,52 @@ def create_backup_table(
     query_executor(snowflake_engine, create_backup_table)
     return True
 
-def get_column_list():
-    
-    return True
+def create_temp_table_ddl(manifest_dict: Dict, table_name: str):
+    raw_database = manifest_dict["raw_database"]
+    raw_schema = manifest_dict["generic_info"]["raw_schema"]
+    original_table_name = build_table_name(table_name, manifest_dict["generic_info"]["table_prefix"])
+    build_ddl_statement= f"""
+                             SELECT CONCAT('CREATE TABLE {original_table_name}_temp\n AS (' ,'SELECT  \n', 
+                                    LISTAGG(
+                                            CASE 
+                                            WHEN LOWER(column_name) = '_uploaded_at' THEN 'MIN( _uploaded_at) AS _uploaded_at'
+                                            WHEN LOWER(column_name) = '_task_instance' THEN 'MAX(TO_DATE(RIGHT(_task_instance,8), \\'YYYYMMDD\\'))  AS _task_instance'
+                                            ELSE column_name 
+                                            END ,',\n') WITHIN GROUP (ORDER BY ordinal_position ASC) 
+                                            , ' \n FROM {original_table_name}' ,
+                             '\n GROUP BY  \n', 
+                                    (SELECT LISTAGG(column_name,',\n') FROM {raw_database}.information_schema.columns 
+                                    WHERE LOWER(table_name) = ('{original_table_name}')   
+                                    AND LOWER(column_name) NOT IN ('_uploaded_at','_task_instance')),
+                             ' \r\n UNION \n',
+                                'SELECT  \n', 
+                                    LISTAGG(
+                                            CASE 
+                                            WHEN LOWER(column_name) = '_uploaded_at' THEN 'MAX( _uploaded_at) AS _uploaded_at'
+                                            WHEN LOWER(column_name) = '_task_instance' THEN 'MAX(TO_DATE(RIGHT(_task_instance,8), \\'YYYYMMDD\\'))  AS _task_instance'
+                                            ELSE column_name 
+                                            END ,',\n') WITHIN GROUP (ORDER BY ordinal_position ASC),
+                             '\n FROM {original_table_name}' ,
+                             '\n GROUP BY  ', 
+                                   (SELECT LISTAGG(column_name,',\n') FROM {raw_database}.information_schema.columns 
+                                    WHERE LOWER(table_name) = ('{original_table_name}')   
+                                    AND LOWER(column_name) NOT IN ('_uploaded_at','_task_instance')),');')
+                                    from {raw_database}.information_schema.columns 
+                                    where LOWER(table_name) = '{original_table_name}';"""
+        
+    return build_ddl_statement
 
 def create_temp_table(
     manifest_dict: dict,
     table_name: str,
 ):
-    get_column_list()
+    create_temp_table_ddl(manifest_dict,table_name)
     return True
 
 
 def deduplicate_scd_tables(manifest_dict: Dict, table_name: str) -> bool:
     """
-    Extract the values from the manifest
+    Extract the values FROM the manifest
     """
     table_prefix = manifest_dict["generic_info"]["table_prefix"]
     raw_schema = manifest_dict["generic_info"]["raw_schema"]
@@ -90,7 +121,7 @@ def deduplicate_scd_tables(manifest_dict: Dict, table_name: str) -> bool:
 
 def main(file_path: str = "t_gitlab_com_scd_advance_metadata_manifest.yml") -> None:
     """
-    Read table name from manifest file and decide if the table exist in the database. Check if the advance metadata column `_task_instance`
+    Read table name FROM manifest file and decide if the table exist in the database. Check if the advance metadata column `_task_instance`
     is present in the table.
     Check for backup schema is present in snowflake.
     Check for old backup table in snowflake and if present check if the creation date is older than 15 days. If yes drop backup table if not create a new backup table.
