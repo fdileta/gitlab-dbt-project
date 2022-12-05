@@ -9,8 +9,7 @@ WITH prep_usage_ping AS (
 
     SELECT * 
     FROM {{ ref('prep_usage_ping') }}
-    WHERE (license_md5 IS NULL OR
-           license_sha256 IS NULL)
+    WHERE license_md5 IS NULL 
 
 ), final AS (
 
@@ -24,7 +23,7 @@ WITH prep_usage_ping AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@kathleentam",
-    updated_by="@rbacovic",
+    updated_by="@ischweickartDD",
     created_date="2021-01-11",
-    updated_date="2022-12-01"
+    updated_date="2021-04-05"
 ) }}

@@ -56,7 +56,6 @@
       dim_product_tier.dim_product_tier_id                AS dim_product_tier_id,
       ping_created_at                                     AS ping_created_at,
       license_md5                                         AS license_md5,
-      license_sha256                                      AS license_sha256,
       dim_location_country_id                             AS dim_location_country_id,
       license_trial_ends_on                               AS license_trial_ends_on,
       license_subscription_id                             AS license_subscription_id,
@@ -84,8 +83,7 @@
       IFF(prep_subscription.dim_subscription_id IS NULL, FALSE, TRUE)                                      AS is_license_subscription_id_valid   -- is the subscription_id in the license table valid (does it exist in the subscription table?)
     FROM prep_usage_ping_cte
     LEFT JOIN prep_license
-      ON (prep_usage_ping_cte.license_md5    = prep_license.license_md5 OR
-          prep_usage_ping_cte.license_sha256 = prep_license.license_sha256)
+      ON prep_usage_ping_cte.license_md5 = prep_license.license_md5
     LEFT JOIN prep_subscription
       ON prep_license.dim_subscription_id = prep_subscription.dim_subscription_id
     LEFT JOIN dim_date
@@ -107,7 +105,6 @@
       dim_installation_id                                                                                         AS dim_installation_id,
       dim_license_id                                                                                              AS dim_license_id,
       license_md5                                                                                                 AS license_md5,
-      license_sha256                                                                                              AS license_sha256,
       ping_created_at                                                                                             AS ping_created_at,
       ping_created_at::DATE                                                                                       AS ping_created_date,
       umau_value                                                                                                  AS umau_value,
@@ -123,7 +120,7 @@
 {{ dbt_audit(
     cte_ref="flattened_high_level",
     created_by="@icooper-acp",
-    updated_by="@rbacovic",
+    updated_by="@snalamaru",
     created_date="2022-03-08",
-    updated_date="2022-12-01"
+    updated_date="2022-07-29"
 ) }}

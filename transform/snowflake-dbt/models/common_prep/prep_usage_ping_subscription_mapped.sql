@@ -13,8 +13,7 @@ WITH usage_pings_with_license_md5 AS (
 
     SELECT *
     FROM {{ ref('prep_usage_ping') }}
-    WHERE (license_md5 IS NOT NULL OR
-           license_sha256 IS NOT NULL)
+    WHERE license_md5 IS NOT NULL
 
 ), map_license_subscription_account AS (
 
