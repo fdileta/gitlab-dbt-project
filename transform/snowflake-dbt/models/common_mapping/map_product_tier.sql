@@ -19,6 +19,8 @@ WITH zuora_product AS (
           THEN 'SaaS - Ultimate'
         WHEN LOWER(zuora_product_rate_plan.product_rate_plan_name) LIKE '%saas - premium%'
           THEN 'SaaS - Premium'
+        WHEN LOWER(zuora_product_rate_plan.product_rate_plan_name) LIKE '%dedicated - ultimate%'
+          THEN 'Dedicated'        
         WHEN LOWER(zuora_product_rate_plan.product_rate_plan_name) LIKE '%ultimate%'
           THEN 'Self-Managed - Ultimate'
         WHEN LOWER(zuora_product_rate_plan.product_rate_plan_name) LIKE '%premium%'
@@ -104,7 +106,7 @@ WITH zuora_product AS (
       CASE
         WHEN LOWER(product_tier_historical) LIKE '%self-managed%'
           THEN 'Self-Managed'
-        WHEN LOWER(product_tier_historical) LIKE ANY ('%saas%', 'storage', 'standard', 'basic', 'plus', 'githost')
+        WHEN LOWER(product_tier_historical) LIKE ANY ('%saas%', 'storage', 'standard', 'basic', 'plus', 'githost', 'dedicated')
           THEN 'SaaS'
         WHEN product_tier_historical = 'SaaS - Other'
           THEN 'SaaS'
@@ -121,6 +123,7 @@ WITH zuora_product AS (
                                           'SaaS - Gold'
                                         , 'Self-Managed - Ultimate'
                                         , 'SaaS - Ultimate'
+                                        , 'Dedicated'
                                         )
           THEN 3
         WHEN product_tier_historical IN (
@@ -152,7 +155,7 @@ WITH zuora_product AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@ischweickartDD",
-    updated_by="@jpeguero",
+    updated_by="@chrissharp",
     created_date="2020-12-14",
-    updated_date="2021-09-17"
+    updated_date="2022-12-05"
 ) }}
