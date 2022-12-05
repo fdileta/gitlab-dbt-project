@@ -19,3 +19,15 @@ Account Watch - Status,17,Session
 Account Watch - Type,18,Session
 Account Watch - Campaign Code,19,Session
 Account Watch - Account Owner,20,Session
+Click URL,21,Hit
+Click Text,22,Hit
+Click Classes,23,Hit
+Referrer,24,Hit
+tags v2,25,Hit
+postType v2,26,Hit
+Lead value,27,User
+Lead status,28,User
+Sales segment,29,User
+Demandbase - SMB/MM Queries,30,Hit
+BlogCategory,31,Hit
+Internal Users,32,User
