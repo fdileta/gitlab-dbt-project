@@ -3,7 +3,7 @@
 ) }}
 
 {{ config({
-    "materialized": "table",
+    "materialized": "incremental",
     "unique_key": "user_snapshot_id"
     })
 }}
@@ -52,6 +52,21 @@
     INNER JOIN snapshot_dates
         ON snapshot_dates.date_actual >= users_snapshots.dbt_valid_from
         AND snapshot_dates.date_actual < {{ coalesce_to_infinity('users_snapshots.dbt_valid_to') }}
+
+    {% if is_incremental() %}
+
+    -- -- this filter will only be applied on an incremental run
+    -- WHERE snapshot_id > (SELECT max(dim_date.date_id)
+    --                      FROM {{ this }}
+    --                      INNER JOIN dim_date
+    --                        ON dim_date.date_actual = snapshot_date
+
+    -- this filter will only be applied on an incremental run
+    WHERE snapshot_dates.date_id > (SELECT MAX(snapshot_id)
+                                    FROM {{ this }}
+                                   )
+
+    {% endif %}    
 
 ), email_classification AS (
 
