@@ -9,7 +9,7 @@
 
 {{ simple_cte([
     ('events', 'prep_snowplow_unnested_events_all'),
-    ('dim_page', 'dim_behavior_website_page'),
+    ('dim_page', 'dim_behavior_website_page')
     ])
 }}
 
@@ -48,9 +48,8 @@
     AND behavior_at > (SELECT max(behavior_at) FROM {{ this }})
 
     {% endif %}
-)
 
-, unstruct_event_with_dims AS (
+), unstruct_event_with_dims AS (
 
     SELECT
 
@@ -83,7 +82,6 @@
       focus_form_element_id,
       focus_form_node_name
     FROM unstruct_event
-<<<<<<< HEAD
     INNER JOIN dim_event 
       ON unstruct_event.event_name = dim_event.event_name
     INNER JOIN dim_page 
@@ -98,13 +96,7 @@
     LEFT JOIN dim_behavior_operating_system
       ON unstruct_event.os_name = dim_behavior_operating_system.os_name
         AND unstruct_event.os_timezone = dim_behavior_operating_system.os_timezone
-=======
-    LEFT JOIN dim_page 
-      ON unstruct_event.clean_url_path = dim_page.clean_url_path 
-        AND unstruct_event.page_url_host = dim_page.page_url_host
-        AND unstruct_event.app_id = dim_page.app_id
-      
->>>>>>> master
+
 )
 
 {{ dbt_audit(
@@ -112,10 +104,5 @@
     created_by="@chrissharp",
     updated_by="@michellecooper",
     created_date="2022-09-27",
-<<<<<<< HEAD
-    updated_date="2022-11-21"
+    updated_date="2022-12-05"
 ) }}
-=======
-    updated_date="2022-12-01"
-) }}
->>>>>>> master

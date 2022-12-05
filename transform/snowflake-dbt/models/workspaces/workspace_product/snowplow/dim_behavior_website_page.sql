@@ -58,6 +58,8 @@
     {% endif %}
     {{ dbt_utils.group_by(n=10) }}
 
+), page AS (
+
     SELECT *
     FROM page_url
 
@@ -235,16 +237,8 @@
        and page_url_path not like '%/tree/%' -- ignore branches named 'security'
          THEN 1
        ELSE 0
-      END AS is_url_interacting_with_security,
-      MIN(derived_tstamp)                                                              AS min_event_timestamp,
-      MAX(derived_tstamp)                                                              AS max_event_timestamp
+      END AS is_url_interacting_with_security
     FROM page
-    {% if is_incremental() %}
-
-    WHERE derived_tstamp > (SELECT max(max_event_timestamp) FROM {{ this }})
-
-    {% endif %}
-    {{ dbt_utils.group_by(n=14) }}
 
 )
 
