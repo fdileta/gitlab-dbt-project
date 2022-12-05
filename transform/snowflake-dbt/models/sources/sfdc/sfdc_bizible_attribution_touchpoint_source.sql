@@ -23,14 +23,15 @@ WITH source AS (
       bizible2__count_w_shaped__c             AS bizible_count_w_shaped,
       bizible2__count_custom_model_2__c       AS bizible_count_custom_model,
 
-      -- attribution weights
+	-- attribution weights
       bizible2__attribution_first_touch__c    AS bizible_weight_first_touch,
       bizible2__attribution_lead_conversion_touch__c  
-                                              AS bizible_weight_lead_creation_touch,
+                                              AS bizible_weight_lead_conversion,
       bizible2__attribution_custom_model__c   AS bizible_weight_full_path,
       bizible2__attribution_u_shaped__c       AS bizible_weight_u_shaped,
       bizible2__attribution_w_shaped__c       AS bizible_weight_w_shaped,
       bizible2__attribution_custom_model_2__c AS bizible_weight_custom_model,
+
 
       -- touchpoint info
       bizible2__touchpoint_date__c            AS bizible_touchpoint_date,
