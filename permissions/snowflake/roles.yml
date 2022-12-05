@@ -2572,6 +2572,7 @@ roles:
         member_of:
             - analyst_core
             - data_team_analyst
+            - restricted_safe
         warehouses:
             - dev_xs
 
