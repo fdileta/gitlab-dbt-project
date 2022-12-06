@@ -42,10 +42,6 @@ WITH snapshot_dates AS (
 
 )
 
-{{ dbt_audit(
-    cte_ref="final",
-    created_by="@snalamaru",
-    updated_by="@snalamaru",
-    created_date="2022-11-03",
-    updated_date="2022-11-03"
-) }}
+SELECT *
+FROM final
+
