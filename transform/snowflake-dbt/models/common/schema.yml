@@ -3626,6 +3626,8 @@ models:
         description:  The unique id of a license from the dim_license model.
       - name: license_md5
         description: The md5 hash of the license file.
+      - name: license_sha256
+        description: The sha256 hash of the license file.
       - name: dim_crm_account_id
         description: Unique identifier of the CRM account associated with the instance
       - name: dim_parent_crm_account_id
