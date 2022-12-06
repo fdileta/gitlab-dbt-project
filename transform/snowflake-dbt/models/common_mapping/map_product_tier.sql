@@ -123,7 +123,7 @@ WITH zuora_product AS (
                                           'SaaS - Gold'
                                         , 'Self-Managed - Ultimate'
                                         , 'SaaS - Ultimate'
-                                        , 'Dedicated'
+                                        , 'Dedicated - Ultimate'
                                         )
           THEN 3
         WHEN product_tier_historical IN (
