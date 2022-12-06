@@ -1,7 +1,7 @@
-WITH source AS (
+WITH prep_crm_task AS (
 
   SELECT *
-  FROM {{ ref('sfdc_task_source') }}
+  FROM {{ ref('prep_crm_task') }}
   WHERE is_deleted = FALSE
 
 ), final AS (
@@ -10,81 +10,81 @@ WITH source AS (
   SELECT
 
     -- Surrogate key
-    {{ dbt_utils.surrogate_key(['task_id']) }}  AS dim_crm_task_sk,
+    prep_crm_task.dim_crm_task_sk,
 
     -- Natural key
-    task_id,
+    prep_crm_task.task_id,
 
     -- Task infomation
-    full_comments,
-    task_subject,
-    task_status,
-    task_subtype,
-    task_type,
-    task_priority,
-    close_task,
-    is_closed,
-    is_deleted,
-    is_archived,
-    is_high_priority,
-    persona_functions,
-    persona_levels,
-    outreach_meeting_type,
-    customer_interaction_sentiment,
-    task_owner_role,
+    prep_crm_task.full_comments,
+    prep_crm_task.task_subject,
+    prep_crm_task.task_status,
+    prep_crm_task.task_subtype,
+    prep_crm_task.task_type,
+    prep_crm_task.task_priority,
+    prep_crm_task.close_task,
+    prep_crm_task.is_closed,
+    prep_crm_task.is_deleted,
+    prep_crm_task.is_archived,
+    prep_crm_task.is_high_priority,
+    prep_crm_task.persona_functions,
+    prep_crm_task.persona_levels,
+    prep_crm_task.outreach_meeting_type,
+    prep_crm_task.customer_interaction_sentiment,
+    prep_crm_task.task_owner_role,
 
     -- Activity infromation
-    activity_disposition,
-    activity_source,
-    activity,
-    csm_activity_type,
-    sa_activity_type,
-    gs_activity_type,
-    gs_sentiment,
-    gs_meeting_type,
-    is_gs_exec_sponsor_present,
-    is_meeting_cancelled,
+    prep_crm_task.activity_disposition,
+    prep_crm_task.activity_source,
+    prep_crm_task.activity,
+    prep_crm_task.csm_activity_type,
+    prep_crm_task.sa_activity_type,
+    prep_crm_task.gs_activity_type,
+    prep_crm_task.gs_sentiment,
+    prep_crm_task.gs_meeting_type,
+    prep_crm_task.is_gs_exec_sponsor_present,
+    prep_crm_task.is_meeting_cancelled,
 
     -- Call information
-    call_type,
-    call_purpose,
-    call_disposition,
-    call_duration_in_seconds,
-    call_recording,
-    is_answered,
-    is_bad_number,
-    is_busy,
-    is_correct_contact,
-    is_not_answered,
-    is_left_message,
+    prep_crm_task.call_type,
+    prep_crm_task.call_purpose,
+    prep_crm_task.call_disposition,
+    prep_crm_task.call_duration_in_seconds,
+    prep_crm_task.call_recording,
+    prep_crm_task.is_answered,
+    prep_crm_task.is_bad_number,
+    prep_crm_task.is_busy,
+    prep_crm_task.is_correct_contact,
+    prep_crm_task.is_not_answered,
+    prep_crm_task.is_left_message,
 
     -- Reminder information
-    is_reminder_set,
+    prep_crm_task.is_reminder_set,
 
     -- Recurrence information
-    is_recurrence,
-    task_recurrence_interval,
-    task_recurrence_instance,
-    task_recurrence_type,
-    task_recurrence_activity_id,
-    task_recurrence_day_of_week,
-    task_recurrence_timezone,
-    task_recurrence_day_of_month,
-    task_recurrence_month,
+    prep_crm_task.is_recurrence,
+    prep_crm_task.task_recurrence_interval,
+    prep_crm_task.task_recurrence_instance,
+    prep_crm_task.task_recurrence_type,
+    prep_crm_task.task_recurrence_activity_id,
+    prep_crm_task.task_recurrence_day_of_week,
+    prep_crm_task.task_recurrence_timezone,
+    prep_crm_task.task_recurrence_day_of_month,
+    prep_crm_task.task_recurrence_month,
 
     -- Sequence information
-    active_sequence_name,
-    sequence_step_number,
+    prep_crm_task.active_sequence_name,
+    prep_crm_task.sequence_step_number,
 
     -- Docs/Video Conferencing
-    google_doc_link,
-    zoom_app_ics_sequence,
-    zoom_app_use_personal_zoom_meeting_id,
-    zoom_app_join_before_host,
-    zoom_app_make_it_zoom_meeting,
-    chorus_call_id
+    prep_crm_task.google_doc_link,
+    prep_crm_task.zoom_app_ics_sequence,
+    prep_crm_task.zoom_app_use_personal_zoom_meeting_id,
+    prep_crm_task.zoom_app_join_before_host,
+    prep_crm_task.zoom_app_make_it_zoom_meeting,
+    prep_crm_task.chorus_call_id
 
-    FROM source
+    FROM prep_crm_task
 
 
 )
