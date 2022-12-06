@@ -10,6 +10,12 @@ Array containing the event_names included in the xMAU metric
 
 {% enddocs %}
 
+{% docs plan_id_at_event_month %}
+
+The ID of the ultimate parent namespace's plan on the month the event was created (ex. 34, 100, 101, etc). If multiple plans are available during the month, this reflects the last available plan for the namespace. Defaults to '34' (free) if a value is not available
+
+{% enddocs %}
+
 {% docs first_major_minor_version_id_with_counter %}
 
 The first (minimum) major_minor_version_id that sent a ping containing the metric
@@ -18,7 +24,7 @@ The first (minimum) major_minor_version_id that sent a ping containing the metri
 
 {% docs first_major_minor_version_with_counter %}
 
-The first (minimum) major_minor_version that sent a ping containing the metric
+The first (minimum) major_minor_version that sent a ping containing the metric, easily joined to `dim_gitlab_releases`
 
 {% enddocs %}
 
@@ -42,7 +48,7 @@ The last (maximum) major_minor_version_id that sent a ping containing the metric
 
 {% docs last_major_minor_version_with_counter %}
 
-The last (maximum) major_minor_version that sent a ping containing the metric
+The last (maximum) major_minor_version that sent a ping containing the metric, easily joined to `dim_gitlab_releases`
 
 {% enddocs %}
 
@@ -154,14 +160,14 @@ Actual recorded usage
 
 {% enddocs %}
 
-{% docs  %}
+{% docs total_subscription_count_on_versions %}
 
-
+Count of subscriptions sending a ping from a version of GitLab with the metric instrumented
 
 {% enddocs %}
 
-{% docs  %}
+{% docs total_licensed_users_on_versions %}
 
-
+Count of licensed users (seats) associated with subscriptions sending a ping from a version of GitLab with the metric instrumented
 
 {% enddocs %}
