@@ -1,6 +1,6 @@
 {{ config(
     materialized='incremental',
-    unique_key='rpt_event_xmau_metric_monthly_snapshot_id',
+    unique_key='xmau_metric_monthly_snapshot_id',
     tags=["mnpi_exception","edm_snapshot", "product"]
 ) }}
 
@@ -36,7 +36,7 @@ WITH snapshot_dates AS (
 ), final AS (
 
      SELECT
-       {{ dbt_utils.surrogate_key(['snapshot_id', 'primary_key']) }} AS rpt_event_xmau_metric_monthly_snapshot_id,
+       {{ dbt_utils.surrogate_key(['snapshot_id', 'xmau_metric_monthly_id']) }} AS xmau_metric_monthly_snapshot_id,
        *
      FROM rpt_event_xmau_metric_monthly_spined
 
