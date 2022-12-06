@@ -414,7 +414,7 @@ The minor version of GitLab on the installation. For example, for 13.6.2, `minor
 
 {% docs major_minor_version %}
 
-The concatenation of major and minor version. For example, for 13.6.2, `major_minor_version` is 13.6. See details [here](https://docs.gitlab.com/ee/policy/maintenance.html)
+The concatenation of major and minor version, easily joined to `dim_gitlab_releases`. For example, for 13.6.2, `major_minor_version` is 13.6. See details [here](https://docs.gitlab.com/ee/policy/maintenance.html).
 
 {% enddocs %}
 
