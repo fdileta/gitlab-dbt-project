@@ -35,7 +35,8 @@ SELECT
   ptc_stars AS ptc_score_value__c,
   ptc_insights AS ptc_insights__c,
   pte_score * 100 AS pte_percent__c,
-  ptc_score * 100 AS ptc_percent__c
+  ptc_score * 100 AS ptc_percent__c,
+  SYSDATE() as updated_at
 FROM all_accounts
 LEFT JOIN pte_scores
           ON all_accounts.crm_account_id = pte_scores.crm_account_id
