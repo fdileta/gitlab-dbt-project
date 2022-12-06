@@ -14,11 +14,6 @@
     - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
     - export SNOWFLAKE_SNAPSHOT_DATABASE="SNOWFLAKE"
     - echo $SNOWFLAKE_SNAPSHOT_DATABASE
-    #- docker login -u "$CI_DBT_IMAGE_DEPLOY_USERNAME" -p "CI_DBT_IMAGE_DEPLOY_TOKEN" registry.gitlab.com
-  after_script:
-    - cd $CI_PROJECT_DIR/transform/snowflake-dbt/
-    - mkdir -p $CI_PROJECT_DIR/public/dbt/
-    - cp -r target $CI_PROJECT_DIR/public/dbt/
   tags:
     - analytics
   only:
