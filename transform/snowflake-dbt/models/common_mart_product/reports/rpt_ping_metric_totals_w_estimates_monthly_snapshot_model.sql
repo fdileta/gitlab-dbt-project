@@ -20,7 +20,7 @@ WITH snapshot_dates AS (
 ), rpt_ping_metric_totals_w_estimates_monthly AS (
 
     SELECT *
-    FROM {{ ref('rpt_ping_metric_totals_w_estimates_monthly_snapshot') }}
+    FROM {{  source('snapshots','rpt_ping_metric_totals_w_estimates_monthly_snapshot') }}
 
 ), rpt_ping_metric_totals_w_estimates_monthly_spined AS (
 
