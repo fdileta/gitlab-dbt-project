@@ -39,7 +39,7 @@
       app_id,
       referrer_url_host || referrer_url_path                                        AS page_url,
       referrer_url_path                                                             AS page_url_path,
-      {{ clean_url('refr_urlpath') }}                                               AS clean_url_path,
+      {{ clean_url('referrer_url_path') }}                                          AS clean_url_path,
       referrer_url_host                                                             AS page_url_host,
       referrer_url_scheme                                                           AS page_url_scheme,
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
