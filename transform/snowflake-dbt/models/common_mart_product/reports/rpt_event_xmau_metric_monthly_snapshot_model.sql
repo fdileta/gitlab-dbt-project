@@ -20,7 +20,7 @@ WITH snapshot_dates AS (
 ), rpt_event_xmau_metric_monthly AS (
 
     SELECT *
-    FROM {{ ref('rpt_event_xmau_metric_monthly_snapshot') }}
+    FROM {{ source('snapshots','rpt_event_xmau_metric_monthly_snapshot') }}
 
 ), rpt_event_xmau_metric_monthly_spined AS (
 
