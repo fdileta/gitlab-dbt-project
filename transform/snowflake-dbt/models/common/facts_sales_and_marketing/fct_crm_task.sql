@@ -16,7 +16,7 @@
     task.task_id                                                AS dim_crm_task_pk,
 
     -- Surrogate key
-    {{ dbt_utils.surrogate_key('task.task_id') }}               AS dim_crm_task_sk,
+    {{ dbt_utils.surrogate_key(['task.task_id']) }}               AS dim_crm_task_sk,
 
     -- Foreign keys
     {{ get_keyed_nulls('task.account_id') }}                    AS dim_crm_account_id,

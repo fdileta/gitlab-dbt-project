@@ -10,7 +10,7 @@ WITH source AS (
   SELECT
 
     -- Surrogate key
-    {{ dbt_utils.surrogate_key('task_id') }}  AS dim_crm_task_sk,
+    {{ dbt_utils.surrogate_key(['task_id']) }}  AS dim_crm_task_sk,
 
     -- Natural key
     task_id,
