@@ -964,8 +964,6 @@ models:
         description: Either the original payload value or a reconstructed value. See https://gitlab.com/gitlab-data/analytics/-/merge_requests/4064/diffs#bc1d7221ae33626053b22854f3ecbbfff3ffe633 for rationale.
       - name: license_md5
         description: JOIN key to the dim_license table on license_md5 OR the original source table from licenseDot
-      - name: license_sha256
-        description: JOIN key to the dim_license table on license_sha256 OR the original source table from licenseDot
       - name: original_edition
         description: The original `edition` value that comes on the usage ping. This has a lot of data inaccuracies
       - name: edition
