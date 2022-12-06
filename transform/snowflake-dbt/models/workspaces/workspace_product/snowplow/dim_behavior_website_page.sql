@@ -37,11 +37,11 @@
 
     SELECT DISTINCT 
       app_id,
-      refr_urlhost || refr_urlpath                                                  AS page_url,
-      refr_urlpath                                                                  AS page_url_path,
+      referrer_url_host || referrer_url_path                                        AS page_url,
+      referrer_url_path                                                             AS page_url_path,
       {{ clean_url('refr_urlpath') }}                                               AS clean_url_path,
-      refr_urlhost                                                                  AS page_url_host,
-      refr_urlscheme                                                                AS page_url_scheme,
+      referrer_url_host                                                             AS page_url_host,
+      referrer_url_scheme                                                           AS page_url_scheme,
       SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
       SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
       SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
@@ -49,7 +49,7 @@
       min(behavior_at)                                                              AS min_event_timestamp,
       max(behavior_at)                                                              AS max_event_timestamp
     FROM events
-    WHERE refr_urlhost || refr_urlpath IS NOT NULL
+    WHERE referrer_url_host || referrer_url_path IS NOT NULL
 
     {% if is_incremental() %}
 

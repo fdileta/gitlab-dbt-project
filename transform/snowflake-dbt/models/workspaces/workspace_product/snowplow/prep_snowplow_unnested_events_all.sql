@@ -65,5 +65,8 @@ SELECT
   {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }} AS dim_behavior_operating_system_sk,
   dvce_type                           AS device_type,
   dvce_ismobile::BOOLEAN              AS is_device_mobile,
-  refr_medium                         AS referrer_medium
+  refr_medium                         AS referrer_medium,
+  refr_urlhost                        AS referrer_url_host,
+  refr_urlpath                        AS referrer_url_path,
+  refr_urlscheme                      AS referrer_url_scheme
 FROM unioned_view
