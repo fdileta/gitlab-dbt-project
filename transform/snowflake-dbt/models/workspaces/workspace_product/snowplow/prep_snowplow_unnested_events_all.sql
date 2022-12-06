@@ -68,5 +68,6 @@ SELECT
   refr_medium                         AS referrer_medium,
   refr_urlhost                        AS referrer_url_host,
   refr_urlpath                        AS referrer_url_path,
-  refr_urlscheme                      AS referrer_url_scheme
+  refr_urlscheme                      AS referrer_url_scheme,
+  (refr_urlhost || refr_urlpath )     AS referrer_url
 FROM unioned_view
