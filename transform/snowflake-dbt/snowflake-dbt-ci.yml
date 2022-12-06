@@ -13,7 +13,6 @@
     - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
     - export SNOWFLAKE_SNAPSHOT_DATABASE="SNOWFLAKE"
     - echo $SNOWFLAKE_SNAPSHOT_DATABASE
-    - ls
   tags:
     - analytics
   only:
@@ -56,12 +55,8 @@
 ➕🐭specify_model:
   <<: *snowflake_dbt_jobs
   script:
+    - mv /analytics/transform/snowflake-dbt/dbt_packages /transform/snowflake-dbt/dbt_packages
     - echo $DBT_MODELS
-    - ls
-    - cd analytics
-    - ls
-    - cd transform
-    - ls
     - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
     - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
