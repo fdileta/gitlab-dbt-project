@@ -2,7 +2,6 @@
   image: registry.gitlab.com/paul_armstrong/ci-dbt-image/ci-dbt-image:first_branch
   stage: ⚙️ dbt Run
   before_script:
-    - cd /analytics/transform/snowflake-dbt
     - echo $BRANCH_NAME
     - if [ $BRANCH_NAME = "master" ]; then export SNOWFLAKE_PREP_DATABASE="PREP"; else export SNOWFLAKE_PREP_DATABASE="${CI_COMMIT_REF_NAME^^}_PREP"; fi
     - if [ $BRANCH_NAME = "master" ]; then export SNOWFLAKE_PROD_DATABASE="PROD"; else export SNOWFLAKE_PROD_DATABASE="${CI_COMMIT_REF_NAME^^}_PROD"; fi
@@ -14,6 +13,7 @@
     - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
     - export SNOWFLAKE_SNAPSHOT_DATABASE="SNOWFLAKE"
     - echo $SNOWFLAKE_SNAPSHOT_DATABASE
+    - ls
   tags:
     - analytics
   only:
@@ -57,7 +57,10 @@
   <<: *snowflake_dbt_jobs
   script:
     - echo $DBT_MODELS
-    - cd /analytics/transform/snowflake-dbt
+    - ls
+    - cd analytics
+    - ls
+    - cd transform
     - ls
     - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
     - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
