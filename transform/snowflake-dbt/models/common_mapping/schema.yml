@@ -51,7 +51,6 @@ models:
     columns:
       - name: dim_license_id
       - name: license_md5
-      - name: license_sha256
       - name: dim_subscription_id
       - name: dim_crm_account_id
       - name: ultimate_parent_account_id
