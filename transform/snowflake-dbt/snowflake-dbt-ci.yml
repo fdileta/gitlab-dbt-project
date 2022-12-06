@@ -58,6 +58,8 @@
 ➕🐭specify_model:
   <<: *snowflake_dbt_jobs
   script:
+    - ls /transform/snowflake-dbt/dbt_packages
+    - pwd
     - echo $DBT_MODELS
     - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
     - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
