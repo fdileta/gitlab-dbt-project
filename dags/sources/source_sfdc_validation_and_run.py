@@ -77,7 +77,7 @@ data_source = "sfdc"
 dag = DAG(
     f"source_{data_source}_validation_and_run",
     default_args=default_args,
-    schedule_interval="10 */12 * * *",
+    schedule_interval="20 */12 * * *",
     description=f"This DAG tests the raw data for {data_source}, runs any snapshots, runs the source models, and tests the source models.",
 )
 
