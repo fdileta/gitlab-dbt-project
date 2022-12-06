@@ -633,3 +633,9 @@ Below are some additional details about the table:
 * Use case: `Service Ping metric-level prep table`
 
 {% enddocs %}
+
+{% docs prep_crm_task %}
+
+Prep model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
+
+{% enddocs %}
