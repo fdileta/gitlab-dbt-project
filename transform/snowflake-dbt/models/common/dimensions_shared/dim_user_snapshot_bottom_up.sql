@@ -55,12 +55,6 @@
 
     {% if is_incremental() %}
 
-    -- -- this filter will only be applied on an incremental run
-    -- WHERE snapshot_id > (SELECT max(dim_date.date_id)
-    --                      FROM {{ this }}
-    --                      INNER JOIN dim_date
-    --                        ON dim_date.date_actual = snapshot_date
-
     -- this filter will only be applied on an incremental run
     WHERE snapshot_dates.date_id > (SELECT MAX(snapshot_id)
                                     FROM {{ this }}
