@@ -8,36 +8,10 @@
     ])
 }}
 
-, event_source AS (
-
-    SELECT
-      event,
-      event_name,
-      platform,
-      gsc_environment       AS environment,
-      se_category           AS event_category,
-      se_action             AS event_action,
-      se_label              AS event_label,
-      se_property           AS event_property,
-      MAX(derived_tstamp)   AS max_timestamp
-    FROM events
-
-    {% if is_incremental() %}
-    
-    WHERE derived_tstamp > (SELECT MAX(max_timestamp) FROM {{this}})
-    
-    {% endif %}
-
-    {{ dbt_utils.group_by(n=8) }}
-)
-
 , final AS (
 
     SELECT
-      -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['event', 'event_name', 'platform', 'environment', 'event_category', 'event_action', 'event_label', 'event_property']) }} AS dim_behavior_event_sk,
-
-      -- Natural Keys
+      dim_behavior_event_sk,
       event,
       event_name,
       platform,
@@ -46,10 +20,16 @@
       event_action,
       event_label,
       event_property,
+      MAX(behavior_at)   AS max_timestamp
+    FROM events
 
-      --Time Attributes for Incremental Load
-      max_timestamp
-    FROM event_source
+    {% if is_incremental() %}
+    
+    WHERE behavior_at > (SELECT MAX(max_timestamp) FROM {{this}})
+    
+    {% endif %}
+
+    {{ dbt_utils.group_by(n=9) }}
 )
 
 {{ dbt_audit(
@@ -57,5 +37,5 @@
     created_by="@chrissharp",
     updated_by="@chrissharp",
     created_date="2022-09-20",
-    updated_date="2022-09-20"
+    updated_date="2022-12-01"
 ) }}

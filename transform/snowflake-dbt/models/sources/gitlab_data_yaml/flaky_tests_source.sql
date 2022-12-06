@@ -26,6 +26,7 @@ WITH source AS (
       data_by_row['flaky_reports']::INT        AS flaky_reports,
       data_by_row['first_flaky_at']::TIMESTAMP AS first_flaky_at,
       data_by_row['last_flaky_at']::TIMESTAMP  AS last_flaky_at,
+      data_by_row['feature_category']::VARCHAR   AS feature_category,
       snapshot_date,
       rank
     FROM intermediate

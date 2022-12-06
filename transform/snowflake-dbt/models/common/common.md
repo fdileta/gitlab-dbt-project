@@ -1466,6 +1466,22 @@ Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team
 
 {% enddocs %}
 
+
+{% docs bdg_metrics_redis_events %}
+## Overview
+This model records the many-to-many relationship between Service Ping Metrics and Redis events. It pulls from the metrics dictionary yml files via `dim_ping_metric`, and contains the
+metric name, the Redis event name, and the aggregate operator and attribute. It will be joined to Snowplow events that contain the Service Ping Context to get SaaS product usage data at the namespace level.
+
+## Aggregation Strategies
+[This thread](https://gitlab.com/gitlab-org/gitlab/-/issues/376244#note_1167575425) has a nice summary of the possible aggregation strategies. The important thing to know from an analyst perspective is that Redis-based metrics come in three basic varities:
+1. Have only one associated Redis event; if that event occurs, count the metric (will have NULL `aggregate_operator`)
+1. Have multiple associated Redis events; count the metric if _any_ Redis event in that list occurs (will have 'OR' `aggregate_operator`, also known as union)
+1. Have multiple associated Redis events; count the metric if _all_ Redis events in that list occur (will have 'AND' `aggregate_operator`, also known as intersection)
+
+As a result, this bridge table will be used a bit differently to count intersection metrics compared to how it will be used to count union metrics.
+
+{% enddocs %}
+
 {% docs dim_crm_task %}
 
 Dimension model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
