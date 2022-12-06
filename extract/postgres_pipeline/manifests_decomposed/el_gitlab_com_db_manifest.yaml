@@ -975,6 +975,20 @@ tables:
       FROM merge_request_metrics
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
+  merge_request_predictions:
+    dbt_source_model: true
+    export_schema: 'gitlab_com'
+    export_table: 'merge_request_predictions'
+    export_table_primary_key: merge_request_id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT merge_request_id
+      , created_at
+      , updated_at
+      , suggested_reviewers
+      FROM merge_request_predictions
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
   merge_requests:
     dbt_source_model: true
     export_schema: 'gitlab_com'
