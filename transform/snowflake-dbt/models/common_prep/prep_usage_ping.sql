@@ -143,7 +143,6 @@ WITH source AS (
       raw_usage_data_id                                  AS raw_usage_data_id,
       raw_usage_data_payload,
       license_md5,
-      license_sha256,
       original_edition,
       edition,
       main_edition,
@@ -170,7 +169,7 @@ WITH source AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@kathleentam",
-    updated_by="@rbacovic",
+    updated_by="@chrissharp",
     created_date="2021-01-10",
-    updated_date="2022-12-01"
+    updated_date="2021-09-30"
 ) }}
