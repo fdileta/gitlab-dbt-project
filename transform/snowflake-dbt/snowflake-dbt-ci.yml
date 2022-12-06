@@ -55,6 +55,9 @@
 ➕🐭specify_model:
   <<: *snowflake_dbt_jobs
   script:
+    - mkdir -p /transform/snowflake-dbt/dbt_packages
+    - ls /analytics/transform/snowflake-dbt/
+    - ls /transform/snowflake-dbt/
     - mv /analytics/transform/snowflake-dbt/dbt_packages /transform/snowflake-dbt/dbt_packages
     - echo $DBT_MODELS
     - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
