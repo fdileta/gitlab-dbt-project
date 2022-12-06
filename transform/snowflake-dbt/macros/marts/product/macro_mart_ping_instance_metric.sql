@@ -90,7 +90,7 @@
       ON dim_billing_account.dim_crm_account_id = dim_crm_accounts.dim_crm_account_id
     INNER JOIN dim_date
       ON effective_start_month <= dim_date.date_day AND effective_end_month > dim_date.date_day
-    {{ dbt_utils.group_by(n=21)}}
+    {{ dbt_utils.group_by(n=22)}}
 
 
   ), latest_subscription AS (
@@ -129,7 +129,7 @@
         dim_ping_metric.is_paid_gmau                                                                                                    AS is_paid_gmau,
         dim_ping_metric.is_umau                                                                                                         AS is_umau,
         dim_ping_instance.license_md5                                                                                                   AS license_md5,
-        license_subscriptions_w_latest_subscription.license_sha256                                                                      AS license_sha256,
+        dim_ping_instance.license_sha256                                                                                                AS license_sha256,
         dim_ping_instance.is_trial                                                                                                      AS is_trial,
         fct_ping_instance_metric.umau_value                                                                                             AS umau_value,
         license_subscriptions_w_latest_subscription.license_id                                                                          AS license_id,
@@ -187,7 +187,8 @@
           AND dim_ping_instance.ip_address_hash = dim_hosts.source_ip_hash
           AND dim_ping_instance.dim_instance_id = dim_hosts.instance_id
       LEFT JOIN license_subscriptions_w_latest_subscription
-        ON dim_ping_instance.license_md5 = license_subscriptions_w_latest_subscription.license_md5
+        ON (dim_ping_instance.license_md5 = license_subscriptions_w_latest_subscription.license_md5 OR
+            dim_ping_instance.license_sha256 = license_subscriptions_w_latest_subscription.license_sha256)
           AND dim_date.first_day_of_month = license_subscriptions_w_latest_subscription.reporting_month
       LEFT JOIN dim_location
         ON fct_ping_instance_metric.dim_location_country_id = dim_location.dim_location_country_id
