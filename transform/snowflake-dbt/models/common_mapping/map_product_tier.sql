@@ -20,7 +20,7 @@ WITH zuora_product AS (
         WHEN LOWER(zuora_product_rate_plan.product_rate_plan_name) LIKE '%saas - premium%'
           THEN 'SaaS - Premium'
         WHEN LOWER(zuora_product_rate_plan.product_rate_plan_name) LIKE '%dedicated - ultimate%'
-          THEN 'Dedicated'        
+          THEN 'Dedicated - Ultimate'        
         WHEN LOWER(zuora_product_rate_plan.product_rate_plan_name) LIKE '%ultimate%'
           THEN 'Self-Managed - Ultimate'
         WHEN LOWER(zuora_product_rate_plan.product_rate_plan_name) LIKE '%premium%'
