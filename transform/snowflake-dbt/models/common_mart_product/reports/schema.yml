@@ -1018,7 +1018,7 @@ models:
 - name: rpt_event_xmau_metric_monthly_snapshot_model
   description: Simpler incremental version of the rpt_event_xmau_metric_monthly snapshot model
   columns:
-      - name: rpt_event_xmau_metric_monthly_snapshot_id
+      - name: xmau_metric_monthly_snapshot_id
         tests:
           - not_null
         tags: ["mnpi_exception","edm_snapshot", "product"]
@@ -1026,7 +1026,7 @@ models:
 - name: rpt_ping_metric_totals_w_estimates_monthly_snapshot_model
   description: Simpler incremental version of the rpt_ping_metric_totals_w_estimates_monthly snapshot model
   columns:
-      - name: rpt_ping_metric_totals_w_estimates_monthly_snapshot_id
+      - name: ping_metric_totals_w_estimates_monthly_snapshot_id
         tests:
           - not_null
         tags: ["mnpi_exception","edm_snapshot", "product"]
