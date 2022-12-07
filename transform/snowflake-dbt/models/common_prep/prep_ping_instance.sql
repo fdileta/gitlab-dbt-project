@@ -144,7 +144,7 @@
         WHEN edition = 'EEU'                  THEN 'Ultimate'
         ELSE NULL 
       END AS product_tier,
-      run_results AS raw_usage_data_payload
+      raw_usage_data_payload
     FROM automated_instance_service_ping
     WHERE created_at >= '2022-12-01' --start using the automated SaaS Service Ping in for Dec 2022 reporting
 
