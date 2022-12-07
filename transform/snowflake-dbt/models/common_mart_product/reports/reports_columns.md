@@ -18,49 +18,49 @@ The ID of the ultimate parent namespace's plan on the month the event was create
 
 {% docs first_major_minor_version_id_with_counter %}
 
-The first (minimum) major_minor_version_id that sent a ping containing the metric
+The first (minimum/earliest) major_minor_version_id that sent a ping containing the metric
 
 {% enddocs %}
 
 {% docs first_major_minor_version_with_counter %}
 
-The first (minimum) major_minor_version that sent a ping containing the metric, easily joined to `dim_gitlab_releases`
+The first (minimum/earliest) major_minor_version that sent a ping containing the metric, easily joined to `dim_gitlab_releases`
 
 {% enddocs %}
 
 {% docs first_major_version_with_counter %}
 
-The first (minimum) major_version that sent a ping containing the metric
+The first (minimum/earliest) major_version that sent a ping containing the metric
 
 {% enddocs %}
 
 {% docs first_minor_version_with_counter %}
 
-The first (minimum) minor_version that sent a ping containing the metric
+The first (minimum/earliest) minor_version that sent a ping containing the metric
 
 {% enddocs %}
 
 {% docs last_major_minor_version_id_with_counter %}
 
-The last (maximum) major_minor_version_id that sent a ping containing the metric
+The last (maximum/most recent) major_minor_version_id that sent a ping containing the metric
 
 {% enddocs %}
 
 {% docs last_major_minor_version_with_counter %}
 
-The last (maximum) major_minor_version that sent a ping containing the metric, easily joined to `dim_gitlab_releases`
+The last (maximum/most recent) major_minor_version that sent a ping containing the metric, easily joined to `dim_gitlab_releases`
 
 {% enddocs %}
 
 {% docs last_major_version_with_counter %}
 
-The last (maximum) major_version that sent a ping containing the metric
+The last (maximum/most recent) major_version that sent a ping containing the metric
 
 {% enddocs %}
 
 {% docs last_minor_version_with_counter %}
 
-The last (maximum) minor_version that sent a ping containing the metric
+The last (maximum/most recent) minor_version that sent a ping containing the metric
 
 {% enddocs %}
 
