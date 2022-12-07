@@ -60,7 +60,8 @@
         WHEN original_edition = 'EEP'                                    THEN 'Premium'
         WHEN original_edition = 'EEU'                                    THEN 'Ultimate'
         ELSE NULL END                                                                                                                             AS product_tier,
-        COALESCE(raw_usage_data.raw_usage_data_payload, usage_data.raw_usage_data_payload_reconstructed)                                          AS raw_usage_data_payload
+        COALESCE(raw_usage_data.raw_usage_data_payload, usage_data.raw_usage_data_payload_reconstructed)                                          AS raw_usage_data_payload,
+      IFF(dim_host_id = 632, 'manual', 'automated') AS ping_type --all GitLab SaaS pings here are manual, everything else is manual
     FROM usage_data
     LEFT JOIN raw_usage_data
       ON usage_data.raw_usage_data_id = raw_usage_data.raw_usage_data_id
@@ -144,7 +145,8 @@
         WHEN edition = 'EEU'                  THEN 'Ultimate'
         ELSE NULL 
       END AS product_tier,
-      raw_usage_data_payload
+      raw_usage_data_payload,
+      ping_type
     FROM automated_instance_service_ping
     WHERE created_at >= '2022-12-01' --start using the automated SaaS Service Ping in for Dec 2022 reporting
 
