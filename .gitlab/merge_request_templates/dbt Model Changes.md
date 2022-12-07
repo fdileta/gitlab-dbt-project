@@ -106,7 +106,10 @@ Example: You might be looking at the count of opportunities before and after, if
 
 - [ ] Does this MR change the **schema** or **model name** of any existing models?
   - [ ] Create an issue to change all existing periscope reporting to reference the new schema/name.
-  - [ ] After merging, ensure the old model is dropped from snowflake. This can be done by creating an issue specifying the tables/models to be dropped and assiging to a snowflake admin. 
+  - [ ] After merging, ensure the old model is dropped from snowflake. This can be done by creating an issue specifying the tables/models to be dropped and assiging to a snowflake admin.
+- [ ] Does this MR introduce a new **schema**?
+  - [ ] Create the schema using the corresponding role (on `RAW` using the `LOADER` role, on `PREP` and `PROD` using the `TRANSFORMER` role)
+  - [ ] Run the Monte Carlo permissions script (documented in the [Handbook](https://about.gitlab.com/handbook/business-technology/data-team/platform/monte-carlo/#note-on-dwh-permissions) and located in MC's official docs) with the corresponding database name as a parameter, for the permissions on this schema to be granted to the `data_observability` role
 </details>
 
 #### Snapshot model
