@@ -44,7 +44,7 @@ final AS (
     run_results['license_user_count']::VARCHAR AS license_user_count,
     run_results['license_starts_at']::TIMESTAMP AS license_starts_at,
     run_results['license_expires_at']::TIMESTAMP AS license_expires_at,
-    PARSE_JSON(run_results['license_expires_at'])::VARIANT AS license_add_ons,
+    NULL AS license_add_ons,
     632::INT AS host_id, -- this is the GitLab host_id
     run_results['mattermost_enabled']::BOOLEAN AS mattermost_enabled,
     run_results['hostname']::VARCHAR AS hostname,
@@ -102,5 +102,5 @@ final AS (
     created_by="@mdrussell",
     updated_by="@mdrussell",
     created_date="2022-11-09",
-    updated_date="2022-12-06"
+    updated_date="2022-12-07"
 ) }}
