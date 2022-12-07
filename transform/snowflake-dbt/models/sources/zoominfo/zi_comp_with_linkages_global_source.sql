@@ -9,7 +9,7 @@ renamed AS (
 
   SELECT
     zi_c_location_id::NUMBER                                             AS location_id,
-    zi_c_company_id::NUMBER                                              AS company_id,
+    zi_c_company_id::INTEGER                                             AS company_id,
     zi_c_is_hq::BOOLEAN                                                  AS is_headquarters,
     zi_es_ecid::NUMBER                                                   AS everstring_company_id,
     zi_c_latitude::FLOAT                                                 AS company_latitude,
@@ -143,7 +143,7 @@ renamed AS (
     NULLIF(zi_es_industries_top3_confidence_scores::VARCHAR, '')         AS everstring_industries_top3_confidence_scores,
     NULLIF(zi_c_naics_top3_confidence_scores::VARCHAR, '')               AS naics_top3_confidence_scores,
     NULLIF(zi_c_sic_top3_confidence_scores::VARCHAR, '')                 AS sic_top3_confidence_scores,
-    NULLIF(zi_c_ids_merged::VARCHAR, '')                                 AS merged_previous_company_ids,
+    NULLIF(TRIM(zi_c_ids_merged::VARCHAR,'|'),'')                        AS merged_previous_company_ids,
     NULLIF(zi_c_names_other::VARCHAR, '')                                AS other_company_names,
     NULLIF(zi_c_url_status::VARCHAR, '')                                 AS company_url_status,
     NULLIF(zi_c_urls_alt::VARCHAR, '')                                   AS alternate_company_urls,

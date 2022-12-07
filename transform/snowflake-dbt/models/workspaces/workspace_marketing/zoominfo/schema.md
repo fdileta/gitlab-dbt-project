@@ -297,12 +297,12 @@ This flag indicates if this record is a Frachisee
 {% enddocs %}
 {% docs zi_c_is_immediate_parent %}
 
-This flag indicates if this record is an Immediate Parent
+This flag indicates if this record is the Immediate Parent entity
 
 {% enddocs %}
 {% docs zi_c_is_domestic_parent %}
 
-This flag indicates if this record is a Domestic Parent
+This flag indicates if this record is the Domestic Parent entity
 
 {% enddocs %}
 {% docs zi_c_hierarchy_level %}
@@ -881,7 +881,7 @@ Immediate parent company's country
 
 {% docs zi_es_domestic_parent_location_id %}
 
-Domestic parent company's location identifier
+Unique identifier of parent company's (in a given country) location ID, where ZI_C_DOMESTIC_HQ = 1
 
 {% enddocs %}
 
