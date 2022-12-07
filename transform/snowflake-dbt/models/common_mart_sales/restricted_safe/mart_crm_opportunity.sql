@@ -1,3 +1,7 @@
+{{ config(
+    tags=["six_hourly"]
+) }}
+
 {{ simple_cte([
     ('dim_crm_account','dim_crm_account'),
     ('dim_crm_opportunity','dim_crm_opportunity'),
