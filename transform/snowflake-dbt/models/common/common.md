@@ -1481,3 +1481,15 @@ metric name, the Redis event name, and the aggregate operator and attribute. It 
 As a result, this bridge table will be used a bit differently to count intersection metrics compared to how it will be used to count union metrics.
 
 {% enddocs %}
+
+{% docs dim_crm_task %}
+
+Dimension model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
+
+{% enddocs %}
+
+{% docs fct_crm_task %}
+
+Fact model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
+
+{% enddocs %}

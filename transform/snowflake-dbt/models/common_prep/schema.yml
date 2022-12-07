@@ -1858,3 +1858,12 @@ models:
         description: Date the Zuora Billing user was created
       - name: is_integration_user
         description: A flag indentifying integration users based on Zuora Billing user last names.
+
+  - name: prep_crm_task
+    description: '{{ doc("prep_crm_task") }}'
+    columns:
+      - name: dim_crm_task_sk
+        description: The unique surrogate key of a [task activity](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) related to Salesforce account, opportunity, lead, or contact.
+        tests:
+          - unique
+          - not_null

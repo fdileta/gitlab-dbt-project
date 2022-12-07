@@ -5326,3 +5326,23 @@ models:
           combination_of_columns:
             - metrics_path
             - redis_event
+
+  - name: dim_crm_task
+    description: '{{ doc("dim_crm_task") }}'
+    columns:
+      - name: dim_crm_task_sk
+        description: '{{ doc("dim_crm_task_sk") }}'
+        tests:
+          - unique
+          - not_null
+        tags: ["tdf", "common"]
+
+  - name: fct_crm_task
+    description: '{{ doc("fct_crm_task") }}'
+    columns:
+      - name: dim_crm_task_sk
+        description: '{{ doc("dim_crm_task_sk") }}'
+        tests:
+          - unique
+          - not_null
+        tags: ["tdf", "common"]
