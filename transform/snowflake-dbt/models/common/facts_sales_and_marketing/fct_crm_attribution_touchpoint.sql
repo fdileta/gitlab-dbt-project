@@ -69,15 +69,23 @@ WITH bizible_attribution_touchpoints AS (
       bizible_attribution_touchpoints.bizible_count_u_shaped,
       bizible_attribution_touchpoints.bizible_count_w_shaped,
       bizible_attribution_touchpoints.bizible_count_custom_model,
-
-      -- touchpoint revenue info
+	
+	-- touchpoint weight info
+      bizible_attribution_touchpoints.bizible_weight_full_path,
+      bizible_attribution_touchpoints.bizible_weight_custom_model,
+      bizible_attribution_touchpoints.bizible_weight_first_touch,
+      bizible_attribution_touchpoints.bizible_weight_lead_conversion,
+      bizible_attribution_touchpoints.bizible_weight_u_shaped,
+      bizible_attribution_touchpoints.bizible_weight_w_shaped,
+     
+	  -- touchpoint revenue info
       bizible_attribution_touchpoints.bizible_revenue_full_path,
       bizible_attribution_touchpoints.bizible_revenue_custom_model,
       bizible_attribution_touchpoints.bizible_revenue_first_touch,
       bizible_attribution_touchpoints.bizible_revenue_lead_conversion,
       bizible_attribution_touchpoints.bizible_revenue_u_shaped,
-      bizible_attribution_touchpoints.bizible_revenue_w_shaped
-
+      bizible_attribution_touchpoints.bizible_revenue_w_shaped,
+      bizible_attribution_touchpoints.bizible_created_date
 
     FROM bizible_attribution_touchpoints
     LEFT JOIN crm_person
@@ -94,7 +102,7 @@ WITH bizible_attribution_touchpoints AS (
 {{ dbt_audit(
     cte_ref="final_attribution_touchpoint",
     created_by="@mcooperDD",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2021-01-21",
-    updated_date="2022-09-12"
+    updated_date="2022-11-29"
 ) }}

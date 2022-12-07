@@ -194,11 +194,6 @@ databases:
     - rkohnke_prep:
         shared: no
 
-    - rparker_prod:
-        shared: no
-    - rparker_prep:
-        shared: no
-
     - schaturvedi_prod:
         shared: no
     - schaturvedi_prep:
@@ -2572,6 +2567,7 @@ roles:
         member_of:
             - analyst_core
             - data_team_analyst
+            - restricted_safe
         warehouses:
             - dev_xs
 
@@ -2695,6 +2691,7 @@ roles:
         member_of:
             - reporter
             - analyst_marketing
+            - restricted_safe
         warehouses:
             - dev_xs
 
@@ -4189,48 +4186,15 @@ roles:
                     - rkohnke_prep.*.*
                     - rkohnke_prod.*.*
 
-    - rparker:
-        member_of:
-            - analyst_core
-            - restricted_safe
-        warehouses:
-            - dev_xs
-        owns:
-            databases:
-                - rparker_prep
-                - rparker_prod
-            schemas:
-                - rparker_prep.*
-                - rparker_prod.*
-            tables:
-                - rparker_prep.*.*
-                - rparker_prod.*.*
-        privileges:
-            databases:
-                read:
-                    - rparker_prep
-                    - rparker_prod
-                write:
-                    - rparker_prep
-                    - rparker_prod
-            schemas:
-                read:
-                    - rparker_prep.*
-                    - rparker_prod.*
-                write:
-                    - rparker_prep.*
-                    - rparker_prod.*
-            tables:
-                read:
-                    - rparker_prep.*.*
-                    - rparker_prod.*.*
-                write:
-                    - rparker_prep.*.*
-                    - rparker_prod.*.*
-
     - rrendon:
         member_of:
             - analyst_engineering
+        warehouses:
+            - dev_xs
+
+    - rwoo:
+        member_of:
+            - dbt_analytics
         warehouses:
             - dev_xs
 
@@ -5022,16 +4986,15 @@ users:
         member_of:
             - rkohnke
 
-    - rparker:
-        can_login: yes
-        member_of:
-            - rparker
-            - accountadmin
-
     - rrendon:
         can_login: yes
         member_of:
             - rrendon
+
+    - rwoo:
+        can_login: yes
+        member_of:
+            - rwoo
 
     - schaturvedi:
         can_login: yes

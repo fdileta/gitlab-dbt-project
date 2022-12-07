@@ -63,12 +63,18 @@ WITH zuora_product AS (
         ELSE FALSE
       END                                                                               AS is_oss_or_edu_rate_plan,
       CASE
-        WHEN common_product_tier.product_tier_name = 'Storage' THEN FALSE
+        WHEN common_product_tier.product_tier_name = 'Storage' 
+            OR product_rate_plan_charge_name LIKE 'Dedicated - Administration%' 
+            OR product_rate_plan_charge_name LIKE 'Dedicated - Storage%'
+        THEN FALSE
         ELSE TRUE
       END                                                                               AS is_licensed_user,
       CASE
-        WHEN common_product_tier.product_tier_name = 'Storage' OR zuora_product_rate_plan.product_rate_plan_name LIKE '%EDU%'
-          THEN FALSE
+        WHEN common_product_tier.product_tier_name = 'Storage' 
+            OR zuora_product_rate_plan.product_rate_plan_name LIKE '%EDU%'
+            OR product_rate_plan_charge_name LIKE 'Dedicated - Administration%' 
+            OR product_rate_plan_charge_name LIKE 'Dedicated - Storage%'
+        THEN FALSE
         ELSE TRUE
       END                                                                               AS is_arpu,
       MIN(zuora_product_rate_plan_charge_tier.price)                                    AS billing_list_price
