@@ -27,6 +27,9 @@
       - public
     expire_in: 1 week
     when: always
+  variables:
+    GIT_STRATEGY: fetch
+
 
 # Common commands anchors
 .clone_raw: &clone_raw
