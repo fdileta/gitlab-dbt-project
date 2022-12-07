@@ -36,6 +36,11 @@ WITH first_contact  AS (
     SELECT *
     FROM {{ref('sfdc_opportunity_stage_source')}}
 
+), sfdc_record_type AS (
+
+  SELECT *
+  FROM {{ref('sfdc_record_type_source')}} 
+
 ), net_iacv_to_net_arr_ratio AS (
 
   SELECT
@@ -623,8 +628,8 @@ WITH first_contact  AS (
       first_contact.dim_crm_person_id,
       first_contact.sfdc_contact_id,
 
-	  -- record type information
-	  record_type.record_type_name,
+      -- record type information
+      sfdc_record_type.record_type_name,
 
       -- attribution information
       linear_attribution_base.count_crm_attribution_touchpoints,
@@ -1318,8 +1323,8 @@ WITH first_contact  AS (
       ON sfdc_opportunity.subscription_start_date::DATE = subscription_start_date.date_actual
     LEFT JOIN sfdc_account AS fulfillment_partner
       ON sfdc_opportunity.fulfillment_partner = fulfillment_partner.account_id
-	LEFT JOIN {{ref('sfdc_record_type_source')}} AS record_type
-		ON sfdc_opportunity.record_type_id=record_type.record_type_id
+    LEFT JOIN  sfdc_record_type
+      ON sfdc_opportunity.record_type_id = sfdc_record_type.record_type_id
     {%- if model_type == 'snapshot' %}
         AND sfdc_opportunity.snapshot_id = fulfillment_partner.snapshot_id
     {%- endif %}
