@@ -12,7 +12,7 @@ WITH source AS (
 
       --Info
       visit_start_time::TIMESTAMP                    AS visit_start_time,
-      DATE(visit_start_time)::DATE                   AS session_date, 
+      DATE(visit_start_time)                         AS session_date, 
       hit_number::NUMBER                             AS hit_number,
       DATEADD('millisecond', time, visit_start_time) AS hit_at,
       is_entrance::BOOLEAN                           AS is_entrance,
