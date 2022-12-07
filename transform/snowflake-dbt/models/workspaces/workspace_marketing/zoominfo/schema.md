@@ -233,7 +233,7 @@ Number of Medical contacts available at the company
 The number of years since the company's last funding
 
 {% enddocs %}
-{% docs zi_c_number_of_investors %}
+{% docs zi_c_num_of_investors %}
 
 Number of investors for a company
 
