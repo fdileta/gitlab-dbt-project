@@ -60,17 +60,17 @@ models:
       - name: source_company_id
         description: The current company_id for the IDs that have been merged together.
       - name: company_name
-        description: '{{ doc("zi_headquarters_company_name") }}'
+        description: '{{ doc("zi_c_company_name") }}'
       - name: company_revenue
-        description: '{{ doc("zi_headquarters_revenue") }}'
+        description: '{{ doc("zi_c_revenue") }}'
       - name: company_employee_count
-        description: '{{ doc("zi_headquarters_employees") }}'
+        description: '{{ doc("zi_c_company_employees") }}'
       - name: company_industry
-        description: '{{ doc("zi_industry_primary") }}'
+        description: '{{ doc("zi_c_industry_primary") }}'
       - name: company_country
-        description: '{{ doc("zi_headquarters_company_country") }}'
+        description: '{{ doc("zi_c_company_country") }}'
       - name: company_state_province
-        description: '{{ doc("zi_headquarters_company_state") }}'
+        description: '{{ doc("zi_c_company_state") }}'
       - name: has_crm_account
         description: A flag to indicate if the company id is matched to a CRM account
       - name: has_crm_lead
