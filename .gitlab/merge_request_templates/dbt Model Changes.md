@@ -67,6 +67,7 @@ Paste the results of dbt test here, including the command.
 #### Performance
 <details>
 <summary><i>Click to toggle Performance</i></summary>
+The aim of the Performance sections is to bring awareness to the performance of the models that are being changed.  Not every change is expected to effect the performance of the model but understanding the model performance will support future development.  Use your discretion on the effort put into this section of the Merge Request as is it not intended to be a blocker to development.
 
 - [ ] Using the [dbt Model Performance runbook](https://gitlab.com/gitlab-data/runbooks/-/blob/main/dbt_performance/model_build_performance.md) retrieve the performance categories for any changed or new models.
 - [ ] Follow the [guidelines](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#guidance-for-checking-model-performance) in the handbook for improving the performance as needed.
