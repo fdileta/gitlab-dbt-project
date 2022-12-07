@@ -300,11 +300,6 @@ This flag indicates if this record is a Frachisee
 This flag indicates if this record is a an Immediate Parent
 
 {% enddocs %}
-{% docs zi_c_is_immediate_parent %}
-
-This flag indicates if this record is a a Domestic Parent
-
-{% enddocs %}
 {% docs zi_c_hierarchy_level %}
 
 This number indicates the hierarchy level equivalent to the hierarchy code
