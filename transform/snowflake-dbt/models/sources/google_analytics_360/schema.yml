@@ -32,5 +32,3 @@ models:
         - name: visit_id
           tests:
             - not_null
-
-
