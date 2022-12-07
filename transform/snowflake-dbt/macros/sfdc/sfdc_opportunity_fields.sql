@@ -1321,10 +1321,10 @@ WITH first_contact  AS (
       ON sfdc_opportunity.iacv_created_date::DATE = arr_created_date.date_actual
     LEFT JOIN dim_date AS subscription_start_date
       ON sfdc_opportunity.subscription_start_date::DATE = subscription_start_date.date_actual
+    LEFT JOIN sfdc_record_type
+      ON sfdc_opportunity.record_type_id = sfdc_record_type.record_type_id
     LEFT JOIN sfdc_account AS fulfillment_partner
       ON sfdc_opportunity.fulfillment_partner = fulfillment_partner.account_id
-    LEFT JOIN  sfdc_record_type
-      ON sfdc_opportunity.record_type_id = sfdc_record_type.record_type_id
     {%- if model_type == 'snapshot' %}
         AND sfdc_opportunity.snapshot_id = fulfillment_partner.snapshot_id
     {%- endif %}
