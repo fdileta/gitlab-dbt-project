@@ -14,12 +14,10 @@
     -- Primary key
     prep_crm_task.dim_crm_task_pk,
 
-    -- Surrogate key
-    prep_crm_task.dim_crm_task_sk,
-
     -- Foreign keys
-    {{ get_keyed_nulls('prep_crm_task.dim_crm_account_id') }}  AS dim_crm_account_id,
-    {{ get_keyed_nulls('prep_crm_task.dim_crm_user_id') }}    AS dim_crm_user_id,
+    {{ get_keyed_nulls('prep_crm_task.dim_crm_task_sk') }}        AS dim_crm_task_sk,
+    {{ get_keyed_nulls('prep_crm_task.dim_crm_account_id') }}     AS dim_crm_account_id,
+    {{ get_keyed_nulls('prep_crm_task.dim_crm_user_id') }}        AS dim_crm_user_id,
     {{ get_keyed_nulls('prep_crm_task.sfdc_record_type_id') }}    AS sfdc_record_type_id,
     {{ get_keyed_nulls('prep_crm_person.dim_crm_person_id') }}    AS dim_crm_person_id,
     {{ get_keyed_nulls('prep_crm_task.dim_crm_opportunity_id') }} AS dim_crm_opportunity_id,
