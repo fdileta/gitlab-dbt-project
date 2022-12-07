@@ -246,7 +246,7 @@ models:
         description: '{{ doc("zi_c_company_employee_range") }}'
       - name: headquarters_revenue_range
         description: '{{ doc("zi_c_company_revenue_range") }}'
-      - name: headquarters_revenue -- convert from thousand
+      - name: headquarters_revenue
         description: '{{ doc("zi_c_company_revenue") }}'
       - name: headquarters_company_phone
         description: '{{ doc("zi_c_company_phone") }}'

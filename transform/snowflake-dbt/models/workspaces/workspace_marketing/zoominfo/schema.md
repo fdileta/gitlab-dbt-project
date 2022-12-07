@@ -297,7 +297,12 @@ This flag indicates if this record is a Frachisee
 {% enddocs %}
 {% docs zi_c_is_immediate_parent %}
 
-This flag indicates if this record is a an Immediate Parent
+This flag indicates if this record is an Immediate Parent
+
+{% enddocs %}
+{% docs zi_c_is_domestic_parent %}
+
+This flag indicates if this record is a Domestic Parent
 
 {% enddocs %}
 {% docs zi_c_hierarchy_level %}
@@ -648,6 +653,11 @@ $1B-$5B
 $5B+)
 
 {% enddocs %}
+{% docs zi_c_company_revenue %}
+
+Convert company revenue from thousands 
+
+{% enddocs %}
 {% docs zi_c_company_phone %}
 
 Company location phone number
@@ -967,7 +977,7 @@ Global parent company's country
 
 {% enddocs %}
 
-{% docs zi_c_everstring_franchisor_location_id %}
+{% docs zi_es_franchisor_location_id %}
 
 Company franchisor's location number
 
