@@ -50,7 +50,7 @@ models:
         description: '{{ doc("zi_es_percent_revenue_growth") }}'
       - name: company_name_confidence_score
         description: '{{ doc("zi_c_name_confidence_score") }}'
-      - name:::END
+      - name: zi_c_url_confidence_score
         description: '{{ doc("zi_c_url_confidence_score") }}'
       - name: company_address_confidence_score
         description: '{{ doc("zi_c_address_confidence_score") }}'
