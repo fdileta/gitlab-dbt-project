@@ -35,8 +35,8 @@ final AS (
     uuid::VARCHAR AS uuid,
     NULL AS historical_max_users, --currently missing from the Automated Service Ping, will be added later
     edition::VARCHAR AS edition,
-    NULL AS raw_usage_data_id,
-    NULL AS raw_usage_data_payload,
+    run_id::VARCHAR AS raw_usage_data_id,
+    run_results::VARIANT AS raw_usage_data_payload,
     run_results['version']::VARCHAR AS version,
     run_results['active_user_count']::NUMBER AS instance_user_count,
     run_results['license_md5']::VARCHAR AS license_md5,
