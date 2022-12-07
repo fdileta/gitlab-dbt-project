@@ -153,11 +153,6 @@ Confidence score for the zi_c_C_SIC field (0.2, 0.4, 0.6, 0.8, 1 - 1 being highe
 Date company's URL was last updated
 
 {% enddocs %}
-{% docs zi_c_url_last_updated %}
-
-Date company's URL was last updated
-
-{% enddocs %}
 {% docs zi_c_inactive_flag %}
 
 Identifies if a company is inactive. (1 or 0, 1 being inactive)
