@@ -6,7 +6,8 @@
     ('sfdc_opportunity_source', 'sfdc_opportunity_source'),
     ('sfdc_opportunity_snapshots_source','sfdc_opportunity_snapshots_source'),
     ('sfdc_opportunity_stage', 'sfdc_opportunity_stage_source'),
-    ('sfdc_account_source_live', 'sfdc_account_source')
+    ('sfdc_account_source_live', 'sfdc_account_source'),
+    ('sfdc_record_type_source', 'sfdc_record_type_source')
 ]) }}
 
 , first_contact  AS (
@@ -564,6 +565,9 @@
       -- contact information
       first_contact.dim_crm_person_id,
       first_contact.sfdc_contact_id,
+
+      -- Record type information
+      sfdc_record_type_source.record_type_name,
 
       -- attribution information
       linear_attribution_base.count_crm_attribution_touchpoints,
@@ -1161,6 +1165,8 @@
     LEFT JOIN net_iacv_to_net_arr_ratio
       ON live_opportunity_owner_fields.opportunity_owner_user_segment = net_iacv_to_net_arr_ratio.user_segment_stamped
         AND sfdc_opportunity_source_live.order_type_stamped_live = net_iacv_to_net_arr_ratio.order_type
+    LEFT JOIN sfdc_record_type_source 
+      ON sfdc_opportunity.record_type_id = sfdc_record_type_source.record_type_id
 
 )
 
