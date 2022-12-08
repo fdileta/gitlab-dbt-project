@@ -3,9 +3,9 @@
   stage: ⚙️ dbt Run
   before_script:
     - mkdir -p transform/snowflake-dbt/dbt_packages
-    - mv /analytics/transform/snowflake-dbt/dbt_packages/* transform/snowflake-dbt/
     - chmod 700 transform/snowflake-dbt/dbt_packages
     - cd transform/snowflake-dbt/
+    - echo $CI_MERGE_REQUEST_DIFF_ID
     - echo $BRANCH_NAME
     - if [ $BRANCH_NAME = "master" ]; then export SNOWFLAKE_PREP_DATABASE="PREP"; else export SNOWFLAKE_PREP_DATABASE="${CI_COMMIT_REF_NAME^^}_PREP"; fi
     - if [ $BRANCH_NAME = "master" ]; then export SNOWFLAKE_PROD_DATABASE="PROD"; else export SNOWFLAKE_PROD_DATABASE="${CI_COMMIT_REF_NAME^^}_PROD"; fi
