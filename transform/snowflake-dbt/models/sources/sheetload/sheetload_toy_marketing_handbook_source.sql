@@ -13,11 +13,11 @@ WITH source AS (
     day::int AS day,
     month,
     duration::int AS duration,
-    campaign::int AS campaign,
-    pdays::int AS pdays,
-    previous::int AS previous,
-    poutcome,
-    y
+    num_contacts_during_campaign::int AS num_contacts_during_campaign,
+    prev_campaign_passed_days::int AS prev_campaign_passed_days,
+    prev_contacts::int AS prev_contacts,
+    prev_outcome,
+    outcome
   FROM {{ source('sheetload', 'toy_marketing_handbook') }}
 
 )
