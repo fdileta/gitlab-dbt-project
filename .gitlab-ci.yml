@@ -56,7 +56,7 @@ include:
   when: manual
 
 # Template for cloning databases in Snowflake for use in MRs
-.snowflake_clone_test: &snowflake_clone_test
+.snowflake_clone_template_test: &snowflake_clone_template_test
   image: registry.gitlab.com/gitlab-data/data-image/data-image:v0.0.13
   tags:
     - analytics
@@ -66,22 +66,20 @@ include:
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event")
       when: always
       variables:
-      - $SNOWFLAKE_SYSADMIN_ROLE
-      - $SNOWFLAKE_LOAD_WAREHOUSE
-      - $SNOWFLAKE_LOAD_DATABASE  # make sure the guard works
-      - $SNOWFLAKE_PREP_DATABASE  # make sure the guard works
-      - $SNOWFLAKE_PROD_DATABASE  # make sure the guard works
+        SNOWFLAKE_SYSADMIN_ROLE: $SNOWFLAKE_SYSADMIN_ROLE
+        SNOWFLAKE_LOAD_WAREHOUSE:  $SNOWFLAKE_LOAD_WAREHOUSE
+        SNOWFLAKE_LOAD_DATABASE: $SNOWFLAKE_LOAD_DATABASE  # make sure the guard works
+        SNOWFLAKE_PREP_DATABASE: $SNOWFLAKE_PREP_DATABASE  # make sure the guard works
+        SNOWFLAKE_PROD_DATABASE: $SNOWFLAKE_PROD_DATABASE  # make sure the guard works
 
-    - if: ($CI_COMMIT_BRANCH == "master")
+    - if: $CI_COMMIT_REF_NAME == "master"
       when: manual
       variables:
-      - $BRANCH_NAME == $SNOWFLAKE_LOAD_DATABASE
-      - $BRANCH_NAME == $SNOWFLAKE_PREP_DATABASE
-      - $BRANCH_NAME == $SNOWFLAKE_PROD_DATABASE
-      - $TEST_PIPELINE
+        BRANCH_NAME: $SNOWFLAKE_PROD_DATABASE
+        TEST_PIPELINE: $TEST_PIPELINE
 
 .snowflake_start_test_clone: &snowflake_start_test_clone
-  <<: *snowflake_clone_template
+  <<: *snowflake_clone_template_test
   environment:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: clone_stop
