@@ -62,6 +62,7 @@ include:
     - analytics
   before_script:
     - export PATH="$CI_PROJECT_DIR/orchestration/:$PATH"
+    - export ORIGINAL_SHA=$(git log origin/master..$CI_COMMIT_BRANCH --oneline  --format=format:%H | tail -1)
   rules:
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event")
       when: always
@@ -90,9 +91,10 @@ include:
 📈clone_prod_test:
   <<: *snowflake_start_test_clone
   rules:
-  - if: ($CI_COMMIT_BEFORE_SHA == '0000000000000000000000000000000000000000')
+  - if: ($ORIGINAL_SHA == $CI_COMMIT_SHA)
     when: always
   script:
+    - echo $ORIGINAL_SHA
     - echo $CI_COMMIT_BEFORE_SHA
     - echo $CI_MERGE_REQUEST_DIFF_ID
     - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA
