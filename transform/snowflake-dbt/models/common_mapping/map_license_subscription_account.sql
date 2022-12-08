@@ -92,6 +92,7 @@ WITH license AS (
         joined.dim_subscription_id,
         joined.dim_crm_account_id,
         joined.dim_parent_crm_account_id,
+        license_statistics.total_number_md5_per_license,
         license_statistics.total_number_sha256_per_license,
         license_statistics.total_number_subscription_per_license,
         license_statistics.total_number_crm_account_per_license,
