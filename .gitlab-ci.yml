@@ -69,12 +69,12 @@ include:
 📈clone_prod:
   <<: *snowflake_start_clone
   script:
-    - export ORIGINAL_SHA=$(git log origin/master..$CI_COMMIT_BRANCH --oneline  --format=format:%H | tail -1)
-    - echo $ORIGINAL_SHA
-    - echo $CI_COMMIT_SHA
-    - if [$ORIGINAL_SHA = $CI_COMMIT_SHA]; then
-    -  manage_snowflake.py manage_clones --database prod --empty && manage_snowflake.py manage_clones --database prep --empty
-    - fi
+    - |-
+      if [[ $CI_MERGE_REQUEST_ID != "" ]]; then
+          echo "Test"
+      else 
+          echo "No test"
+      fi
   when: always
 
 📈clone_prod_manual:
