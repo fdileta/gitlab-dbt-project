@@ -62,6 +62,8 @@
   <<: *snowflake_dbt_jobs
   script:
     - echo $DBT_MODELS
+    - pwd
+    - dbt deps
     - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models +dim_subscription || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
