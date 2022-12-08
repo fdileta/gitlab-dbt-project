@@ -685,8 +685,6 @@ models:
       - name: historical_max_users
       - name: license_md5
         description: JOIN key to dim_licenses and dim_license
-      - name: license_sha256
-        description: JOIN key to dim_licenses and dim_license
       - name: instance_type
         description: Type of instance (Production/Non-Production)
       - name: dim_subscription_id
