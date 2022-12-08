@@ -31,9 +31,14 @@ WITH date_details AS (
                                                           WHERE date_actual = DATEADD(day, -2, CURRENT_DATE))
  ), mart_available_to_renew AS (
 
-    SELECT *
-    FROM {{ref('mart_available_to_renew')}}
+    SELECT renew.*,
+        renew_date.first_day_of_fiscal_quarter  AS renew_fiscal_quarter_date,
+        renew_date.fiscal_quarter_name_fy       AS renew_fiscal_quarter_name,
+        renew_date.fiscal_quarter               AS renew_fiscal_quarter_number
+    FROM {{ref('mart_available_to_renew')}} renew
     --FROM prod.restricted_safe_common_mart_finance.mart_available_to_renew
+    LEFT JOIN date_details renew_date
+        ON renew_date.date_actual = renew.renewal_month
     
  ), dim_subscription AS (
 
@@ -133,11 +138,30 @@ WITH date_details AS (
     SELECT 
         dim_crm_account_id      AS account_id,
         report_dates.report_fiscal_year,
-        SUM(arr)                AS nfy_atr
+        SUM(arr)                AS nfy_atr,
+         SUM(CASE
+          WHEN atr.renew_fiscal_quarter_number = 1
+            THEN arr
+          ELSE 0
+        END)                    AS nfy_q1_atr,
+        SUM(CASE
+          WHEN atr.renew_fiscal_quarter_number = 2
+            THEN arr
+          ELSE 0
+        END)                    AS nfy_q2_atr,
+        SUM(CASE
+          WHEN atr.renew_fiscal_quarter_number = 3
+            THEN arr
+          ELSE 0
+        END)                    AS nfy_q3_atr,
+        SUM(CASE
+          WHEN atr.renew_fiscal_quarter_number = 4
+            THEN arr
+          ELSE 0
+        END)                    AS nfy_q4_atr
     FROM mart_available_to_renew atr
     CROSS JOIN report_dates
     WHERE is_available_to_renew = 1
-    --AND renewal_type = 'Non-MYB'
     AND atr.fiscal_year = report_dates.report_fiscal_year + 1
     GROUP BY 1,2
     
@@ -387,8 +411,32 @@ WITH date_details AS (
     SELECT
       h.account_id,
       h.snapshot_fiscal_year        AS report_fiscal_year,
-      SUM(h.net_arr)                AS open_pipe,
-      SUM(h.calculated_deal_count)   AS count_open_deals
+      -- net arr pipeline
+      SUM(h.net_arr)                AS total_open_pipe,
+      SUM(CASE 
+              WHEN h.close_fiscal_year = h.snapshot_fiscal_year + 1
+                  THEN h.net_arr
+              ELSE 0
+          END)                      AS nfy_open_pipeline,
+      SUM(CASE 
+              WHEN h.close_fiscal_year = h.snapshot_fiscal_year
+                  THEN h.net_arr
+              ELSE 0
+          END)                       AS fy_open_pipeline,
+      
+      -- deal count pipeline
+      SUM(h.calculated_deal_count)   AS total_count_open_deals,
+      SUM(CASE 
+              WHEN h.close_fiscal_year = h.snapshot_fiscal_year + 1
+                  THEN h.net_arr
+              ELSE 0
+          END)                      AS nfy_count_open_deals,
+      SUM(CASE 
+              WHEN h.close_fiscal_year = h.snapshot_fiscal_year
+                  THEN h.net_arr
+              ELSE 0
+          END)                       AS fy_count_open_deals
+      
     FROM sfdc_opportunity_snapshot_xf AS h
     WHERE h.close_date > h.snapshot_date
       AND h.forecast_category_name NOT IN  ('Omitted','Closed')
@@ -659,6 +707,10 @@ WITH date_details AS (
     COALESCE(fy_atr_base.fy_atr,0)           AS fy_atr,
     -- next fiscal year atr base reported at fy
     COALESCE(nfy_atr_base.nfy_atr,0)         AS nfy_atr,
+    COALESCE(nfy_atr_base.nfy_q1_atr,0)      AS nfy_q1_atr,
+    COALESCE(nfy_atr_base.nfy_q2_atr,0)      AS nfy_q2_atr,
+    COALESCE(nfy_atr_base.nfy_q3_atr,0)      AS nfy_q3_atr,
+    COALESCE(nfy_atr_base.nfy_q4_atr,0)      AS nfy_q4_atr,
     -- last 12 months ATR
     COALESCE(last_12m_atr_base.last_12m_atr,0)    AS last_12m_atr,
 
@@ -770,19 +822,23 @@ WITH date_details AS (
     COALESCE(net_arr_fiscal.fy_booked_channel_deal_count,0)          AS fy_booked_channel_deal_count,
 
     -- open pipe forward looking
-    COALESCE(op.open_pipe,0)                                  AS open_pipe,
-    COALESCE(op.count_open_deals,0)                           AS count_open_deals_pipe,
+    COALESCE(op.total_open_pipe,0)                  AS total_open_pipe,
+    COALESCE(op.total_count_open_deals,0)           AS total_count_open_deals_pipe,
+    COALESCE(op.nfy_open_pipeline,0)                AS nfy_open_pipeline,
+    COALESCE(op.fy_open_pipeline,0)                 AS fy_open_pipeline,
+    COALESCE(op.nfy_count_open_deals,0)             AS nfy_count_open_deals,
+    COALESCE(op.fy_count_open_deals,0)              AS fy_count_open_deals,
 
     CASE
       WHEN COALESCE(arr.arr,0) > 0
-          AND COALESCE(op.open_pipe,0) > 0
+          AND COALESCE(op.total_open_pipe,0) > 0
               THEN 1
           ELSE 0
     END                                                       AS customer_has_open_pipe_flag,
 
     CASE
       WHEN COALESCE(arr.arr,0) = 0
-          AND COALESCE(op.open_pipe,0) > 0
+          AND COALESCE(op.total_open_pipe,0) > 0
               THEN 1
           ELSE 0
     END                                                       AS prospect_has_open_pipe_flag,
@@ -942,14 +998,15 @@ SELECT
     account_user_region     AS virtual_upa_region,
     account_user_area       AS virtual_upa_area,
     account_country         AS virtual_upa_country,
-    account_state           AS virtual_upa_state,
     account_zip_code        AS virtual_upa_zip_code,
     account_industry        AS virtual_upa_industry,
+    account_state           AS virtual_upa_state,
     account_owner_name      AS virtual_upa_owner_name,
     account_owner_title_category AS virtual_upa_owner_title_category,
     account_owner_id        AS virtual_upa_owner_id,
     account_id,
     account_name,
+    account_owner_name,
     arr AS account_arr,
     1 AS level
 FROM consolidated_accounts
@@ -969,14 +1026,15 @@ SELECT
     upa.virtual_upa_region,
     upa.virtual_upa_area,
     upa.virtual_upa_country,
-    upa.virtual_upa_state,
     upa.virtual_upa_zip_code,
     upa.virtual_upa_industry,
+    upa.virtual_upa_state,
     upa.virtual_upa_owner_name,
     upa.virtual_upa_owner_title_category,
     upa.virtual_upa_owner_id,
     child.account_id,
     child.account_name,
+    child.account_owner_name,
     child.arr AS account_arr,
     level + 1 AS level
 FROM consolidated_accounts child
@@ -1013,7 +1071,9 @@ SELECT
 FROM max_virtual_upa_depth
 QUALIFY level = 1
 
-), final_virtual_upa AS (
+        
+-- selects the longest hierarchy from the virtual UPAs options
+), selected_hierarchy_virtual_upa AS (
 
     
     SELECT total.*
@@ -1023,6 +1083,89 @@ QUALIFY level = 1
         AND total.report_fiscal_year = selected.report_fiscal_year
 
 
+-- identify unique virtual upas
+), select_unique_virtual_upa AS (
+
+SELECT 
+    final.report_fiscal_year,
+    final.upa_id,
+    final.upa_name,
+    final.upa_user_geo,
+    final.virtual_upa_id,
+    final.virtual_upa_name,
+    final.virtual_upa_segment,
+    final.virtual_upa_geo,
+    final.virtual_upa_region,
+    final.virtual_upa_area,
+    final.virtual_upa_country,
+    final.virtual_upa_zip_code,
+    final.virtual_upa_industry,
+    final.virtual_upa_state,
+    final.virtual_upa_owner_name,
+    final.virtual_upa_owner_title_category,
+    final.virtual_upa_owner_id
+FROM selected_hierarchy_virtual_upa final
+    
+
+-- identify accounts that belong to the same owner of a virtual upa within the hierarchy
+-- after creating the virtual UPA hierarchy, some accounts might 
+), final_virtual_upa AS (
+    
+SELECT 
+    final.report_fiscal_year,
+    final.upa_id,
+    final.upa_name,
+    final.upa_user_geo,
+    extra.virtual_upa_id,
+    extra.virtual_upa_name,
+    extra.virtual_upa_segment,
+    extra.virtual_upa_geo,
+    extra.virtual_upa_region,
+    extra.virtual_upa_area,
+    extra.virtual_upa_country,
+    extra.virtual_upa_zip_code,
+    extra.virtual_upa_industry,
+    extra.virtual_upa_state,
+    extra.virtual_upa_owner_name,
+    extra.virtual_upa_owner_title_category,
+    extra.virtual_upa_owner_id,
+    final.account_id,
+    final.account_name,
+    final.account_owner_name,
+    final.arr AS account_arr,
+    -1 AS level
+FROM consolidated_accounts final
+    INNER JOIN select_unique_virtual_upa extra
+        ON final.upa_id = extra.upa_id
+        AND final.account_owner_name = extra.virtual_upa_owner_name
+        AND final.report_fiscal_year = extra.report_fiscal_year
+-- Exclude accounts already in the hierarchy table
+WHERE final.account_id NOT IN (SELECT DISTINCT account_id FROM selected_hierarchy_virtual_upa)
+UNION
+  SELECT 
+    final.report_fiscal_year,
+    final.upa_id,
+    final.upa_name,
+    final.upa_user_geo,
+    final.virtual_upa_id,
+    final.virtual_upa_name,
+    final.virtual_upa_segment,
+    final.virtual_upa_geo,
+    final.virtual_upa_region,
+    final.virtual_upa_area,
+    final.virtual_upa_country,
+    final.virtual_upa_zip_code,
+    final.virtual_upa_industry,
+    final.virtual_upa_state,
+    final.virtual_upa_owner_name,
+    final.virtual_upa_owner_title_category,
+    final.virtual_upa_owner_id,
+    final.account_id,
+    final.account_name,
+    final.account_owner_name,
+    final.account_arr,
+    final.level
+FROM selected_hierarchy_virtual_upa final
 ------------------------
 
 ), consolidated_upa AS (
@@ -1229,8 +1372,8 @@ QUALIFY level = 1
     SUM(acc.fy_booked_channel_deal_count)        AS fy_booked_channel_deal_count,
 
     -- open pipe forward looking
-    SUM(acc.open_pipe)                    AS open_pipe,
-    SUM(acc.count_open_deals_pipe)        AS count_open_deals_pipe,
+    SUM(acc.total_open_pipe)              AS total_open_pipe,
+    SUM(acc.total_count_open_deals_pipe)  AS total_count_open_deals_pipe,
     SUM(acc.customer_has_open_pipe_flag)  AS customer_has_open_pipe_flag,
     SUM(acc.prospect_has_open_pipe_flag)  AS prospect_has_open_pipe_flag,
 
