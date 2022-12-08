@@ -1553,3 +1553,10 @@ models:
         tests:
           - unique
           - not_null
+
+  - name: mart_crm_account_id
+    description: '{{ doc("mart_crm_account_id") }}'
+    columns:
+      - name: id
+        tests:
+          - not_null
