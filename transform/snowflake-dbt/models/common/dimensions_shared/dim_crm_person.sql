@@ -13,6 +13,7 @@ WITH crm_person AS (
       sfdc_record_type,
       email_hash,
       email_domain,
+      IFF(email_domain_type = 'Business email domain',TRUE,FALSE) AS is_valuable_signup,
       email_domain_type,
 
       --keys
@@ -104,7 +105,7 @@ WITH crm_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@jjstark",
-    updated_by="@rkohnke",
+    updated_by="@degan",
     created_date="2020-09-10",
-    updated_date="2022-09-30"
+    updated_date="2022-11-22"
 ) }}

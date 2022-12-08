@@ -17,8 +17,33 @@ PERMIFROST_IMAGE = "registry.gitlab.com/gitlab-data/permifrost:v0.13.1"
 ANALYST_IMAGE = "registry.gitlab.com/gitlab-data/data-image/analyst-image:v1.0.13"
 
 SALES_ANALYTICS_NOTEBOOKS_PATH = "analytics/sales_analytics_notebooks"
-#SALES_ANALYTICS_NOTEBOOKS_SSH_REPO = "git@gitlab.com:gitlab-data/analytics.git"
-#SALES_ANALYTICS_NOTEBOOKS_HTTP_REPO = "https://gitlab.com/gitlab-data/analytics.git"
+
+DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO = (
+    "git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git"
+)
+DATA_SCIENCE_NAMESPACE_SEG_HTTP_REPO = (
+    "https://gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git"
+)
+
+
+def get_data_science_project_command(model_http_path, model_ssh_path, model_folder):
+    return f"""
+    {data_test_ssh_key_cmd} &&
+    if [[ -z "$GIT_COMMIT" ]]; then
+        export GIT_COMMIT="HEAD"
+    fi
+    if [[ -z "$GIT_DATA_TESTS_PRIVATE_KEY" ]]; then
+        export REPO="{model_http_path}";
+        else
+        export REPO="{model_ssh_path}";
+    fi &&
+    echo "git clone -b main --single-branch --depth 1 $REPO" &&
+    git clone -b main --single-branch --depth 1 $REPO &&
+    echo "checking out commit $GIT_COMMIT" &&
+    cd {model_folder} &&
+    git checkout $GIT_COMMIT &&
+    echo pwd &&
+    cd .."""
 
 
 def get_sales_analytics_notebooks(frequency: str) -> Dict:
@@ -26,7 +51,7 @@ def get_sales_analytics_notebooks(frequency: str) -> Dict:
     notebooks = []
     fileNames = []
 
-    path =  f'{SALES_ANALYTICS_NOTEBOOKS_PATH}/{frequency}/'
+    path = f"{SALES_ANALYTICS_NOTEBOOKS_PATH}/{frequency}/"
 
     for file in os.listdir(path):
         filename = os.fsdecode(file)
@@ -36,6 +61,7 @@ def get_sales_analytics_notebooks(frequency: str) -> Dict:
         else:
             continue
     return dict(zip(notebooks, fileNames))
+
 
 analytics_pipelines_dag = [
     "dbt",
@@ -54,6 +80,7 @@ data_science_pipelines_dag = [
     "ds_propensity_to_expand",
     "ds_propensity_to_contract",
     "ds_propensity_to_purchase_trial",
+    "ds-namespace-segmentation",
 ]
 
 

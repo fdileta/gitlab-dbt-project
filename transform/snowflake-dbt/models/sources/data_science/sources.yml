@@ -19,4 +19,5 @@ sources:
     - name: pte_scores
     - name: ptc_scores
     - name: ptpt_scores
+    - name: namespace_segmentation_scores
 

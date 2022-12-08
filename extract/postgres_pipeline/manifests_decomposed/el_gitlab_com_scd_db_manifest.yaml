@@ -225,16 +225,18 @@ tables:
       , issue_id
       , relative_position
       FROM epic_issues
-  experiments:
-    dbt_source_model: true
-    export_schema: 'gitlab_com'
-    export_table: 'experiments'
-    export_table_primary_key: id
-    import_db: GITLAB_DB
-    import_query: |-
+  fork_network_members:
+    dbt_source_model: true 
+    export_schema: 'gitlab_com' 
+    export_table: 'fork_network_members' 
+    export_table_primary_key: id 
+    import_db: GITLAB_DB 
+    import_query: |- 
       SELECT id
-      , name
-      FROM experiments
+      , fork_network_id
+      , project_id
+      , forked_from_project_id
+      FROM fork_network_members
   gitlab_subscription_histories:
     dbt_source_model: true
     export_schema: 'gitlab_com'

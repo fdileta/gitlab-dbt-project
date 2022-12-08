@@ -64,11 +64,6 @@ databases:
     - eneuberger_prep:
         shared: no
 
-    - ian_prod:
-        shared: no
-    - ian_prep:
-        shared: no
-
     - iweeks_prod:
         shared: no
     - iweeks_prep:
@@ -92,11 +87,6 @@ databases:
     - jstark_prod:
         shared: no
     - jstark_prep:
-        shared: no
-
-    - judume_prod:
-        shared: no
-    - judume_prep:
         shared: no
 
     - juwong_prod:
@@ -169,6 +159,11 @@ databases:
     - nhervas_prep:
         shared: no
 
+    - nmcavinue_prod:
+        shared: no
+    - nmcavinue_prep:
+        shared: no
+
     - nraisinghani_prod:
         shared: no
     - nraisinghani_prep:
@@ -199,11 +194,6 @@ databases:
     - rkohnke_prep:
         shared: no
 
-    - rparker_prod:
-        shared: no
-    - rparker_prep:
-        shared: no
-
     - schaturvedi_prod:
         shared: no
     - schaturvedi_prep:
@@ -214,6 +204,11 @@ databases:
     - snalamaru_prod:
         shared: no
     - snalamaru_prep:
+        shared: no
+
+    - srehm_prod:
+        shared: no
+    - srehm_prep:
         shared: no
 
     - tpoole_prod:
@@ -475,6 +470,7 @@ roles:
             - gitlab_data_yaml
             - google_ads
             - google_analytics_360
+            - google_search_console
             - netsuite
             - mailgun
             - marketo
@@ -1074,6 +1070,8 @@ roles:
         warehouses:
             - dev_xs
             - loading
+        member_of:
+            - restricted_safe
         owns:
             schemas:
                 - raw.sales_analytics
@@ -1094,6 +1092,19 @@ roles:
                 write:
                     - raw.sales_analytics.*
 
+    - data_science_readonly:
+        warehouses:
+            - dev_xs
+        privileges:
+            databases:
+                read:
+                    - raw
+            schemas:
+                read:
+                    - raw.data_science
+            tables:
+                read:
+                    - raw.data_science.*
 
 
 # ==========================================
@@ -1149,6 +1160,7 @@ roles:
             tables:
                 read:
                     - prep.sensitive.bamboohr_separations
+                    - prep.sensitive.workday_terminations
 
     - bamboohr:
         warehouses:
@@ -1767,6 +1779,21 @@ roles:
                     - prep.google_analytics_360.*
                     - raw.google_analytics_360_fivetran.*
 
+    - google_search_console:
+        privileges:
+            databases:
+                read:
+                    - prep
+                    - raw
+            schemas:
+                read:
+                    - prep.google_search_console
+                    - raw.google_search_console
+            tables:
+                read:
+                    - prep.google_search_console.*
+                    - raw.google_search_console.* 
+
     - grafana:
         warehouses:
             - grafana
@@ -2254,6 +2281,20 @@ roles:
                     - prep.saas_usage_ping.*
                     - raw.version_db.*
 
+    - workato:
+        warehouses:
+            - loading
+        privileges:
+            databases:
+                read:
+                    - prod
+            schemas:
+                read:
+                    - prod.pumps_sensitive
+            tables:
+                read:
+                    - prod.pumps_sensitive.pump_marketing_contact
+
     - workday:
         warehouses:
             - dev_xs
@@ -2480,6 +2521,8 @@ roles:
 
     - alpcohen:
         member_of:
+            - analyst_sales
+            - data_team_analyst
             - reporter
             - restricted_safe
             - xactly
@@ -2495,17 +2538,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - amartin:
-        member_of:
-            - analyst_finance
-            - bamboohr_analytics
-            - customers_db
-            - analyst_marketing
-            - data_team_analyst
-            - restricted_safe
-        warehouses:
-            - dev_xs
-
     - aperez:
         member_of:
             - analyst_people
@@ -2513,13 +2545,6 @@ roles:
             - bi_tool_eval_read
             - restricted_safe
             - workday
-        warehouses:
-            - dev_xs
-
-    - ashaikh:
-        member_of:
-            - data_team_analyst
-            - analyst_core
         warehouses:
             - dev_xs
 
@@ -2535,6 +2560,14 @@ roles:
         member_of:
             - analyst_finance
             - bamboohr_analytics
+        warehouses:
+            - dev_xs
+
+    - caitlin:
+        member_of:
+            - analyst_core
+            - data_team_analyst
+            - restricted_safe
         warehouses:
             - dev_xs
 
@@ -2556,6 +2589,12 @@ roles:
             tables:
                 - cbraza_prep.*.*
                 - cbraza_prod.*.*
+
+    - cleroux:
+        member_of:
+            - analyst_engineering
+        warehouses:
+            - dev_xs
 
     - cmeddaugh:
         member_of:
@@ -2652,6 +2691,13 @@ roles:
         member_of:
             - reporter
             - analyst_marketing
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
+    - ddeng:
+        member_of:
+            - analyst_engineering
         warehouses:
             - dev_xs
 
@@ -2696,9 +2742,15 @@ roles:
                     - degan_prep.*.*
                     - degan_prod.*.*
 
-    - dfelton:
+    - dgupta:
         member_of:
-            - securityadmin
+            - adaptive
+            - analyst_finance
+            - customers_db
+            - analyst_marketing
+            - data_team_analyst
+            - restricted_safe
+            - xactly
         warehouses:
             - dev_xs
 
@@ -2879,56 +2931,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - ian:
-        member_of:
-            - data_team_analyst
-            - analyst_sales
-            - restricted_safe
-        warehouses:
-            - dev_xs
-            - dev_m
-        owns:
-            databases:
-                - ian_prep
-                - ian_prod
-            schemas:
-                - ian_prep.*
-                - ian_prod.*
-            tables:
-                - ian_prep.*.*
-                - ian_prod.*.*
-        privileges:
-            databases:
-                read:
-                    - ian_prep
-                    - ian_prod
-                write:
-                    - ian_prep
-                    - ian_prod
-            schemas:
-                read:
-                    - ian_prep.*
-                    - ian_prod.*
-                write:
-                    - ian_prep.*
-                    - ian_prod.*
-            tables:
-                read:
-                    - ian_prep.*.*
-                    - ian_prod.*.*
-                write:
-                    - ian_prep.*.*
-                    - ian_prod.*.*
-
-    - isharan:
-        member_of:
-            - data_team_analyst
-            - analyst_core
-            - restricted_safe
-            - bi_tool_eval_db
-        warehouses:
-            - dev_xs
-
     - iweeks:
         member_of:
             - adaptive
@@ -3035,6 +3037,7 @@ roles:
             - bi_tool_eval_read
             - xactly
             - sales_analytics
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -3188,47 +3191,6 @@ roles:
         warehouses:
             - dev_xs
             - dev_xl
-
-    - judume:
-        member_of:
-            - data_team_analyst
-            - analyst_sales
-            - restricted_safe
-        warehouses:
-            - dev_xs
-            - dev_m
-        owns:
-            databases:
-                - judume_prep
-                - judume_prod
-            schemas:
-                - judume_prep.*
-                - judume_prod.*
-            tables:
-                - judume_prep.*.*
-                - judume_prod.*.*
-        privileges:
-            databases:
-                read:
-                    - judume_prep
-                    - judume_prod
-                write:
-                    - judume_prep
-                    - judume_prod
-            schemas:
-                read:
-                    - judume_prep.*
-                    - judume_prod.*
-                write:
-                    - judume_prep.*
-                    - judume_prod.*
-            tables:
-                read:
-                    - judume_prep.*.*
-                    - judume_prod.*.*
-                write:
-                    - judume_prep.*.*
-                    - judume_prod.*.*
 
     - juwong:
         member_of:
@@ -3447,23 +3409,6 @@ roles:
         member_of: []
         warehouses: []
 
-    - lmai:
-        member_of:
-            - analyst_engineering
-            - bi_tool_eval_read
-        privileges:
-            databases:
-                read:
-                    - prep
-            schemas:
-                read:
-                    - prep.sensitive
-            tables: # https://gitlab.com/gitlab-com/team-member-epics/access-requests/-/issues/6311
-                read:
-                    - prep.sensitive.bamboohr_id_employee_number_mapping
-        warehouses:
-            - dev_xs
-
     - lvinueza:
         member_of:
             - analyst_finance
@@ -3534,8 +3479,10 @@ roles:
             - bamboohr
             - customers_db
             - data_team_analyst
+            - data_science_readonly
             - restricted_safe
             - workday
+            - zendesk
         warehouses:
             - dev_xs
         owns:
@@ -3841,6 +3788,7 @@ roles:
             - bi_tool_eval_read
             - xactly
             - sales_analytics
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -3921,6 +3869,51 @@ roles:
             - reporter
         warehouses:
             - dev_xs
+
+    - nmcavinue:
+        member_of:
+            - adaptive
+            - analyst_finance
+            - customers_db
+            - data_team_analyst
+            - data_manager
+            - restricted_safe
+            - xactly
+            - bi_tool_eval_db
+        warehouses:
+            - dev_xs
+        owns:
+            databases:
+                - nmcavinue_prep
+                - nmcavinue_prod
+            schemas:
+                - nmcavinue_prep.*
+                - nmcavinue_prod.*
+            tables:
+                - nmcavinue_prep.*.*
+                - nmcavinue_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - nmcavinue_prep
+                    - nmcavinue_prod
+                write:
+                    - nmcavinue_prep
+                    - nmcavinue_prod
+            schemas:
+                read:
+                    - nmcavinue_prep.*
+                    - nmcavinue_prod.*
+                write:
+                    - nmcavinue_prep.*
+                    - nmcavinue_prod.*
+            tables:
+                read:
+                    - nmcavinue_prep.*.*
+                    - nmcavinue_prod.*.*
+                write:
+                    - nmcavinue_prep.*.*
+                    - nmcavinue_prod.*.*
 
     - nraisinghani:
         member_of:
@@ -4193,48 +4186,15 @@ roles:
                     - rkohnke_prep.*.*
                     - rkohnke_prod.*.*
 
-    - rparker:
-        member_of:
-            - analyst_core
-            - restricted_safe
-        warehouses:
-            - dev_xs
-        owns:
-            databases:
-                - rparker_prep
-                - rparker_prod
-            schemas:
-                - rparker_prep.*
-                - rparker_prod.*
-            tables:
-                - rparker_prep.*.*
-                - rparker_prod.*.*
-        privileges:
-            databases:
-                read:
-                    - rparker_prep
-                    - rparker_prod
-                write:
-                    - rparker_prep
-                    - rparker_prod
-            schemas:
-                read:
-                    - rparker_prep.*
-                    - rparker_prod.*
-                write:
-                    - rparker_prep.*
-                    - rparker_prod.*
-            tables:
-                read:
-                    - rparker_prep.*.*
-                    - rparker_prod.*.*
-                write:
-                    - rparker_prep.*.*
-                    - rparker_prod.*.*
-
     - rrendon:
         member_of:
             - analyst_engineering
+        warehouses:
+            - dev_xs
+
+    - rwoo:
+        member_of:
+            - dbt_analytics
         warehouses:
             - dev_xs
 
@@ -4350,18 +4310,43 @@ roles:
                     - snalamaru_prep.*.*
                     - snalamaru_prod.*.*
 
-    - statimatla:
+    - srehm:
         member_of:
-            - adaptive
-            - analyst_finance
-            - bamboohr_analytics
-            - customers_db
-            - analyst_marketing
-            - data_team_analyst
-            - restricted_safe
-            - xactly
+            - analyst_growth
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - srehm_prep
+                - srehm_prod
+            schemas:
+                - srehm_prep.*
+                - srehm_prod.*
+            tables:
+                - srehm_prep.*.*
+                - srehm_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - srehm_prep
+                    - srehm_prod
+                write:
+                    - srehm_prep
+                    - srehm_prod
+            schemas:
+                read:
+                    - srehm_prep.*
+                    - srehm_prod.*
+                write:
+                    - srehm_prep.*
+                    - srehm_prod.*
+            tables:
+                read:
+                    - srehm_prep.*.*
+                    - srehm_prod.*.*
+                write:
+                    - srehm_prep.*.*
+                    - srehm_prod.*.*
 
     - stitch:
         warehouses:
@@ -4617,7 +4602,6 @@ users:
             - transformer
             - data_science_loader
             - sales_analytics
-            - restricted_safe
             - reporter
 
     - alpcohen:
@@ -4631,9 +4615,8 @@ users:
             - alu
 
     - amartin:
-        can_login: yes
-        member_of:
-            - amartin
+        can_login: no
+        member_of: []
 
     - aperez:
         can_login: yes
@@ -4641,9 +4624,8 @@ users:
             - aperez
 
     - ashaikh:
-        can_login: yes
-        member_of:
-            - ashaikh
+        can_login: no
+        member_of: []
 
     - bi_tool_eval:
         can_login: yes
@@ -4660,10 +4642,20 @@ users:
         member_of:
             - bnguyen
 
+    - caitlin:
+        can_login: yes
+        member_of:
+            - caitlin
+
     - cbraza:
         can_login: yes
         member_of:
             - cbraza
+
+    - cleroux:
+        can_login: yes
+        member_of:
+            - cleroux            
 
     - cmeddaugh:
         can_login: yes
@@ -4685,15 +4677,24 @@ users:
         member_of:
             - dcharukulvanich
 
+    - ddeng:
+        can_login: yes
+        member_of:
+            - ddeng
+
     - degan:
         can_login: yes
         member_of:
             - degan
 
     - dfelton:
+        can_login: no
+        member_of: []
+
+    - dgupta:
         can_login: yes
         member_of:
-            - dfelton
+            - dgupta            
 
     - dmicovic:
         can_login: yes
@@ -4742,15 +4743,14 @@ users:
         can_login: yes
         member_of:
             - hselim
+        
     - ian:
-        can_login: yes
-        member_of:
-            - ian
+        can_login: no
+        member_of: []
 
     - isharan:
-        can_login: yes
-        member_of:
-            - isharan
+        can_login: no
+        member_of: []
 
     - iweeks:
         can_login: yes
@@ -4800,9 +4800,8 @@ users:
             - jstemmer
 
     - judume:
-        can_login: yes
-        member_of:
-            - judume
+        can_login: no
+        member_of: []
 
     - juwong:
         can_login: yes
@@ -4844,9 +4843,8 @@ users:
         member_of: []
 
     - lmai:
-        can_login: yes
-        member_of:
-            - lmai
+        can_login: no
+        member_of: []
 
     - lvinueza:
         can_login: yes
@@ -4928,6 +4926,11 @@ users:
         member_of:
             - nkhanna
 
+    - nmcavinue:
+        can_login: yes
+        member_of:
+            - nmcavinue
+
     - nraisinghani:
         can_login: yes
         member_of:
@@ -4983,16 +4986,15 @@ users:
         member_of:
             - rkohnke
 
-    - rparker:
-        can_login: yes
-        member_of:
-            - rparker
-            - accountadmin
-
     - rrendon:
         can_login: yes
         member_of:
             - rrendon
+
+    - rwoo:
+        can_login: yes
+        member_of:
+            - rwoo
 
     - schaturvedi:
         can_login: yes
@@ -5024,10 +5026,14 @@ users:
         member_of:
             - snalamaru
 
-    - statimatla:
+    - srehm:
         can_login: yes
         member_of:
-            - statimatla
+            - srehm
+
+    - statimatla:
+        can_login: no
+        member_of: []
 
     - stitch:
         can_login: yes
@@ -5086,6 +5092,11 @@ users:
         can_login: yes
         member_of:
             - webrahim
+
+    - workato:
+        can_login: yes
+        member_of:
+            - workato
 
     - zzhang:
         can_login: yes

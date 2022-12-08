@@ -402,6 +402,15 @@
     "project_column_name": "dim_project_id",
     "primary_key": "dim_ci_build_id",
     "stage_name": "secure"
+  },
+  {
+    "event_name": "kubernetes_with_agent",
+    "source_cte_name": "prep_cluster_agent",
+    "user_column_name": "dim_user_id",
+    "ultimate_parent_namespace_column_name": "ultimate_parent_namespace_id",
+    "project_column_name": "dim_project_id",
+    "primary_key": "cluster_agent_id",
+    "stage_name": "configure"
   }
 ]
 
@@ -440,7 +449,8 @@
     ('prep_ci_pipeline_schedule', 'prep_ci_pipeline_schedule'),
     ('prep_snippet', 'prep_snippet'),
     ('prep_project', 'prep_project'),
-    ('prep_ci_trigger', 'prep_ci_trigger')
+    ('prep_ci_trigger', 'prep_ci_trigger'),
+    ('prep_cluster_agent', 'prep_cluster_agent')
 ]) }}
 
 , dast_jobs AS (

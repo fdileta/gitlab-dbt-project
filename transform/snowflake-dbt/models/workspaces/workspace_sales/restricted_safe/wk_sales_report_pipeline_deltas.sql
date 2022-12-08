@@ -193,9 +193,9 @@ WITH sfdc_opportunity_xf AS (
 
     SELECT 
       deltas.*,
-      users.user_email AS opportunity_owner_email, 
+      users.user_email AS opportunity_owner_email,
+      users.is_rep_flag,
       oppty.sales_qualified_source,
-      oppty.order_type_stamped,
       oppty.opportunity_category,
       oppty.sales_type,
       oppty.owner_id AS opportuniy_owner_id,
@@ -246,8 +246,9 @@ WITH sfdc_opportunity_xf AS (
       oppty.forecast_category_name                    AS current_forecast_category_name,
       oppty.opportunity_category                      AS current_opportunity_category,
       oppty.sales_type                                AS current_sales_type,
-      oppty.order_type_live                           AS current_order_type_live,
-      oppty.sales_qualified_source                    AS current_sales_qualified_source
+      oppty.order_type_stamped                        AS current_order_type,
+      oppty.sales_qualified_source                    AS current_sales_qualified_source,
+      oppty.stage_name                                AS current_stage_name                                     
 
     FROM deltas_consolidated AS deltas
     LEFT JOIN sfdc_opportunity_xf AS oppty

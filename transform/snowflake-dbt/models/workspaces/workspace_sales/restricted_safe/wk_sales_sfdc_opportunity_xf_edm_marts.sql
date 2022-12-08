@@ -409,7 +409,9 @@ WITH edm_opty AS (
     CASE edm_opty.is_sao 
       WHEN TRUE THEN 1 
       ELSE 0 
-    END                                             AS is_eligible_sao_flag 
+    END                                             AS is_eligible_sao_flag,
+
+    opportunity_owner.is_rep_flag
     
 
     FROM edm_opty

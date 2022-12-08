@@ -10,11 +10,12 @@ WITH
 source AS (
   
   SELECT
-    parse_json(value) AS value
+    OBJECT_DELETE(PARSE_JSON(value), 'gcs_export_time') AS value,
+    TO_TIMESTAMP(value['gcs_export_time']::INT, 6) AS gcs_export_time
   FROM {{ source('gcp_billing','summary_gcp_billing') }}
   {% if is_incremental() %}
 
-  WHERE TO_TIMESTAMP(value['gcs_export_time']::INT, 6) > (SELECT MAX(uploaded_at) FROM {{ this }})
+  WHERE gcs_export_time > (SELECT MAX(uploaded_at) FROM {{ this }})
 
   {% endif %}
 
@@ -24,9 +25,10 @@ grouped AS (
   
   SELECT
     value,
+    gcs_export_time,
     count(*) AS occurrence_multiplier
   FROM source
-  GROUP BY 1
+  GROUP BY 1,2
 ),
 
 renamed AS (
@@ -63,7 +65,7 @@ renamed AS (
     TO_TIMESTAMP(value['usage_start_time']::INT, 6) AS usage_start_time,
     TO_TIMESTAMP(value['usage_end_time']::INT, 6) AS usage_end_time,
     value['_partition_date']::DATE AS partition_date,
-    TO_TIMESTAMP(value['gcs_export_time']::INT, 6) AS uploaded_at,
+    gcs_export_time AS uploaded_at,
     occurrence_multiplier
   
   

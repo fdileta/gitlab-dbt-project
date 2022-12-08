@@ -28,7 +28,6 @@ WITH sfdc_account AS (
 
     SELECT
       sfdc_account.*,
-
       tam_user.name                                                                   AS technical_account_manager,
       parent_account.account_name                                                     AS ultimate_parent_account_name, 
 
@@ -131,7 +130,9 @@ WITH sfdc_account AS (
       END                                 AS zi_bit_bucket_presence_flag,
 
     -- NF 2022-01-28 Added extra account owner demographics fields
-    account_owner.user_segment            AS account_owner_user_segment, -- coming directly from source table
+    --account_owner.user_segment            AS account_owner_user_segment, -- coming directly from source table
+    -- JK: 2022-11-16 changing the source back to the user object to align with EDM 
+    account_owner.user_segment            AS account_owner_user_segment,
     account_owner.user_geo                AS account_owner_user_geo, 
     account_owner.user_region             AS account_owner_user_region,
     account_owner.user_area               AS account_owner_user_area,

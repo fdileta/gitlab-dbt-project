@@ -527,7 +527,9 @@ we can delete this connection and use the mart table directly.
         WHEN 'Yes'
           THEN 1 
         ELSE 0
-      END                                 AS is_comp_new_logo_override
+      END                                 AS is_comp_new_logo_override,
+
+      opportunity_owner.is_rep_flag
     
     FROM {{ref('sfdc_opportunity_xf')}} sfdc_opportunity_xf
     -- not all fields are in opportunity xf

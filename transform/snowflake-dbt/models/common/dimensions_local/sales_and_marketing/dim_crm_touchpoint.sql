@@ -68,7 +68,8 @@ WITH campaign_details AS (
       utm_content,
       '0'                           AS is_attribution_touchpoint,
       dim_campaign_id,
-      dim_parent_campaign_id
+      dim_parent_campaign_id,
+      bizible_created_date
 
     FROM bizible_touchpoints_with_campaign
 
@@ -104,7 +105,8 @@ WITH campaign_details AS (
       utm_content,
       '1'                           AS is_attribution_touchpoint,
       dim_campaign_id,
-      dim_parent_campaign_id
+      dim_parent_campaign_id,
+      bizible_created_date
 
     FROM bizible_attribution_touchpoints_with_campaign
 
@@ -179,7 +181,8 @@ WITH campaign_details AS (
           AND is_dg_influenced = 1
           THEN 1
         ELSE 0
-      END AS is_dg_sourced
+      END AS is_dg_sourced,
+      combined_touchpoints.bizible_created_date 
     FROM combined_touchpoints
     LEFT JOIN bizible_campaign_grouping
       ON combined_touchpoints.dim_crm_touchpoint_id = bizible_campaign_grouping.dim_crm_touchpoint_id
@@ -188,7 +191,7 @@ WITH campaign_details AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2021-01-21",
-    updated_date="2022-10-05"
+    updated_date="2022-12-01"
 ) }}

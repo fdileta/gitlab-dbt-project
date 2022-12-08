@@ -348,12 +348,14 @@ WITH date_details AS (
       edm_opp_live.deal_category,
 
       upa.crm_account_name                                           AS ultimate_parent_account_name,
-      upa.parent_crm_account_demographics_sales_segment                     AS upa_demographics_segment,
-      upa.parent_crm_account_demographics_geo                               AS upa_demographics_geo,
-      upa.parent_crm_account_demographics_region                            AS upa_demographics_region,
-      upa.parent_crm_account_demographics_area                              AS upa_demographics_area,
-      upa.parent_crm_account_demographics_territory                         AS upa_demographics_territory
 
+      upa.account_demographics_sales_segment                     AS upa_demographics_segment,
+      upa.account_demographics_geo                               AS upa_demographics_geo,
+      upa.account_demographics_region                            AS upa_demographics_region,
+      upa.account_demographics_area                              AS upa_demographics_area,
+      upa.account_demographics_territory                         AS upa_demographics_territory,
+
+      opportunity_owner.is_rep_flag
 
     FROM {{ref('mart_crm_opportunity_daily_snapshot')}} AS edm_snapshot_opty
     INNER JOIN date_details AS close_date_detail

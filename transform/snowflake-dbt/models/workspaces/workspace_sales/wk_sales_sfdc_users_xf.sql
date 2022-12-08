@@ -135,7 +135,15 @@ WITH RECURSIVE base AS (
           WHEN cro.level_2 LIKE 'VP%'
               THEN 1
           ELSE 0
-      END                                                                                           AS is_lvl_2_vp_flag
+      END                                                                                           AS is_lvl_2_vp_flag,
+      CASE
+        WHEN LOWER(title) LIKE '%strategic account%'
+           OR LOWER(title) LIKE '%account executive%'
+           OR LOWER(title) LIKE '%country manager%'
+           OR LOWER(title) LIKE '%public sector channel manager%'
+        THEN 1
+        ELSE 0
+      END                                                                                          AS is_rep_flag
 
     FROM base
     LEFT JOIN cro_sfdc_hierarchy AS cro

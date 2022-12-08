@@ -28,6 +28,7 @@
       zuora_account.status                                  AS account_status,
       zuora_account.parent_id,
       zuora_account.sfdc_account_code,
+      zuora_account.sfdc_entity,
       zuora_account.currency                                AS account_currency,
       zuora_contact.country                                 AS sold_to_country,
       zuora_account.ssp_channel,
@@ -53,7 +54,7 @@
 {{ dbt_audit(
     cte_ref="filtered",
     created_by="@msendal",
-    updated_by="@jpeguero",
+    updated_by="@michellecooper",
     created_date="2020-07-20",
-    updated_date="2022-07-15"
+    updated_date="2022-11-21"
 ) }}

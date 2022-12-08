@@ -44,7 +44,9 @@ WITH account_dimensions AS (
       -- attribution counts
       bizible_count_first_touch,
       bizible_count_lead_creation_touch,
-      bizible_count_u_shaped
+      bizible_count_u_shaped,
+
+      bizible_touchpoints.bizible_created_date
 
     FROM bizible_touchpoints
     LEFT JOIN account_dimensions
@@ -56,7 +58,7 @@ WITH account_dimensions AS (
 {{ dbt_audit(
     cte_ref="final_touchpoint",
     created_by="@mcooperDD",
-    updated_by="@rkohnke",
+    updated_by="@michellecooper",
     created_date="2021-01-21",
-    updated_date="2021-10-05"
+    updated_date="2021-11-29"
 ) }}

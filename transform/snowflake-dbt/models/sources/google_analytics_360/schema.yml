@@ -25,6 +25,8 @@ models:
         - name: visit_start_time
           tests:
             - not_null
+        - name: export_date
+          description: Date the data is exported from Google Analytics into Big Query
     - name: ga360_session_hit_source
       columns:
         - name: visit_id

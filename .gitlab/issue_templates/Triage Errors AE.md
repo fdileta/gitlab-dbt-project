@@ -30,6 +30,23 @@ WHERE status NOT IN ('success')
 ORDER BY 
   generated_at DESC;
 ```
+You can run the following query to find the tests that failed:
+```sql
+WITH test_results AS (
+  SELECT
+    *,
+    SPLIT_PART(test_unique_id,'.',3) AS test_name
+  FROM "PREP"."DBT"."DBT_TEST_RESULTS_SOURCE"
+)
+
+SELECT
+  *
+FROM test_results
+WHERE DATE_TRUNC('day',uploaded_at) > '2022-11-09'
+  AND DATE_TRUNC('day',uploaded_at) <= '2022-11-10' --update these dates
+  AND status = 'fail'
+ORDER BY uploaded_at DESC, status
+```
 
 </details>
 
