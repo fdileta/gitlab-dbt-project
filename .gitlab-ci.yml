@@ -69,7 +69,7 @@ include:
 📈clone_prod:
   <<: *snowflake_start_clone
   script:
-    - export ORIGINAL_SHA=(git cherry master | head -n 1)
+    - export ORIGINAL_SHA=$(git cherry master | head -n 1)
     - echo $ORIGINAL_SHA
     - echo $CI_COMMIT_SHA
     - if [$ORIGINAL_SHA = $CI_COMMIT_SHA]
