@@ -2,26 +2,31 @@ pumps:
   - model: pump_marketing_contact
     timestamp_column: last_changed
     sensitive: True
+    single: True
     stage: s3_data_pump
     owner: '@jjstark'
   - model: pump_subscription_product_usage
     timestamp_column: report_date
     sensitive: True
+    single: False
     stage: s3_data_pump
     owner: '@snalamaru'
   - model: pump_product_usage_free_user_metrics_monthly
     timestamp_column: reporting_month
     sensitive: True
+    single: False
     owner: '@snalamaru'
     stage: s3_data_pump
   - model: pump_disaster_relief_fund
     timestamp_column: null
     sensitive: True
+    single: False
     owner: '@aperez349'
     stage: s3_data_pump
   - model: pump_daily_sao
     timestamp_column: sao_date
     sensitive: True
+    single: False
     owner: '@paul_armstrong'
     stage: pmg_s3_data_pump
   - model: pump_daily_data_science_scores

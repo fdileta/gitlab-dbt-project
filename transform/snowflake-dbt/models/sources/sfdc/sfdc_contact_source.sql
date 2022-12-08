@@ -53,6 +53,7 @@ renamed AS (
 
     -- info
     dozisf__zoominfo_company_id__c AS zoominfo_company_id,
+    dozisf__zoominfo_id__c AS zoominfo_contact_id,
     zi_company_revenue__c AS zoominfo_company_revenue,
     zi_employee_count__c AS zoominfo_company_employee_count,
     cognism_number_of_employees__c AS cognism_employee_count,
@@ -113,6 +114,9 @@ renamed AS (
     is_first_order_person__c AS is_first_order_person,
     true_initial_mql_date__c AS true_initial_mql_date,
     true_mql_date__c AS true_mql_date,
+	last_transfer_date_time__c AS last_transfer_date_time,
+	time_from_last_transfer_to_sequence__c AS time_from_last_transfer_to_sequence,
+	time_from_mql_to_last_transfer__c AS time_from_mql_to_last_transfer,
     {{ sfdc_source_buckets('leadsource') }}
 
 

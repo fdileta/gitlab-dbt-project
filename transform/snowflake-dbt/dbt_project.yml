@@ -221,15 +221,14 @@ models:
         +materialized: table
         +schema: google_analytics_360
 
+      google_search_console:
+        +schema: google_search_console 
+
       greenhouse:
         +schema: greenhouse
 
       handbook:
         +schema: handbook
-
-      keyhole_twitter:
-        +schema: keyhole_twitter
-        +tags: ["keyhole_twitter", "social", "sources"]
 
       license:
         +schema: license_db
@@ -463,9 +462,6 @@ models:
           +database: "{{ env_var('SNOWFLAKE_PREP_DATABASE') }}" #PREP
           +schema: sensitive
           secure: true
-
-      keyhole_twitter:
-        +tags: [ "keyhole_twitter", "social" ]
 
       license:
         +materialized: view

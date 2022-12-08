@@ -339,56 +339,58 @@ WITH date_details AS (
       edm_snapshot_opty.open_3plus_deal_count,
       edm_snapshot_opty.open_4plus_deal_count,
       edm_snapshot_opty.booked_deal_count,
-      edm_snapshot_opty.churned_contraction_deal_count,
-      edm_snapshot_opty.open_1plus_net_arr,
-      edm_snapshot_opty.open_3plus_net_arr,
-      edm_snapshot_opty.open_4plus_net_arr,
+      -- JK 2022-10-25 they are being calculated in a CTE later for now
+      -- edm_snapshot_opty.churned_contraction_deal_count,
+      -- edm_snapshot_opty.open_1plus_net_arr,
+      -- edm_snapshot_opty.open_3plus_net_arr,
+      -- edm_snapshot_opty.open_4plus_net_arr,
+      -- edm_snapshot_opty.churned_contraction_net_arr,
       edm_snapshot_opty.booked_net_arr,
-      edm_snapshot_opty.churned_contraction_net_arr,
       edm_snapshot_opty.is_excluded_from_pipeline_created       AS is_excluded_flag,
 
       --------------------------------
 
       edm_snapshot_opty.opportunity_owner_manager,
       edm_snapshot_opty.is_edu_oss,
-      edm_snapshot_opty.sales_qualified_source_name             AS sales_qualified_source,
+      --edm_snapshot_opty.sales_qualified_source_name             AS sales_qualified_source,
       edm_snapshot_opty.dim_crm_account_id                      AS account_id,
       edm_snapshot_opty.opportunity_category,
 
       edm_snapshot_opty.account_owner_team_stamped,
       edm_snapshot_opty.account_owner_team_stamped_cro_level,
 
-      edm_snapshot_opty.opportunity_owner_user_segment,
-      edm_snapshot_opty.opportunity_owner_user_region,
-      edm_snapshot_opty.opportunity_owner_user_area,
-      edm_snapshot_opty.opportunity_owner_user_geo,
+      -- JK 2022-10-25: for now we leverage the live opp model for the following keys
+      --edm_snapshot_opty.opportunity_owner_user_segment,
+      --edm_snapshot_opty.opportunity_owner_user_region,
+      --edm_snapshot_opty.opportunity_owner_user_area,
+      --edm_snapshot_opty.opportunity_owner_user_geo,
       
-      edm_snapshot_opty.sales_team_rd_asm_level,
-      edm_snapshot_opty.sales_team_cro_level,
-      edm_snapshot_opty.sales_team_vp_level,
-      edm_snapshot_opty.sales_team_avp_rd_level,
-      edm_snapshot_opty.sales_team_asm_level,
-      edm_snapshot_opty.report_opportunity_user_segment,
-      edm_snapshot_opty.report_opportunity_user_geo,
-      edm_snapshot_opty.report_opportunity_user_region,
-      edm_snapshot_opty.report_opportunity_user_area,
-      edm_snapshot_opty.report_user_segment_geo_region_area,
-      edm_snapshot_opty.report_user_segment_geo_region_area_sqs_ot,
-      LOWER(edm_snapshot_opty.key_sqs)                           AS key_sqs,
-      LOWER(edm_snapshot_opty.key_ot)                            AS key_ot,
-      LOWER(edm_snapshot_opty.key_segment)                       AS key_segment,
-      LOWER(edm_snapshot_opty.key_segment_sqs)                   AS key_segment_sqs,
-      LOWER(edm_snapshot_opty.key_segment_ot)                    AS key_segment_ot,
-      LOWER(edm_snapshot_opty.key_segment_geo)                   AS key_segment_geo,
-      LOWER(edm_snapshot_opty.key_segment_geo_sqs)               AS key_segment_geo_sqs,
-      LOWER(edm_snapshot_opty.key_segment_geo_ot)                AS key_segment_geo_ot,
-      LOWER(edm_snapshot_opty.key_segment_geo_region)            AS key_segment_geo_region,
-      LOWER(edm_snapshot_opty.key_segment_geo_region_sqs)        AS key_segment_geo_region_sqs,
-      LOWER(edm_snapshot_opty.key_segment_geo_region_ot)         AS key_segment_geo_region_ot,
-      LOWER(edm_snapshot_opty.key_segment_geo_region_area)       AS key_segment_geo_region_area,
-      LOWER(edm_snapshot_opty.key_segment_geo_region_area_sqs)   AS key_segment_geo_region_area_sqs,
-      LOWER(edm_snapshot_opty.key_segment_geo_region_area_ot)    AS key_segment_geo_region_area_ot,
-      LOWER(edm_snapshot_opty.key_segment_geo_area)              AS key_segment_geo_area,
+      --edm_snapshot_opty.sales_team_rd_asm_level,
+      --edm_snapshot_opty.sales_team_cro_level,
+      --edm_snapshot_opty.sales_team_vp_level,
+      --edm_snapshot_opty.sales_team_avp_rd_level,
+      --edm_snapshot_opty.sales_team_asm_level,
+      --edm_snapshot_opty.report_opportunity_user_segment,
+      --edm_snapshot_opty.report_opportunity_user_geo,
+      --edm_snapshot_opty.report_opportunity_user_region,
+      --edm_snapshot_opty.report_opportunity_user_area,
+      --edm_snapshot_opty.report_user_segment_geo_region_area,
+      --edm_snapshot_opty.report_user_segment_geo_region_area_sqs_ot,
+      --LOWER(edm_snapshot_opty.key_sqs)                           AS key_sqs,
+      --LOWER(edm_snapshot_opty.key_ot)                            AS key_ot,
+      --LOWER(edm_snapshot_opty.key_segment)                       AS key_segment,
+      --LOWER(edm_snapshot_opty.key_segment_sqs)                   AS key_segment_sqs,
+      --LOWER(edm_snapshot_opty.key_segment_ot)                    AS key_segment_ot,
+      --LOWER(edm_snapshot_opty.key_segment_geo)                   AS key_segment_geo,
+      --LOWER(edm_snapshot_opty.key_segment_geo_sqs)               AS key_segment_geo_sqs,
+      --LOWER(edm_snapshot_opty.key_segment_geo_ot)                AS key_segment_geo_ot,
+      --LOWER(edm_snapshot_opty.key_segment_geo_region)            AS key_segment_geo_region,
+      --LOWER(edm_snapshot_opty.key_segment_geo_region_sqs)        AS key_segment_geo_region_sqs,
+      --LOWER(edm_snapshot_opty.key_segment_geo_region_ot)         AS key_segment_geo_region_ot,
+      --LOWER(edm_snapshot_opty.key_segment_geo_region_area)       AS key_segment_geo_region_area,
+      --LOWER(edm_snapshot_opty.key_segment_geo_region_area_sqs)   AS key_segment_geo_region_area_sqs,
+      --LOWER(edm_snapshot_opty.key_segment_geo_region_area_ot)    AS key_segment_geo_region_area_ot,
+      --LOWER(edm_snapshot_opty.key_segment_geo_area)              AS key_segment_geo_area,
       edm_snapshot_opty.deal_group,
       edm_snapshot_opty.deal_category,
       -- edm_snapshot_opty.opportunity_owner,
@@ -442,6 +444,41 @@ WITH date_details AS (
 
       -- duplicates flag
       sfdc_opportunity_xf.is_duplicate_flag                               AS current_is_duplicate_flag,
+      
+      -- JK 2022-10-25: using live fields instead of the edm snapshot opp table directly
+      sfdc_opportunity_xf.opportunity_owner_user_segment,
+      sfdc_opportunity_xf.opportunity_owner_user_region,
+      sfdc_opportunity_xf.opportunity_owner_user_area,
+      sfdc_opportunity_xf.opportunity_owner_user_geo,
+      
+      sfdc_opportunity_xf.sales_team_rd_asm_level,
+      sfdc_opportunity_xf.sales_team_cro_level,
+      sfdc_opportunity_xf.sales_team_vp_level,
+      sfdc_opportunity_xf.sales_team_avp_rd_level,
+      sfdc_opportunity_xf.sales_team_asm_level,
+      sfdc_opportunity_xf.report_opportunity_user_segment,
+      sfdc_opportunity_xf.report_opportunity_user_geo,
+      sfdc_opportunity_xf.report_opportunity_user_region,
+      sfdc_opportunity_xf.report_opportunity_user_area,
+      sfdc_opportunity_xf.report_user_segment_geo_region_area,
+      sfdc_opportunity_xf.report_user_segment_geo_region_area_sqs_ot,
+      sfdc_opportunity_xf.key_sqs,
+      sfdc_opportunity_xf.key_ot,
+      sfdc_opportunity_xf.key_segment,
+      sfdc_opportunity_xf.key_segment_sqs,
+      sfdc_opportunity_xf.key_segment_ot,
+      sfdc_opportunity_xf.key_segment_geo,
+      sfdc_opportunity_xf.key_segment_geo_sqs,
+      sfdc_opportunity_xf.key_segment_geo_ot,
+      sfdc_opportunity_xf.key_segment_geo_region,
+      sfdc_opportunity_xf.key_segment_geo_region_sqs,
+      sfdc_opportunity_xf.key_segment_geo_region_ot,
+      sfdc_opportunity_xf.key_segment_geo_region_area,
+      sfdc_opportunity_xf.key_segment_geo_region_area_sqs,
+      sfdc_opportunity_xf.key_segment_geo_region_area_ot,
+      sfdc_opportunity_xf.key_segment_geo_area,
+
+      sfdc_opportunity_xf.sales_qualified_source,
 
       ------------------------------------------------------------------------------------------------------
       ------------------------------------------------------------------------------------------------------
@@ -460,7 +497,9 @@ WITH date_details AS (
       upa.account_demographics_geo                               AS upa_demographics_geo,
       upa.account_demographics_region                            AS upa_demographics_region,
       upa.account_demographics_area                              AS upa_demographics_area,
-      upa.account_demographics_territory                         AS upa_demographics_territory
+      upa.account_demographics_territory                         AS upa_demographics_territory,
+
+      opportunity_owner.is_rep_flag
 
       
     FROM sfdc_opportunity_snapshot_history AS opp_snapshot
@@ -526,7 +565,54 @@ WITH date_details AS (
         ON vision_opps.opportunity_id = opp_snapshot.opportunity_id
         AND vision_opps.snapshot_fiscal_quarter_date = opp_snapshot.snapshot_fiscal_quarter_date
 
+
+-- JK 2022-10-25: temporarily calculating open_nplus_net_arrs & churn_contraction fields 
+-- in wk sales model instead of using the fields directly from edm marts
+), temp_calculations AS (
+
+    SELECT
+      *,
+      CASE 
+        WHEN is_eligible_open_pipeline_flag = 1
+          THEN net_arr
+        ELSE 0                                                                                              
+      END                                                 AS open_1plus_net_arr,
+
+      CASE 
+        WHEN is_eligible_open_pipeline_flag = 1
+          AND is_stage_3_plus = 1   
+            THEN net_arr
+        ELSE 0
+      END                                                 AS open_3plus_net_arr,
+  
+      CASE 
+        WHEN is_eligible_open_pipeline_flag = 1  
+          AND is_stage_4_plus = 1
+            THEN net_arr
+        ELSE 0
+      END                                                 AS open_4plus_net_arr,
+
+      CASE
+        WHEN ((is_renewal = 1
+            AND is_lost = 1)
+            OR is_won = 1 )
+            AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
+        THEN calculated_deal_count
+        ELSE 0
+      END                                                 AS churned_contraction_deal_count,
+
+      CASE
+        WHEN ((is_renewal = 1
+            AND is_lost = 1)
+            OR is_won = 1 )
+            AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
+        THEN net_arr
+        ELSE 0
+      END                                                 AS churned_contraction_net_arr
+    
+    FROM add_compound_metrics
+
 )
 
 SELECT *
-FROM add_compound_metrics
+FROM temp_calculations

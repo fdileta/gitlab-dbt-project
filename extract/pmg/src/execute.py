@@ -6,46 +6,45 @@ from big_query_client import BigQueryClient
 from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
     snowflake_stage_load_copy_remove,
-    dataframe_uploader,
 )
 
 config_dict = env.copy()
 
 
 def get_pmg_reporting_data_query(start_date: str, end_date: str) -> str:
-    return (
-        f"SELECT "
-        f"  date,"
-        f"  utm_medium,"
-        f"  utm_source,"
-        f"  utm_campaign,"
-        f"  campaign_code,"
-        f"  geo,"
-        f"  targeting,"
-        f"  ad_unit,"
-        f"  br_nb,"
-        f"  match_unit,"
-        f"  content,"
-        f"  team,"
-        f"  budget,"
-        f"  sales_segment,"
-        f"  data_source,"
-        f"  impressions,"
-        f"  clicks,"
-        f"  conversions,"
-        f"  cost,"
-        f"  ga_conversions,"
-        f"  sends, "
-        f"  opens, "
-        f"  inquiries, "
-        f"  mqls, "
-        f"  linear_sao, "
-        f"  campaign_code_type, "
-        f"  content_type "
-        f"FROM "
-        f"  `pmg-datawarehouse.gitlab.reporting_data`"
-        f"  WHERE date >= '{end_date}' and date < '{start_date}'"
-    )
+    return f"""
+        SELECT 
+          date,
+          medium                    AS utm_medium,
+          source                    AS utm_source,
+          campaign_id               AS utm_campaign,
+          campaign_code,
+          geo,
+          targeting,
+          ad_unit,
+          br_nb,
+          match_unit,
+          content,
+          team,
+          budget,
+          sales_segment,
+          data_source,
+          impressions,
+          clicks,
+          conversions,
+          total_cost                AS cost,
+          ga_conversions,
+          sends, 
+          opens, 
+          inquiries, 
+          mqls, 
+          linear_sao, 
+          campaign_code_type, 
+          content_type 
+        FROM 
+          `pmg-datawarehouse.gitlab_analytics.cross_channel`
+          WHERE date >= '{end_date}' and date < '{start_date}'
+        """
 
 
 def write_date_json(date: str, df: DataFrame) -> str:

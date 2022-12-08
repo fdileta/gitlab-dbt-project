@@ -44,13 +44,14 @@
       mart_crm_attribution_touchpoint.dim_crm_account_id,
       mart_crm_attribution_touchpoint.crm_account_name,
       mart_crm_attribution_touchpoint.crm_account_gtm_strategy,
-      (mart_crm_attribution_touchpoint.net_arr / campaigns_per_opp.campaigns_per_opp) AS net_arr_per_campaign,
+      (mart_crm_attribution_touchpoint.net_arr / NULLIF(campaigns_per_opp.campaigns_per_opp,0)) AS net_arr_per_campaign,
       linear_base.count_touches,
       mart_crm_attribution_touchpoint.bizible_touchpoint_date,
       mart_crm_attribution_touchpoint.bizible_touchpoint_position,
       mart_crm_attribution_touchpoint.bizible_touchpoint_source,
       mart_crm_attribution_touchpoint.bizible_touchpoint_type,
       mart_crm_attribution_touchpoint.bizible_ad_campaign_name,
+      mart_crm_attribution_touchpoint.bizible_ad_group_name,
       mart_crm_attribution_touchpoint.bizible_ad_content,
       mart_crm_attribution_touchpoint.bizible_form_url_raw,
       mart_crm_attribution_touchpoint.bizible_landing_page_raw,
@@ -59,6 +60,7 @@
       mart_crm_attribution_touchpoint.bizible_landing_page,
       mart_crm_attribution_touchpoint.bizible_referrer_page,
       mart_crm_attribution_touchpoint.bizible_marketing_channel,
+	  mart_crm_attribution_touchpoint.campaign_rep_role_name,
       CASE
         WHEN mart_crm_attribution_touchpoint.dim_parent_campaign_id = '7014M000001dn8MQAQ' THEN 'Paid Social.LinkedIn Lead Gen'
         WHEN mart_crm_attribution_touchpoint.bizible_ad_campaign_name = '20201013_ActualTechMedia_DeepMonitoringCI' THEN 'Sponsorship'
@@ -93,29 +95,29 @@
       SUM(mart_crm_attribution_touchpoint.bizible_attribution_percent_full_path) AS full_weight,
       SUM(mart_crm_attribution_touchpoint.bizible_count_custom_model) AS custom_weight,
       COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) AS l_touches,
-      (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / linear_base.count_touches) AS l_weight,
+      (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / NULLIF(linear_base.count_touches,0)) AS l_weight,
       (mart_crm_attribution_touchpoint.net_arr * first_weight) AS first_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * w_weight) AS w_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * u_weight) AS u_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * full_weight) AS full_net_arr,
       (mart_crm_attribution_touchpoint.net_arr * custom_weight) AS custom_net_arr,
-      (mart_crm_attribution_touchpoint.net_arr * (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / linear_base.count_touches)) AS linear_net_arr
+      (mart_crm_attribution_touchpoint.net_arr * (COUNT(DISTINCT mart_crm_attribution_touchpoint.dim_crm_opportunity_id) / NULLIF(linear_base.count_touches,0))) AS linear_net_arr
     FROM
     mart_crm_attribution_touchpoint
     LEFT JOIN linear_base ON
     mart_crm_attribution_touchpoint.dim_crm_opportunity_id = linear_base.dim_crm_opportunity_id
     LEFT JOIN  campaigns_per_opp ON
-    mart_crm_attribution_touchpoint.dim_crm_opportunity_id =      campaigns_per_opp.dim_crm_opportunity_id
-    LEFT JOIN mart_crm_opportunity
-      ON mart_crm_attribution_touchpoint.dim_crm_opportunity_id = mart_crm_opportunity.dim_crm_opportunity_id
-    {{ dbt_utils.group_by(n=54) }}
+    mart_crm_attribution_touchpoint.dim_crm_opportunity_id = campaigns_per_opp.dim_crm_opportunity_id
+    LEFT JOIN mart_crm_opportunity ON
+    mart_crm_attribution_touchpoint.dim_crm_opportunity_id = mart_crm_opportunity.dim_crm_opportunity_id
+    {{ dbt_utils.group_by(n=56) }}
 
 )
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@rkohnke",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2022-01-25",
-    updated_date="2022-10-11"
+    updated_date="2022-12-01"
 ) }}

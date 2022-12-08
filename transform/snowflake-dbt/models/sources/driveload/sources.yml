@@ -26,3 +26,5 @@ sources:
       - name: zuora_revenue_unreleased_pob_report
       - name: zuora_revenue_unbill_rollforward_report
       - name: zuora_revenue_revenue_waterfall_report
+      - name: marketing_press_sov
+      - name: booking_to_billing_monthly_reconciliation

@@ -154,6 +154,7 @@
       dim_sales_qualified_source.sales_qualified_source_name,
       dim_sales_qualified_source.sales_qualified_source_grouped,
       dim_sales_qualified_source.sqs_bucket_engagement,
+	  dim_crm_opportunity.record_type_name,
 
        -- Account fields
       dim_crm_account.crm_account_name,
@@ -184,6 +185,8 @@
       dim_crm_account.crm_account_zi_technologies,
       dim_crm_account.is_jihu_account,
       dim_crm_account.fy22_new_logo_target_list,
+      dim_crm_account.admin_manual_source_number_of_employees,
+      dim_crm_account.admin_manual_source_account_address,
 
       -- Flags
       fct_crm_opportunity.is_won,
@@ -616,9 +619,9 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@michellecooper",
+    updated_by="@rkohnke",
     created_date="2020-12-07",
-    updated_date="2022-09-06"
+    updated_date="2022-11-30"
   ) }}
 
 

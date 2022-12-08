@@ -52,7 +52,8 @@ WITH source AS (
         ELSE SPLIT_PART(SPLIT_PART(bizible_form_url_raw,'utm_content=',2),'&',1) 
       END AS utm_content,
 
-      isdeleted                               AS is_deleted
+      isdeleted                               AS is_deleted,
+      createddate                             AS bizible_created_date
 
 
     FROM source

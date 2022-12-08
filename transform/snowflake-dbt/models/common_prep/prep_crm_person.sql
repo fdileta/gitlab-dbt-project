@@ -147,7 +147,11 @@ WITH biz_person AS (
       zoominfo_mobile_phone_number,
       zoominfo_do_not_call_direct_phone,
       zoominfo_do_not_call_mobile_phone,
-      NULL                                           AS zoominfo_company_employee_count
+      last_transfer_date_time,
+      time_from_last_transfer_to_sequence,
+      time_from_mql_to_last_transfer,
+      NULL                                           AS zoominfo_company_employee_count,
+      zoominfo_contact_id
 
 
     FROM sfdc_contacts
@@ -257,7 +261,11 @@ WITH biz_person AS (
       zoominfo_mobile_phone_number,
       zoominfo_do_not_call_direct_phone,
       zoominfo_do_not_call_mobile_phone,
-      zoominfo_company_employee_count
+      last_transfer_date_time,
+      time_from_last_transfer_to_sequence,
+      time_from_mql_to_last_transfer,
+      zoominfo_company_employee_count,
+      NULL AS zoominfo_contact_id
 
     FROM sfdc_leads
     LEFT JOIN biz_person_with_touchpoints
@@ -289,5 +297,5 @@ WITH biz_person AS (
     created_by="@mcooperDD",
     updated_by="@rkohnke",
     created_date="2020-12-08",
-    updated_date="2022-09-30"
+    updated_date="2022-11-01"
 ) }}

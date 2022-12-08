@@ -110,6 +110,7 @@
       worked_date_pt.first_day_of_month        AS worked_month_pt,
       dim_crm_person.email_domain,
       dim_crm_person.email_domain_type,
+      is_valuable_signup,
       dim_crm_person.email_hash,
       dim_crm_person.status,
       dim_crm_person.lead_source,
@@ -170,6 +171,10 @@
       dim_crm_person.zoominfo_do_not_call_direct_phone,
       dim_crm_person.zoominfo_do_not_call_mobile_phone,
       dim_crm_person.zoominfo_company_employee_count,
+      fct_crm_person.last_transfer_date_time,
+      fct_crm_person.time_from_last_transfer_to_sequence,
+      fct_crm_person.time_from_mql_to_last_transfer,
+      fct_crm_person.zoominfo_contact_id,
       fct_crm_person.is_mql,
       fct_crm_person.is_inquiry,
       CASE
@@ -260,7 +265,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@michellecooper",
+    updated_by="@degan",
     created_date="2020-12-07",
-    updated_date="2022-10-06",
+    updated_date="2022-11-22",
   ) }}  
