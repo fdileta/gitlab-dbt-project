@@ -71,7 +71,8 @@ include:
   script:
     - manage_snowflake.py manage_clones --database prod --empty
     - manage_snowflake.py manage_clones --database prep --empty
-  when: always
+  rules:
+    - if: (git cherry master -v | head -n 1) == $CI_COMMIT_SHA
 
 📈clone_prod_manual:
   <<: *snowflake_start_clone
