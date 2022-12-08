@@ -61,6 +61,10 @@
   - export SNOWFLAKE_TRANSFORM_WAREHOUSE=$SNOWFLAKE_MR_XL_WAREHOUSE
   - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
 
+.4xl_warehouse: &4xl_warehouse
+  - export SNOWFLAKE_TRANSFORM_WAREHOUSE=$SNOWFLAKE_MR_4XL_WAREHOUSE
+  - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
+   
 .xs_warehouse: &xs_warehouse
   - export SNOWFLAKE_TRANSFORM_WAREHOUSE=$SNOWFLAKE_MR_XS_WAREHOUSE
   - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
@@ -105,6 +109,17 @@
     - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
+➕🦣specify_4xl_model:
+  <<: *snowflake_dbt_jobs
+  script:
+    - *4xl_warehouse
+    - *deps_and_seed
+    - echo $DBT_MODELS
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
+    - *xs_warehouse
+    - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
+    - if [ $FAILED ]; then exit 1; fi
+     
 ➕🐭🥩specify_raw_model:
   <<: *snowflake_dbt_jobs
   script:
