@@ -58,19 +58,19 @@
   - export SNOWFLAKE_TRANSFORM_WAREHOUSE=$SNOWFLAKE_MR_XS_WAREHOUSE
   - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
 
-➕🐭specify_model:
+🐭specify_model:
   <<: *snowflake_dbt_jobs
   script:
     - ls /transform/snowflake-dbt/dbt_packages
+    - ls /transform/snowflake-dbt/dbt_packages/audit_helper
     - ls
     - ls /transform
     - pwd
     - echo $DBT_MODELS
-    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models $DBT_MODELS || FAILED=true
-    - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
+    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models +dim_subscription || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-➕🦖specify_l_model:
+🦖specify_l_model:
   <<: *snowflake_dbt_jobs
   script:
     - *l_warehouse
@@ -81,7 +81,7 @@
     - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-➕specify_dbt_parameters:
+specify_dbt_parameters:
   <<: *snowflake_dbt_jobs
   script:
     - *deps_and_seed
@@ -90,7 +90,7 @@
     - dbt test $CI_PROFILE_TARGET $DBT_PARAMETERS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-➕🐘specify_xl_model:
+🐘specify_xl_model:
   <<: *snowflake_dbt_jobs
   script:
     - *xl_warehouse
@@ -101,7 +101,7 @@
     - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-➕🐭🥩specify_raw_model:
+🐭🥩specify_raw_model:
   <<: *snowflake_dbt_jobs
   script:
     - *deps_and_seed
@@ -112,7 +112,7 @@
     - dbt test $CI_PROFILE_TARGET --models $DBT_MODELS || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-➕🌱specify_csv_seed:
+🌱specify_csv_seed:
   <<: *snowflake_dbt_jobs
   script:
     - python3 macro_name_check.py
@@ -120,7 +120,7 @@
     - echo $DBT_MODELS
     - dbt seed --full-refresh $CI_PROFILE_TARGET --select $DBT_MODELS
 
-➕📸🥩specify_snapshot:
+📸🥩specify_snapshot:
   <<: *snowflake_dbt_jobs
   script:
     - echo $DBT_MODELS
@@ -129,7 +129,7 @@
     - *deps_and_seed
     - dbt snapshot $CI_PROFILE_TARGET --select $DBT_MODELS
 
-➕📸🥩🦖specify_l_snapshot:
+📸🥩🦖specify_l_snapshot:
   <<: *snowflake_dbt_jobs
   script:
     - echo $DBT_MODELS
@@ -139,7 +139,7 @@
     - *deps_and_seed
     - dbt snapshot $CI_PROFILE_TARGET --select $DBT_MODELS
 
-➕🏗️🛺run_changed_models_sql:
+🏗️🛺run_changed_models_sql:
   <<: *snowflake_dbt_jobs
   script:
     - *deps_and_seed
@@ -149,7 +149,7 @@
     - dbt test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-➕🏗️🛺🦖run_changed_models_sql_l:
+🏗️🛺🦖run_changed_models_sql_l:
   <<: *snowflake_dbt_jobs
   script:
     - *l_warehouse
@@ -160,7 +160,7 @@
     - dbt test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-➕🏗️🛺🐘run_changed_models_sql_xl:
+🏗️🛺🐘run_changed_models_sql_xl:
   <<: *snowflake_dbt_jobs
   script:
     - *xl_warehouse
@@ -206,7 +206,7 @@ artifact_download:
     - echo $CI_MERGE_REQUEST_REF_PATH
     - python3 -m gitlab_artifacts_downloader.gitlab_artifacts_downloader download_pipeline_artifacts --project_id $CI_PROJECT_ID --branch_name $CI_COMMIT_REF_NAME --stage_name setup_dbt
 
-➕🏗️🔆run_changed_️clone_model_dbt_select:
+🏗️🔆run_changed_️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   variables:
     LOGURU_COLORIZE: "true"
@@ -220,7 +220,7 @@ artifact_download:
     - /builds/gitlab-data/analytics/orchestration/clone_dbt_models_select.py $INPUT
 
 
-➕🔆⚡️clone_model_dbt_select:
+🔆⚡️clone_model_dbt_select:
   <<: *snowflake_dbt_jobs
   variables:
     LOGURU_COLORIZE: "true"
