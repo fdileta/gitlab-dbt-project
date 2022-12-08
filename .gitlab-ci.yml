@@ -73,6 +73,12 @@ include:
     - manage_snowflake.py manage_clones --database prep --empty
   when: always
 
+📈clone_prod_manual:
+  <<: *snowflake_start_clone
+  script:
+    - manage_snowflake.py manage_clones --database prod --empty
+    - manage_snowflake.py manage_clones --database prep --empty
+
 📈❗️clone_prod_real:
   <<: *snowflake_start_clone
   script:
