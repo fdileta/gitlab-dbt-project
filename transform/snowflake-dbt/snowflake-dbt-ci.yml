@@ -4,6 +4,7 @@
   before_script:
     - mkdir -p $CI_PROJECT_DIR/snowflake-dbt/dbt_packages
     - mv /analytics/transform/snowflake-dbt/dbt_packages/* $CI_PROJECT_DIR/snowflake-dbt/dbt_packages
+    - chmod 700 $CI_PROJECT_DIR/snowflake-dbt/dbt_packages
     - cd transform/snowflake-dbt/
     - echo $BRANCH_NAME
     - if [ $BRANCH_NAME = "master" ]; then export SNOWFLAKE_PREP_DATABASE="PREP"; else export SNOWFLAKE_PREP_DATABASE="${CI_COMMIT_REF_NAME^^}_PREP"; fi
@@ -63,7 +64,6 @@
   script:
     - echo $DBT_MODELS
     - pwd
-    - dbt deps
     - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models +dim_subscription || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
