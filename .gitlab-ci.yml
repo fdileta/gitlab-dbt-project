@@ -51,6 +51,7 @@ include:
       variables:
         BRANCH_NAME: $SNOWFLAKE_PROD_DATABASE
         TEST_PIPELINE: $TEST_PIPELINE
+  allow_failure: true
 
 .snowflake_start_clone: &snowflake_start_clone
   <<: *snowflake_clone_template
