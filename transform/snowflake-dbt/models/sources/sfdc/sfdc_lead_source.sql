@@ -112,6 +112,7 @@ renamed AS (
     actively_being_sequenced__c::BOOLEAN AS is_actively_being_sequenced,
     gaclientid__c AS ga_client_id,
     employee_buckets__c AS employee_bucket,
+    mql_counter__c AS mql_counter,
     fo_initial_mql__c AS is_first_order_initial_mql,
     fo_mql__c AS is_first_order_mql,
     is_first_order_person__c AS is_first_order_person,
@@ -120,7 +121,7 @@ renamed AS (
     last_transfer_date_time__c AS last_transfer_date_time,
 	time_from_last_transfer_to_sequence__c AS time_from_last_transfer_to_sequence,
 	time_from_mql_to_last_transfer__c AS time_from_mql_to_last_transfer,
-
+  
 
     {{ sfdc_source_buckets('leadsource') }}
 
