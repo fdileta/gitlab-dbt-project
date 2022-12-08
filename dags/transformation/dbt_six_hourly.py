@@ -46,7 +46,7 @@ GIT_BRANCH = env["GIT_BRANCH"]
 pod_env_vars = {**gitlab_pod_env_vars, **{}}
 
 # This value is set based on the commit hash setter task in dbt_snapshot
-pull_commit_hash = """export GIT_COMMIT="{{ var.value.dbt_hash }}" """
+#pull_commit_hash = """export GIT_COMMIT="{{ var.value.dbt_hash }}" """
 
 
 # Default arguments for the DAG
@@ -95,38 +95,11 @@ dag = DAG(
 )
 dag.doc_md = __doc__
 
-
-def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
-    """
-    Simple function written to exclude a given schedule, currently only checking against dates.
-    Designed to exclude the first Sundays of a given month from the schedule as this is the only date
-    the full refresh now runs on.
-    :param timestamp: Current run date
-    :param exclude_schedule: Cron schedule to exclude
-    :return: Bool, false if it is the first Sunday of the month.
-    """
-    next_run = croniter(exclude_schedule).get_next(datetime)
-    # Excludes the first sunday of every month, this is captured by the regular full refresh.
-    if next_run.date() == timestamp.date():
-        return False
-
-    return True
-
-
-dbt_evaluate_run_date_task = ShortCircuitOperator(
-    task_id="evaluate_dbt_run_date",
-    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "0 */6 * * 1-6"),
-    dag=dag,
-)
-
 # run sfdc_opportunity models on large warehouse
 dbt_six_hourly_models_command = f"""
-    {pull_commit_hash} &&
     {dbt_install_deps_cmd} &&
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
     dbt --no-use-colors run --profiles-dir profile --target prod --selector six_hourly_salesforce_opportunity; ret=$?;
-    target/run_results.json --project-name gitlab-analysis;
-    python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
 """
 
 dbt_six_hourly_models_task = KubernetesPodOperator(
@@ -140,28 +113,9 @@ dbt_six_hourly_models_task = KubernetesPodOperator(
     dag=dag,
 )
 
-# dbt-results
-dbt_results_cmd = f"""
-    {pull_commit_hash} &&
-    {dbt_install_deps_cmd} &&
-    dbt --no-use-colors run --profiles-dir profile --target prod --models sources.dbt+ ; ret=$?;
-    target/run_results.json --project-name gitlab-analysis;
-    python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
-"""
-dbt_results = KubernetesPodOperator(
-    **gitlab_defaults,
-    image=DBT_IMAGE,
-    task_id="dbt-results",
-    name="dbt-results",
-    trigger_rule="all_done",
-    secrets=secrets_list,
-    env_vars=pod_env_vars,
-    arguments=[dbt_results_cmd],
-    dag=dag,
-)
 
 (
     # dbt_evaluate_run_date_task
     dbt_six_hourly_models_task
-    >> dbt_results
+    
 )
