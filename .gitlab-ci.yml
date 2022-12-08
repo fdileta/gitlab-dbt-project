@@ -28,35 +28,8 @@ include:
 # ======
 # Snowflake Database Clones
 # ======
-
 # Template for cloning databases in Snowflake for use in MRs
 .snowflake_clone_template: &snowflake_clone_template
-  image: registry.gitlab.com/gitlab-data/data-image/data-image:v0.0.13
-  tags:
-    - analytics
-  before_script:
-    - export PATH="$CI_PROJECT_DIR/orchestration/:$PATH"
-  only:
-    refs:
-      - merge_requests
-    variables:
-      - $SNOWFLAKE_SYSADMIN_ROLE
-      - $SNOWFLAKE_LOAD_WAREHOUSE
-      - $SNOWFLAKE_LOAD_DATABASE  # make sure the guard works
-      - $SNOWFLAKE_PREP_DATABASE  # make sure the guard works
-      - $SNOWFLAKE_PROD_DATABASE  # make sure the guard works
-  except:
-    refs:
-      - master
-    variables:
-      - $BRANCH_NAME == $SNOWFLAKE_LOAD_DATABASE
-      - $BRANCH_NAME == $SNOWFLAKE_PREP_DATABASE
-      - $BRANCH_NAME == $SNOWFLAKE_PROD_DATABASE
-      - $TEST_PIPELINE
-  when: manual
-
-# Template for cloning databases in Snowflake for use in MRs
-.snowflake_clone_template_test: &snowflake_clone_template_test
   image: registry.gitlab.com/gitlab-data/data-image/data-image:v0.0.13
   tags:
     - analytics
@@ -65,7 +38,6 @@ include:
     - export ORIGINAL_SHA=$(git log origin/master..$CI_COMMIT_BRANCH --oneline  --format=format:%H | tail -1)
   rules:
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event")
-      when: manual
       variables:
         SNOWFLAKE_SYSADMIN_ROLE: $SNOWFLAKE_SYSADMIN_ROLE
         SNOWFLAKE_LOAD_WAREHOUSE:  $SNOWFLAKE_LOAD_WAREHOUSE
@@ -79,27 +51,6 @@ include:
         BRANCH_NAME: $SNOWFLAKE_PROD_DATABASE
         TEST_PIPELINE: $TEST_PIPELINE
 
-.snowflake_start_test_clone: &snowflake_start_test_clone
-  <<: *snowflake_clone_template_test
-  environment:
-    name: review/$CI_COMMIT_REF_NAME
-    on_stop: clone_stop
-  stage: ❄️ Snowflake
-  variables:
-    GIT_STRATEGY: clone
-
-📈clone_prod_test:
-  <<: *snowflake_start_test_clone
-  rules:
-  - if: ($ORIGINAL_SHA == $CI_COMMIT_SHA)
-    when: always
-  - if: ($CI_PIPELINE_SOURCE == "merge_request_event")
-    when: manual
-  script:
-    - manage_snowflake.py manage_clones --database prod --empty
-    - manage_snowflake.py manage_clones --database prep --empty
-
-
 .snowflake_start_clone: &snowflake_start_clone
   <<: *snowflake_clone_template
   environment:
@@ -109,9 +60,13 @@ include:
   variables:
     GIT_STRATEGY: clone
 
-# Clone Jobs
 📈clone_prod:
   <<: *snowflake_start_clone
+  rules:
+  - if: ($ORIGINAL_SHA == $CI_COMMIT_SHA)
+    when: always
+  - if: ($CI_PIPELINE_SOURCE == "merge_request_event")
+    when: manual
   script:
     - manage_snowflake.py manage_clones --database prod --empty
     - manage_snowflake.py manage_clones --database prep --empty
