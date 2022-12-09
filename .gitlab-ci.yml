@@ -81,7 +81,7 @@ include:
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event")
       when: manual
   script:
-    - echo $ORIGINAL_SHA
+    - echo eval($ORIGINAL_SHA)
     - echo $CI_COMMIT_SHA
     - echo $CI_MERGE_REQUEST_DIFF_ID
     - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA
