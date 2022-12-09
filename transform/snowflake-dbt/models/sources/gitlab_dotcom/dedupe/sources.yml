@@ -223,6 +223,8 @@ sources:
         identifier: gitlab_db_merge_request_diffs
       - name: merge_request_metrics
         identifier: gitlab_db_merge_request_metrics
+      - name: merge_request_predictions
+        identifier: gitlab_db_merge_request_predictions
       - name: merge_requests
         identifier: gitlab_db_merge_requests
       - name: merge_requests_closing_issues
