@@ -185,7 +185,7 @@ models:
         - name: stage_name_modified    
           description: This cleans up the stage names to link together stages that are the same in process.
         - name: modified_stage_id
-          description: This modified id gives an id of -1 to the Heired stage that was removed from the source data on 2022-11-30. https://support.greenhouse.io/hc/en-us/articles/9919620043547-BI-Connector-schema-update-November-16-30-2022
+          description: This modified id gives an id of -1 to the Hired stage that was removed from the source data on 2022-11-30. https://support.greenhouse.io/hc/en-us/articles/9919620043547-BI-Connector-schema-update-November-16-30-2022
           tests:
             - not_null 
     - name: greenhouse_approvals_source
