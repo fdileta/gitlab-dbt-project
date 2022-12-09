@@ -76,7 +76,7 @@ include:
 📈clone_prod_automatic:
   <<: *snowflake_auto_first_template
   rules:
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event") && ($ORIGINAL_SHA == $CI_COMMIT_SHA)
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event") && (eval($ORIGINAL_SHA) == $CI_COMMIT_SHA)
       when: always
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event")
       when: manual
