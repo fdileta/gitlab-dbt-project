@@ -6,17 +6,12 @@ WITH source AS (
 ), renamed AS (
 
     SELECT
-      CASE COALESCE(registration_objective,-1)
-          WHEN 0 THEN 'basics' 
-          WHEN 1 THEN 'move_repository' 
-          WHEN 2 THEN 'code_storage' 
-          WHEN 3 THEN 'exploring' 
-          WHEN 4 THEN 'ci' 
-          WHEN 5 THEN 'other' 
-          WHEN 6 THEN 'joining_team'
-          WHEN -1 THEN 'Unknown'
-      END AS jobs_to_be_done,
-      *
+      user_id::NUMBER AS user_id,
+      job_title::VARCHAR AS job_title,
+      other_role::VARCHAR AS other_role,
+      registration_objective::NUMBER AS registration_objective,
+      dbt_valid_from::TIMESTAMP AS dbt_valid_from,
+      dbt_valid_to::TIMESTAMP AS dbt_valid_to
     FROM source
     
 )
