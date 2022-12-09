@@ -24,10 +24,8 @@ import yaml
 
 from fire import Fire
 
-from gitlabdata.orchestration_utils import (
-    dataframe_uploader,
-    snowflake_engine_factory,
-)
+
+from usage_ping_utils import upload_to_snowflake
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -39,7 +37,7 @@ from transform_postgres_to_snowflake import (
 )
 
 ENCODING = "utf8"
-SCHEMA_NAME = "saas_usage_ping"
+
 NAMESPACE_FILE = "usage_ping_namespace_queries.json"
 REDIS_KEY = "redis"
 SQL_KEY = "sql"
@@ -65,9 +63,7 @@ class UsagePing:
 
     def __init__(self, ping_date=None, namespace_metrics_filter=None):
 
-        self.config_vars = env.copy()
 
-        self.loader_engine = snowflake_engine_factory(self.config_vars, "LOADER")
 
         if ping_date is not None:
             self.end_date = datetime.datetime.strptime(ping_date, "%Y-%m-%d").date()
@@ -421,12 +417,8 @@ class UsagePing:
             + ["combined"]
         )
 
-        dataframe_uploader(
-            df_to_upload,
-            self.loader_engine,
-            "instance_combined_metrics",
-            "saas_usage_ping",
-        )
+        upload_to_snowflake(table_name="instance_combined_metrics", data=df_to_upload)
+
         self.loader_engine.dispose()
 
     def upload_sql_metric_errors(self, sql_metric_errors: Dict) -> None:
@@ -439,12 +431,9 @@ class UsagePing:
             self.end_date,
         ]
 
-        dataframe_uploader(
-            df_to_upload,
-            self.loader_engine,
-            "instance_sql_errors",
-            "saas_usage_ping",
-        )
+        upload_to_snowflake(table_name="instance_sql_errors", data=df_to_upload)
+
+
         self.loader_engine.dispose()
 
     def run_metric_checks(self) -> None:
@@ -554,17 +543,6 @@ class UsagePing:
 
         return name, prepared_sql, level
 
-    def upload_to_snowflake(self, table_name: str, data: pd.DataFrame) -> None:
-        """
-        Upload dataframe to Snowflake
-        """
-        dataframe_uploader(
-            dataframe=data,
-            engine=self.loader_engine,
-            table_name=table_name,
-            schema=SCHEMA_NAME,
-        )
-
     def get_result(self, query_dict: dict, conn) -> pd.DataFrame:
         """
         Try to execute query and return results
@@ -605,7 +583,7 @@ class UsagePing:
 
         results = self.get_result(query_dict=query_dict, conn=connection)
 
-        self.upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
+        upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
 
         logging.info(f"metric_name loaded: {metric_name}")
 
