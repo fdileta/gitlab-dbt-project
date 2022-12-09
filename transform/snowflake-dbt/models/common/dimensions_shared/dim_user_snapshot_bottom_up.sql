@@ -27,7 +27,7 @@
  
 ), user_spined AS (
 
-    SELECT
+    SELECT    
         snapshot_dates.date_id AS spined_date_id,
         snapshot_dates.date_actual AS spined_date,
         users_snapshots.user_id,
@@ -38,14 +38,17 @@
         users_snapshots.created_at,
         users_snapshots.updated_at,
         users_snapshots.is_admin,
-        users_snapshots.is_blocked_user,        
-        users_snapshots.notification_email_domain,
-        users_snapshots.email_domain,
-        users_snapshots.public_email_domain,
-        users_snapshots.commit_email_domain,
-        users_snapshots.role_description AS role,
-        users_snapshots.last_activity_date,              
-        users_snapshots.last_sign_in_date,
+        CASE 
+            WHEN users_snapshots.state in ('blocked', 'banned') THEN TRUE
+            ELSE FALSE 
+        END::VARCHAR AS is_blocked_user,
+        SPLIT_PART(COALESCE(users_snapshots.notification_email, email), '@', 2)::VARCHAR AS notification_email_domain,
+        SPLIT_PART(email, '@', 2)::VARCHAR AS email_domain,
+        SPLIT_PART(public_email, '@', 2)::VARCHAR AS public_email_domain,
+        IFF(SPLIT_PART(commit_email, '@', 2) = '', NULL, SPLIT_PART(commit_email, '@', 2))::VARCHAR AS commit_email_domain,
+        COALESCE(users_snapshots.role::VARCHAR,'Unknown') AS role,
+        COALESCE(TO_DATE(last_activity_on)::VARCHAR,'Unknown') AS last_activity_date, 
+        COALESCE(TO_DATE(last_sign_in_at)::VARCHAR,'Unknown')  AS last_sign_in_date,
         users_snapshots.dbt_valid_from,
         users_snapshots.dbt_valid_to      
     FROM users_snapshots
@@ -65,14 +68,19 @@
 ), email_classification AS (
 
     SELECT 
-    *
+        *
     FROM email_classification
 
 ),identity_snapshot_spined AS (
 
     SELECT
         snapshot_dates.date_id AS spined_date_id,
-        identities_snapshots.*
+        identity_id,
+        identity_provider,
+        user_id,
+        created_at,
+        dbt_valid_from,
+        dbt_valid_to     
     FROM 
         identities_snapshots
     INNER JOIN snapshot_dates
@@ -85,7 +93,7 @@
     SELECT
         user_spined.user_id,
         user_spined.spined_date_id,
-        identity_snapshot_spined.provider AS identity_provider
+        identity_snapshot_spined.identity_provider
     FROM 
         user_spined
     LEFT JOIN identity_snapshot_spined
@@ -112,7 +120,16 @@
     SELECT 
         details_snapshots.user_id AS user_id,
         snapshot_dates.date_id AS spined_date_id,
-        details_snapshots.jobs_to_be_done AS jobs_to_be_done
+        CASE COALESCE(registration_objective,-1)
+          WHEN 0 THEN 'basics' 
+          WHEN 1 THEN 'move_repository' 
+          WHEN 2 THEN 'code_storage' 
+          WHEN 3 THEN 'exploring' 
+          WHEN 4 THEN 'ci' 
+          WHEN 5 THEN 'other' 
+          WHEN 6 THEN 'joining_team'
+          WHEN -1 THEN 'Unknown'
+        END AS jobs_to_be_done
     FROM details_snapshots
     INNER JOIN snapshot_dates
         ON snapshot_dates.date_actual >= details_snapshots.dbt_valid_from
