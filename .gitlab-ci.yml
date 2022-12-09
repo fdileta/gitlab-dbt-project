@@ -87,6 +87,7 @@ include:
     - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA
     - echo $CI_MERGE_REQUEST_EVENT_TYPE
     - echo $CI_MERGE_REQUEST_REF_PATH
+    - echo $CI_COMMIT_BEFORE_SHA
     - manage_snowflake.py manage_clones --database prod --empty
     - manage_snowflake.py manage_clones --database prep --empty
 
