@@ -95,7 +95,7 @@ include:
   <<: *snowflake_start_clone
   script:
     - | 
-       if ["$ORIGINAL_SHA" = "$CI_COMMIT_SHA"]; then 
+       if ["$ORIGINAL_SHA" == "$CI_COMMIT_SHA"]; then 
          manage_snowflake.py manage_clones --database prod --empty
        fi
 
