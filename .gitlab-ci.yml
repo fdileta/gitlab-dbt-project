@@ -97,6 +97,7 @@ include:
     - | 
        if [ "$ORIGINAL_SHA" == "$CI_COMMIT_SHA" ]; then 
          manage_snowflake.py manage_clones --database prod --empty
+         manage_snowflake.py manage_clones --database prep --empty
        fi
 
 📈❗️clone_prod_real:
