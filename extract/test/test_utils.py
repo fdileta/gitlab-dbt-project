@@ -129,10 +129,10 @@ def test_convert_response_to_json(create_utils, mocked_responses):
     """
     Test function: convert_response_to_json
     """
-    expected = {"didi": "pro", "test": "1"}
+    expected = {"test1": "pro", "test2": "1"}
     mocked_responses.get(
         "http://some_gitlab_api_url/test",
-        body='{"test": "1", "didi": "pro"}',
+        body='{"test1": "pro", "test2": "1"}',
         status=200,
         content_type="application/json",
     )
