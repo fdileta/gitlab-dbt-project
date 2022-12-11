@@ -5,36 +5,26 @@ usage_ping.py is responsible for uploading the following into Snowflake:
 - usage ping combined metrics (sql + redis)
 - usage ping namespace
 """
-from os import environ as env
-
-from typing import Dict, List, Any, Tuple
-
-from hashlib import md5
-
-from logging import info
 import datetime
 import json
 import logging
 import os
 import sys
+from hashlib import md5
+from logging import info
+from typing import Any, Dict, List, Tuple
 
-import requests
 import pandas as pd
 import yaml
-
 from fire import Fire
-
-
-from usage_ping_utils import upload_to_snowflake
-
 from sqlalchemy.exc import SQLAlchemyError
-
 from transform_postgres_to_snowflake import (
     META_API_COLUMNS,
-    TRANSFORMED_INSTANCE_QUERIES_FILE,
     META_DATA_INSTANCE_QUERIES_FILE,
     METRICS_EXCEPTION,
+    TRANSFORMED_INSTANCE_QUERIES_FILE,
 )
+from utils import EngineFactory, Utils
 
 ENCODING = "utf8"
 
@@ -63,7 +53,8 @@ class UsagePing:
 
     def __init__(self, ping_date=None, namespace_metrics_filter=None):
 
-
+        self.engine_factory = EngineFactory()
+        self.utils = Utils()
 
         if ping_date is not None:
             self.end_date = datetime.datetime.strptime(ping_date, "%Y-%m-%d").date()
@@ -88,17 +79,10 @@ class UsagePing:
         METRIC_DEFINITON_ENDPOINT = (
             "http://gitlab.com/api/v4/usage_data/metric_definitions"
         )
-        config_dict = env.copy()
-        headers = {
-            "PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
-        }
 
-        response = requests.get(METRIC_DEFINITON_ENDPOINT, headers=headers)
-        if response.status_code == 200:
-            metric_definitions = yaml.safe_load(response.text)
-        else:
-            logging.error(response.json)
-            raise ConnectionError("Error requesting job")
+        response = self.utils.get_response(url=METRIC_DEFINITON_ENDPOINT)
+
+        metric_definitions = yaml.safe_load(response.text)
 
         metric_definitions_dict = {
             metric_dict["key_path"]: metric_dict for metric_dict in metric_definitions
@@ -191,13 +175,15 @@ class UsagePing:
         SQL_DATA_SOURCE_VAL = "database"
 
         if payload_source == REDIS_KEY:
-            return (
+            is_matching = (
                 metric_definition_source
                 and metric_definition_source != SQL_DATA_SOURCE_VAL
             )
 
         elif payload_source == SQL_KEY:
-            return metric_definition_source == SQL_DATA_SOURCE_VAL
+            is_matching = metric_definition_source == SQL_DATA_SOURCE_VAL
+
+        return is_matching
 
     def check_data_source(
         self,
@@ -352,9 +338,11 @@ class UsagePing:
         Take a dictionary of {ping_name: sql_query} and run each
         query to then upload to a table in raw.
         """
-        connection = self.loader_engine.connect()
+
+        connection = self.engine_factory.connect()
 
         payload_source = SQL_KEY
+
         saas_queries_with_valid_definitions = self.keep_valid_metric_definitions(
             saas_queries, payload_source, metric_definition_dict
         )
@@ -364,8 +352,9 @@ class UsagePing:
         )
 
         info("Processed queries")
+
         connection.close()
-        self.loader_engine.dispose()
+        self.engine_factory.dispose()
 
         return sql_metrics, sql_metric_errors
 
@@ -375,17 +364,8 @@ class UsagePing:
         Call the Non SQL Metrics API and store the results in Snowflake RAW database
         """
         REDIS_ENDPOINT = "https://gitlab.com/api/v4/usage_data/non_sql_metrics"
-        config_dict = env.copy()
-        headers = {
-            "PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
-        }
 
-        response = requests.get(REDIS_ENDPOINT, headers=headers)
-        if response.status_code == 200:
-            redis_metrics = json.loads(response.text)
-        else:
-            logging.error(response.json)
-            raise ConnectionError("Error requesting job")
+        redis_metrics = self.utils.get_json_response(url=REDIS_ENDPOINT)
 
         payload_source = REDIS_KEY
         redis_metrics = self.keep_valid_metric_definitions(
@@ -417,9 +397,11 @@ class UsagePing:
             + ["combined"]
         )
 
-        upload_to_snowflake(table_name="instance_combined_metrics", data=df_to_upload)
+        self.engine_factory.upload_to_snowflake(
+            table_name="instance_combined_metrics", data=df_to_upload
+        )
 
-        self.loader_engine.dispose()
+        self.engine_factory.dispose()
 
     def upload_sql_metric_errors(self, sql_metric_errors: Dict) -> None:
         """Uploads sql_metric_errors dictionary to Snowflake"""
@@ -431,10 +413,11 @@ class UsagePing:
             self.end_date,
         ]
 
-        upload_to_snowflake(table_name="instance_sql_errors", data=df_to_upload)
+        self.engine_factory.upload_to_snowflake(
+            table_name="instance_sql_errors", data=df_to_upload
+        )
 
-
-        self.loader_engine.dispose()
+        self.engine_factory.dispose()
 
     def run_metric_checks(self) -> None:
         """Checks the following:
@@ -583,7 +566,9 @@ class UsagePing:
 
         results = self.get_result(query_dict=query_dict, conn=connection)
 
-        upload_to_snowflake(table_name="gitlab_dotcom_namespace", data=results)
+        self.engine_factory.upload_to_snowflake(
+            table_name="gitlab_dotcom_namespace", data=results
+        )
 
         logging.info(f"metric_name loaded: {metric_name}")
 
@@ -600,7 +585,7 @@ class UsagePing:
             }
         }
         """
-        connection = self.loader_engine.connect()
+        connection = self.engine_factory.connect()
 
         namespace_queries = self._get_meta_data(file_name=NAMESPACE_FILE)
 
@@ -614,7 +599,7 @@ class UsagePing:
                 )
 
         connection.close()
-        self.loader_engine.dispose()
+        self.engine_factory.dispose()
 
     def backfill(self):
         """
