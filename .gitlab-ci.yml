@@ -35,6 +35,7 @@ include:
     - analytics
   before_script:
     - export PATH="$CI_PROJECT_DIR/orchestration/:$PATH"
+    - export ORIGINAL_SHA=$(git log origin/master..$CI_COMMIT_BRANCH --oneline  --format=format:%H | tail -1)
   rules:
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event")
       when: manual
