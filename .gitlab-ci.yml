@@ -93,13 +93,10 @@ include:
 📈clone_prod:
   <<: *snowflake_start_clone
   script:
-    - echo $ORIGINAL_SHA
-    - echo $CI_COMMIT_SHA
-    - echo $CI_PIPELINE_SOURCE
-    - echo $CI_COMMIT_REF_NAME
-    - manage_snowflake.py manage_clones --database prod --empty
-    - manage_snowflake.py manage_clones --database prep --empty
-
+    - | 
+       if [$ORIGINAL_SHA = $CI_COMMIT_SHA]; then 
+         manage_snowflake.py manage_clones --database prod --empty
+       fi
 
 📈❗️clone_prod_real:
   <<: *snowflake_start_clone
