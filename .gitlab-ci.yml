@@ -36,6 +36,7 @@ include:
     - analytics
   before_script:
     - export PATH="$CI_PROJECT_DIR/orchestration/:$PATH"
+    - export ORIGINAL_SHA=$(git log origin/master..$CI_COMMIT_BRANCH --oneline  --format=format:%H | tail -1)
   only:
     refs:
       - merge_requests
@@ -68,9 +69,19 @@ include:
 📈clone_prod:
   <<: *snowflake_start_clone
   script:
+    - |
+      if [$ORIGINAL_SHA = $CI_COMMIT_SHA]; then 
+        manage_snowflake.py manage_clones --database prod --empty
+        manage_snowflake.py manage_clones --database prep --empty
+      fi
+  when: always
+
+📈clone_prod_manual:
+  <<: *snowflake_start_clone
+  script:
     - manage_snowflake.py manage_clones --database prod --empty
     - manage_snowflake.py manage_clones --database prep --empty
-  when: always
+  when: manual
 
 📈❗️clone_prod_real:
   <<: *snowflake_start_clone
