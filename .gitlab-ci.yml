@@ -76,7 +76,7 @@ include:
 📈clone_prod_automatic:
   <<: *snowflake_auto_first_template
   rules:
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event") && ($ORIGINAL_SHA == $CI_COMMIT_SHA)
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event") &&
       when: always
       variables:
         ORIGINAL_SHA: $ORIGINAL_SHA
@@ -89,8 +89,7 @@ include:
     - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA
     - echo $CI_MERGE_REQUEST_EVENT_TYPE
     - echo $CI_MERGE_REQUEST_REF_PATH
-    - manage_snowflake.py manage_clones --database prod --empty
-    - manage_snowflake.py manage_clones --database prep --empty
+    - if [$ORIGINAL_SHA == $CI_COMMIT_SHA]; then manage_snowflake.py manage_clones --database prod --empty && manage_snowflake.py manage_clones --database prep --empty; fi
 
 .snowflake_start_clone: &snowflake_start_clone
   <<: *snowflake_clone_template
