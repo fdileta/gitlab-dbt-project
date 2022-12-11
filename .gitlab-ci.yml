@@ -89,7 +89,7 @@ include:
     - echo $CI_MERGE_REQUEST_DIFF_BASE_SHA
     - echo $CI_MERGE_REQUEST_EVENT_TYPE
     - echo $CI_MERGE_REQUEST_REF_PATH
-    - if [$ORIGINAL_SHA == $CI_COMMIT_SHA]; then manage_snowflake.py manage_clones --database prod --empty && manage_snowflake.py manage_clones --database prep --empty; fi
+    - if [$ORIGINAL_SHA = $CI_COMMIT_SHA]; then manage_snowflake.py manage_clones --database prod --empty && manage_snowflake.py manage_clones --database prep --empty; fi
 
 .snowflake_start_clone: &snowflake_start_clone
   <<: *snowflake_clone_template
