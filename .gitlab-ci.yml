@@ -74,13 +74,12 @@ include:
     on_stop: clone_stop
   allow_failure: true
 
-📈clone_prod_automatic:
+📈clone_prod_manual:
   <<: *snowflake_auto_first_template
   script:
-    - | 
-       if [$ORIGINAL_SHA = $CI_COMMIT_SHA]; then 
-         manage_snowflake.py manage_clones --database prod --empty
-       fi
+    - manage_snowflake.py manage_clones --database prod --empty
+    - manage_snowflake.py manage_clones --database prep --empty
+  when: manual
 
 .snowflake_start_clone: &snowflake_start_clone
   <<: *snowflake_clone_template
