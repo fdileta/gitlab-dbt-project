@@ -46,8 +46,7 @@ WITH namespaces AS (
 
   SELECT 
     crm_account_name,
-    dim_crm_account_id,
-    parent_crm_account_name
+    dim_crm_account_id
   FROM {{ref('dim_crm_account')}}
       
 ), is_user_in_company_namespace AS (
