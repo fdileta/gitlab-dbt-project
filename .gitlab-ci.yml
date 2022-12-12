@@ -79,7 +79,6 @@ include:
   script:
     - manage_snowflake.py manage_clones --database prod --empty
     - manage_snowflake.py manage_clones --database prep --empty
-  when: manual
 
 .snowflake_start_clone: &snowflake_start_clone
   <<: *snowflake_clone_template
