@@ -1031,7 +1031,8 @@ models:
           - not_null
           - unique:
               config:
-                where: bizible_created_date <= DATEADD('day', -2, CURRENT_DATE)::DATE
+                error_if: ">3"
+                warn_if: ">1"
         tags: ["tdf", "common"]
       - name: opps_per_touchpoint
         description: Count of opportunities associated with a touchpoint.
