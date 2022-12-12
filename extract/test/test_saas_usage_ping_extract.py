@@ -4,7 +4,6 @@ The main test routine for Automated Service Ping
 
 from datetime import datetime, timedelta
 
-
 import pytest
 
 from extract.saas_usage_ping.transform_postgres_to_snowflake import (
@@ -66,10 +65,10 @@ def get_usage_ping():
     """
     Return UsagePing object
     """
-    usage_ping = UsagePing
+    usage_ping = UsagePing()
     usage_ping.end_date = datetime.now()
     usage_ping.start_date_28 = usage_ping.end_date - timedelta(days=28)
-
+    
     return usage_ping
 
 

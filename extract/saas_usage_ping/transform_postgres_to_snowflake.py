@@ -3,7 +3,6 @@ Module is used to transform SQL syntax from Postgres to Snowflake style
 """
 import re
 from logging import info
-
 from typing import Any, Callable, Dict, List
 
 import sqlparse
@@ -466,10 +465,10 @@ if __name__ == "__main__":
 
     url = "https://gitlab.com/api/v4/usage_data/queries"
 
-    payload = utils.get_json_response(url=url)
+    json_payload = utils.get_json_response(url=url)
 
-    final_sql__dict = transform(payload)
-    final_meta_data = utils.keep_meta_data(payload)
+    final_sql__dict = transform(json_data=json_payload)
+    final_meta_data = utils.keep_meta_data(json_data=json_payload)
 
     info("Processed final sql queries")
 

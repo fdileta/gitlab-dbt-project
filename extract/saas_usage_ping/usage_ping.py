@@ -346,7 +346,9 @@ class UsagePing:
 
         return sql_metrics, sql_metric_errors
 
-    def saas_instance_redis_metrics(self, metric_definition_dict: Dict) -> Dict:
+    def saas_instance_redis_metrics(
+        self, metric_definition_dict: Dict
+    ) -> Tuple[Dict, Dict]:
 
         """
         Call the Non SQL Metrics API and store the results in Snowflake RAW database
@@ -385,9 +387,13 @@ class UsagePing:
                 self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE)
             )
             + ["combined"]
-            + self.utils.get_loaded_metadata(keys=[SQL_KEY, REDIS_KEY],
-                                             values=[self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE),
-                                                     redis_metadata])
+            + self.utils.get_loaded_metadata(
+                keys=[SQL_KEY, REDIS_KEY],
+                values=[
+                    self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE),
+                    redis_metadata,
+                ],
+            )
         )
 
         self.engine_factory.upload_to_snowflake(
@@ -415,7 +421,7 @@ class UsagePing:
     def run_metric_checks(self) -> None:
         """Checks the following:
         - All payload metrics appear in the metric_definitions yaml file
-        - The Redis & SQL metrics dont share the same key
+        - The Redis & SQL metrics don't share the same key
             - unlikely unless the duplicate keys are missing from definition file
         """
         has_error = False
@@ -480,11 +486,17 @@ class UsagePing:
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(
             metric_definition_dict, saas_queries
         )
-        redis_metrics, redis_metadata = self.saas_instance_redis_metrics(metric_definition_dict)
+        redis_metrics, redis_metadata = self.saas_instance_redis_metrics(
+            metric_definition_dict
+        )
 
         combined_metrics = self._merge_dicts(redis_metrics, sql_metrics)
 
-        self.upload_combined_metrics(combined_metrics=combined_metrics, saas_queries=saas_queries,redis_metadata=redis_metadata)
+        self.upload_combined_metrics(
+            combined_metrics=combined_metrics,
+            saas_queries=saas_queries,
+            redis_metadata=redis_metadata,
+        )
 
         if sql_metric_errors:
             self.upload_sql_metric_errors(sql_metric_errors)
