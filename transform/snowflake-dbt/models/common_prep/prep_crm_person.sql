@@ -284,7 +284,7 @@ WITH biz_person AS (
     LEFT JOIN biz_person_with_touchpoints
       ON sfdc_leads.lead_id = biz_person_with_touchpoints.bizible_lead_id
     LEFT JOIN marketo_persons
-      ON sfdc_contacts.contact_id = marketo_persons.sfdc_lead_id and sfdc_type = 'Lead'
+      ON sfdc_leads.lead_id = marketo_persons.sfdc_lead_id and sfdc_type = 'Lead'
     WHERE is_converted = 'FALSE'
 
 ), duplicates AS (
