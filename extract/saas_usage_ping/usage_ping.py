@@ -230,7 +230,7 @@ class UsagePing:
         prev_concat_metric_name: str = "",
     ) -> dict:
         """
-        For each payload- sourced either from sql or redis- check against
+        For each payload - sourced either from sql or redis- check against
         the metric_definition.yaml file if it is a valid metric.
 
         A valid metric is one whose payload source matches the defined data_source in the yaml file.
