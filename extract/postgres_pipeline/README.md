@@ -9,7 +9,7 @@ Slowly-Changing dimensions are handled pretty simply. Each time the code is run,
 
 * run `pgp` for SCD tables by invoking `python postgres_pipeline/main.py tap <manifest_path> --load_type scd`
 * This command will tell `pgp` to only extract and load tables that are considered slowly-changing dimensions, it will skip all other tables
-* A table is programmtically determined to be an SCD table if there is no `WHERE` clause in the raw query
+* A table is programmatically determined to be an SCD table if there is no `WHERE` clause in the raw query
 
 Incremental (used by Airflow for time-specific loading and backfilling):
 
