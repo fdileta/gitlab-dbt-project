@@ -2920,6 +2920,13 @@ roles:
             - transforming_xs
             - transforming_xl
 
+    - hkacmarski:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - hselim:
         member_of:
             - adaptive
@@ -4738,6 +4745,11 @@ users:
         can_login: yes
         member_of:
             - grafana
+
+    - hkacmarski:
+        can_login: yes
+        member_of:
+            - hkacmarski
 
     - hselim:
         can_login: yes
