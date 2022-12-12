@@ -2997,6 +2997,13 @@ roles:
         member_of: []
         warehouses: []
 
+    - jbudreski:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - jcaine:
         member_of:
             - analyst_sales
@@ -4773,6 +4780,11 @@ users:
         can_login: yes
         member_of:
             - jahye
+
+    - jbudreski:
+        can_login: yes
+        member_of:
+            - jbudreski
 
     - jcaine:
         can_login: yes
