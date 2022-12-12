@@ -66,10 +66,10 @@
    - chmod -R 700 transform/snowflake-dbt/dbt_packages
    - cd transform/snowflake-dbt/
    - echo $CI_MERGE_REQUEST_DIFF_ID
-    - echo $DBT_MODELS
-    - pwd
-    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models +dim_subscription || FAILED=true
-    - if [ $FAILED ]; then exit 1; fi
+   - echo $DBT_MODELS
+   - pwd
+   - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models +dim_subscription || FAILED=true
+   - if [ $FAILED ]; then exit 1; fi
 
 🦖specify_l_model:
   <<: *snowflake_dbt_jobs
