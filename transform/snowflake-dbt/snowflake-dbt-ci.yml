@@ -56,6 +56,14 @@
   - export SNOWFLAKE_TRANSFORM_WAREHOUSE=$SNOWFLAKE_MR_XS_WAREHOUSE
   - echo $SNOWFLAKE_TRANSFORM_WAREHOUSE
 
+
+dbt_seed:
+  <<: *snowflake_dbt_jobs
+  script:
+   - dbt seed --full-refresh $CI_PROFILE_TARGET #seed data from csv
+   - dbt --warn-error run-operation tag_validation --profiles-dir profile --target ci
+   - if [ $FAILED ]; then exit 1; fi
+
 🐭specify_model:
   <<: *snowflake_dbt_jobs
   script:
