@@ -52,11 +52,25 @@ models:
       columns:
         - name: dim_crm_touchpoint_id
           tests:
-            - not_null
-            - unique:
-                config:
-                  error_if: ">5"
-                  warn_if: ">1"
+              - not_null
+        - name: sdr_sales_segment
+          description: Sales segment of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
+        - name: sdr_region
+          description: Region of the SDR maintained in a [sheetload](https://docs.google.com/spreadsheets/d/17Uhk8yan3C93eKDSznXOEUCYTX9cTbLwWD2klRVykHI/edit#gid=0)
+        - name: is_dg_influenced
+          description: Flag indicating a touchpoint is influenced by Demand Gen based on its segment being Demand Gen.
+        - name: is_dg_sourced
+          description: Flag indicating a touchpoint is sourced from Demand Gen based on its segment being Demand Gen as well as its position being first touch.
+        - name: count_inquiry
+          description: Count of touchpoints associated with the creation of a lead based on their position.
+        - name: count_true_inquiry
+          description: Count of touchpoints that occured on or before the `true_inquiry_date`. 
+        - name: count_mql
+          description: Count of touchpoints that occured on or before the`mql_date`.
+        - name: count_net_new_mql
+          description: Count of touchpoints that occured on or before the `mql_date` that are also Lead Created.
+        - name: count_net_new_accepted
+          description: Count of touchpoints that occured on or before the `accepted_date` that are also Lead Created.
 
     - name: mart_crm_person
       description: Model with person and MQL business logic.
