@@ -714,4 +714,3 @@ models:
         - not_null
 - name: sheetload_toy_marketing_handbook
   description: Toy dataset for ad-hoc Propensity to Purchase modeling
->>>>>>> transform/snowflake-dbt/models/sources/sheetload/schema.yml
