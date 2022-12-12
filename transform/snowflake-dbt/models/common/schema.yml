@@ -3192,6 +3192,8 @@ models:
         description: '{{ doc("host_name") }}'
       - name: product_tier
         description: '{{ doc("ping_product_tier") }}'
+      - name: license_trial
+        description: '{{ doc("license_trial_ping_model") }}'
       - name: is_trial
         description: '{{ doc("is_trial_ping_model") }}'
       - name: source_license_id
