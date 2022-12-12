@@ -18,6 +18,7 @@
       dim_crm_person.dim_crm_user_id,
       dim_crm_person.dim_crm_account_id,
       dim_crm_person.sfdc_record_id,
+      dim_crm_person.marketo_lead_id,
       mql_date_first.date_id                   AS mql_date_first_id,
       mql_date_first.date_day                  AS mql_date_first,
       initial_mql_date_first.date_id           AS initial_mql_date_first_id,
