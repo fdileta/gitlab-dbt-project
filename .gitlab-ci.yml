@@ -74,12 +74,6 @@ include:
     on_stop: clone_stop
   allow_failure: true
 
-📈clone_prod_manual:
-  <<: *snowflake_auto_first_template
-  script:
-    - manage_snowflake.py manage_clones --database prod --empty
-    - manage_snowflake.py manage_clones --database prep --empty
-
 .snowflake_start_clone: &snowflake_start_clone
   <<: *snowflake_clone_template
   environment:
@@ -88,6 +82,12 @@ include:
   stage: ❄️ Snowflake
   variables:
     GIT_STRATEGY: clone
+
+📈clone_prod_manual:
+  <<: *snowflake_start_clone
+  script:
+    - manage_snowflake.py manage_clones --database prod --empty
+    - manage_snowflake.py manage_clones --database prep --empty
 
 📈clone_prod:
   <<: *snowflake_start_clone
