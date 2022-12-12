@@ -7,7 +7,6 @@ import pytest
 
 from extract.saas_usage_ping.usage_ping import (
     UsagePing,
-    SCHEMA_NAME,
     ENCODING,
     NAMESPACE_FILE,
     get_backfill_filter,
@@ -88,7 +87,6 @@ def test_static_variables():
     """
     Check static variables
     """
-    assert SCHEMA_NAME == "saas_usage_ping"
     assert ENCODING == "utf8"
     assert NAMESPACE_FILE == "usage_ping_namespace_queries.json"
 

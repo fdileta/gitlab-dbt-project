@@ -78,15 +78,24 @@ def test_cases_dict_transformed():
 
     return transform(test_cases_dict_subquery)
 
+
 @pytest.fixture(name="actual_dict")
 def prepared_dict(transformed_dict):
     """
     Prepare nested dict for testing
     """
-    prepared = [metrics_query for sub_dict in transformed_dict.values() for metrics_query in sub_dict.values()]
+    prepared = [
+        metrics_query
+        for sub_dict in transformed_dict.values()
+        for metrics_query in sub_dict.values()
+    ]
 
-    return {metric_name: metrics_query[metric_name] for metrics_query in prepared for metric_name in
-              metrics_query.keys()}
+    return {
+        metric_name: metrics_query[metric_name]
+        for metrics_query in prepared
+        for metric_name in metrics_query.keys()
+    }
+
 
 @pytest.fixture(name="list_of_metrics")
 def metric_list() -> set:

@@ -289,8 +289,7 @@ class UsagePing:
         The dict vals are updated recursively to preserve its nested structure
 
         """
-        results: Dict[Any, Any] = {}
-        errors: Dict[Any, Any] = {}
+        results = errors = {}
 
         for key, query in saas_queries.items():
             # if the 'query' is a dictionary, then recursively call
