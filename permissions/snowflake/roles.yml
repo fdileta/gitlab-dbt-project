@@ -2920,6 +2920,13 @@ roles:
             - transforming_xs
             - transforming_xl
 
+    - hkacmarski:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - hselim:
         member_of:
             - adaptive
@@ -2989,6 +2996,13 @@ roles:
     - jameson: # De provisioned as part of Quarterly audit and security check.
         member_of: []
         warehouses: []
+
+    - jbudreski:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
 
     - jcaine:
         member_of:
@@ -4739,6 +4753,11 @@ users:
         member_of:
             - grafana
 
+    - hkacmarski:
+        can_login: yes
+        member_of:
+            - hkacmarski
+
     - hselim:
         can_login: yes
         member_of:
@@ -4761,6 +4780,11 @@ users:
         can_login: yes
         member_of:
             - jahye
+
+    - jbudreski:
+        can_login: yes
+        member_of:
+            - jbudreski
 
     - jcaine:
         can_login: yes

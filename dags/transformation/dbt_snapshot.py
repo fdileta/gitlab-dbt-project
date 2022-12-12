@@ -86,7 +86,7 @@ default_args = {
 
 # Create the DAG
 # Runs 3x per day
-dag = DAG("dbt_snapshots", default_args=default_args, schedule_interval="0 */8 * * *")
+dag = DAG("dbt_snapshots", default_args=default_args, schedule_interval="0 7 * * *")
 
 # dbt-snapshot for daily tag
 # manifest only uploaded to MC from this dag
@@ -188,31 +188,10 @@ dbt_test_snapshot_models = KubernetesPodOperator(
     dag=dag,
 )
 
-
-def run_or_skip_dbt(current_seconds: int, dag_interval: int) -> bool:
-    # Only run models and tests once per day
-    if current_seconds < dag_interval:
-        return True
-    else:
-        return False
-
-
-SCHEDULE_INTERVAL_HOURS = 8
-timestamp = datetime.now()
-current_seconds = timestamp.hour * 3600
-dag_interval = SCHEDULE_INTERVAL_HOURS * 3600
-
-short_circuit = ShortCircuitOperator(
-    task_id="short_circuit",
-    python_callable=lambda: run_or_skip_dbt(current_seconds, dag_interval),
-    dag=dag,
-)
-
 (
     dbt_commit_hash_setter
     >> dbt_commit_hash_exporter
     >> dbt_snapshot
-    >> short_circuit
     >> dbt_snapshot_models_run
     >> dbt_test_snapshot_models
 )
