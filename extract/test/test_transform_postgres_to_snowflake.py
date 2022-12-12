@@ -3,27 +3,26 @@ Test unit to ensure quality of transformation algorithm
 from Postgres to Snowflake
 """
 import pytest
-
 import sqlparse
 
 from extract.saas_usage_ping.transform_postgres_to_snowflake import (
-    META_API_COLUMNS,
-    TRANSFORMED_INSTANCE_QUERIES_FILE,
-    META_DATA_INSTANCE_QUERIES_FILE,
     HAVING_CLAUSE_PATTERN,
+    META_API_COLUMNS,
+    META_DATA_INSTANCE_QUERIES_FILE,
     METRICS_EXCEPTION,
-    transform,
-    get_optimized_token,
-    get_translated_postgres_count,
+    TRANSFORMED_INSTANCE_QUERIES_FILE,
     get_keyword_index,
+    get_optimized_token,
+    get_renamed_query_tables,
+    get_renamed_table_name,
     get_sql_as_string,
     get_token_list,
     get_tokenized_query_list,
     get_transformed_token_list,
-    get_renamed_query_tables,
-    get_renamed_table_name,
+    get_translated_postgres_count,
     is_for_renaming,
     perform_action_on_query_str,
+    transform,
 )
 
 
@@ -387,8 +386,8 @@ def test_subquery_complex(transformed_dict, list_of_metrics):
 
     final_sql_query_dict = transformed_dict
 
-    for usage_key, create_dict in final_sql_query_dict.items():
-        for create_key, metrics_dict in create_dict.items():
+    for _, create_dict in final_sql_query_dict.items():
+        for _, metrics_dict in create_dict.items():
             for metric_name, metric_sql in metrics_dict.items():
                 assert "approval" in metric_name
                 assert metric_name in list_of_metrics

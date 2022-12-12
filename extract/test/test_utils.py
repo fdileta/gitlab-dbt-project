@@ -12,7 +12,7 @@ import responses
 from extract.saas_usage_ping.utils import EngineFactory, Utils
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, name="engine_factory")
 def create_engine_factory():
     """
     Create class object
@@ -20,7 +20,7 @@ def create_engine_factory():
     return EngineFactory()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, name="set_env_variables")
 def mock_settings_env_vars():
     """
     Simulate OS env. variables
@@ -32,17 +32,17 @@ def mock_settings_env_vars():
         yield
 
 
-@pytest.fixture(autouse=True)
-def create_utils(mock_settings_env_vars):
+@pytest.fixture(autouse=True, name="utils")
+def create_utils(set_env_variables):
     """
     Create class object
     """
-    _ = mock_settings_env_vars
+    _ = set_env_variables
 
     return Utils()
 
 
-@pytest.fixture
+@pytest.fixture(name="fake_response")
 def mocked_responses():
     """
     Mock routine to create fake response
@@ -51,86 +51,86 @@ def mocked_responses():
         yield rsps
 
 
-def test_engine_factory(create_engine_factory):
+def test_engine_factory(engine_factory):
     """
     Test Class creation
     """
-    assert create_engine_factory is not None
+    assert engine_factory is not None
 
 
-def test_engine_factory_processing_warehouse(create_engine_factory):
+def test_engine_factory_processing_warehouse(engine_factory):
     """
     Test Class properties - processing_warehouse
     """
-    assert create_engine_factory.processing_warehouse == "LOADER"
+    assert engine_factory.processing_warehouse == "LOADER"
 
 
-def test_engine_factory_schema_name(create_engine_factory):
+def test_engine_factory_schema_name(engine_factory):
     """
     Test Class properties - schema_name
     """
-    assert create_engine_factory.schema_name == "saas_usage_ping"
+    assert engine_factory.schema_name == "saas_usage_ping"
 
 
-def test_engine_factory_loader_engine(create_engine_factory):
+def test_engine_factory_loader_engine(engine_factory):
     """
     Test Class properties - loader_engine
     """
-    assert create_engine_factory.loader_engine is None
+    assert engine_factory.loader_engine is None
 
 
-def test_engine_factory_config_vars(create_engine_factory):
+def test_engine_factory_config_vars(engine_factory):
     """
     Test Class properties - config_vars
     """
-    assert create_engine_factory.config_vars is not None
+    assert engine_factory.config_vars is not None
 
 
-def test_engine_factory_connected(create_engine_factory):
+def test_engine_factory_connected(engine_factory):
     """
     Test Class properties - connected
     """
-    assert create_engine_factory.connected is False
+    assert engine_factory.connected is False
 
 
-def test_connect(create_engine_factory):
+def test_connect(engine_factory):
     """
     Raise an error for connect as no connection data
     """
 
     with pytest.raises(KeyError):
-        create_engine_factory.connect()
+        engine_factory.connect()
 
 
-def test_utils(create_utils):
+def test_utils(utils):
     """
     Test Class creation
     """
-    assert create_utils is not None
+    assert utils is not None
 
 
-def test_headers(create_utils):
+def test_headers(utils):
     """
     Test Class properties - headers
     """
-    assert create_utils.headers["PRIVATE-TOKEN"] == "xxx"
+    assert utils.headers["PRIVATE-TOKEN"] == "xxx"
 
 
-def test_headers_error(create_utils):
+def test_headers_error(utils):
     """
     Test Class properties - headers
     """
     with pytest.raises(KeyError):
-        assert create_utils.headers["WRONG_KEY"] == "xxx"
+        assert utils.headers["WRONG_KEY"] == "xxx"
 
 
-def test_convert_response_to_json(create_utils, mocked_responses):
+def test_convert_response_to_json(utils, fake_response):
 
     """
     Test function: convert_response_to_json
     """
     expected = {"test1": "pro", "test2": "1"}
-    mocked_responses.get(
+    fake_response.get(
         "http://some_gitlab_api_url/test",
         body='{"test1": "pro", "test2": "1"}',
         status=200,
@@ -139,14 +139,14 @@ def test_convert_response_to_json(create_utils, mocked_responses):
 
     resp = requests.get("http://some_gitlab_api_url/test")
 
-    actual = create_utils.convert_response_to_json(response=resp)
+    actual = utils.convert_response_to_json(response=resp)
 
     assert actual == expected
 
 
-def test_get_response(create_utils):
+def test_get_response(utils):
     """
     Force fake url and raise a Connection Error
     """
     with pytest.raises(ConnectionError):
-        _ = create_utils.get_response("http://fake_url/test")
+        _ = utils.get_response("http://fake_url/test")
