@@ -491,6 +491,7 @@ class UsagePing:
         combined_metrics = self._merge_dicts(redis_metrics, sql_metrics)
 
         self.upload_combined_metrics(combined_metrics, saas_queries)
+
         if sql_metric_errors:
             self.upload_sql_metric_errors(sql_metric_errors)
 
