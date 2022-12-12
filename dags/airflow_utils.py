@@ -53,7 +53,7 @@ data_science_pipelines_dag = [
     "ds_propensity_to_expand",
     "ds_propensity_to_contract",
     "ds_propensity_to_purchase_trial",
-    "ds-namespace-segmentation",
+    "ds_namespace_segmentation",
 ]
 
 
