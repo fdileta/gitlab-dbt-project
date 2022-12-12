@@ -134,7 +134,10 @@ def test_evaluate_saas_queries():
     Note: The snowflake outputs cannot be compared because they can change over time
     """
 
-    def get_keys_in_nested_dict(nested_dict, keys=[]):
+    def get_keys_in_nested_dict(nested_dict, keys):
+        if not keys:
+            keys = []
+
         for key, val in nested_dict.items():
             if isinstance(val, dict):
                 get_keys_in_nested_dict(val, keys)

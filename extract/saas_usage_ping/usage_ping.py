@@ -444,14 +444,14 @@ class UsagePing:
                 "Raising error to trigger Slack alert. Error is non-critical, but there is inconsistency with source data. Please check above logs for 'missing definitions' and/or 'key collision' warning."
             )
 
-    def _merge_dicts(
-        self, redis_metrics: Dict, sql_metrics: Dict, path: List = []
-    ) -> Dict:
+    def _merge_dicts(self, redis_metrics: Dict, sql_metrics: Dict, path: List) -> Dict:
         """
         Logic from https://stackoverflow.com/a/7205107
         Combines redis and sql metrics by
         merging sql_metrics into redis_metrics.
         """
+        if not path:
+            path = []
         for key in sql_metrics:
             if key in redis_metrics:
                 if isinstance(redis_metrics[key], dict) and isinstance(
