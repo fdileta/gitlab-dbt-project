@@ -169,8 +169,8 @@ WITH biz_person AS (
       ON sfdc_contacts.contact_id = biz_person_with_touchpoints.bizible_contact_id
     LEFT JOIN was_converted_lead
       ON was_converted_lead.contact_id = sfdc_contacts.contact_id
-    LEFT JOIN marketo_lead_source
-      ON sfdc_contacts.contact_id = marketo_lead_source.sfdc_contact_id and sfdc_type = 'Contact'
+    LEFT JOIN marketo_persons
+      ON sfdc_contacts.contact_id = marketo_persons.sfdc_contact_id and sfdc_type = 'Contact'
 
     UNION
 
@@ -283,8 +283,8 @@ WITH biz_person AS (
     FROM sfdc_leads
     LEFT JOIN biz_person_with_touchpoints
       ON sfdc_leads.lead_id = biz_person_with_touchpoints.bizible_lead_id
-    LEFT JOIN marketo_lead_source
-      ON sfdc_contacts.contact_id = marketo_lead_source.sfdc_lead_id and sfdc_type = 'Lead'
+    LEFT JOIN marketo_persons
+      ON sfdc_contacts.contact_id = marketo_persons.sfdc_lead_id and sfdc_type = 'Lead'
     WHERE is_converted = 'FALSE'
 
 ), duplicates AS (
