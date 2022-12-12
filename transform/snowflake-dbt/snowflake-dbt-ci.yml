@@ -60,7 +60,7 @@
   <<: *snowflake_dbt_jobs
   script:
    - mkdir -p transform/snowflake-dbt/dbt_packages
-   - mv /analytics/transform/snowflake-dbt/dbt_packages/* transform/snowflake-dbt/
+   - mv /analytics/transform/snowflake-dbt/dbt_packages/* transform/snowflake-dbt/dbt_packages/
    - ls /analytics/transform/snowflake-dbt/dbt_packages/
    - ls transform/snowflake-dbt/
    - chmod -R 700 transform/snowflake-dbt/dbt_packages
