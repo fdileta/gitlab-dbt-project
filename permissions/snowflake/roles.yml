@@ -836,9 +836,11 @@ roles:
                       - prod.restricted_safe_common_mart_sales
                       - prod.common_mart_marketing
                       - prod.restricted_safe_workspace_sales
+                      - prod.restricted_safe_common
                       - prep.snowplow_*
                       - prep.gitlab_dotcom
                       - prep.zendesk
+                      - prep.preparation
                       - raw.data_science
                       - raw.salesforce_stitch
                       - raw.snapshots
@@ -852,10 +854,12 @@ roles:
                       - prep.snowplow_*.*
                       - prep.zendesk.*
                       - prep.gitlab_dotcom.*
+                      - prep.preparation.gitlab_dotcom_namespace_lineage_historical_monthly
                       - prod.common.*
                       - prod.legacy.*
                       - prod.common_mart_product.*
                       - prod.restricted_safe_common_mart_sales.*
+                      - prod.restricted_safe_common.dim_crm_account_daily_snapshot
                       - prod.restricted_safe_workspace_sales.*
                       - prod.common_mart_marketing.*
                       - raw.salesforce_stitch.*

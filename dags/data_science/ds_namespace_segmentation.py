@@ -43,8 +43,8 @@ clone_data_science_namespace_seg_repo_cmd = f"""
         else
         export REPO="{DATA_SCIENCE_NAMESPACE_SEG_SSH_REPO}";
     fi &&
-    echo "git clone -b main --single-branch --depth 1 $REPO" &&
-    git clone -b main --single-branch --depth 1 $REPO &&
+    echo "git clone -b change-cloudpickle --single-branch --depth 1 $REPO" &&
+    git clone -b change-cloudpickle --single-branch --depth 1 $REPO &&
     echo "checking out commit $GIT_COMMIT" &&
     cd namespace-segmentation &&
     git checkout $GIT_COMMIT &&
