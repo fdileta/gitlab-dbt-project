@@ -4,7 +4,7 @@
   before_script:
     - mkdir -p transform/snowflake-dbt/dbt_packages
     - mv /analytics/transform/snowflake-dbt/dbt_packages/* transform/snowflake-dbt/
-    - chmod 700 transform/snowflake-dbt/dbt_packages
+    - chmod 700 transform/snowflake-dbt/dbt_packages/*
     - cd transform/snowflake-dbt/
     - echo $CI_MERGE_REQUEST_DIFF_ID
     - echo $BRANCH_NAME
