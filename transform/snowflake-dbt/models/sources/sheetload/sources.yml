@@ -56,6 +56,7 @@ sources:
       - name: event_dictionary_simplified
       - name: fmm_kpi_targets
       - name: fy23_quota
+      - name: ga360_customdimensions
       - name: gcp_active_cud
       - name: gitlab_contributing_organizations
       - name: gitlab_certification_tracking_dashboard
@@ -121,5 +122,3 @@ sources:
       - name: values_certificate
       - name: yc_companies
       - name: xactly_credit_sheetload
-
-
