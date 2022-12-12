@@ -60,7 +60,9 @@ class Utils:
 
     def __init__(self):
         config_dict = env.copy()
-        self.headers = {"PRIVATE-TOKEN": config_dict.get("GITLAB_ANALYTICS_PRIVATE_TOKEN", None)}
+        self.headers = {
+            "PRIVATE-TOKEN": config_dict.get("GITLAB_ANALYTICS_PRIVATE_TOKEN", None)
+        }
         self.encoding = "utf8"
 
         self.meta_api_columns = [
@@ -127,5 +129,19 @@ class Utils:
         """
         Load from json file
         """
-        with open(file=file_name, mode='r', encoding=self.encoding) as file:
+        with open(file=file_name, mode="r", encoding=self.encoding) as file:
             return json.load(file)
+
+    @staticmethod
+    def get_loaded_metadata(keys: list, values: list) -> dict:
+        """
+        Combined metadata from SQL and Redis and export as one json
+        Output:
+        {sql:{version: 15.1, edition: EEU,...},
+         redis: {version: 15.2, edition: CE,...}
+         }
+        """
+        if not keys or not values:
+            return {}
+
+        return {keys[i]: values[i] for i in range(len(keys))}

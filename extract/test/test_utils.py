@@ -192,3 +192,29 @@ def test_keep_meta_data(utils):
     assert "not_in_meta" not in actual
     assert "not_in_meta2" not in actual
     assert "recorded_at" in actual
+
+
+def test_get_loaded_metadata(utils):
+    """
+    Test rotuine get_loaded_metadata
+    """
+
+    expected = {"SQL": {"test": "1"}, "Redis": {"test2": "2"}}
+
+    actual = utils.get_loaded_metadata(
+        keys=["SQL", "Redis"], values=[{"test": "1"}, {"test2": "2"}]
+    )
+
+    assert actual == expected
+
+
+def test_get_loaded_metadata_empty(utils):
+    """
+    Test rotuine get_loaded_metadata empty list(s)
+    """
+
+    expected = {}
+
+    actual = utils.get_loaded_metadata(keys=[], values=[])
+
+    assert actual == expected

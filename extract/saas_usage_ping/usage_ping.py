@@ -354,22 +354,24 @@ class UsagePing:
         url = "https://gitlab.com/api/v4/usage_data/non_sql_metrics"
 
         redis_metrics = self.utils.get_json_response(url=url)
+        redis_metadata = self.utils.keep_meta_data(redis_metrics)
 
         payload_source = REDIS_KEY
         redis_metrics = self.keep_valid_metric_definitions(
             redis_metrics, payload_source, metric_definition_dict
         )
 
-        return redis_metrics
+        return redis_metrics, redis_metadata
 
     def upload_combined_metrics(
-        self, combined_metrics: Dict, saas_queries: Dict
+        self, combined_metrics: Dict, saas_queries: Dict, redis_metadata
     ) -> None:
         """Uploads combined_metrics dictionary to Snowflake"""
         df_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
             + self.dataframe_api_columns
             + ["source"]
+            + ["load_metadata"]
         )
 
         df_to_upload.loc[0] = (
@@ -383,6 +385,9 @@ class UsagePing:
                 self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE)
             )
             + ["combined"]
+            + self.utils.get_loaded_metadata(keys=[SQL_KEY, REDIS_KEY],
+                                             values=[self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE),
+                                                     redis_metadata])
         )
 
         self.engine_factory.upload_to_snowflake(
@@ -475,11 +480,11 @@ class UsagePing:
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(
             metric_definition_dict, saas_queries
         )
-        redis_metrics = self.saas_instance_redis_metrics(metric_definition_dict)
+        redis_metrics, redis_metadata = self.saas_instance_redis_metrics(metric_definition_dict)
 
         combined_metrics = self._merge_dicts(redis_metrics, sql_metrics)
 
-        self.upload_combined_metrics(combined_metrics, saas_queries)
+        self.upload_combined_metrics(combined_metrics=combined_metrics, saas_queries=saas_queries,redis_metadata=redis_metadata)
 
         if sql_metric_errors:
             self.upload_sql_metric_errors(sql_metric_errors)
