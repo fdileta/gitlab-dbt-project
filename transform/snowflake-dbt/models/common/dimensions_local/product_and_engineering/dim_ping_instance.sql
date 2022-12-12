@@ -22,19 +22,24 @@
     LATERAL FLATTEN(input=> raw_usage_data_payload,RECURSIVE => true)
   WHERE key = 'settings'
     AND value LIKE '%collected_data_categories%'
-)
 
-, usage_data_w_date AS (
+),
+
+usage_data_w_date AS (
+
   SELECT
     prep_ping_instance.*,
-    dim_date.date_id                                 AS dim_ping_date_id
+    TO_DATE(prep_ping_instance.raw_usage_data_payload:license_trial_ends_on::TEXT)  AS license_trial_ends_on,
+    dim_date.date_id                                                                AS dim_ping_date_id
   FROM prep_ping_instance
   LEFT JOIN dim_date
     ON TO_DATE(ping_created_at) = dim_date.date_day
 
-), last_ping_of_month_flag AS (
+),
 
-SELECT DISTINCT
+last_ping_of_month_flag AS (
+
+  SELECT DISTINCT
     usage_data_w_date.id                              AS id,
     usage_data_w_date.dim_ping_date_id                AS dim_ping_date_id,
     usage_data_w_date.uuid                            AS uuid,
@@ -50,7 +55,9 @@ SELECT DISTINCT
           PARTITION BY usage_data_w_date.uuid, usage_data_w_date.host_id, dim_date.first_day_of_month
           ORDER BY ping_created_at DESC) = 1
 
-), last_ping_of_week_flag AS (
+), 
+
+last_ping_of_week_flag AS (
 
   SELECT DISTINCT
     usage_data_w_date.id                              AS id,
@@ -67,7 +74,9 @@ SELECT DISTINCT
           PARTITION BY usage_data_w_date.uuid, usage_data_w_date.host_id, dim_date.first_day_of_week
           ORDER BY ping_created_at DESC) = 1
 
-), fct_w_month_flag AS (
+), 
+
+fct_w_month_flag AS (
 
   SELECT
     usage_data_w_date.*,
@@ -79,9 +88,12 @@ SELECT DISTINCT
   LEFT JOIN last_ping_of_week_flag
     ON usage_data_w_date.id = last_ping_of_week_flag.id
 
-), dedicated_instance AS (
+), 
 
-  SELECT DISTINCT prep_ping_instance.uuid
+dedicated_instance AS (
+
+  SELECT DISTINCT 
+    prep_ping_instance.uuid
   FROM prep_ping_instance
   INNER JOIN prep_license
     ON prep_ping_instance.license_md5 = prep_license.license_md5
@@ -91,7 +103,9 @@ SELECT DISTINCT
     ON prep_charge.dim_product_detail_id = prep_product_detail.dim_product_detail_id
   WHERE LOWER(prep_product_detail.product_rate_plan_charge_name) LIKE '%dedicated%'
 
-), final AS (
+), 
+
+final AS (
 
     SELECT DISTINCT
       fct_w_month_flag.dim_ping_instance_id                                                                       AS dim_ping_instance_id,
@@ -120,7 +134,8 @@ SELECT DISTINCT
       fct_w_month_flag.main_edition                                                                               AS ping_edition,
       fct_w_month_flag.hostname                                                                                   AS host_name,
       fct_w_month_flag.product_tier                                                                               AS product_tier,
-      fct_w_month_flag.license_trial                                                                              AS is_trial,
+      fct_w_month_flag.license_trial                                                                              AS license_trial,
+      IFF(fct_w_month_flag.ping_created_at < fct_w_month_flag.license_trial_ends_on, TRUE, FALSE)                 AS is_trial,
       fct_w_month_flag.source_license_id                                                                          AS source_license_id,
       fct_w_month_flag.installation_type                                                                          AS installation_type,
       fct_w_month_flag.license_plan                                                                               AS license_plan,
@@ -199,6 +214,7 @@ SELECT DISTINCT
     FROM fct_w_month_flag
     LEFT JOIN raw_flattened
       ON fct_w_month_flag.raw_usage_data_id = raw_flattened.raw_usage_data_id
+
 )
 
 {{ dbt_audit(
