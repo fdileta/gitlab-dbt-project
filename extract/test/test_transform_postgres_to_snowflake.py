@@ -78,6 +78,15 @@ def test_cases_dict_transformed():
 
     return transform(test_cases_dict_subquery)
 
+@pytest.fixture(name="actual_dict")
+def prepared_dict(transformed_dict):
+    """
+    Prepare nested dict for testing
+    """
+    prepared = [metrics_query for sub_dict in transformed_dict.values() for metrics_query in sub_dict.values()]
+
+    return {metric_name: metrics_query[metric_name] for metrics_query in prepared for metric_name in
+              metrics_query.keys()}
 
 @pytest.fixture(name="list_of_metrics")
 def metric_list() -> set:
@@ -388,7 +397,7 @@ def test_subquery_complex(transformed_dict, list_of_metrics):
                 )  # query parsed properly
 
 
-def test_transform_having_clause(transformed_dict, list_of_metrics):
+def test_transform_having_clause(actual_dict, list_of_metrics):
     """
     Test bugs we found for complex subquery - having clause
 
@@ -398,19 +407,15 @@ def test_transform_having_clause(transformed_dict, list_of_metrics):
     (COUNT(approval_project_rules_users.id) < MAX(approvals_required))
     """
 
-    final_sql_query_dict = transformed_dict
-
-    for usage_key, create_dict in final_sql_query_dict.items():
-        for create_key, metrics_dict in create_dict.items():
-            for metric_name, metric_sql in metrics_dict.items():
-                assert ".id" in metric_sql
-                assert "MAX(" in metric_sql
-                assert "COUNT(approval_project_rules_users.id)" in metric_sql
-                assert "MAX(approvals_required)" in metric_sql
-                assert "subquery" in metric_sql
-                assert metric_sql.count("(") == metric_sql.count(")")
-                assert metric_name in list_of_metrics
-                assert metric_name in metric_sql
+    for metric_name, metric_sql in actual_dict.items():
+        assert ".id" in metric_sql
+        assert "MAX(" in metric_sql
+        assert "COUNT(approval_project_rules_users.id)" in metric_sql
+        assert "MAX(approvals_required)" in metric_sql
+        assert "subquery" in metric_sql
+        assert metric_sql.count("(") == metric_sql.count(")")
+        assert metric_name in list_of_metrics
+        assert metric_name in metric_sql
 
 
 def test_nested_structure():
