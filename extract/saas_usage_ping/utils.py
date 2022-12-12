@@ -60,7 +60,17 @@ class Utils:
 
     def __init__(self):
         config_dict = env.copy()
-        self.headers = {"PRIVATE-TOKEN": config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"]}
+        self.headers = {"PRIVATE-TOKEN": config_dict.get("GITLAB_ANALYTICS_PRIVATE_TOKEN", None)}
+        self.encoding = "utf8"
+
+        self.meta_api_columns = [
+            "recorded_at",
+            "version",
+            "edition",
+            "recording_ce_finished_at",
+            "recording_ee_finished_at",
+            "uuid",
+        ]
 
     @staticmethod
     def convert_response_to_json(response: requests.Response):
@@ -88,3 +98,34 @@ class Utils:
         response = self.get_response(url=url)
 
         return self.convert_response_to_json(response=response)
+
+    def keep_meta_data(self, json_data: dict) -> dict:
+        """
+        Pick up meta-data we want to expose in Snowflake from the original file
+
+        param json_file: json file downloaded from API
+        return: dict
+        """
+
+        meta_data = {
+            meta_api_column: json_data.get(meta_api_column, "")
+            for meta_api_column in self.meta_api_columns
+        }
+
+        return meta_data
+
+    def save_to_json_file(self, file_name: str, json_data: dict) -> None:
+        """
+        param file_name: str
+        param json_data: dict
+        return: None
+        """
+        with open(file=file_name, mode="w", encoding=self.encoding) as wr_file:
+            json.dump(json_data, wr_file)
+
+    def load_from_json_file(self, file_name: str):
+        """
+        Load from json file
+        """
+        with open(file=file_name, mode='r', encoding=self.encoding) as file:
+            return json.load(file)

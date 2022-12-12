@@ -19,18 +19,15 @@ import yaml
 from fire import Fire
 from sqlalchemy.exc import SQLAlchemyError
 from transform_postgres_to_snowflake import (
-    META_API_COLUMNS,
+    ENCODING,
     META_DATA_INSTANCE_QUERIES_FILE,
     METRICS_EXCEPTION,
+    NAMESPACE_FILE,
+    REDIS_KEY,
+    SQL_KEY,
     TRANSFORMED_INSTANCE_QUERIES_FILE,
 )
 from utils import EngineFactory, Utils
-
-ENCODING = "utf8"
-
-NAMESPACE_FILE = "usage_ping_namespace_queries.json"
-REDIS_KEY = "redis"
-SQL_KEY = "sql"
 
 
 def get_backfill_filter(filter_list: list):
@@ -67,7 +64,7 @@ class UsagePing:
             self.metrics_backfill = []
 
         self.start_date_28 = self.end_date - datetime.timedelta(28)
-        self.dataframe_api_columns = META_API_COLUMNS
+        self.dataframe_api_columns = self.utils.meta_api_columns
         self.missing_definitions = {SQL_KEY: [], REDIS_KEY: []}
         self.duplicate_keys = []
 
@@ -76,11 +73,9 @@ class UsagePing:
         Calls api endpoint to get metric_definitions yaml file
         Loads file as list and converts it to a dictionary
         """
-        METRIC_DEFINITON_ENDPOINT = (
-            "http://gitlab.com/api/v4/usage_data/metric_definitions"
-        )
+        url = "http://gitlab.com/api/v4/usage_data/metric_definitions"
 
-        response = self.utils.get_response(url=METRIC_DEFINITON_ENDPOINT)
+        response = self.utils.get_response(url=url)
 
         metric_definitions = yaml.safe_load(response.text)
 
@@ -106,13 +101,11 @@ class UsagePing:
         can be updated to query an end point or query other functions
         to generate the {ping_name: sql_query} dictionary
         """
-        with open(
-            os.path.join(os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE),
-            encoding=ENCODING,
-        ) as file:
-            saas_queries = json.load(file)
+        file_name = os.path.join(
+            os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE
+        )
 
-        return saas_queries
+        return self.utils.load_from_json_file(file_name=file_name)
 
     def _get_dataframe_api_values(self, input_json: dict) -> list:
         """
@@ -144,8 +137,7 @@ class UsagePing:
             current timestamp: 1629986268.131019
             md5 timestamp: 54da37683078de0c1360a8e76d942227
         """
-        encoding = "utf-8"
-        timestamp_encoded = str(input_timestamp).encode(encoding=encoding)
+        timestamp_encoded = str(input_timestamp).encode(encoding=ENCODING)
 
         return md5(timestamp_encoded).hexdigest()
 
@@ -155,13 +147,9 @@ class UsagePing:
         param file_name: str
         return: dict
         """
-
         full_path = os.path.join(os.path.dirname(__file__), file_name)
 
-        with open(full_path, encoding=ENCODING) as file:
-            meta_data = json.load(file)
-
-        return meta_data
+        return self.utils.load_from_json_file(file_name=full_path)
 
     def does_source_match_definition(
         self, payload_source, metric_definition_source
@@ -363,9 +351,9 @@ class UsagePing:
         """
         Call the Non SQL Metrics API and store the results in Snowflake RAW database
         """
-        REDIS_ENDPOINT = "https://gitlab.com/api/v4/usage_data/non_sql_metrics"
+        url = "https://gitlab.com/api/v4/usage_data/non_sql_metrics"
 
-        redis_metrics = self.utils.get_json_response(url=REDIS_ENDPOINT)
+        redis_metrics = self.utils.get_json_response(url=url)
 
         payload_source = REDIS_KEY
         redis_metrics = self.keep_valid_metric_definitions(
@@ -392,7 +380,7 @@ class UsagePing:
                 self._get_md5(datetime.datetime.utcnow().timestamp()),
             ]
             + self._get_dataframe_api_values(
-                self._get_meta_data(META_DATA_INSTANCE_QUERIES_FILE)
+                self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE)
             )
             + ["combined"]
         )
@@ -444,14 +432,15 @@ class UsagePing:
                 "Raising error to trigger Slack alert. Error is non-critical, but there is inconsistency with source data. Please check above logs for 'missing definitions' and/or 'key collision' warning."
             )
 
-    def _merge_dicts(self, redis_metrics: Dict, sql_metrics: Dict, path: List) -> Dict:
+    def _merge_dicts(
+        self, redis_metrics: Dict, sql_metrics: Dict, path: List = []
+    ) -> Dict:
         """
         Logic from https://stackoverflow.com/a/7205107
         Combines redis and sql metrics by
         merging sql_metrics into redis_metrics.
         """
-        if not path:
-            path = []
+
         for key in sql_metrics:
             if key in redis_metrics:
                 if isinstance(redis_metrics[key], dict) and isinstance(

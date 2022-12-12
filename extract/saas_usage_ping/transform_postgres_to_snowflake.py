@@ -1,26 +1,15 @@
 """
 Module is used to transform SQL syntax from Postgres to Snowflake style
 """
-import json
-from typing import Any, Dict, List, Callable
+import re
 from logging import info
 
-from os import environ as env
-import re
+from typing import Any, Callable, Dict, List
+
 import sqlparse
 from sqlparse.sql import Token, TokenList
 from sqlparse.tokens import Whitespace
-
-import requests
-
-META_API_COLUMNS = [
-    "recorded_at",
-    "version",
-    "edition",
-    "recording_ce_finished_at",
-    "recording_ee_finished_at",
-    "uuid",
-]
+from utils import Utils
 
 TRANSFORMED_INSTANCE_QUERIES_FILE = "transformed_instance_queries.json"
 META_DATA_INSTANCE_QUERIES_FILE = "meta_data_instance_queries.json"
@@ -39,24 +28,10 @@ METRICS_EXCEPTION = (
     "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
 )
 
-
-def get_sql_query_map(private_token: str = None) -> Dict[Any, Any]:
-    """
-    Routine to get data from RestFUL API and return as a dict
-    """
-    headers = {
-        "PRIVATE-TOKEN": private_token,
-    }
-
-    url = "https://gitlab.com/api/v4/usage_data/queries"
-
-    response = requests.get(url=url, headers=headers)
-
-    response.raise_for_status()
-
-    source_json_data = json.loads(response.text)
-
-    return source_json_data
+ENCODING = "utf8"
+NAMESPACE_FILE = "usage_ping_namespace_queries.json"
+REDIS_KEY = "redis"
+SQL_KEY = "sql"
 
 
 def get_trimmed_token(token: List[str]) -> List[str]:
@@ -485,45 +460,25 @@ def transform(json_data: Dict[Any, Any]) -> Dict[Any, Any]:
     return transformed
 
 
-def keep_meta_data(json_data: dict) -> dict:
-    """
-    Pick up meta data we want to expose in Snowflake from the original file
-
-    param json_file: json file downloaded from API
-    return: dict
-    """
-
-    meta_data = {
-        meta_api_column: json_data.get(meta_api_column, "")
-        for meta_api_column in META_API_COLUMNS
-    }
-
-    return meta_data
-
-
-def save_to_json_file(file_name: str, json_data: dict) -> None:
-    """
-    param file_name: str
-    param json_data: dict
-    return: None
-    """
-    with open(file=file_name, mode="w", encoding="utf-8") as wr_file:
-        json.dump(json_data, wr_file)
-
-
 if __name__ == "__main__":
-    config_dict = env.copy()
-    payload = get_sql_query_map(
-        private_token=config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"]
-    )
+
+    utils = Utils()
+
+    url = "https://gitlab.com/api/v4/usage_data/queries"
+
+    payload = utils.get_json_response(url=url)
 
     final_sql__dict = transform(payload)
-    final_meta_data = keep_meta_data(payload)
+    final_meta_data = utils.keep_meta_data(payload)
+
     info("Processed final sql queries")
 
-    save_to_json_file(
+    utils.save_to_json_file(
         file_name=TRANSFORMED_INSTANCE_QUERIES_FILE, json_data=final_sql__dict
     )
-    save_to_json_file(
+
+    utils.save_to_json_file(
         file_name=META_DATA_INSTANCE_QUERIES_FILE, json_data=final_meta_data
     )
+
+    info("Done with - Processed final sql queries")

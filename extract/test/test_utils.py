@@ -116,6 +116,22 @@ def test_headers(utils):
     assert utils.headers["PRIVATE-TOKEN"] == "xxx"
 
 
+def test_meta_api_columns(utils):
+    """
+    Test Class properties - meta_api_columns
+    """
+    expected = [
+        "recorded_at",
+        "version",
+        "edition",
+        "recording_ce_finished_at",
+        "recording_ee_finished_at",
+        "uuid",
+    ]
+
+    assert utils.meta_api_columns == expected
+
+
 def test_headers_error(utils):
     """
     Test Class properties - headers
@@ -150,3 +166,29 @@ def test_get_response(utils):
     """
     with pytest.raises(ConnectionError):
         _ = utils.get_response("http://fake_url/test")
+
+
+def test_keep_meta_data(utils):
+    """
+    Test routine keep_meta_data
+    """
+
+    fake_json = {
+        "not_in_meta": "1",
+        "recorded_at": "1",
+        "version": "1",
+        "edition": "1",
+        "recording_ce_finished_at": "1",
+        "recording_ee_finished_at": "1",
+        "uuid": "1",
+        "not_in_meta2": "1",
+    }
+
+    meta_data = utils.keep_meta_data(fake_json)
+    actual = list(meta_data.keys())
+
+    assert isinstance(meta_data, dict)
+    assert utils.meta_api_columns == actual
+    assert "not_in_meta" not in actual
+    assert "not_in_meta2" not in actual
+    assert "recorded_at" in actual

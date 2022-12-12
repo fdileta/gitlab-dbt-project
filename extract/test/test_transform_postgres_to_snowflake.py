@@ -7,7 +7,6 @@ import sqlparse
 
 from extract.saas_usage_ping.transform_postgres_to_snowflake import (
     HAVING_CLAUSE_PATTERN,
-    META_API_COLUMNS,
     META_DATA_INSTANCE_QUERIES_FILE,
     METRICS_EXCEPTION,
     TRANSFORMED_INSTANCE_QUERIES_FILE,
@@ -24,13 +23,15 @@ from extract.saas_usage_ping.transform_postgres_to_snowflake import (
     perform_action_on_query_str,
     transform,
 )
+from extract.saas_usage_ping.utils import Utils
 
 
 def test_static_variables():
     """
     Test case: check static variables
     """
-    assert META_API_COLUMNS == [
+    utils = Utils()
+    assert utils.meta_api_columns == [
         "recorded_at",
         "version",
         "edition",
@@ -189,7 +190,7 @@ def test_transforming_queries():
         check did we fix the bug with "JOINprep", should be fixed to "JOIN prep."
         """
         final_sql = sql_query.upper()
-        print(f"\nfinal_sql: {final_sql}")
+
         assert "JOINPREP" not in final_sql
 
         if "JOIN" in final_sql:

@@ -1,18 +1,19 @@
 """
 The main test routine for Automated Service Ping
 """
+
 from datetime import datetime, timedelta
+
 
 import pytest
 
-from extract.saas_usage_ping.usage_ping import (
-    UsagePing,
+from extract.saas_usage_ping.transform_postgres_to_snowflake import (
     ENCODING,
     NAMESPACE_FILE,
-    get_backfill_filter,
-    SQL_KEY,
     REDIS_KEY,
+    SQL_KEY,
 )
+from extract.saas_usage_ping.usage_ping import UsagePing, get_backfill_filter
 
 
 @pytest.fixture(name="metrics_definition_test_dict")
@@ -134,10 +135,7 @@ def test_evaluate_saas_queries():
     Note: The snowflake outputs cannot be compared because they can change over time
     """
 
-    def get_keys_in_nested_dict(nested_dict, keys):
-        if not keys:
-            keys = []
-
+    def get_keys_in_nested_dict(nested_dict, keys: list = []):
         for key, val in nested_dict.items():
             if isinstance(val, dict):
                 get_keys_in_nested_dict(val, keys)
