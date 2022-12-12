@@ -193,3 +193,16 @@ models:
   description: Users for SS&A Tableau row-level-security
 - name: sheetload_sales_analytics_tableau_rls_roles
   description: User roles for SS&A Tableau row-level-security
+- name: sheetload_ga360_customdimensions
+  description: Custom Dimension Name field from Google Analytics (GA360). Custom dimensions are subject to change or new dimensions may be added. This Google Sheet will automatically update at the 1st of every month powered by a Google Apps Script function.
+  columns: 
+    - name: name
+      tests:
+        - not_null 
+    - name: index
+      tests:
+        - not_null
+        - unique
+    - name: scope
+      tests:
+        - not_null
