@@ -68,7 +68,7 @@ def get_usage_ping():
     usage_ping = UsagePing()
     usage_ping.end_date = datetime.now()
     usage_ping.start_date_28 = usage_ping.end_date - timedelta(days=28)
-    
+
     return usage_ping
 
 
@@ -78,9 +78,7 @@ def get_usage_ping_namespace_file(usage_ping):
     Fixture for namespace file
     """
 
-    return usage_ping._get_meta_data(
-        usage_ping, file_name="usage_ping_namespace_queries.json"
-    )
+    return usage_ping._get_meta_data(file_name="usage_ping_namespace_queries.json")
 
 
 def test_static_variables():
@@ -110,7 +108,7 @@ def test_get_md5(usage_ping):
     ]
 
     for check_time in input_timestamps:
-        res = usage_ping._get_md5(None, check_time)
+        res = usage_ping._get_md5(check_time)
 
         # Check output data type
         assert isinstance(res, str)
@@ -220,7 +218,7 @@ def test_namespace_file_error(usage_ping):
     Test file loading
     """
     with pytest.raises(FileNotFoundError):
-        usage_ping._get_meta_data(usage_ping, file_name="THIS_DOES_NOT_EXITS.json")
+        usage_ping._get_meta_data(file_name="THIS_DOES_NOT_EXITS.json")
 
 
 def test_json_file_consistency_level(namespace_file):
@@ -236,7 +234,7 @@ def test_json_file_consistency_level(namespace_file):
 
         assert level == "namespace"
 
-
+#
 @pytest.mark.parametrize(
     "test_value, expected_value",
     [
@@ -272,7 +270,7 @@ def test_replace_placeholders(usage_ping):
     """
     sql = "SELECT 1 FROM TABLE WHERE created_at BETWEEN between_start_date AND between_end_date"
 
-    actual = usage_ping.replace_placeholders(usage_ping, sql=sql)
+    actual = usage_ping.replace_placeholders(sql=sql)
 
     assert "between_start_date" not in actual
     assert "between_end_date" not in actual
