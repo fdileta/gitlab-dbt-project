@@ -59,3 +59,5 @@ sources:
       - name: zuora_subscription_snapshots
       - name: mart_available_to_renew_snapshot
       - name: mart_charge_snapshot
+      - name: rpt_ping_metric_totals_w_estimates_monthly_snapshot
+      - name: rpt_event_xmau_metric_monthly_snapshot
