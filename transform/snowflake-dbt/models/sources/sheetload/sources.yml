@@ -118,6 +118,7 @@ sources:
       - name: sisense_user_roles
       - name: social_marketing_metrics
       - name: social_marketing_topic_metrics
+      - name: toy_marketing_handbook
       - name: usage_ping_metrics_sections
       - name: values_certificate
       - name: yc_companies
