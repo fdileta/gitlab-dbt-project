@@ -221,6 +221,9 @@ models:
         +materialized: table
         +schema: google_analytics_360
 
+      google_search_console:
+        +schema: google_search_console 
+
       greenhouse:
         +schema: greenhouse
 

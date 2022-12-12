@@ -98,6 +98,7 @@ WITH prep_amendment AS (
     subscription.term_end_fiscal_year,
     subscription.is_single_fiscal_year_term_subscription,
     subscription.second_active_renewal_month,
+    subscription.cancelled_date,
 
     --Lineage and Cohort Information
     subscription_lineage.subscription_lineage,
@@ -121,5 +122,5 @@ WITH prep_amendment AS (
     created_by="@snalamaru",
     updated_by="@michellecooper",
     created_date="2020-12-16",
-    updated_date="2022-07-07"
+    updated_date="2022-11-21"
 ) }}
