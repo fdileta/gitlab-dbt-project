@@ -10,7 +10,6 @@ import json
 import logging
 import os
 import sys
-from hashlib import md5
 from logging import info
 from typing import Any, Dict, List, Tuple
 
@@ -19,7 +18,6 @@ import yaml
 from fire import Fire
 from sqlalchemy.exc import SQLAlchemyError
 from transform_postgres_to_snowflake import (
-    ENCODING,
     META_DATA_INSTANCE_QUERIES_FILE,
     METRICS_EXCEPTION,
     NAMESPACE_FILE,
@@ -121,25 +119,6 @@ class UsagePing:
         ]
 
         return dataframe_api_value_list
-
-    def _get_md5(
-        self, input_timestamp: float = datetime.datetime.utcnow().timestamp()
-    ) -> str:
-        """
-        Convert input datetime into md5 hash.
-        Result is returned as a string.
-        Example:
-
-            Input (datetime): datetime.utcnow().timestamp()
-            Output (str): md5 hash
-
-            -----------------------------------------------------------
-            current timestamp: 1629986268.131019
-            md5 timestamp: 54da37683078de0c1360a8e76d942227
-        """
-        timestamp_encoded = str(input_timestamp).encode(encoding=ENCODING)
-
-        return md5(timestamp_encoded).hexdigest()
 
     def _get_meta_data(self, file_name: str) -> dict:
         """
@@ -381,7 +360,7 @@ class UsagePing:
                 saas_queries,
                 json.dumps(combined_metrics),
                 self.end_date,
-                self._get_md5(datetime.datetime.utcnow().timestamp()),
+                self.utils.get_md5(datetime.datetime.utcnow().timestamp()),
             ]
             + self._get_dataframe_api_values(
                 self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE)
@@ -407,7 +386,7 @@ class UsagePing:
         df_to_upload = pd.DataFrame(columns=["run_id", "sql_errors", "ping_date"])
 
         df_to_upload.loc[0] = [
-            self._get_md5(datetime.datetime.utcnow().timestamp()),
+            self.utils.get_md5(datetime.datetime.utcnow().timestamp()),
             json.dumps(sql_metric_errors),
             self.end_date,
         ]

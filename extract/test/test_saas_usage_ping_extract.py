@@ -89,37 +89,6 @@ def test_static_variables():
     assert NAMESPACE_FILE == "usage_ping_namespace_queries.json"
 
 
-def test_get_md5(usage_ping):
-    """
-    Simple MD5 test.
-    Know testing the private method is not aligned
-    with the best praxis,
-    but found it is sufficient
-    in this implementation.
-    """
-
-    input_timestamps = [
-        datetime(2021, 9, 1, 23, 10, 21).timestamp(),
-        datetime(2020, 8, 1, 23, 10, 22).timestamp(),
-        datetime(2021, 7, 1, 23, 10, 23).timestamp(),
-        "test_string",
-        "",
-        None,
-    ]
-
-    for check_time in input_timestamps:
-        res = usage_ping._get_md5(check_time)
-
-        # Check output data type
-        assert isinstance(res, str)
-        # Check is len 32 as it is expected length
-        assert len(res) == 32  # bytes in hex representation
-        # As this is one-way function,
-        # can't test it with many things
-        # let see to we have all details with various inputs
-        assert res is not None
-
-
 def test_evaluate_saas_queries():
     """
     Run a series of test queries against Snowflake.

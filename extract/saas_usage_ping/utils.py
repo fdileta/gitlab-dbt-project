@@ -2,8 +2,9 @@
 Utils unit for Automated Service ping
 """
 
-
+import datetime
 import json
+from hashlib import md5
 from os import environ as env
 
 import pandas as pd
@@ -145,3 +146,22 @@ class Utils:
             return {}
 
         return {keys[i]: values[i] for i in range(len(keys))}
+
+    def get_md5(
+        self, input_timestamp: float = datetime.datetime.utcnow().timestamp()
+    ) -> str:
+        """
+        Convert input datetime into md5 hash.
+        Result is returned as a string.
+        Example:
+
+            Input (datetime): datetime.utcnow().timestamp()
+            Output (str): md5 hash
+
+            -----------------------------------------------------------
+            current timestamp: 1629986268.131019
+            md5 timestamp: 54da37683078de0c1360a8e76d942227
+        """
+        timestamp_encoded = str(input_timestamp).encode(encoding=self.encoding)
+
+        return md5(timestamp_encoded).hexdigest()
