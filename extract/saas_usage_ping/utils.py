@@ -61,6 +61,7 @@ class Utils:
 
     def __init__(self):
         config_dict = env.copy()
+
         self.headers = {
             "PRIVATE-TOKEN": config_dict.get("GITLAB_ANALYTICS_PRIVATE_TOKEN", None)
         }

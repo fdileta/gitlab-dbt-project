@@ -351,8 +351,15 @@ class UsagePing:
         df_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
             + self.dataframe_api_columns
-            + ["source"]
-            + ["load_metadata"]
+            + ["source", "load_metadata"]
+        )
+
+        combined_metadata = self.utils.get_loaded_metadata(
+            keys=[SQL_KEY, REDIS_KEY],
+            values=[
+                self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE),
+                redis_metadata,
+            ],
         )
 
         df_to_upload.loc[0] = (
@@ -366,13 +373,7 @@ class UsagePing:
                 self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE)
             )
             + ["combined"]
-            + self.utils.get_loaded_metadata(
-                keys=[SQL_KEY, REDIS_KEY],
-                values=[
-                    self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE),
-                    redis_metadata,
-                ],
-            )
+            + combined_metadata
         )
 
         self.engine_factory.upload_to_snowflake(
