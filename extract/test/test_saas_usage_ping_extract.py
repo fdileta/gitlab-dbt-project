@@ -105,7 +105,7 @@ def test_evaluate_saas_queries():
         return keys
 
     usage_ping_test = UsagePing()
-    connection = usage_ping_test.loader_engine.connect()
+    connection = usage_ping_test.engine_factory.connect()
     saas_queries = {
         "active_user_count": "SELECT 'active_user_count' AS counter_name,  COUNT(users.id) AS counter_value, TO_DATE(CURRENT_DATE) AS run_day   FROM prep.gitlab_dotcom.gitlab_dotcom_users_dedupe_source AS users WHERE (users.state IN ('active')) AND (users.user_type IS NULL OR users.user_type IN (6, 4))",
         "counts": {
