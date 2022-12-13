@@ -155,22 +155,6 @@ def test_headers(utils):
     assert utils.headers["PRIVATE-TOKEN"] == "xxx"
 
 
-def test_meta_api_columns(utils):
-    """
-    Test Class properties - meta_api_columns
-    """
-    expected = [
-        "recorded_at",
-        "version",
-        "edition",
-        "recording_ce_finished_at",
-        "recording_ee_finished_at",
-        "uuid",
-    ]
-
-    assert utils.meta_api_columns == expected
-
-
 def test_headers_error(utils):
     """
     Test Class properties - headers

@@ -43,15 +43,6 @@ def test_static_variables():
     ]
     assert TRANSFORMED_INSTANCE_SQL_QUERIES_FILE == "transformed_instance_queries.json"
     assert META_DATA_INSTANCE_QUERIES_FILE == "meta_data_instance_queries.json"
-
-
-def test_constants():
-    """
-    Test contants to ensure there are in the proper place
-    with proper values
-    """
-    assert TRANSFORMED_INSTANCE_SQL_QUERIES_FILE is not None
-    assert META_DATA_INSTANCE_QUERIES_FILE is not None
     assert HAVING_CLAUSE_PATTERN is not None
     assert METRICS_EXCEPTION is not None
 
