@@ -1,9 +1,9 @@
  WITH source AS (
 
         SELECT 
-            Name::VARCHAR AS dimension_name,
-            Index::NUMBER AS dimension_index,
-            Scope::VARCHAR AS dimension_scope
+            dimension_name::VARCHAR AS dimension_name,
+            dimension_index::NUMBER AS dimension_index,
+            dimension_scope::VARCHAR AS dimension_scope
         FROM {{ source('sheetload','ga360_customdimensions') }}
 
 )
