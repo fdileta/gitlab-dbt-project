@@ -2,7 +2,7 @@
 
         SELECT 
             Name::VARCHAR AS name,
-            Index::VARCHAR AS index,
+            Index::NUMBER AS index,
             Scope::VARCHAR AS scope
         FROM {{ source('sheetload','ga360_customdimensions') }}
 
