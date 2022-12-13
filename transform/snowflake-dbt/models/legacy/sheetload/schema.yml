@@ -196,13 +196,13 @@ models:
 - name: sheetload_ga360_custom_dimensions
   description: Custom Dimension Name field from Google Analytics (GA360). Custom dimensions are subject to change or new dimensions may be added. This Google Sheet will automatically update at the 1st of every month powered by a Google Apps Script function.
   columns: 
-    - name: name
+    - name: dimension_name
       tests:
         - not_null 
-    - name: index
+    - name: dimension_index
       tests:
         - not_null
         - unique
-    - name: scope
+    - name: dimension_scope
       tests:
         - not_null
