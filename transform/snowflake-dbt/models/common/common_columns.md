@@ -426,7 +426,7 @@ The id of the major minor version, defined as `major_version*100 + minor_version
 
 {% docs version_is_prerelease %}
 
-Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details [here](https://docs.gitlab.com/ee/policy/maintenance.html)
+Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details [here](https://docs.gitlab.com/ee/policy/maintenance.html). This is defined as `IFF(version ILIKE '%-pre', TRUE, FALSE)`
 
 {% enddocs %}
 
@@ -1050,3 +1050,44 @@ The unique surrogate key of a [task activity](https://help.salesforce.com/s/arti
 
 {% enddocs %}
 
+{% docs snapshot_id %}
+
+The ID of the date the snapshot was valid, easily joined to `dim_date` (YYYYMMDD)
+
+{% enddocs %}
+
+{% docs snapshot_date %}
+
+The date the snapshot record was valid (YYYY-MM-DD)
+
+{% enddocs %}
+
+{% docs dbt_scd_id %}
+
+A unique key generated for each snapshotted record. This is used internally by dbt and is not intended for analysis.
+
+{% enddocs %}
+
+{% docs dbt_created_at_snapshot_model %}
+
+The created_at timestamp of the source record when this snapshot row was inserted. This is used internally by dbt and is not intended for analysis.
+
+{% enddocs %}
+
+{% docs dbt_updated_at_snapshot_model %}
+
+The updated_at timestamp of the source record when this snapshot row was inserted. This is used internally by dbt and is not intended for analysis.
+
+{% enddocs %}
+
+{% docs dbt_valid_from %}
+
+The timestamp when this snapshot row was first inserted. This column can be used to order the different "versions" of a record.
+
+{% enddocs %}
+
+{% docs dbt_valid_to %}
+
+The timestamp when this row became invalidated. The most recent snapshot record will have `dbt_valid_to` set to null.
+
+{% enddocs %}
