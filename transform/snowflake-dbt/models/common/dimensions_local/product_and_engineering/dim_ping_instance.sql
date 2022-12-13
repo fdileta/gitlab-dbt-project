@@ -11,13 +11,13 @@
     ('prep_product_detail','prep_product_detail')
     ])
 
-}}
+}},
 
-, raw_flattened AS (
+raw_flattened AS (
 
-  SELECT 
+  SELECT
     raw_usage_data_id,
-    REPLACE(REPLACE(REPLACE(LOWER((raw_usage_data_payload:settings.collected_data_categories::TEXT)),'"',''),'[',''),']','') collected_data_categories 
+    REPLACE(REPLACE(REPLACE(LOWER((raw_usage_data_payload:settings.collected_data_categories::TEXT)),'"',''),'[',''),']','') collected_data_categories
   FROM prep_ping_instance,
     LATERAL FLATTEN(input=> raw_usage_data_payload,RECURSIVE => true)
   WHERE key = 'settings'
@@ -29,8 +29,8 @@ usage_data_w_date AS (
 
   SELECT
     prep_ping_instance.*,
-    TO_DATE(prep_ping_instance.raw_usage_data_payload:license_trial_ends_on::TEXT)  AS license_trial_ends_on,
-    dim_date.date_id                                                                AS dim_ping_date_id
+    dim_date.date_id                                                                AS dim_ping_date_id,
+    TO_DATE(prep_ping_instance.raw_usage_data_payload:license_trial_ends_on::TEXT)  AS license_trial_ends_on
   FROM prep_ping_instance
   LEFT JOIN dim_date
     ON TO_DATE(ping_created_at) = dim_date.date_day
@@ -55,7 +55,7 @@ last_ping_of_month_flag AS (
           PARTITION BY usage_data_w_date.uuid, usage_data_w_date.host_id, dim_date.first_day_of_month
           ORDER BY ping_created_at DESC) = 1
 
-), 
+),
 
 last_ping_of_week_flag AS (
 
@@ -74,7 +74,7 @@ last_ping_of_week_flag AS (
           PARTITION BY usage_data_w_date.uuid, usage_data_w_date.host_id, dim_date.first_day_of_week
           ORDER BY ping_created_at DESC) = 1
 
-), 
+),
 
 fct_w_month_flag AS (
 
@@ -88,11 +88,11 @@ fct_w_month_flag AS (
   LEFT JOIN last_ping_of_week_flag
     ON usage_data_w_date.id = last_ping_of_week_flag.id
 
-), 
+),
 
 dedicated_instance AS (
 
-  SELECT DISTINCT 
+  SELECT DISTINCT
     prep_ping_instance.uuid
   FROM prep_ping_instance
   INNER JOIN prep_license
@@ -103,7 +103,7 @@ dedicated_instance AS (
     ON prep_charge.dim_product_detail_id = prep_product_detail.dim_product_detail_id
   WHERE LOWER(prep_product_detail.product_rate_plan_charge_name) LIKE '%dedicated%'
 
-), 
+),
 
 final AS (
 
