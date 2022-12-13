@@ -32,5 +32,6 @@ pumps:
   - model: pump_daily_ds_scores
     timestamp_column: updated_at
     sensitive: True
+    single: False
     owner: '@rigerta'
     stage: to_be_defined
