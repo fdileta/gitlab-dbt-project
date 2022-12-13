@@ -414,7 +414,7 @@ The minor version of GitLab on the installation. For example, for 13.6.2, `minor
 
 {% docs major_minor_version %}
 
-The concatenation of major and minor version. For example, for 13.6.2, `major_minor_version` is 13.6. See details [here](https://docs.gitlab.com/ee/policy/maintenance.html)
+The concatenation of major and minor version, easily joined to `dim_gitlab_releases`. For example, for 13.6.2, `major_minor_version` is 13.6. See details [here](https://docs.gitlab.com/ee/policy/maintenance.html).
 
 {% enddocs %}
 
@@ -1043,3 +1043,10 @@ The milestone when the metric was introduced and when it was available to Self-M
 The source of the metric. May be set to a value like `database`, `redis`, `redis_hll`, `prometheus`, `system`.
 
 {% enddocs %}
+
+{% docs dim_crm_task_sk %}
+
+The unique surrogate key of a [task activity](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) related to Salesforce account, opportunity, lead, or contact.
+
+{% enddocs %}
+

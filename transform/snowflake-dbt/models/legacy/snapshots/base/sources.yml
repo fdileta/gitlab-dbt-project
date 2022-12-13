@@ -59,3 +59,10 @@ sources:
       - name: zuora_subscription_snapshots
       - name: mart_available_to_renew_snapshot
       - name: mart_charge_snapshot
+      - name: customers_db_leads_snapshots
+      - name: gitlab_dotcom_users_snapshots
+      - name: gitlab_dotcom_user_preferences_snapshots
+      - name: gitlab_dotcom_user_details_snapshots
+      - name: gitlab_dotcom_identities_snapshots
+      - name: rpt_ping_metric_totals_w_estimates_monthly_snapshot
+      - name: rpt_event_xmau_metric_monthly_snapshot

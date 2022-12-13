@@ -20,6 +20,10 @@
          {
             "regexp_pattern":"((\/([0-9A-Za-z_.-])*){2,})?\/alert_management\/(.)*",
             "regexp_function":"REGEXP"
+         },
+         {
+            "regexp_pattern":"((\/([0-9A-Za-z_.-])*){2,})?\/metrics",
+            "regexp_function":"NOT REGEXP"
          }
       ]
    },

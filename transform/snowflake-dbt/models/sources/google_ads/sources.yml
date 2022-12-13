@@ -19,3 +19,9 @@ sources:
 
     tables:
       - name: ad_group_hourly_stats
+      - name: campaign_history
+      - name: ad_group_history
+      - name: ad_history
+      - name: expanded_text_ad_history
+      - name: ad_stats
+
