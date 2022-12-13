@@ -35,7 +35,7 @@ default_args = {
     "depends_on_past": False,
     "on_failure_callback": slack_failed_task,
     "owner": "airflow",
-    "retries": 2,
+    "retries": 0,
     "retry_delay": timedelta(minutes=10),
     "start_date": datetime(2022, 8, 9),
     "dagrun_timeout": timedelta(hours=2),
@@ -55,8 +55,8 @@ clone_data_science_ptc_repo_cmd = f"""
         else
         export REPO="{DATA_SCIENCE_PTC_SSH_REPO}";
     fi &&
-    echo "git clone -b main --single-branch --depth 1 $REPO" &&
-    git clone -b main --single-branch --depth 1 $REPO &&
+    echo "git clone -b change-cloudpickle --single-branch --depth 1 $REPO" &&
+    git clone -b change-cloudpickle --single-branch --depth 1 $REPO &&
     echo "checking out commit $GIT_COMMIT" &&
     cd namespace-segmentation &&
     git checkout $GIT_COMMIT &&
