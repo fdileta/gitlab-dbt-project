@@ -3,13 +3,26 @@ The main test routine for utils for Automated Service Ping
 """
 
 import os
-from unittest import mock
+import re
 from datetime import datetime
+from unittest import mock
+
 import pytest
 import requests
 import responses
 
-from extract.saas_usage_ping.utils import EngineFactory, Utils
+from extract.saas_usage_ping.utils import (
+    ENCODING,
+    HAVING_CLAUSE_PATTERN,
+    META_DATA_INSTANCE_QUERIES_FILE,
+    METRICS_EXCEPTION,
+    NAMESPACE_FILE,
+    REDIS_KEY,
+    SQL_KEY,
+    TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
+    EngineFactory,
+    Utils,
+)
 
 
 @pytest.fixture(autouse=True, name="engine_factory")
@@ -49,6 +62,32 @@ def mocked_responses():
     """
     with responses.RequestsMock() as rsps:
         yield rsps
+
+
+def test_static_variables():
+    """
+    Test case: check static variables
+    """
+
+    assert TRANSFORMED_INSTANCE_SQL_QUERIES_FILE == "transformed_instance_queries.json"
+    assert META_DATA_INSTANCE_QUERIES_FILE == "meta_data_instance_queries.json"
+    assert NAMESPACE_FILE == "usage_ping_namespace_queries.json"
+    assert HAVING_CLAUSE_PATTERN == re.compile(
+        "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
+    )
+    assert METRICS_EXCEPTION == (
+        "counts.clusters_platforms_eks",
+        "counts.clusters_platforms_gke",
+        "usage_activity_by_stage.configure.clusters_platforms_gke",
+        "usage_activity_by_stage.configure.clusters_platforms_eks",
+        "usage_activity_by_stage_monthly.configure.clusters_platforms_gke",
+        "usage_activity_by_stage_monthly.configure.clusters_platforms_eks",
+        "usage_activity_by_stage.release.users_creating_deployment_approvals",
+        "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
+    )
+    assert ENCODING == "utf8"
+    assert SQL_KEY == "sql"
+    assert REDIS_KEY == "redis"
 
 
 def test_engine_factory(engine_factory):

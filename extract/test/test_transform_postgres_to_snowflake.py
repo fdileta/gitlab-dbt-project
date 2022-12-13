@@ -20,11 +20,11 @@ from extract.saas_usage_ping.transform_postgres_to_snowflake import (
     transform,
 )
 from extract.saas_usage_ping.utils import (
-    Utils,
     HAVING_CLAUSE_PATTERN,
     META_DATA_INSTANCE_QUERIES_FILE,
     METRICS_EXCEPTION,
     TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
+    Utils,
 )
 
 

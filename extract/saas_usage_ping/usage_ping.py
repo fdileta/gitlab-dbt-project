@@ -169,7 +169,7 @@ class UsagePing:
         need to be checked because some metrics are only defined by their parent name
         i.e `usage_activity_by_stage.manage.user_auth_by_provider.*`
         """
-        METRIC_DEFINITION_DATA_SOURCE_KEY = "data_source"
+        metric_definition_data_source_key = "data_source"
         metric_definition = metric_definition_dict.get(concat_metric_name, {})
 
         parent_metric_definition = metric_definition_dict.get(
@@ -179,10 +179,10 @@ class UsagePing:
         if metric_definition or parent_metric_definition:
             # check if redis or sql payload has the correct corresponding data source in the yaml file
             if self.does_source_match_definition(
-                payload_source, metric_definition.get(METRIC_DEFINITION_DATA_SOURCE_KEY)
+                payload_source, metric_definition.get(metric_definition_data_source_key)
             ) or self.does_source_match_definition(
                 payload_source,
-                parent_metric_definition.get(METRIC_DEFINITION_DATA_SOURCE_KEY),
+                parent_metric_definition.get(metric_definition_data_source_key),
             ):
                 return "valid_source"
 

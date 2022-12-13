@@ -6,13 +6,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from extract.saas_usage_ping.utils import (
-    ENCODING,
-    NAMESPACE_FILE,
-    REDIS_KEY,
-    SQL_KEY,
-)
 from extract.saas_usage_ping.usage_ping import UsagePing, get_backfill_filter
+from extract.saas_usage_ping.utils import ENCODING, NAMESPACE_FILE, REDIS_KEY, SQL_KEY
 
 
 @pytest.fixture(name="metrics_definition_test_dict")
@@ -202,6 +197,7 @@ def test_json_file_consistency_level(namespace_file):
         level = metrics.get("level")
 
         assert level == "namespace"
+
 
 #
 @pytest.mark.parametrize(
