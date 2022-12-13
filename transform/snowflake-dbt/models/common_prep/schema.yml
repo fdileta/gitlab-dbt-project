@@ -614,7 +614,7 @@ models:
           - unique
         tags: ["tdf", "common", "gainsight"]
       - name: license_sha256
-        description: The license_sha256 hash of the license file. Use this field to join to fct_usage_ping_payloads.
+        description: The license_sha256 is a secure hash created off the license file to be compliant with FIPS. This field can be used to join to the Service ping data.
         tests:
           - not_null
           - unique
