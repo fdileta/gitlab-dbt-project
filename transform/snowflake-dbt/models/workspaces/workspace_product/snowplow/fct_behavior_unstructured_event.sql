@@ -1,8 +1,8 @@
 {{ config(
     
         materialized = "incremental",
-        unique_key = "fct_behavior_unstructured_pk",
-        full_refresh= only_force_full_refresh(),
+        unique_key = "fct_behavior_unstructured_sk",
+        full_refresh = true if flags.FULL_REFRESH and var('full_refresh_force', false) else false,
         on_schema_change = 'sync_all_columns',
         cluster_by = ['behavior_at::DATE']
 
@@ -52,7 +52,7 @@
     SELECT
 
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['event_id']) }} AS fct_behavior_unstructured_pk,
+      {{ dbt_utils.surrogate_key(['event_id','behavior_at']) }} AS fct_behavior_unstructured_sk,
 
       -- Natural Key
       unstruct_event.app_id,

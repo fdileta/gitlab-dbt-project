@@ -1,7 +1,7 @@
 {{config(
 
     materialized='incremental',
-    unique_key='fct_behavior_structured_pk',
+    unique_key='behavior_structured_event_pk',
     full_refresh= only_force_full_refresh(),
     on_schema_change='sync_all_columns',
     post_hook=["{{ rolling_window_delete('behavior_at','month',25) }}"],
@@ -65,14 +65,14 @@ WITH structured_event_renamed AS (
     SELECT
 
       -- Primary Key
-      {{ dbt_utils.surrogate_key(['event_id']) }}               AS fct_behavior_structured_pk,
+      structured_event_renamed.event_id                                                                                                                        AS behavior_structured_event_pk,
 
       -- Foreign Keys
       dim_behavior_website_page.dim_behavior_website_page_sk,
       structured_event_renamed.dim_behavior_browser_sk,
       structured_event_renamed.dim_behavior_operating_system_sk,
-      structured_event_renamed.gsc_namespace_id                 AS dim_namespace_id,
-      structured_event_renamed.gsc_project_id                   AS dim_project_id,
+      structured_event_renamed.gsc_namespace_id                                                                                                                AS dim_namespace_id,
+      structured_event_renamed.gsc_project_id                                                                                                                  AS dim_project_id,
       structured_event_renamed.dim_behavior_event_sk,
 
       -- Time Attributes
@@ -80,7 +80,6 @@ WITH structured_event_renamed AS (
       structured_event_renamed.behavior_at,
 
       -- Degenerate Dimensions (Event Attributes)
-      structured_event_renamed.event_id,
       structured_event_renamed.tracker_version,
       structured_event_renamed.session_index,
       structured_event_renamed.app_id,
