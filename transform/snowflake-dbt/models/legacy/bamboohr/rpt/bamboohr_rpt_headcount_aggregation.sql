@@ -88,19 +88,6 @@ WITH source AS (
         1 - (rolling_12_month_separations_management/
             NULLIF(rolling_12_month_headcount_management,0)))                            AS retention_management,
 
-
-      headcount_end_staff,
-      headcount_average_staff,
-      hired_staff,
-      separated_staff,
-      AVG(COALESCE(headcount_average_staff, 0)) {{partition_statement}}             AS rolling_12_month_headcount_staff,
-      SUM(COALESCE(separated_staff,0)) {{partition_statement}}                      AS rolling_12_month_separations_staff,
-      IFF(rolling_12_month_headcount_staff< rolling_12_month_separations_staff, 
-        NULL,
-        1 - (rolling_12_month_separations_management/
-            NULLIF(rolling_12_month_headcount_staff,0)))                            AS retention_staff,
-
-
       headcount_end_individual_contributor,
       headcount_average_contributor,
       hired_contributor,
@@ -118,8 +105,6 @@ WITH source AS (
       SUM(headcount_average_leader) {{ratio_to_report_partition_statement}}         AS total_headcount_leader,
       MIN(headcount_average_manager) {{ratio_to_report_partition_statement}}        AS min_headcount_manager,
       SUM(headcount_average_manager) {{ratio_to_report_partition_statement}}        AS total_headcount_manager,
-      MIN(headcount_average_staff) {{ratio_to_report_partition_statement}}          AS min_headcount_staff,
-      SUM(headcount_average_staff) {{ratio_to_report_partition_statement}}          AS total_headcount_staff,
       MIN(headcount_average_contributor) {{ratio_to_report_partition_statement}}    AS min_headcount_contributor,
 
 
@@ -130,9 +115,7 @@ WITH source AS (
       RATIO_TO_REPORT(headcount_end_leader) 
         {{ratio_to_report_partition_statement}}                                     AS percent_of_headcount_leaders,
       RATIO_TO_REPORT(headcount_end_manager) 
-        {{ratio_to_report_partition_statement}}                                     AS percent_of_headcount_manager,     
-      RATIO_TO_REPORT(headcount_end_staff) 
-        {{ratio_to_report_partition_statement}}                                     AS percent_of_headcount_staff,      
+        {{ratio_to_report_partition_statement}}                                     AS percent_of_headcount_manager,          
       RATIO_TO_REPORT(headcount_end_individual_contributor) 
         {{ratio_to_report_partition_statement}}                                     AS percent_of_headcount_contributor,
       
@@ -238,15 +221,6 @@ WITH source AS (
       rolling_12_month_separations_management,
       retention_management,
 
-      IFF(headcount_end_staff < 3 AND eeoc_field_name != 'no_eeoc', 
-        NULL, headcount_end_staff)                                              AS headcount_end_staff,
-      IFF(headcount_average_staff < 3 AND eeoc_field_name != 'no_eeoc', 
-        NULL, headcount_average_staff)                                          AS headcount_average_staff,
-      IFF(hired_staff < 3 AND eeoc_field_name != 'no_eeoc', 
-        NULL, hired_staff)                                                      AS hired_staff,
-      IFF(separated_staff < 3 AND eeoc_field_name != 'no_eeoc',
-        NULL, separated_staff)                                                  AS separated_staff,
-
       IFF(headcount_end_individual_contributor < 4 AND eeoc_field_name != 'no_eeoc', 
         NULL, headcount_end_individual_contributor)                              AS headcount_end_contributor,
       IFF(headcount_average_contributor < 4 AND eeoc_field_name != 'no_eeoc', 
@@ -264,9 +238,6 @@ WITH source AS (
         NULL, percent_of_headcount_leaders)                                      AS percent_of_headcount_leaders,
       IFF(total_headcount_manager < 3 AND show_value_criteria = FALSE,  
         NULL, percent_of_headcount_manager)                                      AS percent_of_headcount_manager,    
-      IFF((total_headcount_staff < 5 and show_value_criteria = FALSE) 
-           OR (breakout_type = 'all_attributes_breakout' AND eeoc_field_name !='no_eeoc'), 
-        NULL, percent_of_headcount_staff)                                        AS percent_of_headcount_staff,  
       IFF(total_headcount_end_contributor < 5 AND show_value_criteria = FALSE, 
         NULL, percent_of_headcount_contributor)                                  AS percent_of_headcount_contributor,
 
