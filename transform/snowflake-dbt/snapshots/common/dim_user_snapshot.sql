@@ -1,5 +1,5 @@
 {% snapshot dim_user_snapshot %}
--- Using dbt updated at field as we want a new set of data everyday.
+-- Using dbt check_cols as we want only new rows when any of these columns change.
     {{
         config(
           unique_key='dim_user_sk',
