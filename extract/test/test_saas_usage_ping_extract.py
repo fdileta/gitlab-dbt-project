@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from extract.saas_usage_ping.transform_postgres_to_snowflake import (
+from extract.saas_usage_ping.utils import (
     ENCODING,
     NAMESPACE_FILE,
     REDIS_KEY,

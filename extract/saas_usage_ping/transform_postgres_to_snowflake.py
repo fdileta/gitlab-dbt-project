@@ -1,36 +1,18 @@
 """
 Module is used to transform SQL syntax from Postgres to Snowflake style
 """
-import re
 from logging import info
 from typing import Any, Callable, Dict, List
 
 import sqlparse
 from sqlparse.sql import Token, TokenList
 from sqlparse.tokens import Whitespace
-from utils import Utils
-
-TRANSFORMED_INSTANCE_QUERIES_FILE = "transformed_instance_queries.json"
-META_DATA_INSTANCE_QUERIES_FILE = "meta_data_instance_queries.json"
-HAVING_CLAUSE_PATTERN = re.compile(
-    "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
+from utils import (
+    HAVING_CLAUSE_PATTERN,
+    META_DATA_INSTANCE_QUERIES_FILE,
+    TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
+    Utils,
 )
-
-METRICS_EXCEPTION = (
-    "counts.clusters_platforms_eks",
-    "counts.clusters_platforms_gke",
-    "usage_activity_by_stage.configure.clusters_platforms_gke",
-    "usage_activity_by_stage.configure.clusters_platforms_eks",
-    "usage_activity_by_stage_monthly.configure.clusters_platforms_gke",
-    "usage_activity_by_stage_monthly.configure.clusters_platforms_eks",
-    "usage_activity_by_stage.release.users_creating_deployment_approvals",
-    "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
-)
-
-ENCODING = "utf8"
-NAMESPACE_FILE = "usage_ping_namespace_queries.json"
-REDIS_KEY = "redis"
-SQL_KEY = "sql"
 
 
 def get_trimmed_token(token: List[str]) -> List[str]:
@@ -473,7 +455,7 @@ if __name__ == "__main__":
     info("Processed final sql queries")
 
     utils.save_to_json_file(
-        file_name=TRANSFORMED_INSTANCE_QUERIES_FILE, json_data=final_sql__dict
+        file_name=TRANSFORMED_INSTANCE_SQL_QUERIES_FILE, json_data=final_sql__dict
     )
 
     utils.save_to_json_file(

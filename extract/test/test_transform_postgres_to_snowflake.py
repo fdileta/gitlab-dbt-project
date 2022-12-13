@@ -6,10 +6,6 @@ import pytest
 import sqlparse
 
 from extract.saas_usage_ping.transform_postgres_to_snowflake import (
-    HAVING_CLAUSE_PATTERN,
-    META_DATA_INSTANCE_QUERIES_FILE,
-    METRICS_EXCEPTION,
-    TRANSFORMED_INSTANCE_QUERIES_FILE,
     get_keyword_index,
     get_optimized_token,
     get_renamed_query_tables,
@@ -23,7 +19,13 @@ from extract.saas_usage_ping.transform_postgres_to_snowflake import (
     perform_action_on_query_str,
     transform,
 )
-from extract.saas_usage_ping.utils import Utils
+from extract.saas_usage_ping.utils import (
+    Utils,
+    HAVING_CLAUSE_PATTERN,
+    META_DATA_INSTANCE_QUERIES_FILE,
+    METRICS_EXCEPTION,
+    TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
+)
 
 
 def test_static_variables():
@@ -39,7 +41,7 @@ def test_static_variables():
         "recording_ee_finished_at",
         "uuid",
     ]
-    assert TRANSFORMED_INSTANCE_QUERIES_FILE == "transformed_instance_queries.json"
+    assert TRANSFORMED_INSTANCE_SQL_QUERIES_FILE == "transformed_instance_queries.json"
     assert META_DATA_INSTANCE_QUERIES_FILE == "meta_data_instance_queries.json"
 
 
@@ -48,7 +50,7 @@ def test_constants():
     Test contants to ensure there are in the proper place
     with proper values
     """
-    assert TRANSFORMED_INSTANCE_QUERIES_FILE is not None
+    assert TRANSFORMED_INSTANCE_SQL_QUERIES_FILE is not None
     assert META_DATA_INSTANCE_QUERIES_FILE is not None
     assert HAVING_CLAUSE_PATTERN is not None
     assert METRICS_EXCEPTION is not None

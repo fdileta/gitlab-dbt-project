@@ -4,12 +4,37 @@ Utils unit for Automated Service ping
 
 import datetime
 import json
+import re
 from hashlib import md5
 from os import environ as env
 
 import pandas as pd
 import requests
 from gitlabdata.orchestration_utils import dataframe_uploader, snowflake_engine_factory
+
+TRANSFORMED_INSTANCE_SQL_QUERIES_FILE = "transformed_instance_queries.json"
+META_DATA_INSTANCE_QUERIES_FILE = "meta_data_instance_queries.json"
+NAMESPACE_FILE = "usage_ping_namespace_queries.json"
+
+HAVING_CLAUSE_PATTERN = re.compile(
+    "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
+)
+
+METRICS_EXCEPTION = (
+    "counts.clusters_platforms_eks",
+    "counts.clusters_platforms_gke",
+    "usage_activity_by_stage.configure.clusters_platforms_gke",
+    "usage_activity_by_stage.configure.clusters_platforms_eks",
+    "usage_activity_by_stage_monthly.configure.clusters_platforms_gke",
+    "usage_activity_by_stage_monthly.configure.clusters_platforms_eks",
+    "usage_activity_by_stage.release.users_creating_deployment_approvals",
+    "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
+)
+
+ENCODING = "utf8"
+
+REDIS_KEY = "redis"
+SQL_KEY = "sql"
 
 
 class EngineFactory:
@@ -65,7 +90,7 @@ class Utils:
         self.headers = {
             "PRIVATE-TOKEN": config_dict.get("GITLAB_ANALYTICS_PRIVATE_TOKEN", None)
         }
-        self.encoding = "utf8"
+        self.encoding = ENCODING
 
         self.meta_api_columns = [
             "recorded_at",

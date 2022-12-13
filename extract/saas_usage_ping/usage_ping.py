@@ -17,15 +17,16 @@ import pandas as pd
 import yaml
 from fire import Fire
 from sqlalchemy.exc import SQLAlchemyError
-from transform_postgres_to_snowflake import (
+from utils import (
     META_DATA_INSTANCE_QUERIES_FILE,
     METRICS_EXCEPTION,
     NAMESPACE_FILE,
     REDIS_KEY,
     SQL_KEY,
-    TRANSFORMED_INSTANCE_QUERIES_FILE,
+    TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
+    EngineFactory,
+    Utils,
 )
-from utils import EngineFactory, Utils
 
 
 def get_backfill_filter(filter_list: list):
@@ -100,7 +101,7 @@ class UsagePing:
         to generate the {ping_name: sql_query} dictionary
         """
         file_name = os.path.join(
-            os.path.dirname(__file__), TRANSFORMED_INSTANCE_QUERIES_FILE
+            os.path.dirname(__file__), TRANSFORMED_INSTANCE_SQL_QUERIES_FILE
         )
 
         return self.utils.load_from_json_file(file_name=file_name)
