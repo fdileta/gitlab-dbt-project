@@ -132,15 +132,6 @@ def test_engine_factory_connected(engine_factory):
     assert engine_factory.connected is False
 
 
-def test_connect(engine_factory):
-    """
-    Raise an error for connect as no connection data
-    """
-
-    with pytest.raises(KeyError):
-        engine_factory.connect()
-
-
 def test_utils(utils):
     """
     Test Class creation
