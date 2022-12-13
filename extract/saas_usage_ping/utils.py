@@ -13,14 +13,14 @@ import requests
 from gitlabdata.orchestration_utils import dataframe_uploader, snowflake_engine_factory
 
 TRANSFORMED_INSTANCE_SQL_QUERIES_FILE = "transformed_instance_queries.json"
-META_DATA_INSTANCE_QUERIES_FILE = "meta_data_instance_queries.json"
+META_DATA_INSTANCE_SQL_QUERIES_FILE = "meta_data_instance_queries.json"
 NAMESPACE_FILE = "usage_ping_namespace_queries.json"
 
 HAVING_CLAUSE_PATTERN = re.compile(
     "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
 )
 
-METRICS_EXCEPTION = (
+METRICS_EXCEPTION_INSTANCE_SQL = (
     "counts.clusters_platforms_eks",
     "counts.clusters_platforms_gke",
     "usage_activity_by_stage.configure.clusters_platforms_gke",
@@ -32,7 +32,6 @@ METRICS_EXCEPTION = (
 )
 
 ENCODING = "utf8"
-
 REDIS_KEY = "redis"
 SQL_KEY = "sql"
 

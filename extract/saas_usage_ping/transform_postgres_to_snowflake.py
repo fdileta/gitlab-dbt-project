@@ -9,7 +9,7 @@ from sqlparse.sql import Token, TokenList
 from sqlparse.tokens import Whitespace
 from utils import (
     HAVING_CLAUSE_PATTERN,
-    META_DATA_INSTANCE_QUERIES_FILE,
+    META_DATA_INSTANCE_SQL_QUERIES_FILE,
     TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
     Utils,
 )
@@ -459,7 +459,7 @@ if __name__ == "__main__":
     )
 
     utils.save_to_json_file(
-        file_name=META_DATA_INSTANCE_QUERIES_FILE, json_data=final_meta_data
+        file_name=META_DATA_INSTANCE_SQL_QUERIES_FILE, json_data=final_meta_data
     )
 
     info("Done with - Processed final sql queries")

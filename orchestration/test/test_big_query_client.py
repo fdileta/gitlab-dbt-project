@@ -2,7 +2,6 @@ import os
 
 import pytest
 
-
 from orchestration.big_query_client import BigQueryClient
 
 bq_client = BigQueryClient().get_client()

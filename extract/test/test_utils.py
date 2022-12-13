@@ -14,8 +14,8 @@ import responses
 from extract.saas_usage_ping.utils import (
     ENCODING,
     HAVING_CLAUSE_PATTERN,
-    META_DATA_INSTANCE_QUERIES_FILE,
-    METRICS_EXCEPTION,
+    META_DATA_INSTANCE_SQL_QUERIES_FILE,
+    METRICS_EXCEPTION_INSTANCE_SQL,
     NAMESPACE_FILE,
     REDIS_KEY,
     SQL_KEY,
@@ -70,12 +70,12 @@ def test_static_variables():
     """
 
     assert TRANSFORMED_INSTANCE_SQL_QUERIES_FILE == "transformed_instance_queries.json"
-    assert META_DATA_INSTANCE_QUERIES_FILE == "meta_data_instance_queries.json"
+    assert META_DATA_INSTANCE_SQL_QUERIES_FILE == "meta_data_instance_queries.json"
     assert NAMESPACE_FILE == "usage_ping_namespace_queries.json"
     assert HAVING_CLAUSE_PATTERN == re.compile(
         "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
     )
-    assert METRICS_EXCEPTION == (
+    assert METRICS_EXCEPTION_INSTANCE_SQL == (
         "counts.clusters_platforms_eks",
         "counts.clusters_platforms_gke",
         "usage_activity_by_stage.configure.clusters_platforms_gke",

@@ -18,8 +18,8 @@ import yaml
 from fire import Fire
 from sqlalchemy.exc import SQLAlchemyError
 from utils import (
-    META_DATA_INSTANCE_QUERIES_FILE,
-    METRICS_EXCEPTION,
+    META_DATA_INSTANCE_SQL_QUERIES_FILE,
+    METRICS_EXCEPTION_INSTANCE_SQL,
     NAMESPACE_FILE,
     REDIS_KEY,
     SQL_KEY,
@@ -67,7 +67,7 @@ class UsagePing:
         self.missing_definitions = {SQL_KEY: [], REDIS_KEY: []}
         self.duplicate_keys = []
 
-    def _get_metrics_definition_dict(self) -> Dict[str, Any]:
+    def _get_instance_sql_metrics_definition(self) -> Dict[str, Any]:
         """
         Calls api endpoint to get metric_definitions yaml file
         Loads file as list and converts it to a dictionary
@@ -95,7 +95,7 @@ class UsagePing:
         """
         return self.metrics_backfill
 
-    def _get_instance_queries(self) -> Dict:
+    def _get_instance_sql_metrics_queries(self) -> Dict:
         """
         can be updated to query an end point or query other functions
         to generate the {ping_name: sql_query} dictionary
@@ -121,7 +121,7 @@ class UsagePing:
 
         return dataframe_api_value_list
 
-    def _get_meta_data(self, file_name: str) -> dict:
+    def _get_meta_data_from_file(self, file_name: str) -> dict:
         """
         Load metadata from .json file from the file system
         param file_name: str
@@ -224,7 +224,7 @@ class UsagePing:
                     valid_metric_dict[metric_name] = return_dict
             else:
                 if (
-                    concat_metric_name.lower() not in METRICS_EXCEPTION
+                    concat_metric_name.lower() not in METRICS_EXCEPTION_INSTANCE_SQL
                     or payload_source != "sql"
                 ):
                     data_source_status = self.check_data_source(
@@ -244,7 +244,7 @@ class UsagePing:
 
         return valid_metric_dict
 
-    def evaluate_saas_queries(
+    def evaluate_saas_instance_sql_queries(
         self, connection, saas_queries: Dict
     ) -> Tuple[Dict, Dict]:
         """
@@ -263,7 +263,7 @@ class UsagePing:
         for key, query in saas_queries.items():
             # if the 'query' is a dictionary, then recursively call
             if isinstance(query, dict):
-                results_returned, errors_returned = self.evaluate_saas_queries(
+                results_returned, errors_returned = self.evaluate_saas_instance_sql_queries(
                     connection, query
                 )
                 if results_returned:
@@ -315,7 +315,7 @@ class UsagePing:
             saas_queries, payload_source, metric_definition_dict
         )
 
-        sql_metrics, sql_metric_errors = self.evaluate_saas_queries(
+        sql_metrics, sql_metric_errors = self.evaluate_saas_instance_sql_queries(
             connection, saas_queries_with_valid_definitions
         )
 
@@ -358,7 +358,7 @@ class UsagePing:
         combined_metadata = self.utils.get_loaded_metadata(
             keys=[SQL_KEY, REDIS_KEY],
             values=[
-                self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE),
+                self._get_meta_data_from_file(file_name=META_DATA_INSTANCE_SQL_QUERIES_FILE),
                 redis_metadata,
             ],
         )
@@ -371,7 +371,7 @@ class UsagePing:
                 self.utils.get_md5(datetime.datetime.utcnow().timestamp()),
             ]
             + self._get_dataframe_api_values(
-                self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE)
+                self._get_meta_data_from_file(file_name=META_DATA_INSTANCE_SQL_QUERIES_FILE)
             )
             + ["combined"]
             + [combined_metadata]
@@ -383,7 +383,7 @@ class UsagePing:
 
         self.engine_factory.dispose()
 
-    def upload_sql_metric_errors(self, sql_metric_errors: Dict) -> None:
+    def upload_instance_sql_metrics_errors(self, sql_metric_errors: Dict) -> None:
         """Uploads sql_metric_errors dictionary to Snowflake"""
         df_to_upload = pd.DataFrame(columns=["run_id", "sql_errors", "ping_date"])
 
@@ -461,8 +461,8 @@ class UsagePing:
         3. Combines the two payloads
         4. Uploads the combined payload, and any of the sql errors
         """
-        metric_definition_dict = self._get_metrics_definition_dict()
-        saas_queries = self._get_instance_queries()
+        metric_definition_dict = self._get_instance_sql_metrics_definition()
+        saas_queries = self._get_instance_sql_metrics_queries()
 
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(
             metric_definition_dict, saas_queries
@@ -480,7 +480,7 @@ class UsagePing:
         )
 
         if sql_metric_errors:
-            self.upload_sql_metric_errors(sql_metric_errors)
+            self.upload_instance_sql_metrics_errors(sql_metric_errors)
 
         # self.run_metric_checks()
 
@@ -575,7 +575,7 @@ class UsagePing:
         """
         connection = self.engine_factory.connect()
 
-        namespace_queries = self._get_meta_data(file_name=NAMESPACE_FILE)
+        namespace_queries = self._get_meta_data_from_file(file_name=NAMESPACE_FILE)
 
         for namespace_query in namespace_queries:
             if metrics_filter(namespace_query):
