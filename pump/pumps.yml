@@ -32,5 +32,6 @@ pumps:
   - model: pump_daily_data_science_scores
     timestamp_column: updated_at
     sensitive: True
+    single: False
     owner: '@rigerta'
     stage: s3_data_science_pump
