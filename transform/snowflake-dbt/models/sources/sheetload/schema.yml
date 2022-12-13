@@ -699,3 +699,5 @@ models:
     - name: key_segment_geo
       tests:
         - not_null
+- name: sheetload_toy_marketing_handbook
+  description: Toy dataset for ad-hoc Propensity to Purchase modeling
