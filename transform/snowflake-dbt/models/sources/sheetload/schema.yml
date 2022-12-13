@@ -699,7 +699,7 @@ models:
     - name: key_segment_geo
       tests:
         - not_null
-- name: sheetload_ga360_custom_dimensions
+- name: sheetload_ga360_custom_dimensions_source
   description: Custom Dimension Name field from Google Analytics (GA360). Custom dimensions are subject to change or new dimensions may be added. This Google Sheet will automatically update at the 1st of every month powered by a Google Apps Script function.
   columns: 
     - name: dimension_name
