@@ -1043,3 +1043,10 @@ The milestone when the metric was introduced and when it was available to Self-M
 The source of the metric. May be set to a value like `database`, `redis`, `redis_hll`, `prometheus`, `system`.
 
 {% enddocs %}
+
+{% docs dim_crm_task_sk %}
+
+The unique surrogate key of a [task activity](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) related to Salesforce account, opportunity, lead, or contact.
+
+{% enddocs %}
+
