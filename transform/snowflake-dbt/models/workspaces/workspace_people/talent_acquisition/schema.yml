@@ -25,7 +25,7 @@ models:
               - job_id
               - job_opening_id
               - application_id
-              - stage_entered_date
+              - modified_stage_id
       columns:
         - name: job_id
           tests:
@@ -36,6 +36,6 @@ models:
         - name: application_id
           tests:
             - not_null
-        - name: stage_entered_date
+        - name: modified_stage_id
           tests:
             - not_null 
