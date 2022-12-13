@@ -42,7 +42,9 @@ default_args = {
 }
 
 # Prepare the cmd
-DATA_SCIENCE_PTC_SSH_REPO = "git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git"
+DATA_SCIENCE_PTC_SSH_REPO = (
+    "git@gitlab.com:gitlab-data/data-science-projects/namespace-segmentation.git"
+)
 DATA_SCIENCE_PTC_HTTP_REPO = "https://gitlab_analytics:$GITLAB_ANALYTICS_PRIVATE_TOKEN@gitlab.com/gitlab-data/data-science-projects/namespace-segmentation.git"
 
 clone_data_science_ptc_repo_cmd = f"""
