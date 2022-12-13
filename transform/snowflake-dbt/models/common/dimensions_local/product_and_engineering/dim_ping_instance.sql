@@ -220,7 +220,7 @@ final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@icooper-acp",
-    updated_by="@tpoole1",
+    updated_by="@cbraza",
     created_date="2022-03-08",
-    updated_date="2022-10-06"
+    updated_date="2022-12-13"
 ) }}
