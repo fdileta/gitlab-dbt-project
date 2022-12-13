@@ -426,7 +426,7 @@ The id of the major minor version, defined as `major_version*100 + minor_version
 
 {% docs version_is_prerelease %}
 
-Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details [here](https://docs.gitlab.com/ee/policy/maintenance.html). This is defined as `IFF(version ILIKE '%-pre', TRUE, FALSE)`
+Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details [here](https://docs.gitlab.com/ee/policy/maintenance.html)
 
 {% enddocs %}
 
