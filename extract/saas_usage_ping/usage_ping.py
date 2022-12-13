@@ -373,7 +373,7 @@ class UsagePing:
                 self._get_meta_data(file_name=META_DATA_INSTANCE_QUERIES_FILE)
             )
             + ["combined"]
-            + combined_metadata
+            + [combined_metadata]
         )
 
         self.engine_factory.upload_to_snowflake(
