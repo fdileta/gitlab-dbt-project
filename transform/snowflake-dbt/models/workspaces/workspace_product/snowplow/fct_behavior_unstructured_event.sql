@@ -2,7 +2,7 @@
     
         materialized = "incremental",
         unique_key = "fct_behavior_unstructured_sk",
-        full_refresh = true if flags.FULL_REFRESH and var('full_refresh_force', false) else false,
+        full_refresh = only_force_full_refresh(),
         on_schema_change = 'sync_all_columns',
         cluster_by = ['behavior_at::DATE']
 
