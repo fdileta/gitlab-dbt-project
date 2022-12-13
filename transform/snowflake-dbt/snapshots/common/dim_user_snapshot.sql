@@ -3,7 +3,6 @@
     {{
         config(
           unique_key='dim_user_sk',
-
           strategy='check',
           check_cols=[
                       'shared_runners_seconds', 
@@ -41,12 +40,8 @@
                       'created_by',
                       'updated_by',
                       'model_created_date',
-                      'model_updated_date',
-                      'dbt_created_at'
+                      'model_updated_date'
                      ],
-          
-          strategy='timestamp',
-          updated_at='dbt_created_at',
           invalidate_hard_deletes=True
          )
     }}
@@ -54,8 +49,7 @@
     SELECT
     {{
           dbt_utils.star(
-            from=ref('dim_user'),
-            except=['DBT_UPDATED_AT']
+            from=ref('dim_user')
             )
     }}
     FROM {{ ref('dim_user') }}
