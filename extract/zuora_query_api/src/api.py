@@ -103,10 +103,7 @@ class ZuoraQueriesAPI:
         :rtype:
         """
         api_url = f"{self.base_url}/query/jobs"
-        response = requests.get(
-            api_url,
-            headers=self.request_headers,
-        )
+        response = requests.get(api_url, headers=self.request_headers,)
         data = response.json()
         job = [j for j in data.get("data") if j.get("id") == job_id]
         if len(job) > 0:
