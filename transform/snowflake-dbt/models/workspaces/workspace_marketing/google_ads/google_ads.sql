@@ -5,7 +5,7 @@ WITH find_current_campaigns AS (
       campaign_updated_at
     ) OVER (PARTITION BY campaign_id ORDER BY campaign_updated_at DESC) AS latest_update,
     latest_update = campaign_updated_at AS is_latest
-  FROM {{ ref('google_adds_campaign_history_source') }}
+  FROM {{ ref('google_ads_campaign_history_source') }}
 ),
 
 current_campaigns AS (
@@ -22,7 +22,7 @@ find_current_ad_groups AS (
       ad_group_updated_at
     ) OVER (PARTITION BY ad_group_id ORDER BY ad_group_updated_at DESC) AS latest_update,
     latest_update = ad_group_updated_at AS is_latest
-  FROM {{ ref('google_adds_ad_group_history_source') }} 
+  FROM {{ ref('google_ads_ad_group_history_source') }} 
 ),
 
 current_ad_group AS (
@@ -43,7 +43,7 @@ find_current_ads AS (
       ad_updated_at
     ) OVER (PARTITION BY ad_id ORDER BY ad_updated_at DESC) AS latest_update,
     latest_update = ad_updated_at AS is_latest
-  FROM {{ ref('google_adds_ad_history_source') }} --raw.google_ads.ad_history
+  FROM {{ ref('google_ads_ad_history_source') }} 
 ),
 
 current_ads AS (
@@ -60,7 +60,7 @@ find_ad_text AS (
       ad_text_updated_at
     ) OVER (PARTITION BY ad_id ORDER BY ad_text_updated_at DESC) AS latest_update,
     latest_update = ad_text_updated_at AS is_latest
-  FROM {{ ref('google_adds_expanded_text_ad_history_source') }} 
+  FROM {{ ref('google_ads_expanded_text_ad_history_source') }} 
 ),
 
 current_ad_text AS (
@@ -72,7 +72,7 @@ current_ad_text AS (
 
 ad_stats AS (
   SELECT *
-  FROM {{ ref('google_adds_ad_stats_source') }} 
+  FROM {{ ref('google_ads_ad_stats_source') }} 
 )
 
 SELECT
