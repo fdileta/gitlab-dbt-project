@@ -73,7 +73,9 @@ def get_usage_ping_namespace_file(usage_ping):
     Fixture for namespace file
     """
 
-    return usage_ping._get_meta_data_from_file(file_name="usage_ping_namespace_queries.json")
+    return usage_ping._get_meta_data_from_file(
+        file_name="usage_ping_namespace_queries.json"
+    )
 
 
 def test_static_variables():
@@ -135,7 +137,9 @@ def test_evaluate_saas_queries():
             }
         },
     }
-    results, errors = usage_ping_test.evaluate_saas_instance_sql_queries(connection, saas_queries)
+    results, errors = usage_ping_test.evaluate_saas_instance_sql_queries(
+        connection, saas_queries
+    )
 
     # check that the correct queries have suceeded and errored
     assert get_keys_in_nested_dict(results) == get_keys_in_nested_dict(expected_results)
