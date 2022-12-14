@@ -836,6 +836,7 @@ roles:
                       - prod.restricted_safe_common_mart_sales
                       - prod.common_mart_marketing
                       - prod.restricted_safe_workspace_sales
+                      - prod.restricted_safe_common
                       - prod.pumps_sensitive
                       - prep.snowplow_*
                       - prep.gitlab_dotcom
