@@ -953,7 +953,7 @@
 {{ dbt_audit(
     cte_ref="unioned",
     created_by="@michellecooper",
-    updated_by="@iweeks",
+    updated_by="@lvinueza",
     created_date="2021-12-06",
-    updated_date="2022-10-15"
+    updated_date="2022-12-15"
 ) }}

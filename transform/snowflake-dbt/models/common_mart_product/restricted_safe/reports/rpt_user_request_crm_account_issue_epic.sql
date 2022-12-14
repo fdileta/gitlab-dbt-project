@@ -82,7 +82,7 @@ WITH mart_user_request AS (
 {{ dbt_audit(
     cte_ref="issue_account_summary",
     created_by="@jpeguero",
-    updated_by="@jpeguero",
+    updated_by="@lvinueza",
     created_date="2021-12-15",
-    updated_date="2022-01-05",
+    updated_date="2022-12-15",
   ) }}
