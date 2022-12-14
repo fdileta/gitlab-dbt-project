@@ -26,7 +26,7 @@ WITH date_details AS (
       deal_group,
       opportunity_owner_manager,
       is_edu_oss,
-      account_owner_team_stamped, 
+      -- account_owner_team_stamped, 
 
       -- Opportunity Owner Stamped fields
       opportunity_owner_user_segment,
@@ -579,6 +579,7 @@ WITH date_details AS (
 
     SELECT
       *,
+
       CASE
         WHEN (
             is_won = 1 
@@ -587,6 +588,7 @@ WITH date_details AS (
           THEN net_arr
         ELSE 0 
       END                                                   AS booked_net_arr,
+
       CASE
         WHEN is_edu_oss = 0
           AND is_deleted = 0
@@ -597,23 +599,27 @@ WITH date_details AS (
             THEN 1
         ELSE 0
       END                                                   AS is_booked_net_arr_flag,
+
       CASE 
         WHEN is_eligible_open_pipeline_flag = 1
           THEN net_arr
         ELSE 0                                                                                              
       END                                                   AS open_1plus_net_arr,
+
       CASE 
         WHEN is_eligible_open_pipeline_flag = 1
           AND is_stage_3_plus = 1   
             THEN net_arr
         ELSE 0
-      END                                                  AS open_3plus_net_arr,
+      END                                                   AS open_3plus_net_arr,
+
       CASE 
         WHEN is_eligible_open_pipeline_flag = 1  
           AND is_stage_4_plus = 1
             THEN net_arr
         ELSE 0
-      END                                                  AS open_4plus_net_arr,
+      END                                                   AS open_4plus_net_arr,
+
       CASE
         WHEN ((is_renewal = 1
             AND is_lost = 1)
@@ -621,7 +627,8 @@ WITH date_details AS (
             AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
         THEN calculated_deal_count
         ELSE 0
-      END                                                 AS churned_contraction_deal_count,
+      END                                                   AS churned_contraction_deal_count,
+
       CASE
         WHEN ((is_renewal = 1
             AND is_lost = 1)
@@ -629,7 +636,7 @@ WITH date_details AS (
             AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
         THEN net_arr
         ELSE 0
-      END                                                 AS churned_contraction_net_arr,
+      END                                                   AS churned_contraction_net_arr,
 
       -- ASP Analysis eligibility issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2606
       CASE 
@@ -645,7 +652,7 @@ WITH date_details AS (
           -- Not JiHu
             THEN 1
           ELSE 0
-      END                                                AS is_eligible_asp_analysis_flag,
+      END                                                   AS is_eligible_asp_analysis_flag,
 
        -- Age eligibility issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2606
       CASE 
@@ -662,7 +669,7 @@ WITH date_details AS (
           -- Not JiHu
             THEN 1
           ELSE 0
-      END                                                AS is_eligible_age_analysis_flag,
+      END                                                   AS is_eligible_age_analysis_flag,
 
       CASE
         WHEN is_edu_oss = 0
@@ -671,7 +678,7 @@ WITH date_details AS (
           -- Not JiHu
             THEN 1
           ELSE 0
-      END                                                AS is_eligible_churn_contraction_flag,
+      END                                                   AS is_eligible_churn_contraction_flag,
 
       -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
       -- 2022-08-23 JK: using the central is_sao logic
@@ -681,8 +688,7 @@ WITH date_details AS (
           AND stage_name NOT IN ('10-Duplicate')
             THEN 1
         ELSE 0
-      END                                               AS is_eligible_sao_flag
-
+      END                                                   AS is_eligible_sao_flag
 
     FROM add_compound_metrics
 )
