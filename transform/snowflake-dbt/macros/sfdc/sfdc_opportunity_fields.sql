@@ -36,6 +36,11 @@ WITH first_contact  AS (
     SELECT *
     FROM {{ref('sfdc_opportunity_stage_source')}}
 
+), sfdc_record_type AS (
+
+  SELECT *
+  FROM {{ref('sfdc_record_type_source')}} 
+
 ), net_iacv_to_net_arr_ratio AS (
 
   SELECT
@@ -190,7 +195,7 @@ WITH first_contact  AS (
       created_date::DATE                                                 AS created_date,
       sales_accepted_date::DATE                                          AS sales_accepted_date,
       close_date::DATE                                                   AS close_date,
-      net_arr                                                            AS raw_net_arr,
+      net_arr                                                            AS raw_net_arr, 
     {%- if model_type == 'live' %}
         CASE
           WHEN sfdc_opportunity_source.stage_name
@@ -622,6 +627,9 @@ WITH first_contact  AS (
       -- contact information
       first_contact.dim_crm_person_id,
       first_contact.sfdc_contact_id,
+
+      -- record type information
+      sfdc_record_type.record_type_name,
 
       -- attribution information
       linear_attribution_base.count_crm_attribution_touchpoints,
@@ -1313,6 +1321,8 @@ WITH first_contact  AS (
       ON sfdc_opportunity.iacv_created_date::DATE = arr_created_date.date_actual
     LEFT JOIN dim_date AS subscription_start_date
       ON sfdc_opportunity.subscription_start_date::DATE = subscription_start_date.date_actual
+    LEFT JOIN sfdc_record_type
+      ON sfdc_opportunity.record_type_id = sfdc_record_type.record_type_id
     LEFT JOIN sfdc_account AS fulfillment_partner
       ON sfdc_opportunity.fulfillment_partner = fulfillment_partner.account_id
     {%- if model_type == 'snapshot' %}

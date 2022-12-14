@@ -15,18 +15,20 @@ SELECT
     upa_user_geo,
     account_id              AS virtual_upa_id,
     account_name            AS virtual_upa_name,
-    account_user_segment    AS virtual_upa_segment,
+    upa_ad_segment          AS virtual_upa_segment,
     account_user_geo        AS virtual_upa_geo,
     account_user_region     AS virtual_upa_region,
     account_user_area       AS virtual_upa_area,
     account_country         AS virtual_upa_country,
     account_zip_code        AS virtual_upa_zip_code,
     account_industry        AS virtual_upa_industry,
-    account_owner_name            AS virtual_upa_owner_name,
-    account_owner_title_category  AS virtual_upa_owner_title_category,
-    account_owner_id              AS virtual_upa_owner_id,
+    account_state           AS virtual_upa_state,
+    account_owner_name      AS virtual_upa_owner_name,
+    account_owner_title_category AS virtual_upa_owner_title_category,
+    account_owner_id        AS virtual_upa_owner_id,
     account_id,
     account_name,
+    account_owner_name,
     arr AS account_arr,
     1 AS level
 FROM report_metrics_summary_account_year
@@ -48,11 +50,13 @@ SELECT
     upa.virtual_upa_country,
     upa.virtual_upa_zip_code,
     upa.virtual_upa_industry,
+    upa.virtual_upa_state,
     upa.virtual_upa_owner_name,
     upa.virtual_upa_owner_title_category,
     upa.virtual_upa_owner_id,
     child.account_id,
     child.account_name,
+    child.account_owner_name,
     child.arr AS account_arr,
     level + 1 AS level
 FROM report_metrics_summary_account_year child
@@ -89,7 +93,9 @@ SELECT
 FROM max_virtual_upa_depth
 QUALIFY level = 1
 
-), final_virtual_upa AS (
+        
+-- selects the longest hierarchy from the virtual UPAs options
+), selected_hierarchy_virtual_upa AS (
 
     
     SELECT total.*
@@ -98,6 +104,90 @@ QUALIFY level = 1
         ON total.virtual_upa_id = selected.virtual_upa_id
         AND total.report_fiscal_year = selected.report_fiscal_year
 
+
+-- identify unique virtual upas
+), select_unique_virtual_upa AS (
+
+SELECT 
+    final.report_fiscal_year,
+    final.upa_id,
+    final.upa_name,
+    final.upa_user_geo,
+    final.virtual_upa_id,
+    final.virtual_upa_name,
+    final.virtual_upa_segment,
+    final.virtual_upa_geo,
+    final.virtual_upa_region,
+    final.virtual_upa_area,
+    final.virtual_upa_country,
+    final.virtual_upa_zip_code,
+    final.virtual_upa_industry,
+    final.virtual_upa_state,
+    final.virtual_upa_owner_name,
+    final.virtual_upa_owner_title_category,
+    final.virtual_upa_owner_id
+FROM selected_hierarchy_virtual_upa final
+    
+
+-- identify accounts that belong to the same owner of a virtual upa within the hierarchy
+-- after creating the virtual UPA hierarchy, some accounts might 
+), final_virtual_upa AS (
+    
+SELECT 
+    final.report_fiscal_year,
+    final.upa_id,
+    final.upa_name,
+    final.upa_user_geo,
+    extra.virtual_upa_id,
+    extra.virtual_upa_name,
+    extra.virtual_upa_segment,
+    extra.virtual_upa_geo,
+    extra.virtual_upa_region,
+    extra.virtual_upa_area,
+    extra.virtual_upa_country,
+    extra.virtual_upa_zip_code,
+    extra.virtual_upa_industry,
+    extra.virtual_upa_state,
+    extra.virtual_upa_owner_name,
+    extra.virtual_upa_owner_title_category,
+    extra.virtual_upa_owner_id,
+    final.account_id,
+    final.account_name,
+    final.account_owner_name,
+    final.arr AS account_arr,
+    -1 AS level
+FROM report_metrics_summary_account_year final
+    INNER JOIN select_unique_virtual_upa extra
+        ON final.upa_id = extra.upa_id
+        AND final.account_owner_name = extra.virtual_upa_owner_name
+        AND final.report_fiscal_year = extra.report_fiscal_year
+-- Exclude accounts already in the hierarchy table
+WHERE final.account_id NOT IN (SELECT DISTINCT account_id FROM selected_hierarchy_virtual_upa)
+UNION
+  SELECT 
+    final.report_fiscal_year,
+    final.upa_id,
+    final.upa_name,
+    final.upa_user_geo,
+    final.virtual_upa_id,
+    final.virtual_upa_name,
+    final.virtual_upa_segment,
+    final.virtual_upa_geo,
+    final.virtual_upa_region,
+    final.virtual_upa_area,
+    final.virtual_upa_country,
+    final.virtual_upa_zip_code,
+    final.virtual_upa_industry,
+    final.virtual_upa_state,
+    final.virtual_upa_owner_name,
+    final.virtual_upa_owner_title_category,
+    final.virtual_upa_owner_id,
+    final.account_id,
+    final.account_name,
+    final.account_owner_name,
+    final.account_arr,
+    final.level
+FROM selected_hierarchy_virtual_upa final
 
 ------------------------
     
@@ -168,6 +258,7 @@ QUALIFY level = 1
             THEN new_upa.virtual_upa_country 
         ELSE acc.upa_ad_country
     END                                     AS upa_ad_country,
+
     CASE 
         WHEN new_upa.upa_id IS NOT NULL 
             THEN new_upa.virtual_upa_zip_code 
@@ -194,18 +285,7 @@ QUALIFY level = 1
         WHEN new_upa.upa_id IS NOT NULL 
             THEN new_upa.virtual_upa_area
         ELSE acc.upa_user_area
-    END                                     AS upa_user_area,
-    CASE 
-        WHEN new_upa.upa_id IS NOT NULL 
-            THEN new_upa.virtual_upa_country 
-        ELSE acc.upa_ad_country
-    END                                     AS upa_user_country,
-    CASE 
-        WHEN new_upa.upa_id IS NOT NULL 
-            THEN new_upa.virtual_upa_zip_code 
-        ELSE acc.upa_ad_zip_code
-    END                                     AS upa_user_zip_code,
-    
+    END                                     AS upa_user_area,   
     
     acc.lam_dev_count_bin_rank,
     acc.lam_dev_count_bin_name,
@@ -231,9 +311,13 @@ QUALIFY level = 1
     SUM(acc.has_technical_account_manager_flag) AS count_technical_account_managers,
 
     -- atr for current fy
-    SUM(acc.fy_sfdc_atr)  AS fy_sfdc_atr,
+    SUM(acc.fy_atr)  AS fy_atr,
     -- next fiscal year atr base reported at fy
-    SUM(acc.nfy_sfdc_atr) AS nfy_sfdc_atr,
+    SUM(acc.nfy_atr) AS nfy_atr,
+    SUM(acc.nfy_q1_atr)     AS nfy_q1_atr,
+    SUM(acc.nfy_q2_atr)     AS nfy_q2_atr,
+    SUM(acc.nfy_q3_atr)     AS nfy_q3_atr,
+    SUM(acc.nfy_q4_atr)     AS nfy_q4_atr,
 
     -- arr by fy
     SUM(acc.arr) AS arr,
@@ -298,8 +382,12 @@ QUALIFY level = 1
     SUM(acc.fy_booked_channel_deal_count)        AS fy_booked_channel_deal_count,
 
     -- open pipe forward looking
-    SUM(acc.open_pipe)                    AS open_pipe,
-    SUM(acc.count_open_deals_pipe)        AS count_open_deals_pipe,
+    SUM(acc.total_open_pipe)              AS total_open_pipe,
+    SUM(acc.total_count_open_deals_pipe)  AS total_count_open_deals_pipe,
+    SUM(acc.nfy_open_pipeline)            AS nfy_open_pipeline,
+    SUM(acc.fy_open_pipeline)             AS fy_open_pipeline,
+    SUM(acc.nfy_count_open_deals)         AS nfy_count_open_deals,
+    SUM(acc.fy_count_open_deals)          AS fy_count_open_deals,
     SUM(acc.customer_has_open_pipe_flag)  AS customer_has_open_pipe_flag,
     SUM(acc.prospect_has_open_pipe_flag)  AS prospect_has_open_pipe_flag,
 
@@ -327,7 +415,7 @@ QUALIFY level = 1
     LEFT JOIN final_virtual_upa new_upa
         ON new_upa.account_id = acc.account_id
         AND new_upa.report_fiscal_year = acc.report_fiscal_year
-  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
 
 )
 

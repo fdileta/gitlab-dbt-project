@@ -101,7 +101,13 @@ WITH dim_billing_account AS (
       dim_crm_account.parent_crm_account_demographics_region                          AS parent_crm_account_demographics_region,
       dim_crm_account.parent_crm_account_demographics_area                            AS parent_crm_account_demographics_area,
       dim_crm_account.parent_crm_account_demographics_territory                       AS parent_crm_account_demographics_territory,
-
+      dim_crm_account.parent_crm_account_demographics_max_family_employee             AS parent_crm_account_demographics_max_family_employee,
+      dim_crm_account.parent_crm_account_demographics_upa_country                     AS parent_crm_account_demographics_upa_country,
+      dim_crm_account.parent_crm_account_demographics_upa_state                       AS parent_crm_account_demographics_upa_state,
+      dim_crm_account.parent_crm_account_demographics_upa_city                        AS parent_crm_account_demographics_upa_city,
+      dim_crm_account.parent_crm_account_demographics_upa_street                      AS parent_crm_account_demographics_upa_street,
+      dim_crm_account.parent_crm_account_demographics_upa_postal_code                 AS parent_crm_account_demographics_upa_postal_code,
+      dim_crm_account.crm_account_demographics_employee_count                         AS crm_account_demographics_employee_count,
 
       --subscription info
       dim_subscription.dim_subscription_id                                            AS dim_subscription_id,
