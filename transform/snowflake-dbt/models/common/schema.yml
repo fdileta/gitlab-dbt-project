@@ -3484,6 +3484,8 @@ models:
         description: Data quality flag to check if the subscription_id in the license table is valid (does it exist in the subscription table?)
       - name: is_service_ping_license_in_customerDot
         description: Data quality flag to check if the license from service ping exist in CustomerDot.
+      - name: ping_type
+        description: '{{ doc("ping_type") }}'
 
   - name: fct_ping_instance_metric_rolling_6_months
     description: '{{ doc("fct_ping_instance_metric_rolling_6_months") }}'
