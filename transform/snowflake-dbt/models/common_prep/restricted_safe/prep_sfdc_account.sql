@@ -69,8 +69,7 @@ WITH sfdc_account AS (
       MAX(parent_sales_segment_clean) OVER (PARTITION BY UPPER(TRIM(parent_sales_segment_clean)))           AS dim_parent_sales_segment_name_source,
       MAX(account_billing_country_clean) OVER (PARTITION BY UPPER(TRIM(account_billing_country_clean)))     AS dim_account_location_country_name_source,
       MAX(parent_billing_country_clean) OVER (PARTITION BY UPPER(TRIM(parent_billing_country_clean)))       AS dim_parent_location_country_name_source,
-      MAX(account_tsp_territory_clean) OVER (PARTITION BY UPPER(TRIM(account_tsp_territory_clean)))         AS dim_account_sales_territory_name_source,
-
+      MAX(account_tsp_territory_clean) OVER (PARTITION BY UPPER(TRIM(account_tsp_territory_clean)))         AS dim_account_sales_territory_name_source
     FROM sfdc_account_with_ultimate_parent
 
 )
