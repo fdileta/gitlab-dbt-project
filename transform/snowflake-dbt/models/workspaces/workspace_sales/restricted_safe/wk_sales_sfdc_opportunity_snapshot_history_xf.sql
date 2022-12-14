@@ -242,7 +242,16 @@ WITH date_details AS (
       
       edm_snapshot_opty.is_renewal,
       edm_snapshot_opty.is_credit                                AS is_credit_flag,
+      
       edm_snapshot_opty.is_refund,
+
+      -- existing is_refund logic in XF
+      -- CASE
+      --   WHEN sfdc_opportunity_snapshot_history.opportunity_category IN ('Decommission')
+      --     THEN 1
+      --   ELSE 0
+      -- END                                                          AS is_refund,
+      
       edm_snapshot_opty.is_contract_reset                        AS is_contract_reset_flag,
 
       -- NF: 20210827 Fields for competitor analysis
@@ -322,10 +331,6 @@ WITH date_details AS (
       edm_snapshot_opty.deal_size,
       edm_snapshot_opty.calculated_deal_size,
       edm_snapshot_opty.is_eligible_open_pipeline               AS is_eligible_open_pipeline_flag,
-      edm_snapshot_opty.is_eligible_asp_analysis                AS is_eligible_asp_analysis_flag,
-      edm_snapshot_opty.is_eligible_age_analysis                AS is_eligible_age_analysis_flag,
-      edm_snapshot_opty.is_booked_net_arr                       AS is_booked_net_arr_flag,
-      edm_snapshot_opty.is_eligible_churn_contraction           AS is_eligible_churn_contraction_flag,
       edm_snapshot_opty.created_in_snapshot_quarter_net_arr,
       edm_snapshot_opty.created_and_won_same_quarter_net_arr,
       edm_snapshot_opty.created_in_snapshot_quarter_deal_count,
@@ -341,8 +346,17 @@ WITH date_details AS (
       -- edm_snapshot_opty.open_4plus_net_arr,
       -- edm_snapshot_opty.churned_contraction_net_arr,
       -- edm_snapshot_opty.booked_net_arr,
-      
-      edm_snapshot_opty.is_excluded_from_pipeline_created        AS is_excluded_flag,
+      -- edm_snapshot_opty.is_booked_net_arr                       AS is_booked_net_arr_flag,
+      -- edm_snapshot_opty.is_eligible_asp_analysis                AS is_eligible_asp_analysis_flag,
+      -- edm_snapshot_opty.is_eligible_age_analysis                AS is_eligible_age_analysis_flag,
+      -- edm_snapshot_opty.is_eligible_churn_contraction           AS is_eligible_churn_contraction_flag,
+      -- edm_snapshot_opty.is_excluded_from_pipeline_created        AS is_excluded_flag,
+
+      -- CASE edm_snapshot_opty.is_sao 
+      --   WHEN TRUE THEN 1 
+      --   ELSE 0 
+      -- END                                                        AS is_eligible_sao_flag 
+
       edm_snapshot_opty.dim_crm_account_id                       AS account_id,
       edm_snapshot_opty.account_owner_team_stamped,
       edm_snapshot_opty.account_owner_team_stamped_cro_level,
@@ -359,12 +373,9 @@ WITH date_details AS (
       edm_snapshot_opty.account_demographics_geo,
       edm_snapshot_opty.account_demographics_region,
       edm_snapshot_opty.account_demographics_area,
-      edm_snapshot_opty.account_demographics_territory,
+      edm_snapshot_opty.account_demographics_territory
       
-      CASE edm_snapshot_opty.is_sao 
-        WHEN TRUE THEN 1 
-        ELSE 0 
-      END                                                        AS is_eligible_sao_flag 
+
 
 
     FROM {{ref('mart_crm_opportunity_daily_snapshot')}} AS edm_snapshot_opty
@@ -534,7 +545,26 @@ WITH date_details AS (
           AND opp_snapshot.sales_qualified_source  != 'Web Direct Generated'
               THEN 1
          ELSE 0
-      END                                                      AS is_eligible_created_pipeline_flag
+      END                                                      AS is_eligible_created_pipeline_flag,
+
+      -- 20201021 NF: This should be replaced by a table that keeps track of excluded deals for forecasting purposes
+      CASE 
+        WHEN opp_snapshot.ultimate_parent_id IN ('001610000111bA3','0016100001F4xla','0016100001CXGCs','00161000015O9Yn','0016100001b9Jsc') 
+          AND opp_snapshot.close_date < '2020-08-01' 
+            THEN 1
+        -- NF 2021 - Pubsec extreme deals
+        WHEN opp_snapshot.opportunity_id IN ('0064M00000WtZKUQA3','0064M00000Xb975QAB')
+          AND opp_snapshot.snapshot_date < '2021-05-01' 
+          THEN 1
+        -- exclude vision opps from FY21-Q2
+        WHEN opp_snapshot.pipeline_created_fiscal_quarter_name = 'FY21-Q2'
+            AND vision_opps.opportunity_id IS NOT NULL
+          THEN 1
+        -- NF 20220415 PubSec duplicated deals on Pipe Gen -- Lockheed Martin GV - 40000 Ultimate Renewal
+        WHEN opp_snapshot.opportunity_id IN ('0064M00000ZGpfQQAT','0064M00000ZGpfVQAT','0064M00000ZGpfGQAT')
+          THEN 1
+        ELSE 0
+      END                                                         AS is_excluded_flag
 
     FROM sfdc_opportunity_snapshot_history_xf opp_snapshot
     LEFT JOIN vision_opps
@@ -556,12 +586,22 @@ WITH date_details AS (
             )
           THEN net_arr
         ELSE 0 
-      END                                                 AS booked_net_arr,
+      END                                                   AS booked_net_arr,
+      CASE
+        WHEN is_edu_oss = 0
+          AND is_deleted = 0
+          AND (is_won = 1 
+              OR (is_renewal = 1 AND is_lost = 1))
+          AND order_type_stamped IN ('1. New - First Order','2. New - Connected','3. Growth','4. Contraction','6. Churn - Final','5. Churn - Partial')
+          -- Not JiHu
+            THEN 1
+        ELSE 0
+      END                                                   AS is_booked_net_arr_flag,
       CASE 
         WHEN is_eligible_open_pipeline_flag = 1
           THEN net_arr
         ELSE 0                                                                                              
-      END                                                 AS open_1plus_net_arr,
+      END                                                  AS open_1plus_net_arr,
       CASE 
         WHEN is_eligible_open_pipeline_flag = 1
           AND is_stage_3_plus = 1   
@@ -589,10 +629,64 @@ WITH date_details AS (
             AND order_type_stamped IN ('5. Churn - Partial' ,'6. Churn - Final', '4. Contraction')
         THEN net_arr
         ELSE 0
-      END                                                 AS churned_contraction_net_arr
-    
+      END                                                 AS churned_contraction_net_arr,
+
+      -- ASP Analysis eligibility issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2606
+      CASE 
+        WHEN is_edu_oss = 0
+          AND is_deleted = 0
+          -- For ASP we care mainly about add on, new business, excluding contraction / churn
+          AND order_type_stamped IN ('1. New - First Order','2. New - Connected','3. Growth')
+          -- Exclude Decomissioned as they are not aligned to the real owner
+          -- Contract Reset, Decomission
+          AND opportunity_category IN ('Standard','Ramp Deal','Internal Correction')
+          -- Exclude Deals with nARR < 0
+          AND net_arr > 0
+          -- Not JiHu
+            THEN 1
+          ELSE 0
+      END                                                    AS is_eligible_asp_analysis_flag,
+
+       -- Age eligibility issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2606
+      CASE 
+        WHEN is_edu_oss = 0
+          AND is_deleted = 0
+          -- Renewals are not having the same motion as rest of deals
+          AND is_renewal = 0
+          -- For stage age we exclude only ps/other
+          AND order_type_stamped IN ('1. New - First Order','2. New - Connected','3. Growth','4. Contraction','6. Churn - Final','5. Churn - Partial')
+          -- Only include deal types with meaningful journeys through the stages
+          AND opportunity_category IN ('Standard','Ramp Deal','Decommissioned')
+          -- Web Purchase have a different dynamic and should not be included
+          AND is_web_portal_purchase = 0
+          -- Not JiHu
+            THEN 1
+          ELSE 0
+      END                                                   AS is_eligible_age_analysis_flag,
+
+      CASE
+        WHEN is_edu_oss = 0
+          AND is_deleted = 0
+          AND order_type_stamped IN ('4. Contraction','6. Churn - Final','5. Churn - Partial')
+          -- Not JiHu
+            THEN 1
+          ELSE 0
+      END                                                  AS is_eligible_churn_contraction_flag,
+
+      -- SAO alignment issue: https://gitlab.com/gitlab-com/sales-team/field-operations/sales-operations/-/issues/2656
+      -- 2022-08-23 JK: using the central is_sao logic
+      CASE
+        WHEN sales_accepted_date IS NOT NULL
+          AND is_edu_oss = 0
+          AND stage_name NOT IN ('10-Duplicate')
+            THEN 1
+        ELSE 0
+      END                                                     AS is_eligible_sao_flag
+
+
     FROM add_compound_metrics
 )
 
 SELECT *
 FROM temp_calculations
+
