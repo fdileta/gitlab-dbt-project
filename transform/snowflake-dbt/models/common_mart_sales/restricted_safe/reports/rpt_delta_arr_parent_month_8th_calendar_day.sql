@@ -60,7 +60,7 @@ WITH dim_product_detail AS (
       --add 1 month to generate churn month
       DATEADD('month',1,MAX(arr_month))   AS date_month_end
     FROM mart_arr
-    {{ dbt_utils.group_by(n=2) }}
+    {{ dbt_utils.group_by(n=1) }}
 
 ), base AS (
 
@@ -91,7 +91,7 @@ WITH dim_product_detail AS (
     LEFT JOIN mart_arr
       ON base.arr_month = mart_arr.arr_month
       AND base.dim_parent_crm_account_id = mart_arr.dim_parent_crm_account_id
-    {{ dbt_utils.group_by(n=3) }}
+    {{ dbt_utils.group_by(n=2) }}
 
 ), prior_month AS (
 
