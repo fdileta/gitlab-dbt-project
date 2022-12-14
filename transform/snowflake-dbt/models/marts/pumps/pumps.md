@@ -43,3 +43,10 @@ Inherits filters from parent models, but most notably:
 - For SaaS customers, not all metrics can be calculated via the namespace-level Service Ping. For metrics that originate from `redis_hll`, Snowplow counters are used to track event-level data. Then, the data team aggregates those counters in Snowflake to mimic the Service Ping calcuation.
 
 {% enddocs %}
+
+{% docs mart_crm_account_id %}
+
+This table contains combined information on PtE and PtC scores per account and score date.
+Detailed information on this model can be found on this [issue] (https://gitlab.com/gitlab-data/data-science/-/issues/62).
+
+{% enddocs %}

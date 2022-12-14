@@ -97,7 +97,7 @@ models:
             description: Product category is based on the rate plan name.
             tests:
               - accepted_values:
-                      values: ['GitHost', 'Other', 'SaaS - Ultimate', 'Basic', 'SaaS - Bronze', 'Self-Managed - Premium', 'Self-Managed - Starter', 'Self-Managed - Ultimate', 'Support', 'Plus', 'SaaS - Premium', 'Standard', 'Trueup', 'Storage', 'SaaS - Other']
+                      values: ['GitHost', 'Other', 'SaaS - Ultimate', 'Basic', 'SaaS - Bronze', 'Self-Managed - Premium', 'Self-Managed - Starter', 'Self-Managed - Ultimate', 'Support', 'Plus', 'SaaS - Premium', 'Standard', 'Trueup', 'Storage', 'SaaS - Other', 'Dedicated - Ultimate']
           - name: delivery
             description: delivery is based on the product category name.
             tests:
@@ -144,7 +144,7 @@ models:
             description: Product category is based on the rate plan name.
             tests:
               - accepted_values:
-                      values: ['GitHost', 'Other', 'SaaS - Ultimate', 'Basic', 'SaaS - Bronze', 'Self-Managed - Premium', 'Self-Managed - Starter', 'Self-Managed - Ultimate', 'Support', 'Plus', 'SaaS - Premium', 'Standard', 'Trueup', 'Storage', 'SaaS - Other']
+                      values: ['GitHost', 'Other', 'SaaS - Ultimate', 'Basic', 'SaaS - Bronze', 'Self-Managed - Premium', 'Self-Managed - Starter', 'Self-Managed - Ultimate', 'Support', 'Plus', 'SaaS - Premium', 'Standard', 'Trueup', 'Storage', 'SaaS - Other', 'Dedicated - Ultimate']
               - not_null
           - name: rate_plan_charge_name
             tests:

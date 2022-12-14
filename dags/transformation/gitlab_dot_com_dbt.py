@@ -110,7 +110,7 @@ def dbt_tasks(dbt_module_name, dbt_task_name):
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
         dbt snapshot --profiles-dir profile --target prod --select path:snapshots/{dbt_module_name}; ret=$?;
-        montecarlo import dbt-run-results \
+        montecarlo import dbt-run --run-results \
         target/run_results.json --project-name gitlab-analysis;
         python ../../orchestration/upload_dbt_file_to_snowflake.py snapshots; exit $ret
     """
@@ -132,7 +132,7 @@ def dbt_tasks(dbt_module_name, dbt_task_name):
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
         dbt run --profiles-dir profile --target prod --models +sources.{dbt_module_name}; ret=$?;
-        montecarlo import dbt-run-results \
+        montecarlo import dbt-run --run-results \
         target/run_results.json --project-name gitlab-analysis;
         python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
     """
@@ -153,7 +153,7 @@ def dbt_tasks(dbt_module_name, dbt_task_name):
     model_test_cmd = f"""
         {dbt_install_deps_nosha_cmd} &&
         dbt test --profiles-dir profile --target prod --models +sources.{dbt_module_name} {run_command_test_exclude}; ret=$?;
-        montecarlo import dbt-run-results \
+        montecarlo import dbt-run --run-results \
         target/run_results.json --project-name gitlab-analysis;
         python ../../orchestration/upload_dbt_file_to_snowflake.py test; exit $ret
     """
