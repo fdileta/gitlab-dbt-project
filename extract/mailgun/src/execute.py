@@ -128,12 +128,10 @@ def load_event_logs(event: str, full_refresh: bool = False):
     :param full_refresh:
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
-    info(config_dict["START_TIME"])
-    info(type(config_dict["START_TIME"]))
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
     else:
-        start_date = datetime.datetime.now() - datetime.timedelta(hours=16)
+        start_date = datetime.datetime.strptime(config_dict["START_TIME"], "%Y-%m-%dT%H:%M:%S%z") - datetime.timedelta(hours=16)
 
     results = extract_logs(event, start_date)
 
