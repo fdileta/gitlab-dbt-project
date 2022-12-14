@@ -836,6 +836,7 @@ roles:
                       - prod.restricted_safe_common_mart_sales
                       - prod.common_mart_marketing
                       - prod.restricted_safe_workspace_sales
+                      - prod.pumps_sensitive
                       - prep.snowplow_*
                       - prep.gitlab_dotcom
                       - prep.zendesk
@@ -858,6 +859,7 @@ roles:
                       - prod.restricted_safe_common_mart_sales.*
                       - prod.restricted_safe_workspace_sales.*
                       - prod.common_mart_marketing.*
+                      - prod.pumps_sensitive.*
                       - raw.salesforce_stitch.*
                       - raw.snapshots.*
                   write:
