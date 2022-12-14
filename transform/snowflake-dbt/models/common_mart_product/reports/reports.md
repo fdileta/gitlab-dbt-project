@@ -27,7 +27,7 @@
 - `stage_name IS NULL` for UMAU events
 - Aggregated Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
   - Events that are 29,30 or 31 days prior to the Last Day of the Month will Not be included in these totals
-  - This is intended to match the instance-level Service Ping metrics by getting a 28-day count
+  - This is intended to match the installation-level Service Ping metrics by getting a 28-day count
 
 **Other Comments:**
 - The [Definitive Guide to xMAU Analysis](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/) contains additional information about xMAU reporting
@@ -61,7 +61,7 @@
 - Not all events have a user associated with them (ex: 'milestones'), and not all events have a namespace associated with them (ex: 'users_created'). Therefore it is expected that `user_count = 0` or `ultimate_parent_namespace_count = 0` for these events.
 - Aggregated Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
   - Events that are 29,30 or 31 days prior to the Last Day of the Month will Not be included in these totals
-  - This is intended to match the instance-level Service Ping metrics by getting a 28-day count
+  - This is intended to match the installation-level Service Ping metrics by getting a 28-day count
 
 **Tips for Use:**
 - The model currently exposes a plan_id, but not a plan_name. It is recommended to JOIN to [`prep_gitlab_dotcom_plan`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.prep_gitlab_dotcom_plan) to map the IDs to names. (Issue to add the plan_name to this model [here](https://gitlab.com/gitlab-data/analytics/-/issues/15172))
