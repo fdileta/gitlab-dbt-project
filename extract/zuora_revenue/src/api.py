@@ -260,10 +260,7 @@ class ZuoraRevProAPI:
                 break
 
     def pull_zuora_table_data(
-        self,
-        table_name: str,
-        fromDate: str,
-        toDate: str,
+        self, table_name: str, fromDate: str, toDate: str,
     ) -> None:
         """
         Function pull the Zuora Revenue BI view or table and download it to file and upload it to the GCS bucket.

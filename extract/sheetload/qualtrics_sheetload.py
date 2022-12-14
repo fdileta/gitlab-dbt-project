@@ -72,15 +72,13 @@ def push_contacts_to_qualtrics(
 
 
 def get_metadata(
-    file,
-    google_sheet_client,
-    maximum_backoff_sec: int = 300,
+    file, google_sheet_client, maximum_backoff_sec: int = 300,
 ):
     """
     Returns the google sheet name and file name
     """
     n = 0
-    while maximum_backoff_sec > (2**n):
+    while maximum_backoff_sec > (2 ** n):
         try:
             file.client.login()
             file_name = file.title
