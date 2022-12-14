@@ -131,7 +131,10 @@ for export in stream["exports"]:
         task_id=export_name,
         name=export_name,
         secrets=[GCP_BILLING_ACCOUNT_CREDENTIALS],
-        env_vars={**pod_env_vars, "EXPORT_DATE": "{{ yesterday_ds }}",},
+        env_vars={
+            **pod_env_vars,
+            "EXPORT_DATE": "{{ yesterday_ds }}",
+        },
         affinity=get_affinity(False),
         tolerations=get_toleration(False),
         arguments=[billing_extract_command],

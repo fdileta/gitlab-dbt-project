@@ -198,7 +198,10 @@ def rollup_table_clone(
 
             column_string = ", ".join((column_info)["column_name"].unique())
             merged_df = pd.merge(
-                column_info, roll_up_table_info, how="outer", on="column_name",
+                column_info,
+                roll_up_table_info,
+                how="outer",
+                on="column_name",
             )
             select_string = " "
             for i, row in merged_df.iterrows():

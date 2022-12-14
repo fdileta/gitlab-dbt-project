@@ -96,7 +96,9 @@ def show_extraction_status(bucket: str, table_name: str):
 
 
 def table_truncate_to_daily_load(
-    schema: str, table_name: str, conn_dict: Dict[str, str] = None,
+    schema: str,
+    table_name: str,
+    conn_dict: Dict[str, str] = None,
 ) -> None:
     """
     To do the truncate and commit in the same session explicit connection has been created.
@@ -119,7 +121,10 @@ def table_truncate_to_daily_load(
 
 
 def zuora_revenue_load(
-    bucket: str, schema: str, table_name: str, conn_dict: Dict[str, str] = None,
+    bucket: str,
+    schema: str,
+    table_name: str,
+    conn_dict: Dict[str, str] = None,
 ) -> None:
 
     """
@@ -168,5 +173,7 @@ if __name__ == "__main__":
     # Copy all environment variables to dict.
     config_dict = env.copy()
     Fire(
-        {"zuora_load": zuora_revenue_load,}
+        {
+            "zuora_load": zuora_revenue_load,
+        }
     )

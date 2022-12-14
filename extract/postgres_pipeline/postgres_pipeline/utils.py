@@ -330,7 +330,8 @@ def check_if_schema_changed(
     query_stem = raw_query.lower().split("where")[0]
     source_query = "{0} limit 1"
     source_columns = pd.read_sql(
-        sql=source_query.format(query_stem), con=source_engine,
+        sql=source_query.format(query_stem),
+        con=source_engine,
     ).columns
 
     # Get the columns from the target_table
