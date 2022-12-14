@@ -870,7 +870,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@lvinueza",
     created_date="2022-08-08",
-    updated_date="2022-09-06"
+    updated_date="2022-12-15"
 ) }}
