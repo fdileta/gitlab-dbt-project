@@ -18,6 +18,7 @@ WITH customers_db_licenses AS (
     SELECT
       customers_db_licenses.license_id AS dim_license_id,
       customers_db_licenses.license_md5,
+      customers_db_licenses.license_sha256,
       COALESCE(customers_db_licenses.zuora_subscription_id, license_md5_subscription_mapping.zuora_subscription_id) AS dim_subscription_id,
       customers_db_licenses.zuora_subscription_name AS subscription_name,
       'Customers Portal' AS environment,
@@ -50,6 +51,7 @@ WITH customers_db_licenses AS (
 
       -- Descriptive information
       licenses.license_md5,
+      licenses.license_sha256,
       licenses.subscription_name,
       licenses.environment,
       licenses.license_user_count,
@@ -72,7 +74,7 @@ WITH customers_db_licenses AS (
 {{ dbt_audit(
     cte_ref="renamed",
     created_by="@snalamaru",
-    updated_by="@iweeks",
+    updated_by="@rbacovic",
     created_date="2021-01-08",
-    updated_date="2022-09-29"
+    updated_date="2022-12-01"
 ) }}
