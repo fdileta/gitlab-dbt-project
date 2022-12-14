@@ -1,5 +1,6 @@
 {% snapshot dim_user_snapshot %}
 -- Using dbt check_cols as we want only new rows when any of these columns change.
+--   Cant just use updated_at because it is sometimes less than or greater than last_activity_date
     {{
         config(
           unique_key='dim_user_sk',
@@ -38,9 +39,7 @@
                       'country',
                       'state',
                       'created_by',
-                      'updated_by',
-                      'model_created_date',
-                      'model_updated_date'
+                      'updated_by'
                      ],
           invalidate_hard_deletes=True
          )
@@ -49,7 +48,8 @@
     SELECT
     {{
           dbt_utils.star(
-            from=ref('dim_user')
+            from=ref('dim_user'),
+            except=['DBT_UPDATED_AT']
             )
     }}
     FROM {{ ref('dim_user') }}
