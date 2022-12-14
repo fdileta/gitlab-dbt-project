@@ -45,8 +45,8 @@ WITH structured_event_renamed AS (
     WHERE event = 'struct'
     {% if is_incremental() %}
 
-      AND behavior_at > (SELECT MAX({{ var('incremental_backfill_date', 'behavior_at') }}) FROM {{ this }})
-      AND behavior_at <= (SELECT DATEADD(month, 1,  MAX({{ var('incremental_backfill_date', 'behavior_at') }}) )  FROM {{ this }})
+      AND behavior_at > (SELECT MAX({{ var('incremental_backfill_date'::DATE, 'behavior_at') }}) FROM {{ this }})
+      AND behavior_at <= (SELECT DATEADD(month, 1,  MAX({{ var('incremental_backfill_date'::DATE, 'behavior_at') }}) )  FROM {{ this }})
 
 
     {% endif %}
