@@ -1,7 +1,7 @@
 {{ config({
         "materialized": "table",
         "unique_key": "dim_user_snapshot_hist_id",
-        "tags": ["edm_snapshot", "user_snapshot"]
+        "tags": ["edm_snapshot", "user_snapshots"]
     })
 }}
 
