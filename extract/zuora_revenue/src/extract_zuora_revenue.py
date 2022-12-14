@@ -87,9 +87,7 @@ if __name__ == "__main__":
     logger.info(f"The date range for extraction is {from_date} to {end_date}")
     # Pull the data for the BI view for defined start and end date
     zuora_revpro.pull_zuora_table_data(
-        results.table_name,
-        from_date,
-        end_date,
+        results.table_name, from_date, end_date,
     )
     print(f"{results.table_name} = {end_date}")
     # To do daily full refresh as part of this issue https://gitlab.com/gitlab-data/analytics/-/issues/10774 it has been turned to do daily full refresh.

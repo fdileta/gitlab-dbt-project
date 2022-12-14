@@ -158,10 +158,7 @@ if __name__ == "__main__":
 
     for key, value in comp_calc_dict.items():
         curl_and_upload(
-            key,
-            value,
-            COMP_CALC_URL,
-            config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
+            key, value, COMP_CALC_URL, config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"],
         )
 
     curl_and_upload("team", "team.yml", TEAM_URL)

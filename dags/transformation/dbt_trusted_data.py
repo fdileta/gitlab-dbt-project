@@ -60,9 +60,7 @@ dag_schedule = "0 6 * * *"
 
 # Create the DAG
 dag = DAG(
-    "dbt_trusted_data",
-    default_args=default_args,
-    schedule_interval=dag_schedule,
+    "dbt_trusted_data", default_args=default_args, schedule_interval=dag_schedule,
 )
 
 # dbt_trusted_data

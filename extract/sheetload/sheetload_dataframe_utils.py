@@ -5,9 +5,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy.engine.base import Engine
 
-from gitlabdata.orchestration_utils import (
-    query_executor,
-)
+from gitlabdata.orchestration_utils import query_executor
 
 
 def table_has_changed(data: pd.DataFrame, engine: Engine, table: str) -> bool:
@@ -75,10 +73,7 @@ def translate_column_names(input: str):
 
 
 def dw_uploader_append_only(
-    engine: Engine,
-    table: str,
-    data: pd.DataFrame,
-    chunk: int = 0,
+    engine: Engine, table: str, data: pd.DataFrame, chunk: int = 0,
 ) -> bool:
     """
     Use a DB engine to upload a dataframe.
@@ -86,8 +81,7 @@ def dw_uploader_append_only(
 
     # Clean the column names and add metadata, generate the dtypes
     data.columns = [
-        translate_column_names(str(column_name))
-        for column_name in data.columns
+        translate_column_names(str(column_name)) for column_name in data.columns
     ]
     data = data.infer_objects()
 

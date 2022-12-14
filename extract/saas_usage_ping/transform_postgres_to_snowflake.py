@@ -241,8 +241,7 @@ def get_snowflake_query(
     )
 
     tokenized.insert(
-        select_index + 1,
-        " '" + metrics_name + "' AS counter_name, ",
+        select_index + 1, " '" + metrics_name + "' AS counter_name, ",
     )
 
     return tokenized
