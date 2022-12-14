@@ -147,3 +147,6 @@ models:
             combination_of_columns:
               - backend
               - recorded_at
+
+    - name: leading_organization_entry_dates
+      description: The entry and exit dates of organizations that are admitted into our Leading Organization program
