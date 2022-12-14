@@ -75,7 +75,7 @@ WITH sfdc_account AS (
 {{ dbt_audit(
     cte_ref="sfdc_account_final",
     created_by="@paul_armstrong",
-    updated_by="@jpeguero",
+    updated_by="@lvinueza",
     created_date="2020-10-30",
-    updated_date="2021-04-26"
+    updated_date="2022-12-15"
 ) }}
