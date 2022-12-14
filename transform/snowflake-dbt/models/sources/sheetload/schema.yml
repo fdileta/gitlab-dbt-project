@@ -701,3 +701,5 @@ models:
         - not_null
 - name: sheetload_toy_marketing_handbook
   description: Toy dataset for ad-hoc Propensity to Purchase modeling
+- name: sheetload_leading_organization_entry_dates_source
+  description: The entry and exit dates of organizations that are admitted into our Leading Organization program

@@ -147,3 +147,5 @@ models:
             combination_of_columns:
               - backend
               - recorded_at
+
+    - name: leading_organization_entry_dates
