@@ -32,7 +32,8 @@ WITH source AS (
         source.raw_usage_data_payload:usage_activity_by_stage_monthly.manage.events::NUMBER     AS umau_value,
         path                                                                                    AS metrics_path,
         IFF(value = -1, 0, value)                                                               AS metric_value,
-        IFF(value = -1, TRUE, FALSE)                                                            AS has_timed_out
+        IFF(value = -1, TRUE, FALSE)                                                            AS has_timed_out,
+        ping_type                                                                               AS ping_type
       FROM source,
         LATERAL FLATTEN(input => raw_usage_data_payload,
         RECURSIVE => true)
