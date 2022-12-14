@@ -341,8 +341,8 @@ WITH date_details AS (
       -- edm_snapshot_opty.open_3plus_net_arr,
       -- edm_snapshot_opty.open_4plus_net_arr,
       -- edm_snapshot_opty.churned_contraction_net_arr,
-
-      edm_snapshot_opty.booked_net_arr,
+      -- edm_snapshot_opty.booked_net_arr,
+      
       edm_snapshot_opty.is_excluded_from_pipeline_created        AS is_excluded_flag,
       edm_snapshot_opty.dim_crm_account_id                       AS account_id,
       edm_snapshot_opty.account_owner_team_stamped,
@@ -545,10 +545,19 @@ WITH date_details AS (
 
 -- JK 2022-10-25: temporarily calculating open_nplus_net_arrs & churn_contraction fields 
 -- in wk sales model instead of using the fields directly from edm marts
+-- JK 2022-12-13: adding booked_net_arr in the temp calculation cte
 ), temp_calculations AS (
 
     SELECT
       *,
+      CASE
+        WHEN (
+            is_won = 1 
+            OR (is_renewal = 1 AND is_lost = 1)
+            )
+          THEN net_arr
+        ELSE 0 
+      END                                                 AS booked_net_arr,
       CASE 
         WHEN is_eligible_open_pipeline_flag = 1
           THEN net_arr
