@@ -9,7 +9,7 @@ from unittest import mock
 
 import pytest
 import requests
-# import responses
+import responses
 
 from extract.saas_usage_ping.utils import (
     ENCODING,
@@ -55,13 +55,13 @@ def create_utils(set_env_variables):
     return Utils()
 
 
-# @pytest.fixture(name="fake_response")
-# def mocked_responses():
-#     """
-#     Mock routine to create fake response
-#     """
-#     with responses.RequestsMock() as rsps:
-#         yield rsps
+@pytest.fixture(name="fake_response")
+def mocked_responses():
+    """
+    Mock routine to create fake response
+    """
+    with responses.RequestsMock() as rsps:
+        yield rsps
 
 
 def test_static_variables():
@@ -154,32 +154,32 @@ def test_headers_error(utils):
         assert utils.headers["WRONG_KEY"] == "xxx"
 
 
-# def test_convert_response_to_json(utils, fake_response):
-#
-#     """
-#     Test function: convert_response_to_json
-#     """
-#     expected = {"test1": "pro", "test2": "1"}
-#     fake_response.get(
-#         "http://some_gitlab_api_url/test",
-#         body='{"test1": "pro", "test2": "1"}',
-#         status=200,
-#         content_type="application/json",
-#     )
-#
-#     resp = requests.get("http://some_gitlab_api_url/test")
-#
-#     actual = utils.convert_response_to_json(response=resp)
-#
-#     assert actual == expected
-#
-#
-# def test_get_response(utils):
-#     """
-#     Force fake url and raise a Connection Error
-#     """
-#     with pytest.raises(ConnectionError):
-#         _ = utils.get_response("http://fake_url/test")
+def test_convert_response_to_json(utils, fake_response):
+
+    """
+    Test function: convert_response_to_json
+    """
+    expected = {"test1": "pro", "test2": "1"}
+    fake_response.get(
+        "http://some_gitlab_api_url/test",
+        body='{"test1": "pro", "test2": "1"}',
+        status=200,
+        content_type="application/json",
+    )
+
+    resp = requests.get("http://some_gitlab_api_url/test")
+
+    actual = utils.convert_response_to_json(response=resp)
+
+    assert actual == expected
+
+
+def test_get_response(utils):
+    """
+    Force fake url and raise a Connection Error
+    """
+    with pytest.raises(ConnectionError):
+        _ = utils.get_response("http://fake_url/test")
 
 
 def test_keep_meta_data(utils):
