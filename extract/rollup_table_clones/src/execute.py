@@ -24,5 +24,7 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=20)
     logging.getLogger("snowflake.connector.cursor").disabled = True
     Fire(
-        {"rollup_full_table_clones": rollup_table_clones,}
+        {
+            "rollup_full_table_clones": rollup_table_clones,
+        }
     )

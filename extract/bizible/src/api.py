@@ -138,7 +138,10 @@ class BizibleSnowFlakeExtractor:
 
             self.upload_query(table_name, file_name, query)
 
-    def upload_complete_file(self, table_name: str,) -> None:
+    def upload_complete_file(
+        self,
+        table_name: str,
+    ) -> None:
         """
 
         :param table_name:
@@ -209,11 +212,15 @@ class BizibleSnowFlakeExtractor:
                 )
                 if record_count >= 10000:
                     self.upload_partitioned_files(
-                        table_name, last_modified_date, date_column,
+                        table_name,
+                        last_modified_date,
+                        date_column,
                     )
                 elif record_count < 10000:
                     self.upload_batch(
-                        table_name, last_modified_date, date_column,
+                        table_name,
+                        last_modified_date,
+                        date_column,
                     )
                 else:
                     logging.info(f"No records available for {table_name}")

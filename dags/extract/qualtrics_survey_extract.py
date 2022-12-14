@@ -67,7 +67,12 @@ qualtrics_operator = KubernetesPodOperator(
         SNOWFLAKE_LOAD_WAREHOUSE,
         SNOWFLAKE_LOAD_PASSWORD,
     ],
-    env_vars={**pod_env_vars, **{"QUALTRICS_DATA_CENTER": "eu",},},
+    env_vars={
+        **pod_env_vars,
+        **{
+            "QUALTRICS_DATA_CENTER": "eu",
+        },
+    },
     affinity=get_affinity(False),
     tolerations=get_toleration(False),
     arguments=[qualtrics_extract_command],

@@ -440,7 +440,10 @@ class UsagePing:
         ]
 
         dataframe_uploader(
-            df_to_upload, self.loader_engine, "instance_sql_errors", "saas_usage_ping",
+            df_to_upload,
+            self.loader_engine,
+            "instance_sql_errors",
+            "saas_usage_ping",
         )
         self.loader_engine.dispose()
 

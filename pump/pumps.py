@@ -17,8 +17,12 @@ def get_copy_command(model, sensitive, timestamp, inc_start, inc_end, stage, sin
             model=model, schema="pumps" if sensitive is False else "pumps_sensitive"
         )
 
-        where_statement = " WHERE {timestamp} between '{inc_start}' and '{inc_end}'".format(
-            timestamp=timestamp, inc_start=inc_start, inc_end=inc_end,
+        where_statement = (
+            " WHERE {timestamp} between '{inc_start}' and '{inc_end}'".format(
+                timestamp=timestamp,
+                inc_start=inc_start,
+                inc_end=inc_end,
+            )
         )
 
         if timestamp is None:

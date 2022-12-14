@@ -73,7 +73,10 @@ def translate_column_names(input: str):
 
 
 def dw_uploader_append_only(
-    engine: Engine, table: str, data: pd.DataFrame, chunk: int = 0,
+    engine: Engine,
+    table: str,
+    data: pd.DataFrame,
+    chunk: int = 0,
 ) -> bool:
     """
     Use a DB engine to upload a dataframe.
