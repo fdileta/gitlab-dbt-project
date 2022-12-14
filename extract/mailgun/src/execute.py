@@ -128,7 +128,8 @@ def load_event_logs(event: str, full_refresh: bool = False):
     :param full_refresh:
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
-
+    info(config_dict["START_TIME"])
+    info(type(config_dict["START_TIME"]))
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
     else:
