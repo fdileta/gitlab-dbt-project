@@ -175,7 +175,7 @@ WITH dim_billing_account_api_sandbox AS (
 {{ dbt_audit(
     cte_ref="final_table",
     created_by="@ken_aguilar",
-    updated_by="@ken_aguilar",
+    updated_by="@lvinueza",
     created_date="2021-09-06",
-    updated_date="2021-09-06"
+    updated_date="2022-12-15"
 ) }}

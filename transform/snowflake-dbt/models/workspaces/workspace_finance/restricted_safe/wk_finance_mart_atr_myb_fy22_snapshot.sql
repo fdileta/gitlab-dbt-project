@@ -316,7 +316,7 @@ WITH dim_billing_account AS (
 {{ dbt_audit(
     cte_ref="renewal_report",
     created_by="@iweeks",
-    updated_by="@iweeks",
+    updated_by="@lvinueza",
     created_date="2021-03-15",
-    updated_date="2021-08-05"
+    updated_date="2022-12-15"
 ) }}

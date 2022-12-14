@@ -173,7 +173,7 @@ WITH dim_billing_account_central_sandbox AS (
 {{ dbt_audit(
     cte_ref="final_table",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@lvinueza",
     created_date="2022-03-31",
-    updated_date="2022-03-31"
+    updated_date="2022-12-15"
 ) }}

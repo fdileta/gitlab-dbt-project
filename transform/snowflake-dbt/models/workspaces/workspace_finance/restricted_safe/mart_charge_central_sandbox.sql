@@ -174,7 +174,7 @@
 {{ dbt_audit(
     cte_ref="mart_charge",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@lvinueza",
     created_date="2022-04-13",
-    updated_date="2022-04-13"
+    updated_date="2022-12-15"
 ) }}

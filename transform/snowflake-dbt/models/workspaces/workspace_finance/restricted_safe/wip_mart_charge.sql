@@ -163,7 +163,7 @@ WITH dim_amendment AS (
 {{ dbt_audit(
     cte_ref="mart_charge",
     created_by="@iweeks",
-    updated_by="@iweeks",
+    updated_by="@lvinueza",
     created_date="2021-05-10",
-    updated_date="2021-05-10"
+    updated_date="2022-12-15"
 ) }}
