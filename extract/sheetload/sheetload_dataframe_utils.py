@@ -1,5 +1,9 @@
+"""
+Sheetload dataframe utils unit
+"""
+
 import time
-from logging import error, info
+from logging import info
 
 import numpy as np
 import pandas as pd
@@ -86,8 +90,7 @@ def dw_uploader_append_only(
 
     # Clean the column names and add metadata, generate the dtypes
     data.columns = [
-        translate_column_names(str(column_name))
-        for column_name in data.columns
+        translate_column_names(str(column_name)) for column_name in data.columns
     ]
     data = data.infer_objects()
 
