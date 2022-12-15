@@ -131,11 +131,12 @@ def load_event_logs(event: str, full_refresh: bool = False):
 
     info(f"Running from {config_dict['START_TIME']} to {config_dict['END_TIME']}")
     start_date = datetime.datetime.now() - datetime.timedelta(hours=16)
-    info(f"Old start date {start_date.strftime('%m/%d/%Y, %H:%M:%S')}")
+    info(f"Old start date {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
     else:
         start_date = datetime.datetime.strptime(config_dict["START_TIME"], "%Y-%m-%dT%H:%M:%S%z") - datetime.timedelta(hours=16)
+    info(f"New start date {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
 
     results = extract_logs(event, start_date)
 
