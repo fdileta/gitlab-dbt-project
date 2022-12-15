@@ -78,6 +78,7 @@ sources:
       - name: infrastructure_missing_employees
       - name: job_roles_prior_to_2020_02
       - name: kpi_status
+      - name: leading_organization_entry_dates
       - name: linkedin_recruiter
       - name: location_factor_targets
       - name: location_factor_temporary_2020_december
