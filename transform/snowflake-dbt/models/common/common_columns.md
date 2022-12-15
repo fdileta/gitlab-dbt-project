@@ -450,7 +450,7 @@ Boolean flag which is set to True if the installation has a valid trial license 
 
 {% docs license_trial_ping_model %}
 
-Boolean flag which is set to True if the installation has a valid trial license at Service Ping creation. There are cases where `is_trial` can be True even when an installation is outside of a trial period, so be cautious using this field.
+Boolean flag which is set to True if the installation has a valid trial license at Service Ping creation. This field can be NULL if no license information is provided. There are cases where `license_trial = TRUE` even when an installation is outside of a trial period, so be cautious using this field. 
 
 {% enddocs %}
 
