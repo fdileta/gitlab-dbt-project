@@ -473,40 +473,27 @@ class UsagePing:
         3. Combines the two payloads
         4. Uploads the combined payload, and any of the sql errors
         """
-        logging.info("Start instance_sql_metrics")
+
         metric_definition_dict = self._get_instance_sql_metrics_definition()
         saas_queries = self._get_instance_sql_metrics_queries()
-
-        logging.info(
-            f"End instance_sql_metrics: metric_definition_dict {len(metric_definition_dict)}"
-        )
 
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(
             metric_definition_dict=metric_definition_dict, saas_queries=saas_queries
         )
 
-        logging.info(f"End instance_sql_metrics: sql_metrics {len(sql_metrics)}")
-
-        logging.info("Start instance_redis_metrics")
         redis_metrics, redis_metadata = self.saas_instance_redis_metrics(
             metric_definition_dict=metric_definition_dict
         )
-        logging.info(f"End instance_redis_metrics: redis_metrics {len(redis_metrics)}")
 
-        logging.info("Start merging dicts")
         combined_metrics = self._merge_dicts(
             redis_metrics=redis_metrics, sql_metrics=sql_metrics
         )
-
-        logging.info("Start uploading data to Snowflake")
 
         self.upload_combined_metrics(
             combined_metrics=combined_metrics,
             saas_queries=saas_queries,
             redis_metadata=redis_metadata,
         )
-
-        logging.info("End uploading data to Snowflake")
 
         if sql_metric_errors:
             self.upload_instance_sql_metrics_errors(sql_metric_errors=sql_metric_errors)
@@ -550,7 +537,6 @@ class UsagePing:
         name, sql, level = self.get_prepared_values(query=query_dict)
 
         try:
-            # Expecting [id, namespace_ultimate_parent_id, counter_value]
             res = pd.read_sql(sql=sql, con=conn)
             error = "Success"
         except SQLAlchemyError as e:
