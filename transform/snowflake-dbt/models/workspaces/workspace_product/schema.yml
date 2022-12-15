@@ -94,3 +94,6 @@ models:
         description: '{{ doc("model_updated_date") }}'
       - name: dbt_updated_at
       - name: dbt_created_at
+
+  - name: suggested_merge_request_reviewers
+    description: Table for exploring the suggested reviewers for a merge request

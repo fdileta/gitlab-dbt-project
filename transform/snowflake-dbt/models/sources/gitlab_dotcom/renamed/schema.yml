@@ -1910,3 +1910,18 @@ models:
       - name: pipeline_id
       - name: is_latest
       - name: security_scan_status
+
+  - name: gitlab_dotcom_merge_request_predictions_source
+    description: >-
+      Base model for Gitlab.com suggested merge request reviewers.
+    columns:
+      - name: merge_request_id
+        tests:
+          - not_null
+          - unique
+      - name: created_at
+      - name: updated_at
+      - name: suggested_reviewers
+      - name: suggested_reviewers_top_n
+      - name: suggested_reviewers_version
+      - name: suggested_reviewers_list

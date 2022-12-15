@@ -836,9 +836,13 @@ roles:
                       - prod.restricted_safe_common_mart_sales
                       - prod.common_mart_marketing
                       - prod.restricted_safe_workspace_sales
+                      - prod.restricted_safe_common
+                      - prod.pumps_sensitive
                       - prep.snowplow_*
                       - prep.gitlab_dotcom
                       - prep.zendesk
+                      - prep.preparation
+                      - prep.customers
                       - raw.data_science
                       - raw.salesforce_stitch
                       - raw.snapshots
@@ -852,12 +856,16 @@ roles:
                       - prep.snowplow_*.*
                       - prep.zendesk.*
                       - prep.gitlab_dotcom.*
+                      - prep.preparation.*
+                      - prep.customers.*
                       - prod.common.*
                       - prod.legacy.*
                       - prod.common_mart_product.*
                       - prod.restricted_safe_common_mart_sales.*
+                      - prod.restricted_safe_common.*
                       - prod.restricted_safe_workspace_sales.*
                       - prod.common_mart_marketing.*
+                      - prod.pumps_sensitive.*
                       - raw.salesforce_stitch.*
                       - raw.snapshots.*
                   write:
@@ -2707,6 +2715,7 @@ roles:
             - analyst_marketing
             - restricted_safe
             - bi_tool_eval_read
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -2760,6 +2769,7 @@ roles:
             - analyst_marketing
             - restricted_safe
             - bi_tool_eval_read
+            - data_science_readonly
         warehouses:
             - dev_xs
 
@@ -2920,6 +2930,13 @@ roles:
             - transforming_xs
             - transforming_xl
 
+    - hkacmarski:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - hselim:
         member_of:
             - adaptive
@@ -2983,12 +3000,20 @@ roles:
             - analyst_marketing
             - restricted_safe
             - bi_tool_eval_read
+            - data_science_readonly
         warehouses:
             - dev_xs
 
     - jameson: # De provisioned as part of Quarterly audit and security check.
         member_of: []
         warehouses: []
+
+    - jbudreski:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
 
     - jcaine:
         member_of:
@@ -4151,6 +4176,7 @@ roles:
             - restricted_safe
             - bi_tool_eval_read
             - data_team_analyst
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
@@ -4739,6 +4765,11 @@ users:
         member_of:
             - grafana
 
+    - hkacmarski:
+        can_login: yes
+        member_of:
+            - hkacmarski
+
     - hselim:
         can_login: yes
         member_of:
@@ -4761,6 +4792,11 @@ users:
         can_login: yes
         member_of:
             - jahye
+
+    - jbudreski:
+        can_login: yes
+        member_of:
+            - jbudreski
 
     - jcaine:
         can_login: yes

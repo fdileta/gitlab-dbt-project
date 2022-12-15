@@ -337,3 +337,11 @@ sheets:
     owner: '@j_kim'
     tabs: 
       - sales_analytics_tableau_rls_roles
+  - name: toy_marketing_handbook
+    owner: '@jstemmer1'
+    tabs: 
+      - toy_marketing_handbook
+  - name: leading_organizations
+    owner: '@nick_vh'
+    tabs:
+      - leading_organization_entry_dates

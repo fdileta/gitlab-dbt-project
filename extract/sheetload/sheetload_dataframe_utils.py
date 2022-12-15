@@ -9,9 +9,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy.engine.base import Engine
 
-from gitlabdata.orchestration_utils import (
-    query_executor,
-)
+from gitlabdata.orchestration_utils import query_executor
 
 
 def table_has_changed(data: pd.DataFrame, engine: Engine, table: str) -> bool:
