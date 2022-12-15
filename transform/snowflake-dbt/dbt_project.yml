@@ -311,6 +311,7 @@ models:
 
       zengrc:
         +schema: zengrc
+        +materialized: view
 
       zoominfo:
         +schema: zoominfo
@@ -587,6 +588,8 @@ models:
       workspace_engineering:
         +schema: workspace_engineering
         +materialized: table
+        zengrc:
+          +materialized: view
 
       workspace_people:
         +schema: workspace_people
