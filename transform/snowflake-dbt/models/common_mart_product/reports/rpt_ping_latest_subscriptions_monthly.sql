@@ -92,9 +92,8 @@ Aggregate mart_charge information (used as the basis of truth), this gets rid of
   SELECT
        dim_date.date_actual               AS arr_month,
        fct_charge.dim_subscription_id     AS dim_subscription_id,
-       SUM(mrr)                           AS mrr,
-       SUM(arr)                           AS arr,
-       SUM(quantity)                      AS licensed_user_count
+       SUM(quantity)                      AS licensed_user_count,
+       IFF(SUM(arr) > 0, TRUE, FALSE)     AS is_paid_subscription
      FROM fct_charge
      INNER JOIN dim_date
         ON effective_start_month <= dim_date.date_actual
@@ -127,8 +126,7 @@ Join mart_charge information bringing in mart_charge subscriptions which DO NOT 
     joined_subscriptions.major_minor_version_id                                                             AS major_minor_version_id,
     joined_subscriptions.instance_user_count                                                                AS instance_user_count,
     mart_charge_cleaned.licensed_user_count                                                                 AS licensed_user_count,
-    mart_charge_cleaned.arr                                                                                 AS arr,
-    mart_charge_cleaned.mrr                                                                                 AS mrr,
+    mart_charge_cleaned.is_paid_subscription                                                                AS is_paid_subscription,
     joined_subscriptions.ping_count                                                                         AS ping_count,
     FALSE                                                                                                   AS is_missing_charge_subscription
   FROM mart_charge_cleaned
@@ -144,8 +142,7 @@ Grab the latest values to join to missing subs
 
     SELECT
         dim_subscription_id,
-        mrr,
-        arr,
+        is_paid_subscription,
         licensed_user_count
     FROM mart_charge_cleaned
         QUALIFY ROW_NUMBER() OVER (
@@ -182,8 +179,7 @@ Join to capture missing metrics, uses the last value found for these in fct_char
     SELECT
         missing_subs.*,
         latest_mart_charge_values.licensed_user_count         AS licensed_user_count,
-        latest_mart_charge_values.arr                         AS arr,
-        latest_mart_charge_values.mrr                         AS mrr,
+        is_paid_subscription,
         TRUE                                                  AS is_missing_charge_subscription
     FROM missing_subs
         INNER JOIN latest_mart_charge_values
@@ -200,8 +196,7 @@ Join to capture missing metrics, uses the last value found for these in fct_char
         major_minor_version_id,
         instance_user_count,
         licensed_user_count,
-        arr,
-        mrr,
+        is_paid_subscription,
         ping_count,
         is_missing_charge_subscription
     FROM arr_counts_joined
@@ -217,8 +212,7 @@ Join to capture missing metrics, uses the last value found for these in fct_char
         major_minor_version_id,
         instance_user_count,
         licensed_user_count,
-        arr,
-        mrr,
+        is_paid_subscription,
         ping_count,
         is_missing_charge_subscription
     FROM missing_subs_joined
@@ -235,8 +229,7 @@ Join to capture missing metrics, uses the last value found for these in fct_char
         latest_subs_unioned.major_minor_version_id                                                                                                                                AS major_minor_version_id,
         latest_subs_unioned.instance_user_count                                                                                                                                   AS instance_user_count,
         FLOOR(latest_subs_unioned.licensed_user_count)                                                                                                                            AS licensed_user_count,
-        latest_subs_unioned.arr                                                                                                                                                   AS arr,
-        latest_subs_unioned.mrr                                                                                                                                                   As mrr,
+        latest_subs_unioned.is_paid_subscription                                                                                                                                  AS is_paid_subscription,
         IFNULL(latest_subs_unioned.ping_count, 0)                                                                                                                                 AS ping_count,
         IFF(latest_subs_unioned.ping_edition IS NULL, FALSE, TRUE)                                                                                                                AS has_sent_pings,
         latest_subs_unioned.is_missing_charge_subscription                                                                                                                        AS is_missing_charge_subscription
@@ -248,7 +241,7 @@ Join to capture missing metrics, uses the last value found for these in fct_char
  {{ dbt_audit(
      cte_ref="final",
      created_by="@icooper-acp",
-     updated_by="@snalamaru",
+     updated_by="@jpeguero",
      created_date="2022-05-05",
-     updated_date="2022-06-07"
+     updated_date="2022-12-15"
  ) }}
