@@ -1,4 +1,4 @@
-{{ config(alias='sfdc_opportunity_xf') }}
+{{ config(alias='sfdc_opportunity_xf_new') }}
 
 WITH edm_opty AS (
 
