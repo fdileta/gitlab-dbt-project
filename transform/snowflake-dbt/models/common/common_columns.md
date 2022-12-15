@@ -1052,7 +1052,7 @@ The unique surrogate key of a [task activity](https://help.salesforce.com/s/arti
 
 {% docs snapshot_id %}
 
-The ID of the date the snapshot was valid, easily joined to `dim_date` (YYYYMMDD)
+The ID of the date the snapshot was valid, easily joined to `dim_date` (YYYYMMDD). This column is often used as the spined date for [date spining](https://discourse.getdbt.com/t/finding-active-days-for-a-subscription-user-account-date-spining/265).
 
 {% enddocs %}
 
@@ -1076,7 +1076,7 @@ The created_at timestamp of the source record when this snapshot row was inserte
 
 {% docs dbt_updated_at_snapshot_model %}
 
-The updated_at timestamp of the source record when this snapshot row was inserted. This is used internally by dbt and is not intended for analysis.
+The updated_at timestamp of the source record when this snapshot row was inserted or last updated. This is used internally by dbt and is not intended for analysis.
 
 {% enddocs %}
 
