@@ -103,3 +103,11 @@ models:
           tests:
             - not_null
             - unique
+    - name: instance_combined_metrics
+      tags: ["product", "service_ping"]
+      description: '{{ doc("instance_combined_metrics") }}'
+      columns:
+        - name: id
+          tests:
+            - not_null
+            - unique

@@ -41,6 +41,7 @@
       zuora_account_spined.status                                  AS account_status,
       zuora_account_spined.parent_id,
       zuora_account_spined.sfdc_account_code,
+      zuora_account_spined.sfdc_entity,
       zuora_account_spined.currency                                AS account_currency,
       zuora_contact.country                                        AS sold_to_country,
       zuora_account_spined.ssp_channel,
@@ -65,7 +66,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@jpeguero",
+    updated_by="@michellecooper",
     created_date="2021-08-09",
-    updated_date="2021-10-21"
+    updated_date="2021-11-21"
 ) }}

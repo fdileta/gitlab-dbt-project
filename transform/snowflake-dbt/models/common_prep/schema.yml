@@ -35,6 +35,14 @@ models:
         tests:
           - not_null
 
+  - name: prep_cluster_agent
+    description: Prep table to select the kubernetes with agents and add aditional information such as the ultimate_namespace_id.
+    columns:
+      - name: cluster_agent_id
+        tests:
+          - not_null
+          - unique
+
   - name: prep_dim_subscription_snapshot_base
     description: Base model for the dim_subscription snapshot data
     columns:
@@ -601,6 +609,12 @@ models:
         tags: ["tdf", "common", "gainsight"]
       - name: license_md5
         description: The md5 hash of the license file. Use this field to join to fct_usage_ping_payloads.
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "common", "gainsight"]
+      - name: license_sha256
+        description: The license_sha256 is a secure hash created off the license file to be compliant with FIPS. This field can be used to join to the Service ping data.
         tests:
           - not_null
           - unique
@@ -1643,53 +1657,143 @@ models:
         tests:
           - not_null
           - unique
-        description: The unique identifier of the ping
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
+        description: '{{ doc("dim_host_id") }}'
       - name: dim_instance_id
-        description:  The uuid of an instance from the dim_instances model.
+        description:  '{{ doc("dim_instance_id") }}'
+      - name: dim_installation_id
+        description:  '{{ doc("dim_installation_id") }}'
       - name: ping_created_at
-        description: The time when the ping was created
-      - name: ip_address_hash
-        description: The source_ip_hash associated with the instance
+        description: '{{ doc("ping_created_at") }}'
+      - name: original_edition
+        description: '{{ doc("original_edition") }}'
+      - name: id
+        description: '{{ doc("id_ping_model") }}'
       - name: version
-        description: The version associated with the instance (9., 10., 11., ... 14.)
+        description: '{{ doc("version_ping_model") }}'
+      - name: ip_address_hash
+        description: '{{ doc("ip_address_hash_ping_model") }}'
       - name: instance_user_count
-        description: The total count of users on the instance
+        description: '{{ doc("instance_user_count") }}'
       - name: license_md5
-        description: The license_md5 associated with the instance
+        description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
       - name: historical_max_users
-        description: The max user number the instance has had
+        description: '{{ doc("historical_max_users") }}'
       - name: license_user_count
-        description: The user count for the license
+        description: '{{ doc("license_user_count") }}'
       - name: license_starts_at
-        description: The date the license starts at
+        description: '{{ doc("license_starts_at") }}'
       - name: license_expires_at
-        description:  The date the license ends on
+        description:  '{{ doc("license_expires_at") }}'
       - name: license_add_ons
-        description: The add ones associated with the license
+        description: '{{ doc("license_add_ons") }}'
+      - name: recorded_at
+        description: '{{ doc("recorded_at_ping_model") }}'
+      - name: updated_at
+        description: '{{ doc("updated_at_ping_model") }}'
       - name: mattermost_enabled
-        description: Denotes whether mattermost is enabled
+        description: '{{ doc("mattermost_enabled") }}'
       - name: uuid
-        description: The unique id of the instance from the dim_instances model
+        description: '{{ doc("uuid_ping_model") }}'
       - name: hostname
-        description: The name (URL) of the host
+        description: '{{ doc("host_name") }}'
       - name: host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
+        description: '{{ doc("host_id") }}'
       - name: license_trial
-        description: Denoted whether the license is a trial or not
+        description: '{{ doc("license_trial_ping_model") }}'
       - name: source_license_id
-        description: The unique id of a source license
+        description: '{{ doc("source_license_id") }}'
       - name: installation_type
-        description: The type of installation associated with the instance (i.e. gitlab-development-kit, gitlab-helm-chart, gitlab-omnibus-helm-chart)
+        description: '{{ doc("installation_type") }}'
       - name: license_plan
-        description: The license plan associated with the instance (i.e. Ultimate, Premium)
+        description: '{{ doc("license_plan") }}'
       - name: database_adapter
-        description: The type of database adapter being used (i.e. mysql2, postgresql)
+        description: '{{ doc("database_adapter") }}'
       - name: database_version
-        description: The database version associated with the instance (i.e. 9.5.3)
+        description: '{{ doc("database_version") }}'
       - name: git_version
-        description: The version of gitlab the instance is running (i.e. 2.17.0, 2.33.1, 2.23.0)
+        description: '{{ doc("git_version") }}'
+      - name: gitlab_pages_enabled
+        description: '{{ doc("gitlab_pages_enabled") }}'
+      - name: gitlab_pages_version
+        description: '{{ doc("gitlab_pages_version") }}'
+      - name: container_registry_enabled
+        description: '{{ doc("container_registry_enabled") }}'
+      - name: elasticsearch_enabled
+        description: '{{ doc("elasticsearch_enabled") }}'
+      - name: geo_enabled
+        description: '{{ doc("geo_enabled") }}'
+      - name: gitlab_shared_runners_enabled
+        description: '{{ doc("gitlab_shared_runners_enabled") }}'
+      - name: gravatar_enabled
+        description: '{{ doc("gravatar_enabled") }}'
+      - name: ldap_enabled
+        description: '{{ doc("ldap_enabled") }}'
+      - name: omniauth_enabled
+        description: '{{ doc("omniauth_enabled") }}'
+      - name: reply_by_email_enabled
+        description: '{{ doc("reply_by_email_enabled") }}'
+      - name: signup_enabled
+        description: '{{ doc("signup_enabled") }}'
+      - name: prometheus_metrics_enabled
+        description: '{{ doc("prometheus_metrics_enabled") }}'
+      - name: usage_activity_by_stage
+        description: '{{ doc("usage_activity_by_stage") }}'
+      - name: usage_activity_by_stage_monthly
+        description: '{{ doc("usage_activity_by_stage_monthly") }}'
+      - name: gitaly_clusters
+        description: '{{ doc("gitaly_clusters") }}'
+      - name: gitaly_version
+        description: '{{ doc("gitaly_version") }}'
+      - name: gitaly_servers
+        description: '{{ doc("gitaly_servers") }}'
+      - name: gitaly_filesystems
+        description: '{{ doc("gitaly_filesystems") }}'
+      - name: gitpod_enabled
+        description: '{{ doc("gitpod_enabled") }}'
+      - name: object_store
+        description: '{{ doc("object_store") }}'
+      - name: is_dependency_proxy_enabled
+        description: '{{ doc("is_dependency_proxy_enabled") }}'
+      - name: recording_ce_finished_at
+        description: '{{ doc("recording_ce_finished_at") }}'
+      - name: recording_ee_finished_at
+        description: '{{ doc("recording_ee_finished_at") }}'
+      - name: stats_used
+        description: '{{ doc("stats_used") }}'
+      - name: counts
+        description: '{{ doc("stats_used") }}'
+      - name: is_ingress_modsecurity_enabled
+        description: '{{ doc("is_ingress_modsecurity_enabled") }}'
+      - name: topology
+        description: '{{ doc("topology") }}'
+      - name: is_grafana_link_enabled
+        description: '{{ doc("is_grafana_link_enabled") }}'
+      - name: analytics_unique_visits
+        description: '{{ doc("analytics_unique_visits") }}'
+      - name: raw_usage_data_id
+        description: '{{ doc("raw_usage_data_id") }}'
+      - name: container_registry_vendor
+        description: '{{ doc("container_registry_vendor") }}'
+      - name: container_registry_version
+        description: '{{ doc("container_registry_version") }}'
+      - name: main_edition
+        description: '{{ doc("ping_edition") }}'
+      - name: product_tier
+        description: '{{ doc("ping_product_tier") }}'
+      - name: raw_usage_data_payload
+        description: '{{ doc("raw_usage_data_payload") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: prep_ping_instance_flattened
     description: ' {{ doc("prep_ping_instance_flattened") }} '
@@ -1698,30 +1802,47 @@ models:
         tests:
           - not_null
           #- unique --Commenting this as the model is erroring out due to a waarehouse timeout limit of 1800 seconds
-        description: The unique ID of the prep_ping_instance_flattenned model consisting of `dim_ping_instance_id` and path
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
+        description: The unique ID of the prep_ping_instance_flattened model consisting of dim_ping_instance_id and path
       - name: dim_ping_instance_id
+        description: '{{ doc("dim_ping_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_instance_id
+        description:  '{{ doc("dim_instance_id") }}'
+      - name: dim_installation_id
+        description:  '{{ doc("dim_installation_id") }}'
       - name: ping_created_at
-        description: The time when the ping was created
+        description: '{{ doc("ping_created_at") }}'
+      - name: ip_address_hash
+        description: '{{ doc("ip_address_hash_ping_model") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: original_edition
+        description: '{{ doc("original_edition") }}'
       - name: main_edition
-        description: The edition of GitLab on the instance (EE, CE)
+        description: '{{ doc("ping_edition") }}'
       - name: product_tier
-        description: The product tier associated with the instance (Premium, Starter, Core, Ultimate)
-      - name: license_subscription_id
-        description: The unique id of a license subscription
+        description: '{{ doc("ping_product_tier") }}'
       - name: license_trial_ends_on
-        description: The date when the trial license ends
+        description: '{{ doc("license_trial_ends_on") }}'
+      - name: license_subscription_id
+        description: '{{ doc("license_subscription_id") }}'
       - name: umau_value
-        description: The unique monthly active user value for the instance
+        description: '{{ doc("umau_value") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+        description: '{{ doc("metrics_path") }}'
       - name: metric_value
-        description: The value associated with the metric path
+        description: '{{ doc("metric_value") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
+        description: '{{ doc("has_timed_out") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: prep_billing_account_user
     description: Zuora Billing users
@@ -1743,3 +1864,12 @@ models:
         description: Date the Zuora Billing user was created
       - name: is_integration_user
         description: A flag indentifying integration users based on Zuora Billing user last names.
+
+  - name: prep_crm_task
+    description: '{{ doc("prep_crm_task") }}'
+    columns:
+      - name: dim_crm_task_sk
+        description: The unique surrogate key of a [task activity](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) related to Salesforce account, opportunity, lead, or contact.
+        tests:
+          - unique
+          - not_null

@@ -86,7 +86,7 @@ default_args = {
 
 # Create the DAG
 # Runs 3x per day
-dag = DAG("dbt_snapshots", default_args=default_args, schedule_interval="0 */8 * * *")
+dag = DAG("dbt_snapshots", default_args=default_args, schedule_interval="0 7 * * *")
 
 # dbt-snapshot for daily tag
 # manifest only uploaded to MC from this dag
@@ -95,9 +95,9 @@ dbt_snapshot_cmd = f"""
     {dbt_install_deps_nosha_cmd} &&
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
     dbt snapshot -s tag:daily --profiles-dir profile --exclude path:snapshots/zuora path:snapshots/sfdc path:snapshots/gitlab_dotcom; ret=$?;
-    montecarlo import dbt-manifest \
+    montecarlo import dbt-run --manifest \
     target/manifest.json --project-name gitlab-analysis --batch-size 500;
-    montecarlo import dbt-run-results \
+    montecarlo import dbt-run --run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py snapshots; exit $ret
 """
@@ -188,31 +188,10 @@ dbt_test_snapshot_models = KubernetesPodOperator(
     dag=dag,
 )
 
-
-def run_or_skip_dbt(current_seconds: int, dag_interval: int) -> bool:
-    # Only run models and tests once per day
-    if current_seconds < dag_interval:
-        return True
-    else:
-        return False
-
-
-SCHEDULE_INTERVAL_HOURS = 8
-timestamp = datetime.now()
-current_seconds = timestamp.hour * 3600
-dag_interval = SCHEDULE_INTERVAL_HOURS * 3600
-
-short_circuit = ShortCircuitOperator(
-    task_id="short_circuit",
-    python_callable=lambda: run_or_skip_dbt(current_seconds, dag_interval),
-    dag=dag,
-)
-
 (
     dbt_commit_hash_setter
     >> dbt_commit_hash_exporter
     >> dbt_snapshot
-    >> short_circuit
     >> dbt_snapshot_models_run
     >> dbt_test_snapshot_models
 )

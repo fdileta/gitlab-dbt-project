@@ -18,6 +18,7 @@
       dim_crm_person.dim_crm_user_id,
       dim_crm_person.dim_crm_account_id,
       dim_crm_person.sfdc_record_id,
+      dim_crm_person.marketo_lead_id,
       mql_date_first.date_id                   AS mql_date_first_id,
       mql_date_first.date_day                  AS mql_date_first,
       initial_mql_date_first.date_id           AS initial_mql_date_first_id,
@@ -110,6 +111,7 @@
       worked_date_pt.first_day_of_month        AS worked_month_pt,
       dim_crm_person.email_domain,
       dim_crm_person.email_domain_type,
+      is_valuable_signup,
       dim_crm_person.email_hash,
       dim_crm_person.status,
       dim_crm_person.lead_source,
@@ -264,7 +266,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@rkohnke",
+    updated_by="@degan",
     created_date="2020-12-07",
-    updated_date="2022-11-01",
+    updated_date="2022-12-12",
   ) }}  

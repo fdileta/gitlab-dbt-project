@@ -12,6 +12,8 @@ WITH source AS (
       --Info
       email::VARCHAR                            AS email,
       {{ hash_of_column('EMAIL') }}
+      sfdc_lead_id::VARCHAR                     AS sfdc_lead_id,
+      sfdc_contact_id::VARCHAR                  AS sfdc_contact_id,
       first_name::VARCHAR                       AS first_name,
       last_name::VARCHAR                        AS last_name,
       company::VARCHAR                          AS company_name,
@@ -19,6 +21,7 @@ WITH source AS (
       {{it_job_title_hierarchy('job_title')}},
       country::VARCHAR                          AS country,
       mobile_phone::VARCHAR                     AS mobile_phone,
+      sfdc_type::VARCHAR                        AS sfdc_type,
       inactive_lead_c::BOOLEAN                  AS is_lead_inactive,
       inactive_contact_c::BOOLEAN               AS is_contact_inactive,
       sales_segmentation_c::VARCHAR             AS sales_segmentation,

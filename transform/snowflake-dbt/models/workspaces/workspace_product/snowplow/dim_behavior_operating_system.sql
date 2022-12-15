@@ -7,20 +7,20 @@
 WITH device_information AS (
 
   SELECT
-    {{ dbt_utils.surrogate_key(['os_name', 'os_timezone']) }}   AS dim_behavior_operating_system_sk,
-    os_family::VARCHAR                                          AS os,
-    os_name::VARCHAR                                            AS os_name,
-    os_manufacturer::VARCHAR                                    AS os_manufacturer,
-    os_timezone::VARCHAR                                        AS os_timezone,
-    dvce_type::VARCHAR                                          AS device_type,
-    dvce_ismobile::BOOLEAN                                      AS is_device_mobile,
-    MAX(derived_tstamp)                                         AS max_timestamp
+    dim_behavior_operating_system_sk,
+    os,
+    os_name,
+    os_manufacturer,
+    os_timezone,
+    device_type,
+    is_device_mobile,
+    MAX(behavior_at)                                         AS max_timestamp
   FROM {{ ref('prep_snowplow_unnested_events_all') }}
   WHERE true
 
   {% if is_incremental() %}
     
-  AND derived_tstamp > (SELECT MAX(max_timestamp) FROM {{this}})
+  AND behavior_at > (SELECT MAX(max_timestamp) FROM {{this}})
     
   {% endif %}
 
@@ -33,5 +33,5 @@ WITH device_information AS (
     created_by="@michellecooper",
     updated_by="@chrissharp",
     created_date="2022-09-20",
-    updated_date="2022-10-14"
+    updated_date="2022-12-01"
 ) }}

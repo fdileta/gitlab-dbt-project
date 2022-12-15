@@ -1,15 +1,11 @@
 import time
-from logging import error, info, basicConfig, getLogger, warning
+from logging import error, info
 
 import numpy as np
 import pandas as pd
 from sqlalchemy.engine.base import Engine
 
-from gitlabdata.orchestration_utils import (
-    postgres_engine_factory,
-    snowflake_engine_factory,
-    query_executor,
-)
+from gitlabdata.orchestration_utils import query_executor
 
 
 def table_has_changed(data: pd.DataFrame, engine: Engine, table: str) -> bool:
@@ -67,6 +63,15 @@ def dw_uploader(
     return True
 
 
+def translate_column_names(input: str):
+    """
+        Converts column names into a SnowFlake - parsable format.
+    :param input:
+    :return:
+    """
+    return input.translate(input.maketrans(" /", "__"))  # can easily add more
+
+
 def dw_uploader_append_only(
     engine: Engine,
     table: str,
@@ -79,8 +84,7 @@ def dw_uploader_append_only(
 
     # Clean the column names and add metadata, generate the dtypes
     data.columns = [
-        str(column_name).replace(" ", "_").replace("/", "_")
-        for column_name in data.columns
+        translate_column_names(str(column_name)) for column_name in data.columns
     ]
     data = data.infer_objects()
 
