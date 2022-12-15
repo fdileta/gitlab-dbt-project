@@ -4174,6 +4174,7 @@ roles:
             - restricted_safe
             - bi_tool_eval_read
             - data_team_analyst
+            - data_science_readonly
         warehouses:
             - dev_xs
         owns:
