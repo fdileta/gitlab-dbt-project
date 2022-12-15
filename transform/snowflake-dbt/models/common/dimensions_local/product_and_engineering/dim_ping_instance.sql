@@ -197,7 +197,8 @@ SELECT DISTINCT
         ELSE FALSE
       END                                                                                                         AS is_last_ping_of_week,
       raw_flattened.collected_data_categories,
-      fct_w_month_flag.raw_usage_data_payload
+      fct_w_month_flag.raw_usage_data_payload,
+      fct_w_month_flag.ping_type
     FROM fct_w_month_flag
     LEFT JOIN raw_flattened
       ON fct_w_month_flag.raw_usage_data_id = raw_flattened.raw_usage_data_id
@@ -206,7 +207,7 @@ SELECT DISTINCT
 {{ dbt_audit(
     cte_ref="final",
     created_by="@icooper-acp",
-    updated_by="@rbacovic",
+    updated_by="@mdrussell",
     created_date="2022-03-08",
-    updated_date="2022-12-01"
+    updated_date="2022-12-12"
 ) }}

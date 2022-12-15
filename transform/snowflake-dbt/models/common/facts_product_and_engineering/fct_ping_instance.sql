@@ -71,11 +71,13 @@
       license_user_count                                  AS license_user_count,
       umau_value                                          AS umau_value,
       product_tier                                        AS product_tier,
-      main_edition                                        AS main_edition
+      main_edition                                        AS main_edition,
+      ping_type                                           AS ping_type
     FROM add_country_info_to_usage_ping
     LEFT JOIN dim_product_tier
     ON TRIM(LOWER(add_country_info_to_usage_ping.product_tier)) = TRIM(LOWER(dim_product_tier.product_tier_historical_short))
     AND IFF( add_country_info_to_usage_ping.dim_instance_id = 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f','SaaS','Self-Managed') = dim_product_tier.product_delivery_type
+    AND dim_product_tier.product_tier_name != 'Dedicated - Ultimate'
     --AND main_edition = 'EE'
 
 ), joined_payload AS (
@@ -105,7 +107,8 @@
       IFF(prep_usage_ping_cte.ping_created_at < license_trial_ends_on, TRUE, FALSE)                       AS is_trial,
       prep_usage_ping_cte.product_tier                                                                    AS product_tier,
       prep_usage_ping_cte.main_edition                                                                    AS main_edition_product_tier,
-      'VERSION_DB'                                                                                        AS data_source
+      'VERSION_DB'                                                                                        AS data_source,
+      ping_type                                           AS ping_type
     FROM prep_usage_ping_cte
     LEFT JOIN prep_license
       ON prep_usage_ping_cte.license_md5 = prep_license.license_md5
@@ -121,7 +124,7 @@
 {{ dbt_audit(
     cte_ref="joined_payload",
     created_by="@icooper-acp",
-    updated_by="@snalamaru",
+    updated_by="@mdrussell",
     created_date="2022-03-08",
-    updated_date="2022-07-07"
+    updated_date="2022-12-14"
 ) }}
