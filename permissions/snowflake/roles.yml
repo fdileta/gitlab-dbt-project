@@ -3000,6 +3000,7 @@ roles:
             - analyst_marketing
             - restricted_safe
             - bi_tool_eval_read
+            - data_science_readonly
         warehouses:
             - dev_xs
 
