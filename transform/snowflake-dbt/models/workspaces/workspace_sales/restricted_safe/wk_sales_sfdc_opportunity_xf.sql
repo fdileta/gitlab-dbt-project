@@ -1,4 +1,4 @@
-{{ config(alias='sfdc_opportunity_xf_deprecated') }}
+{{ config(alias='sfdc_opportunity_xf') }}
 
 -- +wk_sales_report_pipeline_metrics_per_day_with_targets +wk_sales_report_pipeline_velocity_quarter_with_targets +wk_sales_report_opportunity_pipeline_type
 

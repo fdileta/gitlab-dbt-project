@@ -1,4 +1,4 @@
-{{ config(alias='sfdc_opportunity_snapshot_history_xf_deprecated') }}
+{{ config(alias='sfdc_opportunity_snapshot_history_xf') }}
 
 -- NF 20220907 Original model, deprecated in favor of the one using EDM as source fields
 
