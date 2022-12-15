@@ -484,6 +484,7 @@
       user_request.*,
 
       -- CRM Account attributes
+      dim_crm_account.crm_account_name                                            AS crm_account_name,
       account_next_renewal_month.next_renewal_month                               AS crm_account_next_renewal_month,
       dim_crm_account.health_score_color                                          AS crm_account_health_score_color,
       dim_crm_account.technical_account_manager                                   AS technical_account_manager,
