@@ -95,7 +95,8 @@ dag = DAG(
 def generate_dbt_command(vars_dict):
     json_dict = json.dumps(vars_dict)
     json_load = json.loads(json_dict)
-    var_yaml = "{'incremental_backfill_date': '''" + json_load["year"] + "-" + json_load["month"] + "-01'''}"
+    json_date = json_load["year"] + "-" + json_load["month"] + "-01"
+    var_yaml = "{'incremental_backfill_date': '''" + json_date + "'''}"
 
     dbt_generate_command = f""" 
         {dbt_install_deps_nosha_cmd} &&
