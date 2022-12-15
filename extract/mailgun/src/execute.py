@@ -7,6 +7,7 @@ from email import utils
 from logging import info, basicConfig, getLogger, error
 from os import environ as env
 from typing import Dict, List
+from dateutil import parser as date_parser
 
 import requests
 from requests.exceptions import SSLError
@@ -144,11 +145,8 @@ def load_event_logs(event: str, full_refresh: bool = False):
         start_date = datetime.datetime(2021, 2, 1)
         end_date = datetime.now()
     else:
-        start_date = datetime.datetime.strptime(config_dict["START_TIME"], "%Y-%m-%dT%H:%M:%S%z") - datetime.timedelta(hours=16)
-        end_date = datetime.datetime.strptime(config_dict["START_TIME"], "%Y-%m-%dT%H:%M:%S%z") - \
-                     datetime.timedelta(hours=15) - datetime.timedelta(minutes=30)
-        # end_date = datetime.datetime.strptime(config_dict['END_TIME'], "%Y-%m-%dT%H:%M:%S%z") - datetime.timedelta(
-        #         hours=16)
+        start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(hours=16)
+        end_date = date_parser.parse(config_dict['END_TIME']) - datetime.timedelta(hours=16)
     info(f"New start date {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
     info(f"New end date {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
 
