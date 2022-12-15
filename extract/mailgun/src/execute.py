@@ -42,12 +42,14 @@ def get_logs(domain: str, event: str, formatted_start_date: str, formatted_end_d
     :param formatted_end_date:
     :return:
     """
+    info(f"End date {formatted_end_date}")
+    info(f"Start date {formatted_start_date}")
     return requests.get(
         f"https://api.mailgun.net/v3/{domain}/events",
         auth=("api", api_key),
         params={"begin": formatted_start_date,
                 "end": formatted_end_date,
-                "ascending": "no",
+                "ascending": "yes",
                 "event": event},
     )
 
