@@ -33,32 +33,38 @@ def chunker(seq: List, size: int):
     return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
-def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
+def get_logs(domain: str, event: str, formatted_start_date: str, formatted_end_date: str) -> requests.Response:
     """
     Small convenience wrapper function for mailgun event requests,
     :param domain:
     :param event:
-    :param formatted_date:
+    :param formatted_start_date:
+    :param formatted_end_date:
     :return:
     """
     return requests.get(
         f"https://api.mailgun.net/v3/{domain}/events",
         auth=("api", api_key),
-        params={"begin": formatted_date, "ascending": "yes", "event": event},
+        params={"begin": formatted_start_date,
+                "end": formatted_end_date,
+                "ascending": "no",
+                "event": event},
     )
 
 
-def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
+def extract_logs(event: str, start_date: datetime.datetime, end_date: datetime.datetime) -> List[Dict]:
     """
     Requests and retrieves the event logs for a particular event.
     :param start_date:
+    :param end_date:
     :param event:
     :return:
     """
     page_token = None
     all_results: List[Dict] = []
 
-    formatted_date = utils.format_datetime(start_date)
+    formatted_start_date = utils.format_datetime(start_date)
+    formatted_end_date = utils.format_datetime(end_date)
 
     for domain in domains:
 
@@ -95,7 +101,7 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
                 all_results = all_results[:] + items[:]
 
             else:
-                response = get_logs(domain, event, formatted_date)
+                response = get_logs(domain, event, formatted_start_date, formatted_end_date)
 
                 try:
                     data = response.json()
@@ -129,16 +135,20 @@ def load_event_logs(event: str, full_refresh: bool = False):
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    info(f"Running from {config_dict['START_TIME']} to {config_dict['END_TIME']}")
     start_date = datetime.datetime.now() - datetime.timedelta(hours=16)
     info(f"Old start date {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
+
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
+        end_date = datetime.now()
     else:
         start_date = datetime.datetime.strptime(config_dict["START_TIME"], "%Y-%m-%dT%H:%M:%S%z") - datetime.timedelta(hours=16)
+        end_date = datetime.datetime.strptime(config_dict['END_TIME'], "%Y-%m-%dT%H:%M:%S%z") - datetime.timedelta(
+                hours=16)
     info(f"New start date {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
+    info(f"New end date {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
 
-    results = extract_logs(event, start_date)
+    results = extract_logs(event, start_date, end_date)
 
     info(f"Results length: {len(results)}")
 
