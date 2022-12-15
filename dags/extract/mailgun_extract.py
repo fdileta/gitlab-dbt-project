@@ -77,7 +77,7 @@ for e in events:
         env_vars={
             **pod_env_vars,
             "START_TIME": "{{ execution_date.isoformat() }}",
-            "END_TIME": "{{ yesterday_ds }}",
+            "END_TIME": "{{ next_execution_date.isoformat() }}",
         },
         affinity=get_affinity(False),
         tolerations=get_toleration(False),
