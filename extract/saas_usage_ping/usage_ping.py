@@ -387,7 +387,7 @@ class UsagePing:
                 )
             )
             + ["combined"]
-            + [combined_metadata]
+            + [json.dumps(combined_metadata)]
         )
 
         self.engine_factory.upload_to_snowflake(

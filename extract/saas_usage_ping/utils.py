@@ -163,8 +163,8 @@ class Utils:
         """
         Combined metadata from SQL and Redis and export as one json
         Output:
-        {sql:{version: 15.1, edition: EEU,...},
-         redis: {version: 15.2, edition: CE,...}
+        {"sql":{"version": "15.1", "edition": "EEU",...},
+         "redis": {"version": "15.2", "edition": "CE",...}
          }
         """
         if not keys or not values:
