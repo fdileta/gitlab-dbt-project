@@ -564,7 +564,17 @@ WITH date_details AS (
         WHEN opp_snapshot.opportunity_id IN ('0064M00000ZGpfQQAT','0064M00000ZGpfVQAT','0064M00000ZGpfGQAT')
           THEN 1
         ELSE 0
-      END                                                         AS is_excluded_flag
+      END                                                         AS is_excluded_flag,
+
+      CASE 
+        WHEN lower(opp_snapshot.deal_group) LIKE ANY ('%growth%', '%new%')
+          AND opp_snapshot.is_edu_oss = 0
+          AND opp_snapshot.is_stage_1_plus = 1
+          AND opp_snapshot.forecast_category_name != 'Omitted'
+          AND opp_snapshot.is_open = 1
+         THEN 1
+         ELSE 0
+      END                                                   AS is_eligible_open_pipeline_flag
 
     FROM sfdc_opportunity_snapshot_history_xf opp_snapshot
     LEFT JOIN vision_opps
@@ -772,17 +782,7 @@ WITH date_details AS (
         WHEN net_arr >= 1000000 
           THEN '8. (>1000k)'
         ELSE 'Other' 
-      END                                                           AS calculated_deal_size,
-
-      CASE 
-        WHEN lower(deal_group) LIKE ANY ('%growth%', '%new%')
-          AND is_edu_oss = 0
-          AND is_stage_1_plus = 1
-          AND forecast_category_name != 'Omitted'
-          AND is_open = 1
-         THEN 1
-         ELSE 0
-      END                                                   AS is_eligible_open_pipeline_flag
+      END                                                           AS calculated_deal_size
 
     FROM add_compound_metrics
 )
