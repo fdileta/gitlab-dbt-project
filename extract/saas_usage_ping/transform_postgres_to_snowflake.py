@@ -7,12 +7,10 @@ from typing import Any, Callable, Dict, List
 import sqlparse
 from sqlparse.sql import Token, TokenList
 from sqlparse.tokens import Whitespace
-from utils import (
-    HAVING_CLAUSE_PATTERN,
-    META_DATA_INSTANCE_SQL_QUERIES_FILE,
-    TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
-    Utils,
-)
+from utils import Utils
+
+
+utils = Utils()
 
 
 def get_trimmed_token(token: List[str]) -> List[str]:
@@ -372,7 +370,7 @@ def get_transformed_having_clause(postgres_sql: str) -> str:
     """
     snowflake_having_clause = postgres_sql
 
-    if HAVING_CLAUSE_PATTERN.findall(snowflake_having_clause):
+    if utils.having_clause_pattern.findall(snowflake_having_clause):
 
         snowflake_having_clause = postgres_sql.replace(
             "(approval_project_rules_users)", "(approval_project_rules_users.id)"
@@ -443,8 +441,6 @@ def transform(json_data: Dict[Any, Any]) -> Dict[Any, Any]:
 
 if __name__ == "__main__":
 
-    utils = Utils()
-
     url = "https://gitlab.com/api/v4/usage_data/queries"
 
     json_payload = utils.get_json_response(url=url)
@@ -455,11 +451,11 @@ if __name__ == "__main__":
     info("Processed final sql queries")
 
     utils.save_to_json_file(
-        file_name=TRANSFORMED_INSTANCE_SQL_QUERIES_FILE, json_data=final_sql__dict
+        file_name=utils.transformed_instance_sql_queries_file, json_data=final_sql__dict
     )
 
     utils.save_to_json_file(
-        file_name=META_DATA_INSTANCE_SQL_QUERIES_FILE, json_data=final_meta_data
+        file_name=utils.meta_data_instance_sql_queries_file, json_data=final_meta_data
     )
 
     info("Done with - Processed final sql queries")

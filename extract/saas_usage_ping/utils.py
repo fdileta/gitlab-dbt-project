@@ -12,29 +12,6 @@ import pandas as pd
 import requests
 from gitlabdata.orchestration_utils import dataframe_uploader, snowflake_engine_factory
 
-TRANSFORMED_INSTANCE_SQL_QUERIES_FILE = "transformed_instance_queries.json"
-META_DATA_INSTANCE_SQL_QUERIES_FILE = "meta_data_instance_queries.json"
-NAMESPACE_FILE = "usage_ping_namespace_queries.json"
-
-HAVING_CLAUSE_PATTERN = re.compile(
-    "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
-)
-
-METRICS_EXCEPTION_INSTANCE_SQL = (
-    "counts.clusters_platforms_eks",
-    "counts.clusters_platforms_gke",
-    "usage_activity_by_stage.configure.clusters_platforms_gke",
-    "usage_activity_by_stage.configure.clusters_platforms_eks",
-    "usage_activity_by_stage_monthly.configure.clusters_platforms_gke",
-    "usage_activity_by_stage_monthly.configure.clusters_platforms_eks",
-    "usage_activity_by_stage.release.users_creating_deployment_approvals",
-    "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
-)
-
-ENCODING = "utf8"
-REDIS_KEY = "redis"
-SQL_KEY = "sql"
-
 
 class EngineFactory:
     """
@@ -89,7 +66,10 @@ class Utils:
         self.headers = {
             "PRIVATE-TOKEN": config_dict.get("GITLAB_ANALYTICS_PRIVATE_TOKEN", None)
         }
-        self.encoding = ENCODING
+        self.encoding = "utf8"
+
+        self.sql_key = "sql"
+        self.redis_key = "redis"
 
         self.meta_api_columns = [
             "recorded_at",
@@ -99,6 +79,26 @@ class Utils:
             "recording_ee_finished_at",
             "uuid",
         ]
+
+        self.transformed_instance_sql_queries_file = "transformed_instance_queries.json"
+        self.meta_data_instance_sql_queries_file = "meta_data_instance_queries.json"
+        self.namespace_file = "usage_ping_namespace_queries.json"
+
+        self.having_clause_pattern = re.compile(
+            "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED",
+            re.IGNORECASE,
+        )
+
+        self.metrics_exception_instance_sql = (
+            "counts.clusters_platforms_eks",
+            "counts.clusters_platforms_gke",
+            "usage_activity_by_stage.configure.clusters_platforms_gke",
+            "usage_activity_by_stage.configure.clusters_platforms_eks",
+            "usage_activity_by_stage_monthly.configure.clusters_platforms_gke",
+            "usage_activity_by_stage_monthly.configure.clusters_platforms_eks",
+            "usage_activity_by_stage.release.users_creating_deployment_approvals",
+            "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
+        )
 
     @staticmethod
     def convert_response_to_json(response: requests.Response):

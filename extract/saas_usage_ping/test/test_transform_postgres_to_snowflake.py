@@ -19,32 +19,6 @@ from extract.saas_usage_ping.transform_postgres_to_snowflake import (
     perform_action_on_query_str,
     transform,
 )
-from extract.saas_usage_ping.utils import (
-    HAVING_CLAUSE_PATTERN,
-    META_DATA_INSTANCE_SQL_QUERIES_FILE,
-    METRICS_EXCEPTION_INSTANCE_SQL,
-    TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
-    Utils,
-)
-
-
-def test_static_variables():
-    """
-    Test case: check static variables
-    """
-    utils = Utils()
-    assert utils.meta_api_columns == [
-        "recorded_at",
-        "version",
-        "edition",
-        "recording_ce_finished_at",
-        "recording_ee_finished_at",
-        "uuid",
-    ]
-    assert TRANSFORMED_INSTANCE_SQL_QUERIES_FILE == "transformed_instance_queries.json"
-    assert META_DATA_INSTANCE_SQL_QUERIES_FILE == "meta_data_instance_queries.json"
-    assert HAVING_CLAUSE_PATTERN is not None
-    assert METRICS_EXCEPTION_INSTANCE_SQL is not None
 
 
 @pytest.fixture(name="transformed_dict")

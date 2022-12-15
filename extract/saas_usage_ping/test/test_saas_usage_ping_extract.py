@@ -3,11 +3,8 @@ The main test routine for Automated Service Ping
 """
 
 from datetime import datetime, timedelta
-
 import pytest
-
 from extract.saas_usage_ping.usage_ping import UsagePing, get_backfill_filter
-from extract.saas_usage_ping.utils import ENCODING, NAMESPACE_FILE, REDIS_KEY, SQL_KEY
 
 
 @pytest.fixture(name="metrics_definition_test_dict")
@@ -78,12 +75,12 @@ def get_usage_ping_namespace_file(usage_ping):
     )
 
 
-def test_static_variables():
+def test_static_variables(usage_ping):
     """
     Check static variables
     """
-    assert ENCODING == "utf8"
-    assert NAMESPACE_FILE == "usage_ping_namespace_queries.json"
+    assert usage_ping.utils.encoding == "utf8"
+    assert usage_ping.utils.namespace_file == "usage_ping_namespace_queries.json"
 
 
 def test_evaluate_saas_queries():
@@ -258,7 +255,7 @@ def test_check_data_source(metrics_definition_test_dict):
     usage_ping_test = UsagePing()
 
     # matching redis concat_metric_name
-    payload_source = REDIS_KEY
+    payload_source = usage_ping_test.utils.redis_key
     concat_metric_name = "counts.productivity_analytics_views"
     prev_concat_metric_name = "counts"
     res = usage_ping_test.check_data_source(
@@ -270,7 +267,7 @@ def test_check_data_source(metrics_definition_test_dict):
     assert res == "valid_source"
 
     # matching sql concat_metric_name
-    payload_source = SQL_KEY
+    payload_source = usage_ping_test.utils.sql_key
     concat_metric_name = "usage_activity_by_stage.secure.user_preferences_group_overview_security_dashboard"
     prev_concat_metric_name = "usage_activity_by_stage.secure"
     res = usage_ping_test.check_data_source(
@@ -282,7 +279,7 @@ def test_check_data_source(metrics_definition_test_dict):
     assert res == "valid_source"
 
     # matching sql prev_concat_metric_name
-    payload_source = SQL_KEY
+    payload_source = usage_ping_test.utils.sql_key
     concat_metric_name = (
         "usage_activity_by_stage.manage.user_auth_by_provider.two-factor"
     )
@@ -296,7 +293,7 @@ def test_check_data_source(metrics_definition_test_dict):
     assert res == "valid_source"
 
     # NON-MATCHING data source: redis payload, but metric definition shows data source as sql
-    payload_source = REDIS_KEY
+    payload_source = usage_ping_test.utils.redis_key
     concat_metric_name = (
         "usage_activity_by_stage.manage.user_auth_by_provider.two-factor"
     )
@@ -310,7 +307,7 @@ def test_check_data_source(metrics_definition_test_dict):
     assert res == "not_matching_source"
 
     # metric in payload is missing in metric_definition yaml file
-    payload_source = REDIS_KEY  # should be sql
+    payload_source = usage_ping_test.utils.redis_key  # should be sql
     concat_metric_name = "some_missing_key.some_missing_key2"
     prev_concat_metric_name = "some_missing_key"
     res = usage_ping_test.check_data_source(
@@ -341,7 +338,7 @@ def test_keep_valid_metric_definitions(metrics_definition_test_dict):
         },
     }
 
-    payload_source = REDIS_KEY
+    payload_source = usage_ping_test.utils.redis_key
     valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(
         payload, payload_source, metrics_definition_test_dict
     )
@@ -365,7 +362,7 @@ def test_metric_exceptions(metrics_definition_test_dict):
         "counts": {"clusters_platforms_eks": 0},
     }
 
-    payload_source = SQL_KEY
+    payload_source = usage_ping_test.utils.sql_key
     valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(
         payload, payload_source, metrics_definition_test_dict
     )
@@ -385,11 +382,13 @@ def test_run_metric_checks():
     usage_ping_test.run_metric_checks()  # nothing should happen
 
     # ensure that an error is raised if there's a missing definition
-    usage_ping_test.missing_definitions[SQL_KEY].append("some_missing_definition")
+    usage_ping_test.missing_definitions[usage_ping_test.utils.sql_key].append(
+        "some_missing_definition"
+    )
     with pytest.raises(ValueError, match="Raising error to.*"):
         usage_ping_test.run_metric_checks()
 
-    usage_ping_test.missing_definitions[SQL_KEY] = []  # reset
+    usage_ping_test.missing_definitions[usage_ping_test.utils.sql_key] = []  # reset
     usage_ping_test.run_metric_checks()  # nothing should happen
 
     # ensure that an error is raised if there's a dup key

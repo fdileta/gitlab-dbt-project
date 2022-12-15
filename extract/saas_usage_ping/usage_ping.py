@@ -17,16 +17,7 @@ import pandas as pd
 import yaml
 from fire import Fire
 from sqlalchemy.exc import SQLAlchemyError
-from utils import (
-    META_DATA_INSTANCE_SQL_QUERIES_FILE,
-    METRICS_EXCEPTION_INSTANCE_SQL,
-    NAMESPACE_FILE,
-    REDIS_KEY,
-    SQL_KEY,
-    TRANSFORMED_INSTANCE_SQL_QUERIES_FILE,
-    EngineFactory,
-    Utils,
-)
+from utils import EngineFactory, Utils
 
 
 def get_backfill_filter(filter_list: list):
@@ -64,7 +55,7 @@ class UsagePing:
 
         self.start_date_28 = self.end_date - datetime.timedelta(28)
         self.dataframe_api_columns = self.utils.meta_api_columns
-        self.missing_definitions = {SQL_KEY: [], REDIS_KEY: []}
+        self.missing_definitions = {self.utils.sql_key: [], self.utils.redis_key: []}
         self.duplicate_keys = []
 
     def _get_instance_sql_metrics_definition(self) -> Dict[str, Any]:
@@ -101,7 +92,7 @@ class UsagePing:
         to generate the {ping_name: sql_query} dictionary
         """
         file_name = os.path.join(
-            os.path.dirname(__file__), TRANSFORMED_INSTANCE_SQL_QUERIES_FILE
+            os.path.dirname(__file__), self.utils.transformed_instance_sql_queries_file
         )
 
         return self.utils.load_from_json_file(file_name=file_name)
@@ -142,13 +133,13 @@ class UsagePing:
         """
         SQL_DATA_SOURCE_VAL = "database"
 
-        if payload_source == REDIS_KEY:
+        if payload_source == self.utils.redis_key:
             is_matching = (
                 metric_definition_source
                 and metric_definition_source != SQL_DATA_SOURCE_VAL
             )
 
-        elif payload_source == SQL_KEY:
+        elif payload_source == self.utils.sql_key:
             is_matching = metric_definition_source == SQL_DATA_SOURCE_VAL
 
         return is_matching
@@ -224,7 +215,8 @@ class UsagePing:
                     valid_metric_dict[metric_name] = return_dict
             else:
                 if (
-                    concat_metric_name.lower() not in METRICS_EXCEPTION_INSTANCE_SQL
+                    concat_metric_name.lower()
+                    not in self.utils.metrics_exception_instance_sql
                     or payload_source != "sql"
                 ):
                     data_source_status = self.check_data_source(
@@ -243,6 +235,26 @@ class UsagePing:
                         )
 
         return valid_metric_dict
+
+    def get_instance_sql_data(self, sql_query: str, con) -> tuple:
+        """
+        Get data to write and error (if any) to write
+        for instance_sql_metrics
+        """
+        try:
+            metrics_data = error_data = None
+            query_output = pd.read_sql(sql=sql_query, con=con)
+            # standardize column case across pandas versions
+            query_output.columns = query_output.columns.str.lower()
+            info(query_output)
+            # convert 'numpy int' to 'int' so json can be written
+            metrics_data = int(query_output.loc[0, "counter_value"])
+        except (KeyError, ValueError):
+            metrics_data = 0
+        except SQLAlchemyError as e:
+            error_data = str(e.__dict__["orig"])
+
+        return metrics_data, error_data
 
     def evaluate_saas_instance_sql_queries(
         self, connection, saas_queries: Dict
@@ -275,20 +287,11 @@ class UsagePing:
             elif isinstance(query, str) and query.startswith("SELECT"):
                 logging.info(f"Running ping: {key}...")
 
-                try:
-                    data_to_write = error_data_to_write = None
-                    query_output = pd.read_sql(sql=query, con=connection)
-                    # standardize column case across pandas versions
-                    query_output.columns = query_output.columns.str.lower()
-                    info(query_output)
-                    # convert 'numpy int' to 'int' so json can be written
-                    data_to_write = int(query_output.loc[0, "counter_value"])
-                except (KeyError, ValueError):
-                    data_to_write = 0
-                except SQLAlchemyError as e:
-                    error_data_to_write = str(e.__dict__["orig"])
+                data_to_write, error_data_to_write = self.get_instance_sql_data(
+                    sql_query=query, con=connection
+                )
 
-                if data_to_write is not None:
+                if data_to_write:
                     results[key] = data_to_write
 
                 if error_data_to_write:
@@ -310,7 +313,7 @@ class UsagePing:
 
         connection = self.engine_factory.connect()
 
-        payload_source = SQL_KEY
+        payload_source = self.utils.sql_key
 
         saas_queries_with_valid_definitions = self.keep_valid_metric_definitions(
             saas_queries, payload_source, metric_definition_dict
@@ -339,7 +342,7 @@ class UsagePing:
         redis_metrics = self.utils.get_json_response(url=url)
         redis_metadata = self.utils.keep_meta_data(redis_metrics)
 
-        payload_source = REDIS_KEY
+        payload_source = self.utils.redis_key
         redis_metrics = self.keep_valid_metric_definitions(
             redis_metrics, payload_source, metric_definition_dict
         )
@@ -360,10 +363,10 @@ class UsagePing:
         )
 
         combined_metadata = self.utils.get_loaded_metadata(
-            keys=[SQL_KEY, REDIS_KEY],
+            keys=[self.utils.sql_key, self.utils.redis_key],
             values=[
                 self._get_meta_data_from_file(
-                    file_name=META_DATA_INSTANCE_SQL_QUERIES_FILE
+                    file_name=self.utils.meta_data_instance_sql_queries_file
                 ),
                 redis_metadata,
             ],
@@ -378,7 +381,7 @@ class UsagePing:
             ]
             + self._get_dataframe_api_values(
                 self._get_meta_data_from_file(
-                    file_name=META_DATA_INSTANCE_SQL_QUERIES_FILE
+                    file_name=self.utils.meta_data_instance_sql_queries_file
                 )
             )
             + ["combined"]
@@ -416,7 +419,10 @@ class UsagePing:
             - unlikely unless the duplicate keys are missing from definition file
         """
         has_error = False
-        if self.missing_definitions[SQL_KEY] or self.missing_definitions[REDIS_KEY]:
+        if (
+            self.missing_definitions[self.utils.sql_key]
+            or self.missing_definitions[self.utils.redis_key]
+        ):
             logging.warning(
                 f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}. Please open up an issue with product intelligence to add missing definition into the yaml file."
             )
@@ -590,7 +596,9 @@ class UsagePing:
         """
         connection = self.engine_factory.connect()
 
-        namespace_queries = self._get_meta_data_from_file(file_name=NAMESPACE_FILE)
+        namespace_queries = self._get_meta_data_from_file(
+            file_name=self.utils.namespace_file
+        )
 
         for namespace_query in namespace_queries:
             if metrics_filter(namespace_query):
