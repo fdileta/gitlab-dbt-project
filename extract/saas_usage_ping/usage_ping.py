@@ -340,11 +340,13 @@ class UsagePing:
         url = "https://gitlab.com/api/v4/usage_data/non_sql_metrics"
 
         redis_metrics = self.utils.get_json_response(url=url)
-        redis_metadata = self.utils.keep_meta_data(redis_metrics)
+        redis_metadata = self.utils.keep_meta_data(json_data=redis_metrics)
 
         payload_source = self.utils.redis_key
         redis_metrics = self.keep_valid_metric_definitions(
-            redis_metrics, payload_source, metric_definition_dict
+            payload=redis_metrics,
+            payload_source=payload_source,
+            metric_definition_dict=metric_definition_dict,
         )
 
         return redis_metrics, redis_metadata
