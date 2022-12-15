@@ -349,7 +349,10 @@ class UsagePing:
     def upload_combined_metrics(
         self, combined_metrics: Dict, saas_queries: Dict, redis_metadata
     ) -> None:
-        """Uploads combined_metrics dictionary to Snowflake"""
+        """
+        Uploads combined_metrics dictionary to Snowflake
+        """
+
         df_to_upload = pd.DataFrame(
             columns=["query_map", "run_results", "ping_date", "run_id"]
             + self.dataframe_api_columns
@@ -389,7 +392,9 @@ class UsagePing:
         self.engine_factory.dispose()
 
     def upload_instance_sql_metrics_errors(self, sql_metric_errors: Dict) -> None:
-        """Uploads sql_metric_errors dictionary to Snowflake"""
+        """
+        Uploads sql_metric_errors dictionary to Snowflake
+        """
         df_to_upload = pd.DataFrame(columns=["run_id", "sql_errors", "ping_date"])
 
         df_to_upload.loc[0] = [
@@ -444,7 +449,9 @@ class UsagePing:
                     sql_metrics[key], dict
                 ):
                     self._merge_dicts(
-                        redis_metrics[key], sql_metrics[key], path + [str(key)]
+                        redis_metrics=redis_metrics[key],
+                        sql_metrics=sql_metrics[key],
+                        path=path + [str(key)],
                     )
                 elif redis_metrics[key] == sql_metrics[key]:
                     pass  # same leaf value
@@ -475,19 +482,21 @@ class UsagePing:
         )
 
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(
-            metric_definition_dict, saas_queries
+            metric_definition_dict=metric_definition_dict, saas_queries=saas_queries
         )
 
         logging.info(f"End instance_sql_metrics: sql_metrics {len(sql_metrics)}")
 
         logging.info("Start instance_redis_metrics")
         redis_metrics, redis_metadata = self.saas_instance_redis_metrics(
-            metric_definition_dict
+            metric_definition_dict=metric_definition_dict
         )
         logging.info(f"End instance_redis_metrics: redis_metrics {len(redis_metrics)}")
 
         logging.info("Start merging dicts")
-        combined_metrics = self._merge_dicts(redis_metrics, sql_metrics)
+        combined_metrics = self._merge_dicts(
+            redis_metrics=redis_metrics, sql_metrics=sql_metrics
+        )
 
         logging.info("Start uploading data to Snowflake")
 
@@ -500,7 +509,7 @@ class UsagePing:
         logging.info("End uploading data to Snowflake")
 
         if sql_metric_errors:
-            self.upload_instance_sql_metrics_errors(sql_metric_errors)
+            self.upload_instance_sql_metrics_errors(sql_metric_errors=sql_metric_errors)
 
         # self.run_metric_checks()
 
