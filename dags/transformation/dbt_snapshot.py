@@ -96,7 +96,7 @@ dbt_snapshot_cmd = f"""
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
     dbt snapshot -s tag:daily --profiles-dir profile --exclude path:snapshots/zuora path:snapshots/sfdc path:snapshots/gitlab_dotcom; ret=$?;
     montecarlo import dbt-run --manifest \
-    target/manifest.json --project-name gitlab-analysis --batch-size 500;
+    target/manifest.json --project-name gitlab-analysis;
     montecarlo import dbt-run --run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py snapshots; exit $ret
