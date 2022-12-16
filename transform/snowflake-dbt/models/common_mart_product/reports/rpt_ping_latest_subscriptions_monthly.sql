@@ -179,7 +179,7 @@ Join to capture missing metrics, uses the last value found for these in fct_char
     SELECT
         missing_subs.*,
         latest_mart_charge_values.licensed_user_count         AS licensed_user_count,
-        is_paid_subscription,
+        latest_mart_charge_values.is_paid_subscription        AS is_paid_subscription,
         TRUE                                                  AS is_missing_charge_subscription
     FROM missing_subs
         INNER JOIN latest_mart_charge_values
