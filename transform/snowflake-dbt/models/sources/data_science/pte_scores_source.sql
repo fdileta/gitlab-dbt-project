@@ -23,9 +23,12 @@ WITH source AS (
       data_by_row['grouping']::INT                          AS score_group,
       data_by_row['insights']::VARCHAR                      AS insights,
       uploaded_at::TIMESTAMP                                AS uploaded_at,
-      data_by_row['uptier_likely']::BOOLEAN                 AS uptier_likely
+      data_by_row['uptier_likely']::BOOLEAN                 AS uptier_likely,
+      MAX(score_date) OVER (PARTITION BY crm_account_id)    AS max_score_date,
+      IFF(score_date = max_score_date, 1, 0)                AS is_current
 
     FROM intermediate
+    {{ dbt_utils.group_by(n=9) }}
 
 )
 SELECT *
