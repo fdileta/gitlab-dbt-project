@@ -52,6 +52,7 @@
       dim_subscription.subscription_end_month                                     AS subscription_end_month,
       dim_subscription.dim_subscription_id_original                               AS dim_subscription_id_original,
       dim_billing_account.dim_billing_account_id                                  AS dim_billing_account_id,
+      dim_crm_accounts.parent_crm_account_demographics_sales_segment              AS parent_crm_account_sales_segment,
       dim_crm_accounts.parent_crm_account_industry                                AS parent_crm_account_industry,
       IFF(MAX(mrr) > 0, TRUE, FALSE)                                              AS is_paid_subscription,
       MAX(IFF(product_rate_plan_name ILIKE ANY ('%edu%', '%oss%'), TRUE, FALSE))  AS is_program_subscription,
@@ -81,7 +82,7 @@
       ON dim_billing_account.dim_crm_account_id = dim_crm_accounts.dim_crm_account_id
     INNER JOIN dim_date
       ON effective_start_month <= dim_date.date_day AND effective_end_month > dim_date.date_day
-    {{ dbt_utils.group_by(n=21)}}
+    {{ dbt_utils.group_by(n=15)}}
 
 
   ), latest_subscription AS (
