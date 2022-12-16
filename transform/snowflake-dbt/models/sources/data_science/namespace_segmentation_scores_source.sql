@@ -26,7 +26,7 @@ parsed AS (
     data_by_row['dim_namespace_id']::NUMBER(38, 4) AS dim_namespace_id,
     data_by_row['grouping']::INT AS grouping,
     data_by_row['score_date']::INT AS score_date,
-    data_by_row['gsegmentation']::INT AS segmentation,
+    data_by_row['segmentation']::INT AS segmentation,
     CURRENT_TIMESTAMP()::TIMESTAMP AS uploaded_at
   FROM intermediate
 
