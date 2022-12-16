@@ -10,19 +10,16 @@
 
 , page_url AS (
 
-    SELECT DISTINCT 
+    SELECT 
       app_id,
       page_url,
       page_url_path,
       clean_url_path,
       page_url_host,
       page_url_scheme,
-      SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
-      SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
-      SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
       referrer_medium,
-      min(behavior_at)                                                              AS min_event_timestamp,
-      max(behavior_at)                                                              AS max_event_timestamp
+      MIN(behavior_at)                                                              AS min_event_timestamp,
+      MAX(behavior_at)                                                              AS max_event_timestamp
     FROM events
     WHERE event IN ('struct', 'page_view', 'unstruct')
       AND page_url IS NOT NULL
@@ -31,32 +28,30 @@
       AND behavior_at > (SELECT max(max_event_timestamp) FROM {{ this }})
 
     {% endif %}
-    {{ dbt_utils.group_by(n=10) }}
+    {{ dbt_utils.group_by(n=7) }}
 
-), referer_url AS (
+), referrer_url AS (
 
-    SELECT DISTINCT 
+    SELECT 
       app_id,
       referrer_url                                                                  AS page_url,
       referrer_url_path                                                             AS page_url_path,
       {{ clean_url('referrer_url_path') }}                                          AS clean_url_path,
       referrer_url_host                                                             AS page_url_host,
       referrer_url_scheme                                                           AS page_url_scheme,
-      SPLIT_PART(clean_url_path, '/' ,1)                                            AS page_group,
-      SPLIT_PART(clean_url_path, '/' ,2)                                            AS page_type,
-      SPLIT_PART(clean_url_path, '/' ,3)                                            AS page_sub_type,
       referrer_medium,
-      min(behavior_at)                                                              AS min_event_timestamp,
-      max(behavior_at)                                                              AS max_event_timestamp
+      MIN(behavior_at)                                                              AS min_event_timestamp,
+      MAX(behavior_at)                                                              AS max_event_timestamp
     FROM events
-    WHERE referrer_url IS NOT NULL
+    WHERE event IN ('struct', 'page_view', 'unstruct')
+      AND referrer_url IS NOT NULL
 
     {% if is_incremental() %}
 
-      AND behavior_at > (SELECT max(max_event_timestamp) FROM {{ this }})
+      AND behavior_at > (SELECT MAX(max_event_timestamp) FROM {{ this }})
 
     {% endif %}
-    {{ dbt_utils.group_by(n=10) }}
+    {{ dbt_utils.group_by(n=7) }}
 
 ), page AS (
 
@@ -66,13 +61,13 @@
     UNION
 
     SELECT *
-    FROM referer_url
+    FROM referrer_url
 
 ), dim_with_sk AS (
 
     SELECT
       -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['page_url', 'app_id', 'page_url_scheme']) }}               AS dim_behavior_website_page_sk,
+      {{ dbt_utils.surrogate_key(['page_url', 'app_id', 'page_url_scheme']) }}  AS dim_behavior_website_page_sk,
 
       -- Natural Keys
       page_url,
@@ -83,11 +78,12 @@
       page_url_path,
       clean_url_path,
       page_url_scheme,
-      page_group,
-      page_type,
-      page_sub_type,
-      REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1) AS url_namespace_id,
-      REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1) AS url_project_id,
+      SPLIT_PART(clean_url_path, '/' ,1)                                        AS page_group,
+      SPLIT_PART(clean_url_path, '/' ,2)                                        AS page_type,
+      SPLIT_PART(clean_url_path, '/' ,3)                                        AS page_sub_type,
+      referrer_medium,
+      REGEXP_SUBSTR(page_url_path, 'namespace(\\d+)', 1, 1, 'e', 1)             AS url_namespace_id,
+      REGEXP_SUBSTR(page_url_path, 'project(\\d+)', 1, 1, 'e', 1)               AS url_project_id,
       CASE 
         WHEN page_url_path LIKE '%/activity'
           THEN 'Project information - Activity'
@@ -222,7 +218,7 @@
         WHEN page_url_path LIKE '%/-/billings'
           THEN 'Settings - Billings'
         ELSE 'Other'
-      END AS url_path_category,
+      END                                                                       AS url_path_category,
       CASE 
        WHEN 
        ( 
@@ -237,15 +233,18 @@
        and page_url_path not like '%/tree/%' -- ignore branches named 'security'
          THEN 1
        ELSE 0
-      END AS is_url_interacting_with_security
+      END                                                                       AS is_url_interacting_with_security,
+      MIN(min_event_timestamp)                                                  AS min_event_timestamp,
+      MAX(max_event_timestamp)                                                  AS max_event_timestamp
     FROM page
+    {{ dbt_utils.group_by(n=15) }}
 
 )
 
 {{ dbt_audit(
     cte_ref="dim_with_sk",
     created_by="@chrissharp",
-    updated_by="@michellecooper",
+    updated_by="@chrissharp",
     created_date="2022-07-22",
-    updated_date="2022-12-05"
+    updated_date="2022-12-15"
 ) }}

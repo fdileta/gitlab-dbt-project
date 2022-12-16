@@ -32,6 +32,8 @@ WITH structured_event_renamed AS (
       app_id,
       dim_behavior_browser_sk,
       dim_behavior_operating_system_sk,
+      dim_behavior_website_page_sk,
+      dim_behavior_referrer_page_sk,
       gsc_environment,
       gsc_extra,
       gsc_namespace_id,
@@ -43,21 +45,12 @@ WITH structured_event_renamed AS (
 
     FROM {{ ref('prep_snowplow_unnested_events_all') }}
     WHERE event = 'struct'
-      AND behavior_at > DATEADD(MONTH, -25, CURRENT_DATE)
+    
     {% if is_incremental() %}
 
       AND behavior_at > (SELECT MAX(behavior_at) FROM {{ this }})
 
     {% endif %}
-
-), dim_behavior_website_page AS (
-
-    SELECT 
-      dim_behavior_website_page.dim_behavior_website_page_sk,
-      dim_behavior_website_page.clean_url_path,
-      dim_behavior_website_page.page_url_host,
-      dim_behavior_website_page.app_id
-    FROM {{ ref('dim_behavior_website_page') }}
 
 ), structured_events_w_dim AS (
 
@@ -67,7 +60,8 @@ WITH structured_event_renamed AS (
       structured_event_renamed.event_id                                                                                                                        AS behavior_structured_event_pk,
 
       -- Foreign Keys
-      dim_behavior_website_page.dim_behavior_website_page_sk,
+      structured_event_renamed.dim_behavior_website_page_sk,
+      structured_event_renamed.dim_behavior_referrer_page_sk,
       structured_event_renamed.dim_behavior_browser_sk,
       structured_event_renamed.dim_behavior_operating_system_sk,
       structured_event_renamed.gsc_namespace_id                                                                                                                AS dim_namespace_id,
@@ -100,10 +94,6 @@ WITH structured_event_renamed AS (
       structured_event_renamed.gsc_source
 
     FROM structured_event_renamed
-    LEFT JOIN dim_behavior_website_page
-      ON structured_event_renamed.clean_url_path = dim_behavior_website_page.clean_url_path
-        AND structured_event_renamed.page_url_host = dim_behavior_website_page.page_url_host
-        AND structured_event_renamed.app_id = dim_behavior_website_page.app_id
 
 )
 
