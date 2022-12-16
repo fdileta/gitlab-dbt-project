@@ -951,6 +951,32 @@ The following Columns have a Varchar Data Type and are set up to handle Missing 
 
 {% enddocs %}
 
+{% docs dim_user_snapshot_bottom_up %}
+
+Snapshot table with Spined Dates that contains all Gitlab.com Users.
+
+Missing Column Values:
+* Unknown - Value is Null in source data
+* Not Found - Row Not found in source data
+
+The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:
+* role
+* last_activity_date             
+* last_sign_in_date               
+* setup_for_company    
+* jobs_to_be_done
+* for_business_use                 
+* employee_count
+* country
+* state
+
+**Business Logic in this Model:**
+- `spined_date` - every date between dbt_valid_from and dbt_valid_to timeframes.  
+  - spined_date has a time of '00:00:00' which is less than a dbt_valid_from date with a time greater than 00:00:00, ie 2022-11-14 09:01:37.494.  In this case the spined_date for this snapshot record will be 2022-11-15.  
+
+
+{% enddocs %}
+
 {% docs dim_ci_runner %}
 
 A Dimension table that contains all data related to CI runners.
@@ -1463,5 +1489,33 @@ Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team
 {% docs dim_subscription_snapshot_model %}
 
 Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [dim_subscription](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_subscription) model
+
+{% enddocs %}
+
+
+{% docs bdg_metrics_redis_events %}
+## Overview
+This model records the many-to-many relationship between Service Ping Metrics and Redis events. It pulls from the metrics dictionary yml files via `dim_ping_metric`, and contains the
+metric name, the Redis event name, and the aggregate operator and attribute. It will be joined to Snowplow events that contain the Service Ping Context to get SaaS product usage data at the namespace level.
+
+## Aggregation Strategies
+[This thread](https://gitlab.com/gitlab-org/gitlab/-/issues/376244#note_1167575425) has a nice summary of the possible aggregation strategies. The important thing to know from an analyst perspective is that Redis-based metrics come in three basic varities:
+1. Have only one associated Redis event; if that event occurs, count the metric (will have NULL `aggregate_operator`)
+1. Have multiple associated Redis events; count the metric if _any_ Redis event in that list occurs (will have 'OR' `aggregate_operator`, also known as union)
+1. Have multiple associated Redis events; count the metric if _all_ Redis events in that list occur (will have 'AND' `aggregate_operator`, also known as intersection)
+
+As a result, this bridge table will be used a bit differently to count intersection metrics compared to how it will be used to count union metrics.
+
+{% enddocs %}
+
+{% docs dim_crm_task %}
+
+Dimension model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
+
+{% enddocs %}
+
+{% docs fct_crm_task %}
+
+Fact model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
 
 {% enddocs %}

@@ -613,6 +613,12 @@ models:
           - not_null
           - unique
         tags: ["tdf", "common", "gainsight"]
+      - name: license_sha256
+        description: The license_sha256 is a secure hash created off the license file to be compliant with FIPS. This field can be used to join to the Service ping data.
+        tests:
+          - not_null
+          - unique
+        tags: ["tdf", "common", "gainsight"]
       - name: dim_subscription_id
         description: The unique identifier of a version of a subscription.
       - name: subscription_name
@@ -1858,3 +1864,12 @@ models:
         description: Date the Zuora Billing user was created
       - name: is_integration_user
         description: A flag indentifying integration users based on Zuora Billing user last names.
+
+  - name: prep_crm_task
+    description: '{{ doc("prep_crm_task") }}'
+    columns:
+      - name: dim_crm_task_sk
+        description: The unique surrogate key of a [task activity](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) related to Salesforce account, opportunity, lead, or contact.
+        tests:
+          - unique
+          - not_null

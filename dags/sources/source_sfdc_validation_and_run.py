@@ -77,7 +77,7 @@ data_source = "sfdc"
 dag = DAG(
     f"source_{data_source}_validation_and_run",
     default_args=default_args,
-    schedule_interval="10 */12 * * *",
+    schedule_interval="20 */12 * * *",
     description=f"This DAG tests the raw data for {data_source}, runs any snapshots, runs the source models, and tests the source models.",
 )
 
@@ -85,7 +85,7 @@ dag = DAG(
 test_cmd = f"""
     {dbt_install_deps_nosha_cmd} &&
     dbt test --profiles-dir profile --target prod --models source:salesforce; ret=$?;
-    montecarlo import dbt-run-results \
+    montecarlo import dbt-run --run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py source_tests; exit $ret
 """
@@ -105,7 +105,7 @@ snapshot_cmd = f"""
     {dbt_install_deps_nosha_cmd} &&
     export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_L" &&
     dbt snapshot --profiles-dir profile --target prod --select path:snapshots/{data_source}; ret=$?;
-    montecarlo import dbt-run-results \
+    montecarlo import dbt-run --run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py snapshots; exit $ret
 """
@@ -124,7 +124,7 @@ snapshot = KubernetesPodOperator(
 model_run_cmd = f"""
     {dbt_install_deps_nosha_cmd} &&
     dbt run --profiles-dir profile --target prod --models +sources.{data_source}; ret=$?;
-    montecarlo import dbt-run-results \
+    montecarlo import dbt-run --run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
 """
@@ -143,7 +143,7 @@ model_run = KubernetesPodOperator(
 model_test_cmd = f"""
     {dbt_install_deps_nosha_cmd} &&
     dbt test --profiles-dir profile --target prod --models +sources.{data_source} {run_command_test_exclude}; ret=$?;
-    montecarlo import dbt-run-results \
+    montecarlo import dbt-run --run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py test; exit $ret
 """

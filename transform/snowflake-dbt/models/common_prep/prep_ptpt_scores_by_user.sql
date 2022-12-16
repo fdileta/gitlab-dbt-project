@@ -18,7 +18,7 @@
     FROM score_dates
     LIMIT 1
 
-), ptpt_scores AS (
+), ptpt_scores_last AS (
 
     SELECT *
     FROM ptpt_scores
@@ -34,16 +34,16 @@
 
     SELECT
       COALESCE(users.notification_email, users.email) AS email_address,
-      ptpt_scores.namespace_id,
-      ptpt_scores.score,
-      ptpt_scores.score_group,
-      ptpt_scores.insights,
-      ptpt_scores.score_date::DATE                    AS score_date
+      ptpt_scores_last.namespace_id,
+      ptpt_scores_last.score,
+      ptpt_scores_last.score_group,
+      ptpt_scores_last.insights,
+      ptpt_scores_last.score_date::DATE                    AS score_date
     FROM prep_namespace
     INNER JOIN gitlab_dotcom_users_source users
       ON prep_namespace.creator_id = users.user_id
-    INNER JOIN ptpt_scores
-      ON prep_namespace.dim_namespace_id = ptpt_scores.namespace_id
+    INNER JOIN ptpt_scores_last
+      ON prep_namespace.dim_namespace_id = ptpt_scores_last.namespace_id
     QUALIFY ROW_NUMBER() OVER(PARTITION BY email_address ORDER BY score DESC) = 1
 
 ), namespace_creator_ptpt_score_last_2 AS (

@@ -7,7 +7,7 @@
 
 WITH unioned_view AS (
 
-{{ schema_union_all('snowplow_', 'snowplow_unnested_events', database_name=env_var('SNOWFLAKE_PREP_DATABASE')) }}
+{{ schema_union_limit('snowplow_', 'snowplow_unnested_events', 'derived_tstamp', 750, database_name=env_var('SNOWFLAKE_PREP_DATABASE')) }}
 
 )
 

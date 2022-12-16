@@ -117,7 +117,7 @@ dbt_sheetload_cmd = f"""
     export snowflake_load_database="RAW" &&
     {dbt_install_deps_and_seed_nosha_cmd} &&
     dbt run --profiles-dir profile --target prod --models sources.sheetload legacy.sheetload; ret=$?;
-    montecarlo import dbt-run-results \
+    montecarlo import dbt-run --run-results \
     target/run_results.json --project-name gitlab-analysis;
     python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
 """

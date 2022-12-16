@@ -2,8 +2,9 @@
     
         materialized = "incremental",
         unique_key = "fct_behavior_unstructured_sk",
-        full_refresh = true if flags.FULL_REFRESH and var('full_refresh_force', false) else false,
-        on_schema_change = 'sync_all_columns'
+        full_refresh = only_force_full_refresh(),
+        on_schema_change = 'sync_all_columns',
+        cluster_by = ['behavior_at::DATE']
 
 ) }}
 
@@ -41,11 +42,11 @@
       environment
     FROM events
     WHERE event = 'unstruct'
-    AND behavior_at >= DATEADD(MONTH, -25, CURRENT_DATE)
 
     {% if is_incremental() %}
 
-    AND behavior_at > (SELECT max(behavior_at) FROM {{ this }})
+      AND behavior_at > (SELECT MAX({{ var('incremental_backfill_date', 'behavior_at') }}) FROM {{ this }})
+      AND behavior_at <= (SELECT DATEADD(month, 1,  MAX({{ var('incremental_backfill_date', 'behavior_at') }}) )  FROM {{ this }})
 
     {% endif %}
 
