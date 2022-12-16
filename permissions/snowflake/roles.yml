@@ -34,6 +34,11 @@ databases:
     - cbraza_prep:
         shared: no
 
+    - cleroux_prod:
+        shared: no
+    - cleroux_prep:
+        shared: no
+
     - csharp_prod:
         shared: no
     - csharp_prep:
@@ -2601,6 +2606,38 @@ roles:
             - analyst_engineering
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - cleroux_prep
+                - cleroux_prod
+            schemas:
+                - cleroux_prep.*
+                - cleroux_prod.*
+            tables:
+                - cleroux_prep.*.*
+                - cleroux_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - cleroux_prep
+                    - cleroux_prod
+                write:
+                    - cleroux_prep
+                    - cleroux_prod
+            schemas:
+                read:
+                    - cleroux_prep.*
+                    - cleroux_prod.*
+                write:
+                    - cleroux_prep.*
+                    - cleroux_prod.*
+            tables:
+                read:
+                    - cleroux_prep.*.*
+                    - cleroux_prod.*.*
+                write:
+                    - cleroux_prep.*.*
+                    - cleroux_prod.*.*
 
     - cmeddaugh:
         member_of:
