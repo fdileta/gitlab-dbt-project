@@ -487,6 +487,7 @@
       dim_crm_account.crm_account_name                                            AS crm_account_name,
       account_next_renewal_month.next_renewal_month                               AS crm_account_next_renewal_month,
       dim_crm_account.health_score_color                                          AS crm_account_health_score_color,
+      dim_crm_account.parent_crm_account_demographics_sales_segment               AS parent_crm_account_sales_segment,
       dim_crm_account.technical_account_manager                                   AS technical_account_manager,
       dim_crm_account.account_owner                                               AS strategic_account_leader,
       IFNULL(arr_metrics_current_month.quantity, 0)                               AS customer_reach,
