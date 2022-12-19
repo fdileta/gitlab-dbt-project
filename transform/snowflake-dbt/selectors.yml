@@ -1,0 +1,207 @@
+selectors:
+  - name: non_product_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      union:
+        - method: fqn
+          value: "*"
+        - exclude:
+          - method: tag
+            value: product
+          - method: path
+            value: models/legacy/sheetload 
+          - method: path
+            value: models/legacy/snapshots
+          - method: path
+            value: models/sources/gitlab_dotcom
+          - method: path
+            value: models/sources/sheetload
+          - method: path
+            value: models/sources/sfdc
+          - method: path
+            value: models/sources/zuora
+          - method: path
+            value: models/sources/dbt
+          - method: path
+            value: models/workspaces
+
+  - name: test
+    definition:
+      method: path
+      value: models/workspaces
+
+# dbt list --models tag:product --exclude "workspaces.*"  > dbt_product_models.csv
+# dbt list --selector product_models --resource-type model > dbt_product_models_selector.csv
+
+  - name: product_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      union:
+        - method: tag
+          value: product
+        - exclude:
+          - method: path
+            value: models/workspaces
+
+# dbt list --models "workspaces.*" --exclude "workspaces.workspace_data_science.* workspaces.workspace_data.tdf.*" > dbt_workspaces.csv
+# dbt list --selector workspaces --resource-type model > dbt_workspaces_selector.csv
+
+  - name: workspaces
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      union:
+        - method: path
+          value: models/workspaces
+        - exclude:
+          - method: path
+            value: models/workspaces/workspace_data_science
+          - method: path
+            value: models/workspaces/workspace_data/tdf
+
+# dbt list --models "workspaces.workspace_data_science.*"  > dbt_workspaces_xl.csv
+# dbt list --selector workspaces_xl --resource-type model > dbt_workspaces_xl_selector.csv
+
+  - name: workspaces_xl
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: models/workspaces/workspace_data_science
+
+# dbt list --models "workspaces.workspace_data.tdf.*" > dbt_trusted_data.csv  -- dbt_trusted_data
+# dbt list --selector trusted_data --resource-type model > dbt_trusted_data_selector.csv
+
+  - name: workspace_trusted_data
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: models/workspaces/workspace_data/tdf
+
+
+# dbt list --models sources.dbt+  > dbt_results.csv
+# dbt list --selector dbt_results --resource-type model > dbt_results_selector.csv
+
+  - name: dbt_results
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: models/sources/dbt
+      children: true
+
+# dbt list --models +legacy.snapshots --exclude tag:edm_snapshot > dbt_snapshot_models.csv  -- dbt_snapshots
+# dbt list --selector snapshot_models --resource-type model > dbt_snapshot_models_selector.csv
+
+  - name: source_snapshot_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      union:
+        - method: path
+          value: models/legacy/snapshots
+          parents: true
+        - exclude:
+          - method: tag
+            value: edm_snapshot
+
+# dbt list --models tag:edm_snapshot > dbt_edm_snapshot_models.csv  -- dbt_edm_snapshots->dbt_snapshot_models
+# dbt list --selector edm_snapshot_models --resource-type model > dbt_edm_snapshot_models_selector.csv
+
+  - name: edm_snapshot_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: tag
+      value: edm_snapshot
+
+# dbt list --models sources.sheetload legacy.sheetload > dbt_sheetload.csv  -- sheetload
+# dbt list --selector sheetload --resource-type model > dbt_sheetload_selector.csv
+
+  - name: sheetload_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      union:
+        - method: path
+          value: models/sources/sheetload
+        - method: path
+          value: models/legacy/sheetload
+
+
+# dbt list --models +sources.customers > dbt_customers.csv  -- t_customers-source-model-run -> t_gitlab_com_db_dbt
+# dbt list --selector customers-source-model --resource-type model > dbt_customers_selector.csv
+
+  - name: customers_source_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: models/sources/customers
+      parents: true
+
+# dbt list --models +sources.gitlab_dotcom > dbt_gitlab_dotcom.csv  -- t_gitlab_dotcom-source-model-run -> t_gitlab_com_db_dbt
+# dbt list --selector gitlab_dotcom-source-model --resource-type model > dbt_gitlab_dotcom_selector.csv
+
+  - name: gitlab_dotcom_source_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: models/sources/gitlab_dotcom
+      parents: true
+
+# dbt list --models +sources.gitlab_ops > dbt_gitlab_ops.csv  -- t_gitlab_ops-source-model-run -> t_gitlab_com_db_dbt
+# dbt list --selector gitlab_ops-source-model --resource-type model > dbt_gitlab_ops_selector.csv 
+
+  - name: gitlab_ops_source_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: models/sources/gitlab_ops
+      parents: true
+
+# dbt list --models +sources.sfdc > dbt_sfdc.csv  -- sfdc_model_run -> source_sfdc_validation_and_run
+# dbt list --selector sfdc_source --resource-type model > dbt_sfdc_selector.csv 
+
+  - name: sfdc_source_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: models/sources/sfdc
+      parents: true
+
+# dbt list --models +sources.zuora> dbt_zuora.csv  -- zuora_model_run -> source_zuora_validation_and_run
+# dbt list --selector zuora_source --resource-type model > dbt_zuora_selector.csv
+
+  - name: zuora_source_models
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: models/sources/zuora
+      parents: true
+
+
+# Snapshots
+
+# dbt list -s tag:daily --exclude path:snapshots/zuora path:snapshots/sfdc path:snapshots/gitlab_dotcom > snapshot_daily.csv -- dbt_snapshot -> dbt-snapshots
+# dbt list --selector daily_snapshots --resource-type snapshot > snapshot_daily_selector.csv
+
+  - name: daily_snapshots
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      union:
+        - method: tag
+          value: daily
+          parents: true
+        - exclude:
+          - method: path
+            value: snapshots/zuora
+          - method: path
+            value: snapshots/sfdc
+          - method: path
+            value: snapshots/gitlab_dotcom
+
+# dbt list --select path:snapshots/sfdc -- source_sfdc_validation_and_run -> sfdc-source-snapshot
+
+# dbt list --select path:snapshots/zuora -- source_zuora_validation_and_run -> zuora-source-snapshot
+
+# dbt list -s tag:edm_snapshot --profiles-dir profile -- dbt_edm_snapshot -> dbt-edm-snapshots
+
+# dbt list --select path:snapshots/customers -- t_gitlab_customers_db_dbt -> t_customers-source-snapshot
+
+# dbt list --select path:snapshots/gitlab_dotcom -- t_gitlab_com_db_dbt -> t_gitlab_dotcom-source-snapshot
+
+# dbt list --select path:snapshots/gitlab_ops -- t_gitlab_ops_db_dbt -> t_gitlab_ops_db-source-snapshot
