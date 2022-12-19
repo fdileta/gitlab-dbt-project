@@ -10,7 +10,8 @@
 
 , page_url AS (
 
-    SELECT 
+    SELECT
+      dim_behavior_website_page_sk,
       app_id,
       page_url,
       page_url_path,
@@ -28,11 +29,12 @@
       AND behavior_at > (SELECT max(max_event_timestamp) FROM {{ this }})
 
     {% endif %}
-    {{ dbt_utils.group_by(n=7) }}
+    {{ dbt_utils.group_by(n=8) }}
 
 ), referrer_url AS (
 
-    SELECT 
+    SELECT
+      dim_behavior_referrer_page_sk                                                 AS dim_behavior_website_page_sk,
       app_id,
       referrer_url                                                                  AS page_url,
       referrer_url_path                                                             AS page_url_path,
@@ -51,7 +53,7 @@
       AND behavior_at > (SELECT MAX(max_event_timestamp) FROM {{ this }})
 
     {% endif %}
-    {{ dbt_utils.group_by(n=7) }}
+    {{ dbt_utils.group_by(n=8) }}
 
 ), page AS (
 
@@ -67,7 +69,7 @@
 
     SELECT
       -- Surrogate Key
-      {{ dbt_utils.surrogate_key(['page_url', 'app_id', 'page_url_scheme']) }}  AS dim_behavior_website_page_sk,
+      dim_behavior_website_page_sk,
 
       -- Natural Keys
       page_url,

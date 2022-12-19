@@ -71,5 +71,5 @@ SELECT
   refr_urlpath                        AS referrer_url_path,
   refr_urlscheme                      AS referrer_url_scheme,
   (refr_urlhost || refr_urlpath )     AS referrer_url,
-  {{ dbt_utils.surrogate_key(['referrer_url', 'app_id', 'page_url_scheme']) }}  AS dim_behavior_referrer_page_sk
+  {{ dbt_utils.surrogate_key(['referrer_url', 'app_id', 'referrer_url_scheme']) }}  AS dim_behavior_referrer_page_sk
 FROM unioned_view
