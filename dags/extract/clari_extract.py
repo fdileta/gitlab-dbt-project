@@ -41,7 +41,7 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    'clari_extractv5',
+    'clari_extractv6',
     default_args=default_args,
     schedule_interval="0 8 * * *",
     start_date=datetime(2022, 12, 17),
@@ -50,7 +50,7 @@ dag = DAG(
 
 bash_task = BashOperator(
     dag=dag,
-    task_id='clari_daily',
+    task_id='bash_task',
     bash_command="echo '{{ execution_date }}'",
 )
 
