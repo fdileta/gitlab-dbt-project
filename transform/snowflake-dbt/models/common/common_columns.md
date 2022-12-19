@@ -414,7 +414,7 @@ The minor version of GitLab on the installation. For example, for 13.6.2, `minor
 
 {% docs major_minor_version %}
 
-The concatenation of major and minor version. For example, for 13.6.2, `major_minor_version` is 13.6. See details [here](https://docs.gitlab.com/ee/policy/maintenance.html)
+The concatenation of major and minor version, easily joined to `dim_gitlab_releases`. For example, for 13.6.2, `major_minor_version` is 13.6. See details [here](https://docs.gitlab.com/ee/policy/maintenance.html).
 
 {% enddocs %}
 
@@ -1050,3 +1050,44 @@ The unique surrogate key of a [task activity](https://help.salesforce.com/s/arti
 
 {% enddocs %}
 
+{% docs snapshot_id %}
+
+The ID of the date the snapshot was valid, easily joined to `dim_date` (YYYYMMDD). This column is often used as the spined date for [date spining](https://discourse.getdbt.com/t/finding-active-days-for-a-subscription-user-account-date-spining/265).
+
+{% enddocs %}
+
+{% docs snapshot_date %}
+
+The date the snapshot record was valid (YYYY-MM-DD)
+
+{% enddocs %}
+
+{% docs dbt_scd_id %}
+
+A unique key generated for each snapshotted record. This is used internally by dbt and is not intended for analysis.
+
+{% enddocs %}
+
+{% docs dbt_created_at_snapshot_model %}
+
+The created_at timestamp of the source record when this snapshot row was inserted. This is used internally by dbt and is not intended for analysis.
+
+{% enddocs %}
+
+{% docs dbt_updated_at_snapshot_model %}
+
+The updated_at timestamp of the source record when this snapshot row was inserted or last updated. This is used internally by dbt and is not intended for analysis.
+
+{% enddocs %}
+
+{% docs dbt_valid_from %}
+
+The timestamp when this snapshot row was first inserted. This column can be used to order the different "versions" of a record.
+
+{% enddocs %}
+
+{% docs dbt_valid_to %}
+
+The timestamp when this row became invalidated. The most recent snapshot record will have `dbt_valid_to` set to null.
+
+{% enddocs %}

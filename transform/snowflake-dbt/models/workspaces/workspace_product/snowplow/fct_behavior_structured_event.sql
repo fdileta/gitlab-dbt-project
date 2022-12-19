@@ -4,8 +4,8 @@
     unique_key='behavior_structured_event_pk',
     full_refresh= only_force_full_refresh(),
     on_schema_change='sync_all_columns',
-    post_hook=["{{ rolling_window_delete('behavior_at','month',25) }}"]
-
+    post_hook=["{{ rolling_window_delete('behavior_at','month',25) }}"],
+    cluster_by=['behavior_at::DATE']
   )
 
 }}
@@ -43,15 +43,15 @@ WITH structured_event_renamed AS (
 
     FROM {{ ref('prep_snowplow_unnested_events_all') }}
     WHERE event = 'struct'
-      AND behavior_at > DATEADD(MONTH, -25, CURRENT_DATE)
     {% if is_incremental() %}
 
-      AND behavior_at > (SELECT MAX(behavior_at) FROM {{ this }})
+      AND behavior_at > (SELECT MAX({{ var('incremental_backfill_date', 'behavior_at') }}) FROM {{ this }})
+      AND behavior_at <= (SELECT DATEADD(month, 1,  MAX({{ var('incremental_backfill_date', 'behavior_at') }}) )  FROM {{ this }})
+
 
     {% endif %}
-)
 
-, dim_behavior_website_page AS (
+), dim_behavior_website_page AS (
 
     SELECT 
       dim_behavior_website_page.dim_behavior_website_page_sk,

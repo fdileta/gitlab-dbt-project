@@ -19,7 +19,7 @@
     SELECT *
     FROM {{ ref('greenhouse_application_stages_source') }}
     -- Table can contain duplicate records
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY application_id,stage_id,stage_entered_on ORDER BY stage_entered_on) = 1
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY application_id,modified_stage_id,stage_entered_on ORDER BY stage_entered_on) = 1
 
 )
 
@@ -30,6 +30,7 @@
     application_stages.stage_entered_on          AS stage_entered_date,
     application_stages.stage_exited_on           AS stage_exited_date,
     application_stages.application_stage_name,
+    application_stages.modified_stage_id,
     applications.application_id,
     sources.source_name,
     sources.source_type,
@@ -55,3 +56,4 @@
   WHERE application_stages.stage_entered_on IS NOT NULL
     AND jobs.job_opened_at IS NOT NULL
     AND applications.application_id IS NOT NULL
+    AND application_stages.modified_stage_id IS NOT NULL

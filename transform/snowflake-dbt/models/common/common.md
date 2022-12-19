@@ -951,6 +951,32 @@ The following Columns have a Varchar Data Type and are set up to handle Missing 
 
 {% enddocs %}
 
+{% docs dim_user_snapshot_bottom_up %}
+
+Snapshot table with Spined Dates that contains all Gitlab.com Users.
+
+Missing Column Values:
+* Unknown - Value is Null in source data
+* Not Found - Row Not found in source data
+
+The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:
+* role
+* last_activity_date             
+* last_sign_in_date               
+* setup_for_company    
+* jobs_to_be_done
+* for_business_use                 
+* employee_count
+* country
+* state
+
+**Business Logic in this Model:**
+- `spined_date` - every date between dbt_valid_from and dbt_valid_to timeframes.  
+  - spined_date has a time of '00:00:00' which is less than a dbt_valid_from date with a time greater than 00:00:00, ie 2022-11-14 09:01:37.494.  In this case the spined_date for this snapshot record will be 2022-11-15.  
+
+
+{% enddocs %}
+
 {% docs dim_ci_runner %}
 
 A Dimension table that contains all data related to CI runners.

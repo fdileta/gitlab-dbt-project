@@ -1,31 +1,36 @@
 WITH source AS (
 
-    SELECT *
-    FROM {{ source('data_science', 'namespace_segmentation_scores') }}
+  SELECT *
+  FROM {{ source('data_science', 'namespace_segmentation_scores') }}
 
-), intermediate AS (
+),
 
-    SELECT
-      d.value as data_by_row,
-      uploaded_at
-    FROM source,
-    LATERAL FLATTEN(INPUT => PARSE_JSON(jsontext), outer => true) d
+intermediate AS (
 
-), parsed AS (
+  SELECT
+    d.value AS data_by_row,
+    uploaded_at
+  FROM source,
+    LATERAL FLATTEN(INPUT => PARSE_JSON(jsontext), outer => TRUE) AS d
 
-    SELECT
+),
 
-      data_by_row['namespace_id']::VARCHAR                  AS namespace_id,
-      data_by_row['score_date']::TIMESTAMP                  AS score_date,
-      data_by_row['score']::NUMBER(38,4)                    AS score,
-      data_by_row['decile']::INT                            AS decile,
-      data_by_row['importance']::INT                        AS importance,
-      data_by_row['grouping']::INT                          AS score_group,
-      data_by_row['insights']::VARCHAR                      AS insights,
-      uploaded_at::TIMESTAMP                                AS uploaded_at
+parsed AS (
 
-    FROM intermediate
+  SELECT
+
+    data_by_row[
+      'crm_account_owner_user_segment'
+    ]::VARCHAR AS crm_account_owner_user_segment,
+    data_by_row['dim_crm_account_id']::TIMESTAMP AS dim_crm_account_id,
+    data_by_row['dim_namespace_id']::NUMBER(38, 4) AS dim_namespace_id,
+    data_by_row['grouping']::INT AS grouping,
+    data_by_row['score_date']::INT AS score_date,
+    data_by_row['segmentation']::INT AS segmentation,
+    CURRENT_TIMESTAMP()::TIMESTAMP AS uploaded_at
+  FROM intermediate
 
 )
+
 SELECT *
 FROM parsed

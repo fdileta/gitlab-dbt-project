@@ -76,8 +76,7 @@ dbt_datasiren_command = f"""
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="DATASIREN" &&
         dbt run --profiles-dir profile --target prod --models tag:datasiren --exclude datasiren_audit_results+;  ret=$?;
-        montecarlo import dbt-run-results \
-        target/run_results.json --project-name gitlab-analysis;
+        montecarlo import dbt-run --manifest target/manifest.json --run-results target/run_results.json --project-name gitlab-analysis;
         python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
         """
 
@@ -96,8 +95,7 @@ dbt_datasiren_audit_results_command = f"""
         {dbt_install_deps_nosha_cmd} &&
         export SNOWFLAKE_TRANSFORM_WAREHOUSE="DATASIREN" &&
         dbt run --profiles-dir profile --target prod --models datasiren_audit_results+; ret=$?;
-        montecarlo import dbt-run-results \
-        target/run_results.json --project-name gitlab-analysis;
+        montecarlo import dbt-run --manifest target/manifest.json --run-results target/run_results.json --project-name gitlab-analysis;
         python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
         """
 

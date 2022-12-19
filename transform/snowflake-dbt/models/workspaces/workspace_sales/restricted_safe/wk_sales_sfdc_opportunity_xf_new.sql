@@ -1,4 +1,4 @@
-{{ config(alias='sfdc_opportunity_xf_edm_marts') }}
+{{ config(alias='sfdc_opportunity_xf_new') }}
 
 WITH edm_opty AS (
 
@@ -39,21 +39,20 @@ WITH edm_opty AS (
   FROM date_details
   WHERE date_actual = CURRENT_DATE
 
--- CTE to be UPDATED using EDM fields as source
 ), sfdc_opportunity_xf AS (
 
    SELECT
-    edm_opty.dbt_updated_at                   AS _last_dbt_run,
-    edm_opty.dim_crm_account_id               AS account_id,
-    edm_opty.dim_crm_opportunity_id           AS opportunity_id,
-    edm_opty.opportunity_name                 AS opportunity_name,
+    edm_opty.dbt_updated_at                         AS _last_dbt_run,
+    edm_opty.dim_crm_account_id                     AS account_id,
+    edm_opty.dim_crm_opportunity_id                 AS opportunity_id,
+    edm_opty.opportunity_name                       AS opportunity_name,
 
-    edm_opty.close_date                       AS close_date,
-    edm_opty.created_date                     AS created_date,
+    edm_opty.close_date                             AS close_date,
+    edm_opty.created_date                           AS created_date,
     edm_opty.sales_accepted_date,
     edm_opty.sales_qualified_date,
-    edm_opty.subscription_start_date          AS quote_start_date,
-    edm_opty.subscription_end_date            AS quote_end_date,
+    edm_opty.subscription_start_date                AS quote_start_date,
+    edm_opty.subscription_end_date                  AS quote_end_date,
 
     edm_opty.days_in_stage,
     edm_opty.deployment_preference,
@@ -62,7 +61,7 @@ WITH edm_opty AS (
     ----------------------------------------------------------
     edm_opty.owner_id,
     -- edm_opty.opportunity_owner,
-    opportunity_owner.name                         AS opportunity_owner,
+    opportunity_owner.name                          AS opportunity_owner,
     edm_opty.opportunity_owner_department,
     edm_opty.opportunity_owner_manager,
     edm_opty.opportunity_owner_role,
@@ -115,7 +114,6 @@ WITH edm_opty AS (
 
     ----------------------------------------------------------
     ----------------------------------------------------------
-
     edm_opty.opportunity_health,
     edm_opty.is_risky,
     edm_opty.risk_type,
@@ -132,7 +130,7 @@ WITH edm_opty AS (
     edm_opty.stage_3_technical_evaluation_date,
     edm_opty.stage_4_proposal_date,
     edm_opty.stage_5_negotiating_date,
-    edm_opty.stage_6_awaiting_signature_date_date AS stage_6_awaiting_signature_date,
+    edm_opty.stage_6_awaiting_signature_date_date         AS stage_6_awaiting_signature_date,
     edm_opty.stage_6_closed_won_date,
     edm_opty.stage_6_closed_lost_date,
     edm_opty.cp_champion,
@@ -176,16 +174,16 @@ WITH edm_opty AS (
     edm_opty.partner_discount,
     edm_opty.partner_discount_calc,
     edm_opty.comp_channel_neutral,
-    edm_opty.fulfillment_partner                      AS resale_partner_id,
-    resale_account.account_name                       AS resale_partner_name,
+    edm_opty.fulfillment_partner                       AS resale_partner_id,
+    resale_account.account_name                        AS resale_partner_name,
     edm_opty.platform_partner,
 
     ----------------------------------------------------------
     ----------------------------------------------------------
 
     -- account driven fields
-    edm_opty.crm_account_name                         AS account_name,
-    edm_opty.dim_parent_crm_account_id                AS ultimate_parent_account_id,
+    edm_opty.crm_account_name                          AS account_name,
+    edm_opty.dim_parent_crm_account_id                 AS ultimate_parent_account_id,
     edm_opty.is_jihu_account,
 
     edm_opty.account_owner_user_segment,
@@ -199,29 +197,29 @@ WITH edm_opty AS (
     edm_opty.account_demographics_area,
     edm_opty.account_demographics_territory,
 
-    upa.account_demographics_sales_segment           AS upa_demographics_segment,
-    upa.account_demographics_geo                     AS upa_demographics_geo,
-    upa.account_demographics_region                  AS upa_demographics_region,
-    upa.account_demographics_area                    AS upa_demographics_area,
-    upa.account_demographics_territory               AS upa_demographics_territory,
+    upa.account_demographics_sales_segment            AS upa_demographics_segment,
+    upa.account_demographics_geo                      AS upa_demographics_geo,
+    upa.account_demographics_region                   AS upa_demographics_region,
+    upa.account_demographics_area                     AS upa_demographics_area,
+    upa.account_demographics_territory                AS upa_demographics_territory,
 
-    edm_opty.sales_qualified_source_name             AS sales_qualified_source,
+    edm_opty.sales_qualified_source_name              AS sales_qualified_source,
     edm_opty.stage_category,
     edm_opty.calculated_partner_track,
     edm_opty.deal_path_engagement,
     edm_opty.is_refund,
-    edm_opty.is_credit                               AS is_credit_flag,
-    edm_opty.is_contract_reset                       AS is_contract_reset_flag,
-    CAST(edm_opty.is_won AS INTEGER)                 AS is_won,
+    edm_opty.is_credit                                AS is_credit_flag,
+    edm_opty.is_contract_reset                        AS is_contract_reset_flag,
+    CAST(edm_opty.is_won AS INTEGER)                  AS is_won,
     edm_opty.is_lost,
     edm_opty.is_open,
-    edm_opty.is_duplicate                            AS is_duplicate_flag,    
+    edm_opty.is_duplicate                             AS is_duplicate_flag,    
     CASE edm_opty.is_closed 
       WHEN TRUE THEN 1 
       ELSE 0 
-    END                                              AS is_closed,
-    edm_opty.is_closed                               AS stage_is_closed,
-    edm_opty.is_active                               AS stage_is_active,
+    END                                               AS is_closed,
+    edm_opty.is_closed                                AS stage_is_closed,
+    edm_opty.is_active                                AS stage_is_active,
     edm_opty.is_renewal,
 
     -- date fields helpers -- revisit
@@ -316,7 +314,7 @@ WITH edm_opty AS (
     edm_opty.stage_name_4plus,
     edm_opty.deal_category,
     edm_opty.deal_group,
-    edm_opty.calculated_deal_count                                  AS calculated_deal_count,
+    edm_opty.calculated_deal_count                                           AS calculated_deal_count,
 
     ----------------------------------------------------------------
     -- NF 2022-01-28 This is probably TO BE DEPRECATED too, need to align with Channel ops
@@ -343,7 +341,6 @@ WITH edm_opty AS (
 
     -- 20201021 NF: This should be replaced by a table that keeps track of excluded deals for forecasting purposes
     edm_opty.is_excluded_from_pipeline_created                                AS is_excluded_flag,
-
     -----------------------------------------------
 
     edm_opty.report_opportunity_user_segment,
@@ -401,7 +398,7 @@ WITH edm_opty AS (
     edm_opty.is_booked_net_arr                      AS is_booked_net_arr_flag,
     edm_opty.is_eligible_churn_contraction          AS is_eligible_churn_contraction_flag,
     edm_opty.created_and_won_same_quarter_net_arr,
-    edm_opty.churn_contraction_net_arr_bucket       AS churn_contracton_net_arr_bucket,  --typo in wk sales keeping it until the full migration
+    --edm_opty.churn_contraction_net_arr_bucket       AS churn_contracton_net_arr_bucket,  --typo in wk sales keeping it until the full migration
     edm_opty.churn_contraction_net_arr_bucket,
     edm_opty.reason_for_loss_calc,
     NVL(edm_opty.reason_for_loss, edm_opty.downgrade_reason) AS reason_for_loss_staged,
@@ -410,10 +407,8 @@ WITH edm_opty AS (
       WHEN TRUE THEN 1 
       ELSE 0 
     END                                             AS is_eligible_sao_flag,
-
     opportunity_owner.is_rep_flag
     
-
     FROM edm_opty
     -- Date helpers
     INNER JOIN sfdc_accounts_xf AS account
@@ -437,7 +432,6 @@ WITH edm_opty AS (
 ), oppty_final AS (
 
     SELECT
-
       sfdc_opportunity_xf.*,
 
       /*
@@ -455,8 +449,6 @@ WITH edm_opty AS (
         Sales Team -> Same as report, but with a naming convention closer to the sales org hierarchy
 
       */
-
-      
       -------------------
       -- BASE KEYS
       -- 20220214 NF: Temporary keys, until the SFDC key is exposed
