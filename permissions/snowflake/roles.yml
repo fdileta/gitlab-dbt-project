@@ -569,28 +569,6 @@ roles:
             - snowflake_db
             - data_team_analyst
 
-    - analytics_engineer_ga:
-        member_of:
-            - analytics_engineer_core
-            - analyst_people
-            - analyst_engineering
-            - bamboohr
-            - prometheus
-            - workday
-
-    - analytics_engineer_gtm:
-        member_of:
-            - analytics_engineer_core
-            - analyst_marketing
-            - analyst_sales
-            - analyst_finance
-
-    - analytics_engineer_rd:
-        member_of:
-            - analytics_engineer_core
-            - analyst_engineering
-            - analyst_growth
-
     - data_manager:
         warehouses:
             - dev_xs
@@ -3516,12 +3494,16 @@ roles:
         member_of:
             - analyst_finance
             - analyst_people
-            - analytics_engineer_ga
+            - analytics_engineer_core
+            - analyst_people
+            - analyst_engineering
             - bamboohr
             - bamboohr_analytics
             - customers_db
             - data_team_analyst
+            - prometheus
             - restricted_safe
+            - workday 
         warehouses:
             - dev_xs
         owns:
@@ -3624,8 +3606,10 @@ roles:
 
     - mdrussell:
         member_of:
+         - analytics_engineer_core
+         - analyst_engineering
+         - analyst_growth
          - data_team_analyst
-         - analytics_engineer_rd
          - restricted_safe
          - bi_tool_eval_read
          - zuora
@@ -4119,8 +4103,13 @@ roles:
     - pempey:
         member_of:
             - engineer
-            - analytics_engineer_ga
+            - analytics_engineer_core
+            - analyst_people
+            - analyst_engineering
+            - bamboohr
             - bi_tool_eval_db
+            - prometheus
+            - workday
         warehouses:
             - dev_xs
             - dev_m
