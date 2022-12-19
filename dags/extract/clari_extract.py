@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
+from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
 
 from airflow_utils import (
@@ -35,7 +36,7 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    'clari_extract',
+    'clari_extractv2',
     default_args=default_args,
     schedule_interval="0 8 * * *"
 )
@@ -116,6 +117,7 @@ quarterly_short_circuit_task = ShortCircuitOperator(
 )
 
 '''
+dummy_task = DummyOperator(task_id="dummy_operator", dag=dag)
 
 daily_tasks = []
 for i, quarter_to_run in enumerate(get_quarters_to_run('daily')):
@@ -165,6 +167,6 @@ for i, quarter_to_run in enumerate(get_quarter_to_run('daily')):
     daily_tasks.append(daily_task)
 '''
 
-daily_tasks
+dummy_task >> daily_tasks
 # daily_task
 # daily_tasks[-1] >> quarterly_short_circuit_task >> QuarterlyKubeTask`
