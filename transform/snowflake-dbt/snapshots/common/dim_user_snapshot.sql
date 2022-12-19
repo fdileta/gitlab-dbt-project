@@ -1,6 +1,6 @@
 {% snapshot dim_user_snapshot %}
 -- Using dbt check_cols as we want only new rows when any of these columns change.
---   Cant just use updated_at because it is sometimes less than or greater than last_activity_date
+--   Cant just use updated_at because it is sometimes less than and sometimes greater than last_activity_date
     {{
         config(
           unique_key='dim_user_sk',
