@@ -21,13 +21,23 @@ from kube_secrets import (
 )
 
 # Define the default arguments for the DAG
-default_args = {'owner': 'me', 'start_date': datetime(2022, 1, 1)}
+default_args = {
+    "catchup": True,
+    "depends_on_past": False,
+    "on_failure_callback": slack_failed_task,
+    "owner": "airflow",
+    "retry_delay": timedelta(minutes=1),
+    "sla": timedelta(hours=24),
+    "sla_miss_callback": slack_failed_task,
+    "start_date": datetime(2022, 12, 17),
+}
+
 
 # Define the DAG
 dag = DAG(
     'clari_extract',
     default_args=default_args,
-    schedule_interval=timedelta(hours=1)
+    schedule_interval="0 8 * * *"
 )
 
 
