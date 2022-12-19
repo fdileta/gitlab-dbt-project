@@ -3840,6 +3840,12 @@ roles:
         warehouses:
             - dev_xs
 
+    - ncregan:
+        member_of:
+            - google_search_console
+        warehouses:
+            - dev_xs
+
     - nfiguera:
         member_of:
             - analyst_sales
@@ -4981,6 +4987,11 @@ users:
         can_login: yes
         member_of:
             - nbelokolodov
+
+    - ncregan:
+        can_login: yes
+        member_of:
+            - ncregan
 
     - nfiguera:
         can_login: yes
