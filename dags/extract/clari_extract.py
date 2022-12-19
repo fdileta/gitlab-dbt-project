@@ -27,7 +27,7 @@ from kubernetes_helpers import get_affinity, get_toleration
 env = os.environ.copy()
 GIT_BRANCH = env["GIT_BRANCH"]
 pod_env_vars = {**gitlab_pod_env_vars, **{}}
-TASK_SCHEDULE_NAME = 'daily'
+TASK_SCHEDULE = 'daily'
 
 # Define the default arguments for the DAG
 default_args = {
@@ -62,8 +62,8 @@ clari_extract_command = (
 clari_task = KubernetesPodOperator(
     **gitlab_defaults,
     image=DATA_IMAGE,
-    task_id=f"clari-extract-daily-{TASK_SCHEDULE_NAME}",
-    name=f"clari-extract-{TASK_SCHEDULE_NAME}",
+    task_id=f"clari-extract-daily-{TASK_SCHEDULE}",
+    name=f"clari-extract-{TASK_SCHEDULE}",
     secrets=[
         SNOWFLAKE_ACCOUNT,
         SNOWFLAKE_LOAD_ROLE,
@@ -74,7 +74,8 @@ clari_task = KubernetesPodOperator(
     ],
     env_vars={
         **pod_env_vars,
-        "task_schedule": "{{ execution_date }}",
+        "execution_date": "{{ execution_date }}",
+        "task_schedule": TASK_SCHEDULE,
     },
     affinity=get_affinity(False),
     tolerations=get_toleration(False),
