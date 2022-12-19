@@ -111,7 +111,7 @@
           THEN 'Issues - Service Desk'
         WHEN page_url_path LIKE '%/-/issues'
           THEN 'Issues - List'
-        WHEN REGEXP_LIKE( page_url_path , '.*/-/issues/.*' )
+        WHEN REGEXP_LIKE( page_url_path , '.*/-/issues/\\d+' )
           THEN 'Issues - Issue Detail'
         WHEN page_url_path LIKE '%/-/boards'
           THEN 'Issues - Boards'
