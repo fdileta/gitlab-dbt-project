@@ -70,6 +70,7 @@
     LEFT JOIN dim_product_tier
     ON TRIM(LOWER(add_country_info_to_usage_ping.product_tier)) = TRIM(LOWER(dim_product_tier.product_tier_historical_short))
     AND IFF( add_country_info_to_usage_ping.dim_instance_id = 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f','SaaS','Self-Managed') = dim_product_tier.product_delivery_type
+    AND dim_product_tier.product_tier_name != 'Dedicated - Ultimate'
     --AND main_edition = 'EE'
 
 ), joined_payload AS (
@@ -125,5 +126,5 @@
     created_by="@icooper-acp",
     updated_by="@rbacovic",
     created_date="2022-03-08",
-    updated_date="2022-12-01"
+    updated_date="2022-12-19"
 ) }}
