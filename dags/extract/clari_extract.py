@@ -25,7 +25,7 @@ default_args = {'owner': 'me', 'start_date': datetime(2022, 1, 1)}
 
 # Define the DAG
 dag = DAG(
-    'my_dag_id',
+    'clari_extract',
     default_args=default_args,
     schedule_interval=timedelta(hours=1)
 )
@@ -43,39 +43,43 @@ def get_fiscal_quarter(dt):
         fiscal_quarter = 4
 
     # Format the fiscal year and quarter as a string
-    fiscal_year_quarter = f'{fiscal_year} Q{fiscal_quarter}'
+    fiscal_year_quarter = f'{fiscal_year}_Q{fiscal_quarter}'
+    return fiscal_year_quarter
+
+
+def get_current_fiscal_quarter(dt):
+    current_fiscal_quarter = get_fiscal_quarter(dt)
     # quarters are expected to be in a list as they may be manually passed in
-    return [fiscal_year_quarter]
+    return current_fiscal_quarter
 
 
-def get_current_fiscal_quarter():
-    yesterday = datetime.now() - timedelta(days=1)
-    return get_fiscal_quarter(yesterday)
+def get_previous_fiscal_quarter(dt):
+    current_fiscal_quarter = get_fiscal_quarter(dt)
+    fiscal_quarter_prefix = current_fiscal_quarter[:-1]
+    current_quarter_int = int(current_fiscal_quarter[-1])
 
-
-def get_previous_fiscal_quarter():
-    today = datetime.now()
-    current_fiscal_quarter = get_fiscal_quarter(today)
-    if current_fiscal_quarter == 1:
-        return 4
-    return current_fiscal_quarter - 1
+    if current_quarter_int == 1:
+        return fiscal_quarter_prefix + '4'
+    return fiscal_quarter_prefix + f'{current_quarter_int - 1}'
 
 
 # Define a function that takes an argument
-def get_quarter_to_run(task_schedule):
-    print(f'Executing task with argument {task_schedule}')
+def get_quarters_to_run(task_schedule):
+    yesterday = datetime.now() - timedelta(days=1)
+    today = datetime.now()
+    print(f'Executing task with task_schedule: {task_schedule}')
 
     if task_schedule == 'daily':
-        return get_current_fiscal_quarter()
+        return [get_current_fiscal_quarter(yesterday)]
         '''
         if {{config.time_periods}}:
             return {{config.time_periods}}
         else:
-            return get_current_fiscal_quarter()
+            return [get_current_fiscal_quarter()]
         '''
 
     elif task_schedule == 'quarterly':
-        return get_previous_fiscal_quarter()
+        return [get_previous_fiscal_quarter(today)]
 
 
 '''
@@ -104,7 +108,7 @@ quarterly_short_circuit_task = ShortCircuitOperator(
 '''
 
 daily_tasks = []
-for i, quarter_to_run in enumerate(get_quarter_to_run('daily')):
+for i, quarter_to_run in enumerate(get_quarters_to_run('daily')):
     daily_task = BashOperator(
         task_id=f"{quarter_to_run}",
         bash_command=f"echo {quarter_to_run}",
@@ -112,7 +116,6 @@ for i, quarter_to_run in enumerate(get_quarter_to_run('daily')):
     if daily_tasks:
         daily_tasks[-1] >> daily_task
     daily_tasks.append(daily_task)
-
 '''
 for i, quarter_to_run in enumerate(get_quarter_to_run('daily')):
     clari_extract_command = (
