@@ -1,5 +1,7 @@
+import sys
 from dateutil import parser as date_parser
 from os import environ as env
+from logging import info, basicConfig, getLogger, error
 
 config_dict = env.copy()
 
@@ -31,7 +33,7 @@ def _get_previous_fiscal_quarter(dt):
 
 
 def get_fiscal_quarter():
-    execution_date = date_parser.parser(config_dict['execution_date'])
+    execution_date = date_parser.parse(config_dict['execution_date'])
     task_schedule = config_dict['task_schedule']
 
     print(
@@ -48,7 +50,13 @@ def get_fiscal_quarter():
 def main():
     fiscal_quarter = get_fiscal_quarter()
     print(f'\nfiscal_quarter: {fiscal_quarter}')
+    info(f'\nfiscal_quarter: {fiscal_quarter}')
 
 
 if __name__ == '__main__':
+    basicConfig(stream=sys.stdout, level=20)
+    getLogger("snowflake.connector.cursor").disabled = True
     main()
+    info("Complete.")
+
+
