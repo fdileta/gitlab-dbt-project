@@ -4,7 +4,16 @@
     })
 }}
 
-SELECT *
+SELECT 
+  id::NUMBER,
+  tag::VARCHAR,
+  description::VARCHAR,
+  project_id::INT,
+  created_at::TIMESTAMP,
+  updated_at::TIMESTAMP,
+  author_id::INT,
+  sha::VARCHAR,
+  _uploaded_at::FLOAT
 FROM {{ source('gitlab_dotcom', 'releases') }}
 {% if is_incremental() %}
 
