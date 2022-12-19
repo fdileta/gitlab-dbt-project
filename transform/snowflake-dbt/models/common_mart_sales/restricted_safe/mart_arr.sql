@@ -33,19 +33,19 @@ WITH dim_billing_account AS (
 
 ), fct_mrr AS (
 
-  SELECT
-    dim_date_id,
-    dim_subscription_id,
-    dim_product_detail_id,
-    dim_billing_account_id,
-    dim_crm_account_id,
-    SUM(mrr)                                                                      AS mrr,
-    SUM(arr)                                                                      AS arr,
-    SUM(quantity)                                                                 AS quantity,
-    ARRAY_AGG(DISTINCT unit_of_measure) WITHIN GROUP (ORDER BY unit_of_measure)   AS unit_of_measure
-  FROM {{ ref('fct_mrr') }}
-  WHERE subscription_status IN ('Active', 'Cancelled')
-  {{ dbt_utils.group_by(n=5) }}
+    SELECT
+        dim_date_id,
+        dim_subscription_id,
+        dim_product_detail_id,
+        dim_billing_account_id,
+        dim_crm_account_id,
+        SUM(mrr)                                                                       ßAS mrr,
+        SUM(arr)                                                                       AS arr,
+        SUM(quantity)                                                                  AS quantity,
+        ARRAY_AGG(DISTINCT unit_of_measure) WITHIN GROUP (ORDER BY unit_of_measure)    AS unit_of_measure
+    FROM {{ ref('fct_mrr') }}
+    WHERE subscription_status IN ('Active', 'Cancelled')
+    {{ dbt_utils.group_by(n=5) }}
 
 ), joined AS (
 
@@ -158,14 +158,14 @@ WITH dim_billing_account AS (
 
   SELECT
     joined.*,
-    datediff(month, billing_account_cohort_month, arr_month)     AS months_since_billing_account_cohort_start,
-    datediff(quarter, billing_account_cohort_quarter, arr_month) AS quarters_since_billing_account_cohort_start,
-    datediff(month, crm_account_cohort_month, arr_month)         AS months_since_crm_account_cohort_start,
-    datediff(quarter, crm_account_cohort_quarter, arr_month)     AS quarters_since_crm_account_cohort_start,
-    datediff(month, parent_account_cohort_month, arr_month)      AS months_since_parent_account_cohort_start,
-    datediff(quarter, parent_account_cohort_quarter, arr_month)  AS quarters_since_parent_account_cohort_start,
-    datediff(month, subscription_cohort_month, arr_month)        AS months_since_subscription_cohort_start,
-    datediff(quarter, subscription_cohort_quarter, arr_month)    AS quarters_since_subscription_cohort_start
+    datediff(month, billing_account_cohort_month, arr_month)                        AS months_since_billing_account_cohort_start,
+    datediff(quarter, billing_account_cohort_quarter, arr_month)                    AS quarters_since_billing_account_cohort_start,
+    datediff(month, crm_account_cohort_month, arr_month)                            AS months_since_crm_account_cohort_start,
+    datediff(quarter, crm_account_cohort_quarter, arr_month)                        AS quarters_since_crm_account_cohort_start,
+    datediff(month, parent_account_cohort_month, arr_month)                         AS months_since_parent_account_cohort_start,
+    datediff(quarter, parent_account_cohort_quarter, arr_month)                     AS quarters_since_parent_account_cohort_start,
+    datediff(month, subscription_cohort_month, arr_month)                           AS months_since_subscription_cohort_start,
+    datediff(quarter, subscription_cohort_quarter, arr_month)                       AS quarters_since_subscription_cohort_start
   FROM joined
 
 ), parent_arr AS (
