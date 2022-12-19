@@ -111,6 +111,8 @@
           THEN 'Issues - Service Desk'
         WHEN page_url_path LIKE '%/-/issues'
           THEN 'Issues - List'
+        WHEN REGEXP_LIKE( page_url_path , '.*/-/issues/.*' )
+          THEN 'Issues - Issue Detail'
         WHEN page_url_path LIKE '%/-/boards'
           THEN 'Issues - Boards'
         WHEN page_url_path LIKE '%/-/milestones'
@@ -121,6 +123,8 @@
           THEN 'Issues - Requirements'
         WHEN page_url_path LIKE '%/-/merge_requests'
           THEN 'Merge requests'
+        WHEN REGEXP_LIKE( page_url_path , '.*/-/merge_requests/\\d+' )
+          THEN 'Merge requests - MR Detail'
         WHEN page_url_path LIKE '%/-/pipelines'
           THEN 'CI/CD - Pipelines'
         WHEN page_url_path LIKE '%/-/ci/editor'
