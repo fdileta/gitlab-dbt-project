@@ -3,11 +3,11 @@
 --   Cant just use updated_at because it is sometimes less than or greater than last_activity_date
     {{
         config(
+          --target_database='TPOOLE_PREP',
+          --target_schema='LEGACY',
           unique_key='dim_user_sk',
           strategy='check',
           check_cols=[
-                      'shared_runners_seconds', 
-                      'shared_runners_seconds_last_reset',
                       'dim_user_sk',
                       'user_id',
                       'dim_user_id',
