@@ -120,12 +120,14 @@ quarterly_short_circuit_task = ShortCircuitOperator(
 daily_tasks = []
 for i, quarter_to_run in enumerate(get_quarters_to_run('daily')):
     daily_task = BashOperator(
+        dag=dag,
         task_id=f"{quarter_to_run}",
         bash_command=f"echo {quarter_to_run}",
     )
     if daily_tasks:
         daily_tasks[-1] >> daily_task
     daily_tasks.append(daily_task)
+
 '''
 for i, quarter_to_run in enumerate(get_quarter_to_run('daily')):
     clari_extract_command = (
@@ -164,4 +166,5 @@ for i, quarter_to_run in enumerate(get_quarter_to_run('daily')):
 '''
 
 daily_tasks
+# daily_task
 # daily_tasks[-1] >> quarterly_short_circuit_task >> QuarterlyKubeTask`
