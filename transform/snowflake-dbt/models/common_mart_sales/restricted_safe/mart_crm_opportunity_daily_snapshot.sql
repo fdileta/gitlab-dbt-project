@@ -132,11 +132,6 @@ final AS (
 
     -- account fields
     dim_crm_account.crm_account_name,
-    dim_crm_account.parent_crm_account_demographics_sales_segment           AS account_demographics_segment,
-    dim_crm_account.parent_crm_account_demographics_geo                     AS account_demographics_geo,
-    dim_crm_account.parent_crm_account_demographics_region                  AS account_demographics_region,
-    dim_crm_account.parent_crm_account_demographics_area                    AS account_demographics_area,
-    dim_crm_account.parent_crm_account_demographics_territory               AS account_demographics_territory,
     dim_crm_account.parent_crm_account_demographics_sales_segment,
     dim_crm_account.parent_crm_account_demographics_geo,
     dim_crm_account.parent_crm_account_demographics_region,

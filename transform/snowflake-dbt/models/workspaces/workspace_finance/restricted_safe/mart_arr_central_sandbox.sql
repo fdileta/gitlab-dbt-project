@@ -60,14 +60,15 @@ WITH dim_billing_account_central_sandbox AS (
       dim_billing_account_central_sandbox.billing_account_number                            AS billing_account_number,
 
       -- crm account info
-      dim_crm_account.dim_crm_account_id                                                AS dim_crm_account_id,
-      dim_crm_account.crm_account_name                                                  AS crm_account_name,
-      dim_crm_account.dim_parent_crm_account_id                                         AS dim_parent_crm_account_id,
-      dim_crm_account.parent_crm_account_demographics_sales_segment                     AS parent_crm_account_sales_segment,
-      dim_crm_account.parent_crm_account_industry                                       AS parent_crm_account_industry,
-      dim_crm_account.health_score_color                                                AS health_score_color,
-      dim_crm_account.health_number                                                     AS health_number,
-      dim_crm_account.is_jihu_account                                                   AS is_jihu_account,
+      dim_crm_account.dim_crm_account_id                                                    AS dim_crm_account_id,
+      dim_crm_account.crm_account_name                                                      AS crm_account_name,
+      dim_crm_account.dim_parent_crm_account_id                                             AS dim_parent_crm_account_id,
+      dim_crm_account.dim_parent_crm_account_id                                             AS dim_parent_crm_account_id,
+      dim_crm_account.parent_crm_account_demographics_sales_segment                         AS parent_crm_account_sales_segment,
+      dim_crm_account.parent_crm_account_industry                                           AS parent_crm_account_industry,
+      dim_crm_account.health_score_color                                                    AS health_score_color,
+      dim_crm_account.health_number                                                         AS health_number,
+      dim_crm_account.is_jihu_account                                                       AS is_jihu_account,
 
       --subscription info
       dim_subscription_central_sandbox.dim_subscription_id                                  AS dim_subscription_id,
