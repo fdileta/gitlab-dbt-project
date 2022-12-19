@@ -58,6 +58,7 @@
       dim_crm_accounts.dim_parent_crm_account_id                                  AS dim_parent_crm_account_id,
       dim_crm_accounts.parent_crm_account_demographics_sales_segment              AS parent_crm_account_sales_segment,
       dim_crm_accounts.parent_crm_account_industry                                AS parent_crm_account_industry,
+      dim_crm_accounts.parent_crm_account_demographics_territory                  AS parent_crm_account_sales_territory,
       dim_crm_accounts.technical_account_manager                                  AS technical_account_manager,
       IFF(MAX(mrr) > 0, TRUE, FALSE)                                              AS is_paid_subscription,
       MAX(IFF(product_rate_plan_name ILIKE ANY ('%edu%', '%oss%'), TRUE, FALSE))  AS is_program_subscription,
@@ -142,6 +143,7 @@
         license_subscriptions_w_latest_subscription.dim_parent_crm_account_id                                                           AS dim_parent_crm_account_id,
         license_subscriptions_w_latest_subscription.parent_crm_account_demographics_sales_segment                                       AS parent_crm_account_sales_segment,
         license_subscriptions_w_latest_subscription.parent_crm_account_industry                                                         AS parent_crm_account_industry,
+        license_subscriptions_w_latest_subscription.parent_crm_account_sales_territory                                                  AS parent_crm_account_sales_territory,
         license_subscriptions_w_latest_subscription.technical_account_manager                                                           AS technical_account_manager,
         COALESCE(is_paid_subscription, FALSE)                                                                                           AS is_paid_subscription,
         COALESCE(is_program_subscription, FALSE)                                                                                        AS is_program_subscription,
@@ -247,7 +249,10 @@
 
       -- account metadata
       crm_account_name,
+      parent_crm_account_sales_segment,
       parent_crm_account_industry,
+      parent_crm_account_sales_territory,
+      technical_account_manager,
 
       ping_created_at,
       ping_created_date_month,

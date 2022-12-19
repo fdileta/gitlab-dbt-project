@@ -39,7 +39,7 @@ WITH dim_billing_account AS (
         dim_product_detail_id,
         dim_billing_account_id,
         dim_crm_account_id,
-        SUM(mrr)                                                                       ßAS mrr,
+        SUM(mrr)                                                                       AS mrr,
         SUM(arr)                                                                       AS arr,
         SUM(quantity)                                                                  AS quantity,
         ARRAY_AGG(DISTINCT unit_of_measure) WITHIN GROUP (ORDER BY unit_of_measure)    AS unit_of_measure

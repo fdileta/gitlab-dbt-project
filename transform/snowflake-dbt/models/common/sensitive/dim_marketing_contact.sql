@@ -86,7 +86,8 @@ WITH sfdc_lead AS (
       END                                                                                                                   AS company_name,
       crm_person.title                                                                                                      AS job_title,
       crm_person.it_job_title_hierarchy,
-      crm_account.parent_crm_account_demographics_sales_segment,
+      crm_account.parent_crm_account_demographics_sales_segment                                                             AS parent_crm_account_sales_segment,
+      crm_account.parent_crm_account_demographics_region                                                                    AS parent_crm_account_region,
       crm_person.account_demographics_geo                                                                                   AS crm_person_region,
       CASE
         WHEN sfdc_lead_contact = 'contact' THEN sfdc_contact.mailing_country
@@ -251,6 +252,7 @@ WITH sfdc_lead AS (
       END                                                                                                                AS it_job_title_hierarchy,
       COALESCE(zuora.country, marketo_lead.country, sfdc.country, customer_db.country)                                   AS country,
       sfdc.parent_crm_account_demographics_sales_segment                                                                 AS sfdc_parent_sales_segment,
+      COALESCE(sfdc.parent_crm_account_region, sfdc.crm_person_region)                                                   AS sfdc_parent_crm_account_region,
       IFF(marketo_lead.email_address IS NOT NULL, TRUE, FALSE)                                                           AS is_marketo_lead,
       COALESCE(marketo_lead.is_marketo_email_bounced, FALSE)                                                             AS is_marketo_email_hard_bounced,
       marketo_lead.marketo_email_bounced_date                                                                            AS marketo_email_hard_bounced_date,

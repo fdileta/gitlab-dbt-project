@@ -68,6 +68,7 @@ WITH dim_billing_account_api_sandbox AS (
       dim_crm_account.parent_crm_account_demographics_sales_segment                     AS parent_crm_account_sales_segment,
       dim_crm_account.parent_crm_account_demographics_territory                         AS parent_crm_account_sales_territory,
       dim_crm_account.parent_crm_account_industry                                       AS parent_crm_account_industry,
+      dim_crm_account.parent_crm_account_demographics_max_family_employee               AS parent_crm_account_max_family_employee,
       dim_crm_account.health_score_color                                                AS health_score_color,
       dim_crm_account.health_number                                                     AS health_number,
       dim_crm_account.is_jihu_account                                                   AS is_jihu_account,

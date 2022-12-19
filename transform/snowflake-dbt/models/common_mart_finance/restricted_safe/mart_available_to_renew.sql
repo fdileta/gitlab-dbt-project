@@ -931,6 +931,7 @@
     zuora_renewal_subscription_name,
     renewal_subscription_end_month,
     crm_account_name,
+    parent_crm_account_sales_segment,
     dim_crm_user_id,
     user_name,
     user_role_id,
