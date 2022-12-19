@@ -194,14 +194,58 @@ selectors:
           - method: path
             value: snapshots/gitlab_dotcom
 
-# dbt list --select path:snapshots/sfdc -- source_sfdc_validation_and_run -> sfdc-source-snapshot
+# dbt list --select path:snapshots/sfdc > snapshot_sfdc.csv -- source_sfdc_validation_and_run -> sfdc-source-snapshot
+# dbt list --selector sfdc_snapshots --resource-type snapshot > snapshot_sfdc_selector.csv
 
-# dbt list --select path:snapshots/zuora -- source_zuora_validation_and_run -> zuora-source-snapshot
 
-# dbt list -s tag:edm_snapshot --profiles-dir profile -- dbt_edm_snapshot -> dbt-edm-snapshots
+  - name: sfdc_snapshots
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: snapshots/sfdc
+          
 
-# dbt list --select path:snapshots/customers -- t_gitlab_customers_db_dbt -> t_customers-source-snapshot
+# dbt list --select path:snapshots/zuora > snapshot_zuora.csv -- source_zuora_validation_and_run -> zuora-source-snapshot
+# dbt list --selector zuora_snapshots --resource-type snapshot > snapshot_zuora_selector.csv
 
-# dbt list --select path:snapshots/gitlab_dotcom -- t_gitlab_com_db_dbt -> t_gitlab_dotcom-source-snapshot
+  - name: zuora_snapshots
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: snapshots/zuora
 
-# dbt list --select path:snapshots/gitlab_ops -- t_gitlab_ops_db_dbt -> t_gitlab_ops_db-source-snapshot
+# dbt list -s tag:edm_snapshot > snapshot_edm.csv --profiles-dir profile -- dbt_edm_snapshot -> dbt-edm-snapshots
+# dbt list --selector edm_snapshots > snapshot_edm_selector.csv
+
+  - name: edm_snapshots
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: tag
+      value: edm_snapshot
+
+# dbt list --select path:snapshots/customers > snapshot_customers.csv -- t_gitlab_customers_db_dbt -> t_customers-source-snapshot
+# dbt list --selector customers_snapshots > snapshot_customers_selector.csv
+
+  - name: customers_snapshots
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: snapshots/customers
+
+# dbt list --select path:snapshots/gitlab_dotcom > snapshot_gitlab_dotcom.csv -- t_gitlab_com_db_dbt -> t_gitlab_dotcom-source-snapshot
+# dbt list --selector gitlab_dotcom_snapshots > snapshot_gitlab_dotcom_selector.csv
+
+  - name: gitlab_dotcom_snapshots
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: snapshots/gitlab_dotcom
+
+# dbt list --select path:snapshots/gitlab_ops > snapshot_gitlab_ops.csv -- t_gitlab_ops_db_dbt -> t_gitlab_ops_db-source-snapshot
+# dbt list --selector gitlab_ops_snapshots > snapshot_gitlab_ops_selector.csv
+
+  - name: gitlab_ops_snapshots
+    description: "Non-incremental Snowplow models that power nightly exports"
+    definition:
+      method: path
+      value: snapshots/gitlab_ops
