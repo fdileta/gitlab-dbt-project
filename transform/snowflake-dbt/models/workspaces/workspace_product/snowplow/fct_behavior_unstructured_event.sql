@@ -10,7 +10,6 @@
 
 {{ simple_cte([
     ('events', 'prep_snowplow_unnested_events_all'),
-    ('dim_page', 'dim_behavior_website_page')
     ])
 }}
 
@@ -25,9 +24,6 @@
       gsc_pseudonymized_user_id,
       clean_url_path,
       page_url_host,
-      page_url,
-      page_url_path,
-      page_url_scheme,
       app_id,
       session_id,
       link_click_target_url,
@@ -39,6 +35,8 @@
       focus_form_node_name,
       dim_behavior_browser_sk,
       dim_behavior_operating_system_sk,
+      dim_behavior_website_page_sk,
+      dim_behavior_referrer_page_sk,
       environment
     FROM events
     WHERE event = 'unstruct'
@@ -64,7 +62,8 @@
 
       -- Surrogate Keys
       unstruct_event.dim_behavior_event_sk,
-      dim_page.dim_behavior_website_page_sk,
+      unstruct_event.dim_behavior_website_page_sk,
+      unstruct_event.dim_behavior_referrer_page_sk,
       unstruct_event.dim_behavior_browser_sk,
       unstruct_event.dim_behavior_operating_system_sk,
 
@@ -83,27 +82,13 @@
       focus_form_element_id,
       focus_form_node_name
     FROM unstruct_event
-    INNER JOIN dim_event 
-      ON unstruct_event.event_name = dim_event.event_name
-    INNER JOIN dim_page 
-      ON unstruct_event.page_url = dim_page.page_url
-        AND unstruct_event.app_id = dim_page.app_id
-        AND unstruct_event.page_url_scheme = dim_page.page_url_scheme
-    LEFT JOIN dim_behavior_browser
-      ON unstruct_event.browser_name = dim_behavior_browser.browser_name
-        AND unstruct_event.browser_major_version = dim_behavior_browser.browser_major_version
-        AND unstruct_event.browser_minor_version = dim_behavior_browser.browser_minor_version
-        AND unstruct_event.browser_language = dim_behavior_browser.browser_language
-    LEFT JOIN dim_behavior_operating_system
-      ON unstruct_event.os_name = dim_behavior_operating_system.os_name
-        AND unstruct_event.os_timezone = dim_behavior_operating_system.os_timezone
-
+      
 )
 
 {{ dbt_audit(
     cte_ref="unstruct_event_with_dims",
     created_by="@chrissharp",
-    updated_by="@michellecooper",
+    updated_by="@chrissharp",
     created_date="2022-09-27",
-    updated_date="2022-12-05"
+    updated_date="2022-12-01"
 ) }}
