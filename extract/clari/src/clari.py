@@ -48,3 +48,7 @@ def get_fiscal_quarter():
 def main():
     fiscal_quarter = get_fiscal_quarter()
     print(f'\nfiscal_quarter: {fiscal_quarter}')
+
+
+if __name__ == '__main__':
+    main()
