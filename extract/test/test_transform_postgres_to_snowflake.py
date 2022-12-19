@@ -46,7 +46,7 @@ def test_cases_dict_transformed():
     return transform(test_cases_dict_subquery)
 
 
-@pytest.fixture(name="actual_dict")
+@pytest.fixture(name="final_sql__dict")
 def prepared_dict(transformed_dict):
     """
     Prepare nested dict for testing
@@ -373,7 +373,7 @@ def test_subquery_complex(transformed_dict, list_of_metrics):
                 )  # query parsed properly
 
 
-def test_transform_having_clause(actual_dict, list_of_metrics):
+def test_transform_having_clause(final_sql__dict, list_of_metrics):
     """
     Test bugs we found for complex subquery - having clause
 
@@ -383,7 +383,7 @@ def test_transform_having_clause(actual_dict, list_of_metrics):
     (COUNT(approval_project_rules_users.id) < MAX(approvals_required))
     """
 
-    for metric_name, metric_sql in actual_dict.items():
+    for metric_name, metric_sql in final_sql__dict.items():
         assert ".id" in metric_sql
         assert "MAX(" in metric_sql
         assert "COUNT(approval_project_rules_users.id)" in metric_sql

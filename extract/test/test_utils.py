@@ -59,19 +59,19 @@ def test_static_variables(utils):
     """
 
     assert (
-        utils.transformed_instance_sql_queries_file
+        utils.TRANSFORMED_INSTANCE_SQL_QUERIES_FILE
         == "transformed_instance_queries.json"
     )
     assert (
-        utils.meta_data_instance_sql_queries_file == "meta_data_instance_queries.json"
+            utils.META_DATA_INSTANCE_SQL_QUERIES_FILE == "meta_data_instance_queries.json"
     )
-    assert utils.namespace_file == "usage_ping_namespace_queries.json"
-    assert utils.having_clause_pattern == re.compile(
+    assert utils.NAMESPACE_FILE == "usage_ping_namespace_queries.json"
+    assert utils.HAVING_CLAUSE_PATTERN == re.compile(
         "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
     )
-    assert utils.encoding == "utf8"
-    assert utils.sql_key == "sql"
-    assert utils.redis_key == "redis"
+    assert utils.ENCODING == "utf8"
+    assert utils.SQL_KEY == "sql"
+    assert utils.REDIS_KEY == "redis"
 
 
 def test_engine_factory(engine_factory):
@@ -186,7 +186,7 @@ def test_keep_meta_data(utils):
     actual = list(meta_data.keys())
 
     assert isinstance(meta_data, dict)
-    assert utils.meta_api_columns == actual
+    assert utils.META_API_COLUMNS == actual
     assert "not_in_meta" not in actual
     assert "not_in_meta2" not in actual
     assert "recorded_at" in actual
@@ -222,7 +222,7 @@ def test_get_md5(utils):
     """
     Simple MD5 test.
     Know testing the private method is not aligned
-    with the best praxis,
+    with the best practices,
     but found it is sufficient
     in this implementation.
     """

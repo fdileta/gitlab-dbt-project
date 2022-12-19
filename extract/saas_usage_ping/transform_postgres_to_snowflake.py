@@ -370,7 +370,7 @@ def get_transformed_having_clause(postgres_sql: str) -> str:
     """
     snowflake_having_clause = postgres_sql
 
-    if utils.having_clause_pattern.findall(snowflake_having_clause):
+    if utils.HAVING_CLAUSE_PATTERN.findall(snowflake_having_clause):
 
         snowflake_having_clause = postgres_sql.replace(
             "(approval_project_rules_users)", "(approval_project_rules_users.id)"
@@ -443,7 +443,7 @@ if __name__ == "__main__":
 
     url = "https://gitlab.com/api/v4/usage_data/queries"
 
-    json_payload = utils.get_json_response(url=url)
+    json_payload = utils.get_response_as_dict(url=url)
 
     final_sql__dict = transform(json_data=json_payload)
     final_meta_data = utils.keep_meta_data(json_data=json_payload)
@@ -451,11 +451,11 @@ if __name__ == "__main__":
     info("Processed final sql queries")
 
     utils.save_to_json_file(
-        file_name=utils.transformed_instance_sql_queries_file, json_data=final_sql__dict
+        file_name=utils.TRANSFORMED_INSTANCE_SQL_QUERIES_FILE, json_data=final_sql__dict
     )
 
     utils.save_to_json_file(
-        file_name=utils.meta_data_instance_sql_queries_file, json_data=final_meta_data
+        file_name=utils.META_DATA_INSTANCE_SQL_QUERIES_FILE, json_data=final_meta_data
     )
 
     info("Done with - Processed final sql queries")

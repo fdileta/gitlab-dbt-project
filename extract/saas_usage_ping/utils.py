@@ -60,45 +60,46 @@ class Utils:
     Utils class for service ping
     """
 
+    ENCODING = "utf8"
+
+    SQL_KEY = "sql"
+    REDIS_KEY = "redis"
+
+    META_API_COLUMNS = [
+        "recorded_at",
+        "version",
+        "edition",
+        "recording_ce_finished_at",
+        "recording_ee_finished_at",
+        "uuid",
+    ]
+
+    TRANSFORMED_INSTANCE_SQL_QUERIES_FILE = "transformed_instance_queries.json"
+    META_DATA_INSTANCE_SQL_QUERIES_FILE = "meta_data_instance_queries.json"
+    NAMESPACE_FILE = "usage_ping_namespace_queries.json"
+
+    HAVING_CLAUSE_PATTERN = re.compile(
+        "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED",
+        re.IGNORECASE,
+    )
+
+    METRICS_EXCEPTION_INSTANCE_SQL = (
+        "counts.clusters_platforms_eks",
+        "counts.clusters_platforms_gke",
+        "usage_activity_by_stage.configure.clusters_platforms_gke",
+        "usage_activity_by_stage.configure.clusters_platforms_eks",
+        "usage_activity_by_stage_monthly.configure.clusters_platforms_gke",
+        "usage_activity_by_stage_monthly.configure.clusters_platforms_eks",
+        "usage_activity_by_stage.release.users_creating_deployment_approvals",
+        "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
+    )
+
     def __init__(self):
         config_dict = env.copy()
 
         self.headers = {
             "PRIVATE-TOKEN": config_dict.get("GITLAB_ANALYTICS_PRIVATE_TOKEN", None)
         }
-        self.encoding = "utf8"
-
-        self.sql_key = "sql"
-        self.redis_key = "redis"
-
-        self.meta_api_columns = [
-            "recorded_at",
-            "version",
-            "edition",
-            "recording_ce_finished_at",
-            "recording_ee_finished_at",
-            "uuid",
-        ]
-
-        self.transformed_instance_sql_queries_file = "transformed_instance_queries.json"
-        self.meta_data_instance_sql_queries_file = "meta_data_instance_queries.json"
-        self.namespace_file = "usage_ping_namespace_queries.json"
-
-        self.having_clause_pattern = re.compile(
-            "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED",
-            re.IGNORECASE,
-        )
-
-        self.metrics_exception_instance_sql = (
-            "counts.clusters_platforms_eks",
-            "counts.clusters_platforms_gke",
-            "usage_activity_by_stage.configure.clusters_platforms_gke",
-            "usage_activity_by_stage.configure.clusters_platforms_eks",
-            "usage_activity_by_stage_monthly.configure.clusters_platforms_gke",
-            "usage_activity_by_stage_monthly.configure.clusters_platforms_eks",
-            "usage_activity_by_stage.release.users_creating_deployment_approvals",
-            "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
-        )
 
     @staticmethod
     def convert_response_to_json(response: requests.Response):
@@ -119,7 +120,7 @@ class Utils:
         except requests.ConnectionError as e:
             raise ConnectionError("Error requesting job") from e
 
-    def get_json_response(self, url):
+    def get_response_as_dict(self, url):
         """
         get prepared response in json format
         """
@@ -137,7 +138,7 @@ class Utils:
 
         meta_data = {
             meta_api_column: json_data.get(meta_api_column, "")
-            for meta_api_column in self.meta_api_columns
+            for meta_api_column in self.META_API_COLUMNS
         }
 
         return meta_data
@@ -148,14 +149,14 @@ class Utils:
         param json_data: dict
         return: None
         """
-        with open(file=file_name, mode="w", encoding=self.encoding) as wr_file:
+        with open(file=file_name, mode="w", encoding=self.ENCODING) as wr_file:
             json.dump(json_data, wr_file)
 
     def load_from_json_file(self, file_name: str):
         """
         Load from json file
         """
-        with open(file=file_name, mode="r", encoding=self.encoding) as file:
+        with open(file=file_name, mode="r", encoding=self.ENCODING) as file:
             return json.load(file)
 
     @staticmethod
@@ -187,6 +188,6 @@ class Utils:
             current timestamp: 1629986268.131019
             md5 timestamp: 54da37683078de0c1360a8e76d942227
         """
-        timestamp_encoded = str(input_timestamp).encode(encoding=self.encoding)
+        timestamp_encoded = str(input_timestamp).encode(encoding=self.ENCODING)
 
         return md5(timestamp_encoded).hexdigest()

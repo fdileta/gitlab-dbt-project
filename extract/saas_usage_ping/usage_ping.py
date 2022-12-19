@@ -54,8 +54,8 @@ class UsagePing:
             self.metrics_backfill = []
 
         self.start_date_28 = self.end_date - datetime.timedelta(28)
-        self.dataframe_api_columns = self.utils.meta_api_columns
-        self.missing_definitions = {self.utils.sql_key: [], self.utils.redis_key: []}
+        self.dataframe_api_columns = self.utils.META_API_COLUMNS
+        self.missing_definitions = {self.utils.SQL_KEY: [], self.utils.REDIS_KEY: []}
         self.duplicate_keys = []
 
     def _get_instance_sql_metrics_definition(self) -> Dict[str, Any]:
@@ -92,7 +92,7 @@ class UsagePing:
         to generate the {ping_name: sql_query} dictionary
         """
         file_name = os.path.join(
-            os.path.dirname(__file__), self.utils.transformed_instance_sql_queries_file
+            os.path.dirname(__file__), self.utils.TRANSFORMED_INSTANCE_SQL_QUERIES_FILE
         )
 
         return self.utils.load_from_json_file(file_name=file_name)
@@ -133,13 +133,13 @@ class UsagePing:
         """
         SQL_DATA_SOURCE_VAL = "database"
 
-        if payload_source == self.utils.redis_key:
+        if payload_source == self.utils.REDIS_KEY:
             is_matching = (
                 metric_definition_source
                 and metric_definition_source != SQL_DATA_SOURCE_VAL
             )
 
-        elif payload_source == self.utils.sql_key:
+        elif payload_source == self.utils.SQL_KEY:
             is_matching = metric_definition_source == SQL_DATA_SOURCE_VAL
 
         return is_matching
@@ -216,7 +216,7 @@ class UsagePing:
             else:
                 if (
                     concat_metric_name.lower()
-                    not in self.utils.metrics_exception_instance_sql
+                    not in self.utils.METRICS_EXCEPTION_INSTANCE_SQL
                     or payload_source != "sql"
                 ):
                     data_source_status = self.check_data_source(
@@ -275,10 +275,13 @@ class UsagePing:
         for key, query in saas_queries.items():
             # if the 'query' is a dictionary, then recursively call
             if isinstance(query, dict):
-                (
-                    results_returned,
-                    errors_returned,
-                ) = self.evaluate_saas_instance_sql_queries(connection, query)
+
+                instance_sql_results = self.evaluate_saas_instance_sql_queries(
+                    connection, query
+                )
+
+                results_returned, errors_returned = instance_sql_results
+
                 if results_returned:
                     results[key] = results_returned
                 if errors_returned:
@@ -313,7 +316,7 @@ class UsagePing:
 
         connection = self.engine_factory.connect()
 
-        payload_source = self.utils.sql_key
+        payload_source = self.utils.SQL_KEY
 
         saas_queries_with_valid_definitions = self.keep_valid_metric_definitions(
             saas_queries, payload_source, metric_definition_dict
@@ -339,10 +342,10 @@ class UsagePing:
         """
         url = "https://gitlab.com/api/v4/usage_data/non_sql_metrics"
 
-        redis_metrics = self.utils.get_json_response(url=url)
+        redis_metrics = self.utils.get_response_as_dict(url=url)
         redis_metadata = self.utils.keep_meta_data(json_data=redis_metrics)
 
-        payload_source = self.utils.redis_key
+        payload_source = self.utils.REDIS_KEY
         redis_metrics = self.keep_valid_metric_definitions(
             payload=redis_metrics,
             payload_source=payload_source,
@@ -365,10 +368,10 @@ class UsagePing:
         )
 
         combined_metadata = self.utils.get_loaded_metadata(
-            keys=[self.utils.sql_key, self.utils.redis_key],
+            keys=[self.utils.SQL_KEY, self.utils.REDIS_KEY],
             values=[
                 self._get_meta_data_from_file(
-                    file_name=self.utils.meta_data_instance_sql_queries_file
+                    file_name=self.utils.META_DATA_INSTANCE_SQL_QUERIES_FILE
                 ),
                 redis_metadata,
             ],
@@ -383,7 +386,7 @@ class UsagePing:
             ]
             + self._get_dataframe_api_values(
                 self._get_meta_data_from_file(
-                    file_name=self.utils.meta_data_instance_sql_queries_file
+                    file_name=self.utils.META_DATA_INSTANCE_SQL_QUERIES_FILE
                 )
             )
             + ["combined"]
@@ -422,8 +425,8 @@ class UsagePing:
         """
         has_error = False
         if (
-            self.missing_definitions[self.utils.sql_key]
-            or self.missing_definitions[self.utils.redis_key]
+            self.missing_definitions[self.utils.SQL_KEY]
+            or self.missing_definitions[self.utils.REDIS_KEY]
         ):
             logging.warning(
                 f"The following payloads have missing definitions in metric_definitions.yaml{self.missing_definitions}. Please open up an issue with product intelligence to add missing definition into the yaml file."
@@ -599,7 +602,7 @@ class UsagePing:
         connection = self.engine_factory.connect()
 
         namespace_queries = self._get_meta_data_from_file(
-            file_name=self.utils.namespace_file
+            file_name=self.utils.NAMESPACE_FILE
         )
 
         for namespace_query in namespace_queries:
