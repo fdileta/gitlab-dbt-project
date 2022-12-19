@@ -165,6 +165,7 @@
       dim_crm_account.health_number,
       dim_crm_account.health_score_color,
       dim_crm_account.dim_parent_crm_account_id,
+      dim_crm_account.parent_crm_account_demographics_sales_segment,
       dim_crm_account.parent_crm_account_industry,
       dim_crm_account.crm_account_owner_user_segment,
       dim_crm_account.record_type_id,
