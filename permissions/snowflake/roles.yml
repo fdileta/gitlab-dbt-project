@@ -34,6 +34,11 @@ databases:
     - cbraza_prep:
         shared: no
 
+    - cleroux_prod:
+        shared: no
+    - cleroux_prep:
+        shared: no
+
     - csharp_prod:
         shared: no
     - csharp_prep:
@@ -2603,6 +2608,38 @@ roles:
             - analyst_engineering
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - cleroux_prep
+                - cleroux_prod
+            schemas:
+                - cleroux_prep.*
+                - cleroux_prod.*
+            tables:
+                - cleroux_prep.*.*
+                - cleroux_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - cleroux_prep
+                    - cleroux_prod
+                write:
+                    - cleroux_prep
+                    - cleroux_prod
+            schemas:
+                read:
+                    - cleroux_prep.*
+                    - cleroux_prod.*
+                write:
+                    - cleroux_prep.*
+                    - cleroux_prod.*
+            tables:
+                read:
+                    - cleroux_prep.*.*
+                    - cleroux_prod.*.*
+                write:
+                    - cleroux_prep.*.*
+                    - cleroux_prod.*.*
 
     - cmeddaugh:
         member_of:
@@ -3805,6 +3842,12 @@ roles:
         warehouses:
             - dev_xs
 
+    - ncregan:
+        member_of:
+            - google_search_console
+        warehouses:
+            - dev_xs
+
     - nfiguera:
         member_of:
             - analyst_sales
@@ -4946,6 +4989,11 @@ users:
         can_login: yes
         member_of:
             - nbelokolodov
+
+    - ncregan:
+        can_login: yes
+        member_of:
+            - ncregan
 
     - nfiguera:
         can_login: yes
