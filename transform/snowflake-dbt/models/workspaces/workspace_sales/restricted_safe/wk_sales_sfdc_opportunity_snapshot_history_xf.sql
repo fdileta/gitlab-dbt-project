@@ -231,7 +231,12 @@ WITH date_details AS (
       edm_snapshot_opty.is_stage_1_plus,
       edm_snapshot_opty.is_stage_3_plus,
       edm_snapshot_opty.is_stage_4_plus,
-      edm_snapshot_opty.is_won,
+
+      CASE edm_snapshot_opty.is_won
+        WHEN TRUE THEN 1
+        ELSE 0
+      END                                                        AS is_won,
+
       edm_snapshot_opty.is_lost,
       edm_snapshot_opty.is_open,
 
