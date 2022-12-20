@@ -47,6 +47,7 @@ dag = DAG(
     schedule_interval="0 12 1 2,5,8,11 *",
     start_date=datetime(2021, 12, 17),
     catchup=True,
+    max_active_runs=2,
 )
 
 bash_task = BashOperator(

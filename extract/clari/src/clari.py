@@ -24,12 +24,12 @@ def _calc_fiscal_quarter(dt):
 
 def _get_previous_fiscal_quarter(dt):
     current_fiscal_quarter = _calc_fiscal_quarter(dt)
-    fiscal_quarter_prefix = current_fiscal_quarter[:-1]
     current_quarter_int = int(current_fiscal_quarter[-1])
+    current_year_int = int(current_fiscal_quarter[:4])
 
     if current_quarter_int == 1:
-        return fiscal_quarter_prefix + '4'
-    return fiscal_quarter_prefix + f'{current_quarter_int - 1}'
+        return f'{current_year_int-1}_Q4'
+    return f'{current_year_int}_Q{current_quarter_int - 1}'
 
 
 def get_fiscal_quarter():
