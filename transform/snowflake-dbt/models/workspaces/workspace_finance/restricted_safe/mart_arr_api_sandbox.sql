@@ -180,5 +180,5 @@ WITH dim_billing_account_api_sandbox AS (
     created_by="@ken_aguilar",
     updated_by="@lvinueza",
     created_date="2021-09-06",
-    updated_date="2022-12-15"
+    updated_date="2022-12-21"
 ) }}

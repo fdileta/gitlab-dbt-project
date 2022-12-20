@@ -331,5 +331,5 @@ WITH sfdc_lead AS (
     created_by="@rmistry",
     updated_by="@lvinueza",
     created_date="2021-01-19",
-    updated_date="2022-12-15"
+    updated_date="2022-12-21"
 ) }}

@@ -165,5 +165,5 @@ WITH dim_amendment AS (
     created_by="@iweeks",
     updated_by="@lvinueza",
     created_date="2021-05-10",
-    updated_date="2022-12-15"
+    updated_date="2022-12-21"
 ) }}

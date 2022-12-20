@@ -186,5 +186,5 @@ FROM mart_user_request
     created_by="@jpeguero",
     updated_by="@lvinueza",
     created_date="2021-12-15",
-    updated_date="2022-12-15",
+    updated_date="2022-12-21",
   ) }}
