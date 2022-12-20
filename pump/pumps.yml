@@ -29,3 +29,9 @@ pumps:
     single: False
     owner: '@paul_armstrong'
     stage: pmg_s3_data_pump
+  - model: pump_daily_data_science_scores
+    timestamp_column: updated_at
+    sensitive: True
+    single: False
+    owner: '@rigerta'
+    stage: s3_data_science_pump

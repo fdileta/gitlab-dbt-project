@@ -15,6 +15,7 @@ WITH crm_person AS (
       email_domain,
       IFF(email_domain_type = 'Business email domain',TRUE,FALSE) AS is_valuable_signup,
       email_domain_type,
+      marketo_lead_id,
 
       --keys
       master_record_id,
@@ -107,5 +108,5 @@ WITH crm_person AS (
     created_by="@jjstark",
     updated_by="@degan",
     created_date="2020-09-10",
-    updated_date="2022-11-22"
+    updated_date="2022-12-12"
 ) }}
