@@ -145,8 +145,8 @@ def load_event_logs(event: str, full_refresh: bool = False):
         start_date = datetime.datetime(2021, 2, 1)
         end_date = datetime.now()
     else:
-        start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(hours=16)
-        end_date = date_parser.parse(config_dict['END_TIME']) - datetime.timedelta(hours=16)
+        start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(hours=2)
+        end_date = date_parser.parse(config_dict['END_TIME']) - datetime.timedelta(hours=1)
         # Handles manually triggering the DAG.
         if start_date == end_date:
             end_date = datetime.datetime.now()
