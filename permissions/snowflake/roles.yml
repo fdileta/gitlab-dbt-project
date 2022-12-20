@@ -245,7 +245,7 @@ roles:
             - sysadmin
     
     - orgadmin:
-        warehouse:
+        warehouses:
             - admin
 
     - securityadmin:
@@ -266,6 +266,7 @@ roles:
             - accountadmin
             - securityadmin
             - useradmin
+            - orgadmin
         warehouses:
             - admin
         privileges:
