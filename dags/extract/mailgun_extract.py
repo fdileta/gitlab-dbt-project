@@ -27,21 +27,21 @@ GIT_BRANCH = env["GIT_BRANCH"]
 pod_env_vars = {**gitlab_pod_env_vars, **{}}
 
 default_args = {
-    "catchup": True,
     "depends_on_past": False,
     "on_failure_callback": slack_failed_task,
     "owner": "airflow",
     "retry_delay": timedelta(minutes=1),
     "sla": timedelta(hours=24),
     "sla_miss_callback": slack_failed_task,
-    "start_date": datetime(2020, 1, 1),
 }
 
 dag = DAG(
     "mailgun_extract",
     default_args=default_args,
     schedule_interval="0 */12 * * *",
+    start_date=datetime(2020, 1, 1),
     concurrency=2,
+    catchup=True,
 )
 
 events = [
