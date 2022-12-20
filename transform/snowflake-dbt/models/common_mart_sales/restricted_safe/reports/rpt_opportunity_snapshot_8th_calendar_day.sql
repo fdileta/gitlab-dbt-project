@@ -6,7 +6,7 @@ WITH snapshot_dates AS (
     FROM {{ ref('dim_date') }}
     ORDER BY 1 DESC
 
-), mart_crm_opportunity_daily_snapshot AS (
+), crm_opportunity_daily_snapshot AS (
 
     SELECT *
     FROM {{ ref('mart_crm_opportunity_daily_snapshot') }}
@@ -14,9 +14,9 @@ WITH snapshot_dates AS (
 ), final AS (
 
     SELECT *
-    FROM mart_crm_opportunity_daily_snapshot
+    FROM crm_opportunity_daily_snapshot
     INNER JOIN snapshot_dates
-      ON mart_crm_opportunity_daily_snapshot.snapshot_date = snapshot_dates.snapshot_date_fpa
+      ON crm_opportunity_daily_snapshot.snapshot_date = snapshot_dates.snapshot_date_fpa
 
 )
 
