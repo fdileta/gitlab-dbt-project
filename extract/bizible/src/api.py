@@ -119,10 +119,9 @@ class BizibleSnowFlakeExtractor:
         :param date_column:
         :type date_column:
         """
-        end_date = datetime.now()
-        time_increments = 1
+        time_increments = 30
         for dt in rrule.rrule(
-            rrule.HOURLY,
+            rrule.MINUTELY,
             dtstart=last_modified_date,
             until=end_date,
             interval=time_increments,
