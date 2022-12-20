@@ -13,7 +13,7 @@
     SELECT
       dim_behavior_website_page_sk,
       app_id,
-      page_url,
+      page_url_host_path,
       page_url_path,
       clean_url_path,
       page_url_host,
@@ -23,7 +23,7 @@
       MAX(behavior_at)                                                              AS max_event_timestamp
     FROM events
     WHERE event IN ('struct', 'page_view', 'unstruct')
-      AND page_url IS NOT NULL
+      AND page_url_host_path IS NOT NULL
     {% if is_incremental() %}
 
       AND behavior_at > (SELECT max(max_event_timestamp) FROM {{ this }})
@@ -36,7 +36,7 @@
     SELECT
       dim_behavior_referrer_page_sk                                                 AS dim_behavior_website_page_sk,
       app_id,
-      referrer_url                                                                  AS page_url,
+      referrer_url_host_path                                                        AS page_url_host_path,
       referrer_url_path                                                             AS page_url_path,
       {{ clean_url('referrer_url_path') }}                                          AS clean_url_path,
       referrer_url_host                                                             AS page_url_host,
@@ -46,7 +46,7 @@
       MAX(behavior_at)                                                              AS max_event_timestamp
     FROM events
     WHERE event IN ('struct', 'page_view', 'unstruct')
-      AND referrer_url IS NOT NULL
+      AND referrer_url_host_path IS NOT NULL
 
     {% if is_incremental() %}
 
@@ -72,7 +72,7 @@
       dim_behavior_website_page_sk,
 
       -- Natural Keys
-      page_url,
+      page_url_host_path,
       app_id,
       page_url_host,
 
