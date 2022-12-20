@@ -27,7 +27,7 @@ from kubernetes_helpers import get_affinity, get_toleration
 env = os.environ.copy()
 GIT_BRANCH = env["GIT_BRANCH"]
 pod_env_vars = {**gitlab_pod_env_vars, **{}}
-TASK_SCHEDULE = 'daily'
+TASK_SCHEDULE = 'quarterly'
 
 # Define the default arguments for the DAG
 default_args = {
@@ -41,10 +41,11 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    'clari_extractv6',
+    f'clari_extractv6-{TASK_SCHEDULE}',
     default_args=default_args,
-    schedule_interval="0 8 * * *",
-    start_date=datetime(2022, 12, 17),
+    # At 12:00 on day-of-month 1 in February, May, August, and November
+    schedule_interval="0 12 1 2,5,8,11 *",
+    start_date=datetime(2021, 12, 17),
     catchup=True,
 )
 
@@ -62,7 +63,7 @@ clari_extract_command = (
 clari_task = KubernetesPodOperator(
     **gitlab_defaults,
     image=DATA_IMAGE,
-    task_id=f"clari-extract-daily-{TASK_SCHEDULE}",
+    task_id=f"clari-extract-{TASK_SCHEDULE}",
     name=f"clari-extract-{TASK_SCHEDULE}",
     secrets=[
         SNOWFLAKE_ACCOUNT,
