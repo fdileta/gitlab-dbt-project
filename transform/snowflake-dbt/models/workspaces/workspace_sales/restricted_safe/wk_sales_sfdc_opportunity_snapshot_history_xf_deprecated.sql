@@ -110,7 +110,7 @@ WITH date_details AS (
       --partner_discount_calc,
       --comp_channel_neutral
 
-    FROM {{ref('wk_sales_sfdc_opportunity_xf')}}  
+    FROM {{ref('wk_sales_sfdc_opportunity_xf_deprecated')}}  
 
 ), sfdc_users_xf AS (
 
