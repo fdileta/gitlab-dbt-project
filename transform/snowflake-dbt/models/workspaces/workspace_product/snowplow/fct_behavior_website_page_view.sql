@@ -57,9 +57,9 @@
 
       -- Foreign Keys
       dim_behavior_website_page.dim_behavior_website_page_sk,
-      referrer_website_page.dim_behavior_website_page_sk AS dim_behavior_website_page_sk_referer,
-      page_views_w_clean_url.gsc_project_id AS dim_namespace_id,
-      page_views_w_clean_url.gsc_project_id AS dim_project_id,
+      referrer_website_page.dim_behavior_website_page_sk                            AS dim_behavior_referrer_page_sk,
+      page_views_w_clean_url.gsc_project_id                                         AS dim_namespace_id,
+      page_views_w_clean_url.gsc_project_id                                         AS dim_project_id,
 
       --Time Attributes
       page_views_w_clean_url.page_view_start_at,
@@ -72,7 +72,7 @@
       page_views_w_clean_url.user_snowplow_domain_id,
 
       -- GitLab Standard Context
-      page_views_w_clean_url.gsc_environment,
+      page_views_w_clean_url.gsc_environment                                        AS environment,
       page_views_w_clean_url.gsc_extra,
       page_views_w_clean_url.gsc_google_analytics_client_id,
       page_views_w_clean_url.gsc_plan,
@@ -81,7 +81,7 @@
 
       -- Attributes
       dim_behavior_website_page.page_url_path,
-      referrer_website_page.page_url_path AS referer_url_path,
+      referrer_website_page.page_url_path                                           AS referer_url_path,
       page_views_w_clean_url.event_name,
       NULL                                                                          AS sf_formid,
       page_views_w_clean_url.engaged_seconds,
