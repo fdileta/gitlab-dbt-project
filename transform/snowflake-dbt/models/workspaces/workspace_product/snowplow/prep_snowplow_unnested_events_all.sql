@@ -46,12 +46,12 @@ SELECT
   collector_tstamp::TIMESTAMP         AS collector_tstamp,
   domain_userid                       AS user_snowplow_domain_id,
   domain_sessionidx::INT              AS session_index,
-  (page_urlhost || page_urlpath)      AS page_url,
+  (page_urlhost || page_urlpath)      AS page_url_host_path,
   page_urlscheme                      AS page_url_scheme,
   page_urlpath                        AS page_url_path,
   {{ clean_url('page_urlpath') }}     AS clean_url_path,
   page_urlfragment                    AS page_url_fragment,
-  {{ dbt_utils.surrogate_key(['page_url', 'app_id', 'page_url_scheme']) }}  AS dim_behavior_website_page_sk,
+  {{ dbt_utils.surrogate_key(['page_url_host_path', 'app_id', 'page_url_scheme']) }}  AS dim_behavior_website_page_sk,
   gsc_environment                     AS gsc_environment,
   gsc_extra                           AS gsc_extra,
   gsc_namespace_id                    AS gsc_namespace_id,
@@ -70,6 +70,6 @@ SELECT
   refr_urlhost                        AS referrer_url_host,
   refr_urlpath                        AS referrer_url_path,
   refr_urlscheme                      AS referrer_url_scheme,
-  (refr_urlhost || refr_urlpath )     AS referrer_url,
-  {{ dbt_utils.surrogate_key(['referrer_url', 'app_id', 'referrer_url_scheme']) }}  AS dim_behavior_referrer_page_sk
+  (refr_urlhost || refr_urlpath )     AS referrer_url_host_path,
+  {{ dbt_utils.surrogate_key(['referrer_url_host_path', 'app_id', 'referrer_url_scheme']) }}  AS dim_behavior_referrer_page_sk
 FROM unioned_view
