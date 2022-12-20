@@ -49,6 +49,11 @@ databases:
     - david_prep:
         shared: no
 
+    - ddeng_prod:
+        shared: no
+    - ddeng_prep:
+        shared: no
+
     - degan_prod:
         shared: no
     - degan_prep:
@@ -2745,6 +2750,38 @@ roles:
             - analyst_engineering
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - ddeng_prep
+                - ddeng_prod
+            schemas:
+                - ddeng_prep.*
+                - ddeng_prod.*
+            tables:
+                - ddeng_prep.*.*
+                - ddeng_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - ddeng_prep
+                    - ddeng_prod
+                write:
+                    - ddeng_prep
+                    - ddeng_prod
+            schemas:
+                read:
+                    - ddeng_prep.*
+                    - ddeng_prod.*
+                write:
+                    - ddeng_prep.*
+                    - ddeng_prod.*
+            tables:
+                read:
+                    - ddeng_prep.*.*
+                    - ddeng_prod.*.*
+                write:
+                    - ddeng_prep.*.*
+                    - ddeng_prod.*.*
 
     - degan:
         member_of:
