@@ -23,7 +23,6 @@
       MAX(behavior_at)                                                              AS max_event_timestamp
     FROM events
     WHERE event IN ('struct', 'page_view', 'unstruct')
-      AND page_url_host_path IS NOT NULL
     {% if is_incremental() %}
 
       AND behavior_at > (SELECT max(max_event_timestamp) FROM {{ this }})
@@ -46,7 +45,6 @@
       MAX(behavior_at)                                                              AS max_event_timestamp
     FROM events
     WHERE event IN ('struct', 'page_view', 'unstruct')
-      AND referrer_url_host_path IS NOT NULL
 
     {% if is_incremental() %}
 
