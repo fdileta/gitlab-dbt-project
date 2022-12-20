@@ -158,7 +158,9 @@ def load_event_logs(event: str, full_refresh: bool = False):
         # Handles manually triggering the DAG.
         if start_date == end_date:
             end_date = datetime.datetime.now()
-    info(f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
+    info(
+        f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}"
+    )
 
     results = extract_logs(event, start_date, end_date)
 
