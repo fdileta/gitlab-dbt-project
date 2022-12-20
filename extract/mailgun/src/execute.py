@@ -34,7 +34,9 @@ def chunker(seq: List, size: int):
     return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
-def get_logs(domain: str, event: str, formatted_start_date: str, formatted_end_date: str) -> requests.Response:
+def get_logs(
+    domain: str, event: str, formatted_start_date: str, formatted_end_date: str
+) -> requests.Response:
     """
     Small convenience wrapper function for mailgun event requests,
     :param domain:
@@ -48,14 +50,18 @@ def get_logs(domain: str, event: str, formatted_start_date: str, formatted_end_d
     return requests.get(
         f"https://api.mailgun.net/v3/{domain}/events",
         auth=("api", api_key),
-        params={"begin": formatted_start_date,
-                "end": formatted_end_date,
-                "ascending": "yes",
-                "event": event},
+        params={
+            "begin": formatted_start_date,
+            "end": formatted_end_date,
+            "ascending": "yes",
+            "event": event,
+        },
     )
 
 
-def extract_logs(event: str, start_date: datetime.datetime, end_date: datetime.datetime) -> List[Dict]:
+def extract_logs(
+    event: str, start_date: datetime.datetime, end_date: datetime.datetime
+) -> List[Dict]:
     """
     Requests and retrieves the event logs for a particular event.
     :param start_date:
@@ -104,7 +110,9 @@ def extract_logs(event: str, start_date: datetime.datetime, end_date: datetime.d
                 all_results = all_results[:] + items[:]
 
             else:
-                response = get_logs(domain, event, formatted_start_date, formatted_end_date)
+                response = get_logs(
+                    domain, event, formatted_start_date, formatted_end_date
+                )
 
                 try:
                     data = response.json()
@@ -146,8 +154,12 @@ def load_event_logs(event: str, full_refresh: bool = False):
         end_date = datetime.now()
     else:
         # This extends the time window to handle late processing on the API.
-        start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(hours=2)
-        end_date = date_parser.parse(config_dict['END_TIME']) - datetime.timedelta(hours=1)
+        start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
+            hours=2
+        )
+        end_date = date_parser.parse(config_dict["END_TIME"]) - datetime.timedelta(
+            hours=1
+        )
         # Handles manually triggering the DAG.
         if start_date == end_date:
             end_date = datetime.datetime.now()
