@@ -98,6 +98,10 @@ sheets:
     owner: '@rkohnke'
     tabs:
       - fmm_kpi_targets
+  - name: ga360_customdimensions
+    owner: '@dennischarukulvanich'
+    tabs: 
+      - ga360_customdimensions
   - description:  table of active GCP Committed Use Discount (CUD)
     name: gcp_active_cud
     owner: '@dtownsend'
@@ -341,3 +345,7 @@ sheets:
     owner: '@jstemmer1'
     tabs: 
       - toy_marketing_handbook
+  - name: leading_organizations
+    owner: '@nick_vh'
+    tabs:
+      - leading_organization_entry_dates

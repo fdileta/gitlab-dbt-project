@@ -56,6 +56,13 @@ data_science_pipelines_dag = [
     "ds_namespace_segmentation",
 ]
 
+sales_analytics_pipelines_dag = [
+    "sales_analytics_daily_notebooks",
+    "sales_analytics_weekly_notebooks",
+    "sales_analytics_monthly_notebooks",
+    "sales_analytics_quarterly_notebooks",
+]
+
 
 def split_date_parts(day: date, partition: str) -> Dict:
 
@@ -158,6 +165,8 @@ def slack_defaults(context, task_type):
             slack_channel = "#analytics-pipelines"
         elif dag_id in data_science_pipelines_dag:
             slack_channel = "#data-science-pipelines"
+        elif dag_id in sales_analytics_pipelines_dag:
+            slack_channel = "#sales-analytics-pipelines"
         else:
             slack_channel = dag_context.params.get(
                 "slack_channel_override", "#data-pipelines"
@@ -203,6 +212,8 @@ def slack_webhook_conn(slack_channel):
         slack_webhook = Variable.get("AIRFLOW_VAR_ANALYTICS_PIPELINES")
     elif slack_channel == "#data-science-pipelines":
         slack_webhook = Variable.get("AIRFLOW_VAR_DATA_SCIENCE_PIPELINES")
+    elif slack_channel == "#sales-analytics-pipelines":
+        slack_webhook = Variable.get("AIRFLOW_VAR_SALES_ANALYTICS_PIPELINES")
     else:
         slack_webhook = Variable.get("AIRFLOW_VAR_DATA_PIPELINES")
     airflow_http_con_id = Variable.get("AIRFLOW_VAR_SLACK_CONNECTION")
