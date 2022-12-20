@@ -2,7 +2,7 @@
 [sqlfluff]
 dialect = snowflake
 templater = dbt
-exclude_rules = L016
+exclude_rules = L016,L034
 
 [sqlfluff:templater:dbt]
 project_dir = ./
