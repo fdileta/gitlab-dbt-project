@@ -45,8 +45,6 @@ def get_logs(
     :param formatted_end_date:
     :return:
     """
-    info(f"End date {formatted_end_date}")
-    info(f"Start date {formatted_start_date}")
     return requests.get(
         f"https://api.mailgun.net/v3/{domain}/events",
         auth=("api", api_key),
@@ -146,9 +144,6 @@ def load_event_logs(event: str, full_refresh: bool = False):
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    start_date = datetime.datetime.now() - datetime.timedelta(hours=16)
-    info(f"Old start date {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
-
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
         end_date = datetime.now()
@@ -163,8 +158,7 @@ def load_event_logs(event: str, full_refresh: bool = False):
         # Handles manually triggering the DAG.
         if start_date == end_date:
             end_date = datetime.datetime.now()
-    info(f"New start date {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
-    info(f"New end date {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
+    info(f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}")
 
     results = extract_logs(event, start_date, end_date)
 
