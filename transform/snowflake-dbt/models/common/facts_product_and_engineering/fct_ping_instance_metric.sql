@@ -17,7 +17,17 @@
     ])
 
 }}
-, prep_license AS (
+, prep_subscription_md5 AS (
+
+    SELECT dim_subscription_id
+    FROM {{ ref('prep_subscription') }}
+
+), prep_subscription_sha256 AS (
+
+    SELECT dim_subscription_id
+    FROM {{ ref('prep_subscription') }}
+
+), prep_license AS (
 
     SELECT
       license_md5,
@@ -102,22 +112,21 @@
 
     SELECT
       prep_usage_ping_cte.*,
-      COALESCE(prep_license_md5.dim_license_id, prep_license_sha256.dim_license_id)                        AS dim_license_id,
-      dim_date.date_id                                                                                     AS dim_ping_date_id,
-      COALESCE(prep_subscription.dim_subscription_id,license_subscription_id)                              AS dim_subscription_id,
-      IFF(prep_usage_ping_cte.ping_created_at < license_trial_ends_on, TRUE, FALSE)                        AS is_trial,
-      IFF(COALESCE(prep_license_md5.dim_subscription_id,prep_license_sha256.dim_subscription_id) IS NOT NULL, TRUE, FALSE)
-                                                                                                           AS is_license_mapped_to_subscription, -- does the license table have a value in both license_id and subscription_id
-      IFF(prep_subscription.dim_subscription_id IS NULL, FALSE, TRUE)                                      AS is_license_subscription_id_valid   -- is the subscription_id in the license table valid (does it exist in the subscription table?)
+      COALESCE(prep_license_md5.dim_license_id, prep_license_sha256.dim_license_id)                                                AS dim_license_id,
+      dim_date.date_id                                                                                                             AS dim_ping_date_id,
+      COALESCE(COALESCE(prep_subscription_md5.dim_subscription_id,prep_subscription_sha256.dim_subscription_id), license_subscription_id) AS dim_subscription_id,
+      IFF(prep_usage_ping_cte.ping_created_at < license_trial_ends_on, TRUE, FALSE)                                                AS is_trial,
+      IFF(COALESCE(prep_license_md5.dim_subscription_id,prep_license_sha256.dim_subscription_id) IS NOT NULL, TRUE, FALSE)         AS is_license_mapped_to_subscription, -- does the license table have a value in both license_id and subscription_id
+      IFF(COALESCE(prep_subscription_md5.dim_subscription_id,prep_subscription_sha256.dim_subscription_id) IS NULL, FALSE, TRUE)          AS is_license_subscription_id_valid   -- is the subscription_id in the license table valid (does it exist in the subscription table?)
     FROM prep_usage_ping_cte
     LEFT JOIN prep_license_md5
-      ON prep_usage_ping_cte.license_md5    = prep_license.license_md5
+      ON prep_usage_ping_cte.license_md5    = prep_license_md5.license_md5
     LEFT JOIN prep_license_sha256
-      ON prep_usage_ping_cte.license_sha256 = prep_license.license_sha256
-    LEFT JOIN prep_subscription
-      ON prep_license_md5.dim_subscription_id = prep_subscription.dim_subscription_id
-    LEFT JOIN prep_subscription
-      ON prep_license_sha256.dim_subscription_id = prep_subscription.dim_subscription_id
+      ON prep_usage_ping_cte.license_sha256 = prep_license_sha256.license_sha256
+    LEFT JOIN prep_subscription_md5
+      ON prep_license_md5.dim_subscription_id = prep_subscription_md5.dim_subscription_id
+    LEFT JOIN prep_subscription_sha256
+      ON prep_license_sha256.dim_subscription_id = prep_subscription_sha256.dim_subscription_id
     LEFT JOIN dim_date
       ON TO_DATE(prep_usage_ping_cte.ping_created_at) = dim_date.date_day
 
