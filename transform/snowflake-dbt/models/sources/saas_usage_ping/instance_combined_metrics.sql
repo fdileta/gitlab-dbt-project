@@ -93,7 +93,7 @@ final AS (
     'gitlab'::VARCHAR AS container_registry_vendor,
     PARSE_JSON(run_results['analytics_unique_visits'])::VARIANT AS analytics_unique_visits,
     run_results['container_registry_server']['version']::VARCHAR AS container_registry_version,
-    'automated'::VARCHAR AS ping_type
+    'SaaS - Automated'::VARCHAR AS ping_type
   FROM cleaned
 )
 
