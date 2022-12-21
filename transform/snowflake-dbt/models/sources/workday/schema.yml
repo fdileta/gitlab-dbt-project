@@ -408,3 +408,23 @@ models:
       - name: unique_filter_key
         tests:
           - unique
+  
+  - name: workday_supervisory_organizations_source
+    columns:
+      - name: team_id
+        tests:
+          - unique
+          - not_null
+      - name: team_hierarchy_level
+      - name: team_members_count
+      - name: team_manager_inherited
+      - name: team_inactivated
+      - name: team_manager_name
+      - name: team_name
+      - name: team_manager_name_id
+      - name: team_superior_team_id
+      - name: team_inactivated_date
+      - name: is_deleted
+      - name: uploaded_at
+      - name: valid_from
+      - name: valid_to
