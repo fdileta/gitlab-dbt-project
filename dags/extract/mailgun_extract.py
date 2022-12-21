@@ -39,7 +39,7 @@ default_args = {
 dag = DAG(
     "mailgun_extract",
     default_args=default_args,
-    schedule_interval="0 */12 * * *",
+    schedule_interval="0 * * * *",
     concurrency=2,
     start_date=datetime(2020, 1, 1),
 )
