@@ -8,7 +8,6 @@ This extractor queries the BambooHR API for 6 data sets:
     * EmploymentStatus
     * JobInfo
     * CustomBonus
-    * EmergencyContacts
 * Custom Report - https://www.bamboohr.com/api/documentation/employees.php
     * We pull a report that maps the employee number to the id
 
