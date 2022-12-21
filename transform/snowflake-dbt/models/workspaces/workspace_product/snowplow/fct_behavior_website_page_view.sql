@@ -6,7 +6,6 @@
 {{ 
     simple_cte([
     ('page_views', 'prep_snowplow_page_views_all'),
-    ('dim_behavior_website_page', 'dim_behavior_website_page')
     ])
 }}
 
@@ -40,7 +39,8 @@
       referer_url_path,
       page_url,
       referer_url,
-      page_url_scheme
+      page_url_scheme,
+      referer_url_scheme
     FROM page_views
 
     {% if is_incremental() %}
@@ -56,8 +56,8 @@
       {{ dbt_utils.surrogate_key(['event_id','page_view_end_at']) }}                AS fct_behavior_website_page_view_sk,
 
       -- Foreign Keys
-      dim_behavior_website_page.dim_behavior_website_page_sk,
-      referrer_website_page.dim_behavior_website_page_sk                            AS dim_behavior_referrer_page_sk,
+      {{ dbt_utils.surrogate_key(['page_url', 'app_id', 'page_url_scheme']) }}      AS dim_behavior_website_page_sk,
+      {{ dbt_utils.surrogate_key(['referer_url', 'app_id', 'referer_url_scheme']) }}  AS dim_behavior_referrer_page_sk,
       page_views_w_clean_url.gsc_project_id                                         AS dim_namespace_id,
       page_views_w_clean_url.gsc_project_id                                         AS dim_project_id,
 
@@ -80,8 +80,8 @@
       page_views_w_clean_url.gsc_source,
 
       -- Attributes
-      dim_behavior_website_page.page_url_path,
-      referrer_website_page.page_url_path                                           AS referer_url_path,
+      page_views_w_clean_url.page_url_path,
+      page_views_w_clean_url.referer_url_path,
       page_views_w_clean_url.event_name,
       NULL                                                                          AS sf_formid,
       page_views_w_clean_url.engaged_seconds,
@@ -89,14 +89,6 @@
       page_views_w_clean_url.page_view_index,
       page_views_w_clean_url.page_view_in_session_index
     FROM page_views_w_clean_url
-    LEFT JOIN dim_behavior_website_page 
-      ON page_views_w_clean_url.page_url = dim_behavior_website_page.page_url_host_path
-        AND page_views_w_clean_url.app_id = dim_behavior_website_page.app_id
-        AND page_views_w_clean_url.page_url_scheme = dim_behavior_website_page.page_url_scheme
-    LEFT JOIN dim_behavior_website_page AS referrer_website_page
-      ON page_views_w_clean_url.referer_url = referrer_website_page.page_url_host_path
-        AND page_views_w_clean_url.app_id = referrer_website_page.app_id
-        AND page_views_w_clean_url.page_url_scheme = referrer_website_page.page_url_scheme
 
 )
 
