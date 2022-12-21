@@ -47,3 +47,10 @@ models:
             - uuid
             - hostname
             - dim_namespace_id
+  
+  - name: wk_fct_snowplow_events_service_ping
+    columns:
+      - name: event_id
+        tests:
+          - unique
+          - not_null
