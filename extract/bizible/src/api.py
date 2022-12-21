@@ -227,7 +227,7 @@ class BizibleSnowFlakeExtractor:
                 self.upload_complete_file(table_name)
 
     def extract_latest_bizible_file(
-        self, table_name: str, date_column: str = ""
+        self, start_date, end_date, table_name: str, date_column: str = ""
     ) -> None:
         """
 
