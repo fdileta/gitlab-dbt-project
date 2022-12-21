@@ -34,6 +34,7 @@ default_args = {
     "retry_delay": timedelta(minutes=1),
     "sla": timedelta(hours=24),
     "sla_miss_callback": slack_failed_task,
+    "start_date": datetime(2020, 1, 1),
 }
 
 dag = DAG(
@@ -41,7 +42,6 @@ dag = DAG(
     default_args=default_args,
     schedule_interval="0 */12 * * *",
     concurrency=2,
-    start_date=datetime(2020, 1, 1),
 )
 
 events = [
