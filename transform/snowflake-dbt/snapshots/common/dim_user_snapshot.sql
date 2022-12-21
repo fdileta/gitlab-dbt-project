@@ -35,9 +35,7 @@
                       'for_business_use',
                       'employee_count',
                       'country',
-                      'state',
-                      'created_by',
-                      'updated_by'
+                      'state'
                      ],
           invalidate_hard_deletes=True
          )
@@ -47,7 +45,14 @@
     {{
           dbt_utils.star(
             from=ref('dim_user'),
-            except=['DBT_UPDATED_AT']
+            except=['DBT_UPDATED_AT',
+                    'CREATED_BY',
+                    'UPDATED_BY',
+                    'CREATED_DATE',
+                    'UPDATED_DATE',
+                    'MODEL_CREATED_DATE',
+                    'MODEL_UPDATED_DATE'
+                   ]
             )
     }}
     FROM {{ ref('dim_user') }}
