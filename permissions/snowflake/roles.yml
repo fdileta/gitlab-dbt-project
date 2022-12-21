@@ -248,6 +248,10 @@ roles:
         member_of:
             - securityadmin
             - sysadmin
+    
+    - orgadmin:
+        warehouses:
+            - admin
 
     - securityadmin:
         warehouses:
@@ -267,6 +271,7 @@ roles:
             - accountadmin
             - securityadmin
             - useradmin
+            - orgadmin
         warehouses:
             - admin
         privileges:
@@ -2892,6 +2897,7 @@ roles:
             - analyst_core
             - data_manager
             - restricted_safe
+            - orgadmin
         warehouses:
             - dev_xs
         owns:
