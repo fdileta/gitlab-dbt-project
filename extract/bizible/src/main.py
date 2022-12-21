@@ -5,6 +5,7 @@ import sys
 from fire import Fire
 from typing import Dict, Any
 import yaml
+from dateutil import parser as date_parser
 
 
 def manifest_reader(file_path: str) -> Dict[str, Dict]:
@@ -30,6 +31,12 @@ def filter_manifest(manifest_dict: Dict, load_only_table: str = None) -> Dict:
 
 def main(file_path: str, load_only_table: str = None) -> None:
     config_dict = env.copy()
+    start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
+            hours=12
+    )
+    end_date = date_parser.parse(config_dict["END_TIME"]) - datetime.timedelta(
+            hours=1
+    )
     extractor = BizibleSnowFlakeExtractor(config_dict)
 
     logging.info(f"Reading manifest at location: {file_path}")
@@ -44,7 +51,7 @@ def main(file_path: str, load_only_table: str = None) -> None:
             date_column = table_dict.get("date_column")
         else:
             date_column = ""
-        extractor.extract_latest_bizible_file(table, date_column)
+        extractor.extract_latest_bizible_file(start_date, end_date, table_dict, date_column)
 
 
 if __name__ == "__main__":
