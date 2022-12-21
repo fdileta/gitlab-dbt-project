@@ -136,7 +136,7 @@ ORDER BY 1,2,3
 
 **Other Comments:**
 - Metrics can be introduced on different versions for CE and EE.
-- The `milestone` field of the [metrics dictionary](https://metrics.gitlab.com/) can also be used to identify the version when a metric was instrumented, but there a couple of limitations. First, many metrics are just labeled `< 13.9`, so there is a lack of more detail for older metrics. Second, since metrics can be introduced on different versions for CE and EE, `milestone` could be incorrect for one edition/distribution.
+- The `milestone` field of the [metrics dictionary](https://metrics.gitlab.com/) can also be used to identify the version when a metric was instrumented, but there are couple of limitations. First, many metrics are just labeled `< 13.9`, so there is a lack of more detail for older metrics. Second, since metrics can be introduced on different versions for CE and EE, `milestone` could be incorrect for one edition/distribution.
 - First/last version is dependent on the metric appearing in a Service Ping payload. There are cases where this value is incorrect due to installations somehow sending the metrics from previous versions, but there is no other complete SSOT for when a metric was introduced.
 
 {% enddocs %}
