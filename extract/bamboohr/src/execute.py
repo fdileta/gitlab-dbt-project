@@ -71,7 +71,6 @@ if __name__ == "__main__":
         jobinfo="jobInfo",
         employmentstatus="employmentStatus",
         custombonus="customBonus",
-        emergencyContacts="emergencyContacts",
         customontargetearnings="customOnTargetEarnings",
         customcurrencyconversion="customCurrencyConversion",
     )
