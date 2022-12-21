@@ -2,7 +2,8 @@
 [sqlfluff]
 dialect = snowflake
 templater = dbt
-exclude_rules = L016,L034
+exclude_rules = L016,L031,L034
+large_file_skip_byte_limit = 25000
 
 [sqlfluff:templater:dbt]
 project_dir = ./
@@ -23,6 +24,9 @@ align_scope = bracketed
 [sqlfluff:rules]
 tab_space_size = 2
 max_line_length = 100
+
+[sqlfluff:rules:L003]
+hanging_indents = False
 
 [sqlfluff:rules:L010]
 # Keywords
