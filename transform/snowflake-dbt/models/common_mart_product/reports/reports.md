@@ -114,7 +114,7 @@ ORDER BY 1,2,3,4
 - This model can easily be joined to [`dim_ping_metric`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_ping_metric) in order to get additional attributes about the metric (`time_frame`, `group_name`, `is_smau`, etc)
 - This model can easily be joined to [`dim_gitlab_releases`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_gitlab_releases) to get the release date for a version
 
-Example query incorporating those tips
+Example query
 
 ```
 SELECT
