@@ -54,3 +54,18 @@ models:
         tests:
           - unique
           - not_null
+
+  - name: wk_mart_snowplow_events_service_ping_metrics
+    columns:
+      - name: event_id
+        tests:
+          - unique
+          - not_null
+
+  - name: wk_rpt_user_based_metric_counts_namespace_monthly
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - date_month
+            - ultimate_parent_namespace_id
+            - metrics_path
