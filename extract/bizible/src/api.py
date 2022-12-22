@@ -96,18 +96,17 @@ class BizibleSnowFlakeExtractor:
             query_start_date = dt
             query_end_date = dt + timedelta(hours=time_increments)
 
-            if date_column != "":
-                query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
-                    WHERE {date_column} >= '{query_start_date}' 
-                    AND {date_column} < '{query_end_date}'"""
-            else:
-                query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}"""
+            query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
+                WHERE {date_column} >= '{query_start_date}' 
+                AND {date_column} < '{query_end_date}'"""
 
             file_name = f"{table_name}_{str(dt.year)}-{str(dt.month)}-{str(dt.day)}-{str(dt.hour)}.csv"
 
             self.upload_query(table_name, file_name, query)
 
-    def process_bizible_file(self, start_date: datetime, end_date: datetime, table_name: Dict, date_column: str) -> None:
+    def process_bizible_file(self, start_date: datetime, end_date: datetime, table_name: Dict, date_column: str,
+                             full_refresh: bool = False
+                             ) -> None:
         """
 
         :param start_date:
@@ -117,6 +116,10 @@ class BizibleSnowFlakeExtractor:
         :return:
         """
         logging.info(f"Running {table_name} query")
+
+        if full_refresh:
+            start_date = datetime.datetime(2020, 1, 1)
+
         self.upload_partitioned_files(
             table_name,
             start_date,
