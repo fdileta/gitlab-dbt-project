@@ -109,6 +109,7 @@
       FROM license_subscriptions
         LEFT JOIN latest_subscription
       ON license_subscriptions.dim_subscription_id_original = latest_subscription.dim_subscription_id_original
+   WHERE license_md5 IS NOT NULL
 
   ), license_subscriptions_w_latest_subscription_sha256 AS (
 
@@ -118,6 +119,7 @@
       FROM license_subscriptions
         LEFT JOIN latest_subscription
       ON license_subscriptions.dim_subscription_id_original = latest_subscription.dim_subscription_id_original
+    WHERE license_sha256 IS NOT NULL
 
   ), joined AS (
 
