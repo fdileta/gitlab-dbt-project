@@ -84,7 +84,7 @@
       ON dim_billing_account.dim_crm_account_id = dim_crm_accounts.dim_crm_account_id
     INNER JOIN dim_date
       ON effective_start_month <= dim_date.date_day AND effective_end_month > dim_date.date_day
-    {{ dbt_utils.group_by(n=16)}}
+    {{ dbt_utils.group_by(n=17)}}
 
 
   ), latest_subscription AS (
