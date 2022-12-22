@@ -13,7 +13,7 @@ WITH source AS (
 		source.*,
 		dims.dimension_index,
 		dims.dimension_name,
-		dim.dimension_value
+		dims.dimension_value
 	FROM source
 	LEFT JOIN custom_dimensions AS dims
 	ON dims.visit_id = source.visit_id 
