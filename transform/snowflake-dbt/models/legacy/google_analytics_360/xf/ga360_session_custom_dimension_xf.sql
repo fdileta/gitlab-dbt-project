@@ -19,7 +19,7 @@ WITH session_custom_dims AS (
 	    
 	FROM session_custom_dims
 	LEFT JOIN ga_index_names 
-		ON session_custom_dims.dimension_index = ga_index_names.index
+		ON session_custom_dims.dimension_index = ga_index_names.dimension_index
 
 )
 
