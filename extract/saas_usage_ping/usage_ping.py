@@ -355,7 +355,11 @@ class UsagePing:
         return redis_metrics, redis_metadata
 
     def upload_combined_metrics(
-        self, combined_metrics: Dict, saas_queries: Dict, redis_metadata
+        self,
+        combined_metrics: Dict,
+        saas_queries: Dict,
+        sql_metadata,
+        redis_metadata,
     ) -> None:
         """
         Uploads combined_metrics dictionary to Snowflake
@@ -370,9 +374,7 @@ class UsagePing:
         combined_metadata = self.utils.get_loaded_metadata(
             keys=[self.utils.SQL_KEY, self.utils.REDIS_KEY],
             values=[
-                self._get_meta_data_from_file(
-                    file_name=self.utils.META_DATA_INSTANCE_SQL_QUERIES_FILE
-                ),
+                sql_metadata,
                 redis_metadata,
             ],
         )
@@ -500,9 +502,14 @@ class UsagePing:
             redis_metrics=redis_metrics, sql_metrics=sql_metrics
         )
 
+        sql_metadata = self._get_meta_data_from_file(
+            file_name=self.utils.META_DATA_INSTANCE_SQL_QUERIES_FILE
+        )
+
         self.upload_combined_metrics(
             combined_metrics=combined_metrics,
             saas_queries=saas_queries,
+            sql_metadata=sql_metadata,
             redis_metadata=redis_metadata,
         )
 
