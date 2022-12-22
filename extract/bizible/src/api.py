@@ -98,7 +98,7 @@ class BizibleSnowFlakeExtractor:
             interval=time_increments,
         ):
             query_start_date = dt
-            query_end_date = dt + timedelta(hours=time_increments)
+            query_end_date = dt + timedelta(minutes=time_increments)
 
             query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
                 WHERE {date_column} >= '{query_start_date}' 
