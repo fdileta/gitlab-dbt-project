@@ -417,12 +417,6 @@ WITH date_details AS (
             THEN 0
         ELSE 1  
       END                                                         AS is_open,
-
-      -- CASE 
-      --   WHEN sfdc_opportunity_snapshot_history.stage_name IN ('8-Closed Lost', 'Closed Lost', '9-Unqualified', 'Closed Won', '10-Duplicate') 
-      --     THEN 1
-      --   ELSE 0
-      -- END                                                         AS is_closed,
       sfdc_opportunity_snapshot_history.is_closed,
       
 
