@@ -37,6 +37,7 @@ def main(file_path: str, load_only_table: str = None) -> None:
     end_date = date_parser.parse(config_dict["END_TIME"]) - datetime.timedelta(
             hours=1
     )
+    logging.info(f"Running from {start_date} to {end_date}")
     extractor = BizibleSnowFlakeExtractor(config_dict)
 
     logging.info(f"Reading manifest at location: {file_path}")
