@@ -2990,6 +2990,8 @@ roles:
 
     - hkacmarski:
         member_of:
+            - analyst_sales
+            - bi_tool_eval_read
             - reporter
             - restricted_safe
         warehouses:
