@@ -11,7 +11,6 @@
       cleaned_version,
       dim_crm_account_id,
       crm_account_name,
-      parent_crm_account_name,
       ping_date,
       umau_28_days_user,
       action_monthly_active_users_project_repo_28_days_user,
