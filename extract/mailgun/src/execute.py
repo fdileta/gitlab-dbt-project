@@ -155,6 +155,8 @@ def load_event_logs(event: str, full_refresh: bool = False):
         end_date = date_parser.parse(config_dict["END_TIME"]) - datetime.timedelta(
             hours=1
         )
+    info(f"Start {config_dict['START_TIME']}")
+    info(f"Start {config_dict['END_TIME']}")
     info(
         f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}"
     )
