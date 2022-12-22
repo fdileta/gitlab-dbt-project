@@ -53,7 +53,7 @@ def main(file_path: str, load_only_table: str = None) -> None:
             date_column = table_dict.get("date_column")
         else:
             date_column = ""
-        extractor.process_bizible_file(start_date, end_date, table_dict, date_column, full_refresh=False)
+        extractor.process_bizible_file(start_date, end_date, table, date_column, full_refresh=False)
 
 
 if __name__ == "__main__":
