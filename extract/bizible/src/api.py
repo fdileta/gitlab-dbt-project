@@ -75,7 +75,11 @@ class BizibleSnowFlakeExtractor:
         os.remove(file_name)
 
     def upload_partitioned_files(
-        self, table_name: str, start_date: datetime, end_date: datetime, date_column: str
+        self,
+        table_name: str,
+        start_date: datetime,
+        end_date: datetime,
+        date_column: str,
     ) -> None:
         """
         Created due to memory limitations, increments over the data set in hourly batches, primarily to ensure
@@ -104,9 +108,29 @@ class BizibleSnowFlakeExtractor:
 
             self.upload_query(table_name, file_name, query)
 
-    def process_bizible_file(self, start_date: datetime, end_date: datetime, table_name: Dict, date_column: str,
-                             full_refresh: bool = False
-                             ) -> None:
+    def upload_complete_file(
+        self,
+        table_name: str,
+    ) -> None:
+        """
+
+        :param table_name:
+        :type table_name:
+        """
+        query = f"""
+        SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}"""
+
+        file_name = f"{table_name}.csv"
+        self.upload_query(table_name, file_name, query)
+
+    def process_bizible_file(
+        self,
+        start_date: datetime,
+        end_date: datetime,
+        table_name: Dict,
+        date_column: str,
+        full_refresh: bool = False,
+    ) -> None:
         """
 
         :param start_date:
@@ -120,9 +144,12 @@ class BizibleSnowFlakeExtractor:
         if full_refresh:
             start_date = datetime.datetime(2020, 1, 1)
 
-        self.upload_partitioned_files(
-            table_name,
-            start_date,
-            end_date,
-            date_column,
-        )
+        if date_column == "":
+            self.upload_complete_file(table_name)
+        else:
+            self.upload_partitioned_files(
+                table_name,
+                start_date,
+                end_date,
+                date_column,
+            )

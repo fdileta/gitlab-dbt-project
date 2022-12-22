@@ -33,11 +33,9 @@ def filter_manifest(manifest_dict: Dict, load_only_table: str = None) -> Dict:
 def main(file_path: str, load_only_table: str = None) -> None:
     config_dict = env.copy()
     start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
-            hours=12
+        hours=12
     )
-    end_date = date_parser.parse(config_dict["END_TIME"]) - datetime.timedelta(
-            hours=1
-    )
+    end_date = date_parser.parse(config_dict["END_TIME"]) - datetime.timedelta(hours=1)
     logging.info(f"Running from {start_date} to {end_date}")
     extractor = BizibleSnowFlakeExtractor(config_dict)
 
@@ -53,7 +51,9 @@ def main(file_path: str, load_only_table: str = None) -> None:
             date_column = table_dict.get("date_column")
         else:
             date_column = ""
-        extractor.process_bizible_file(start_date, end_date, table, date_column, full_refresh=False)
+        extractor.process_bizible_file(
+            start_date, end_date, table, date_column, full_refresh=False
+        )
 
 
 if __name__ == "__main__":
