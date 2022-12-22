@@ -104,7 +104,7 @@ class BizibleSnowFlakeExtractor:
                 WHERE {date_column} >= '{query_start_date}' 
                 AND {date_column} < '{query_end_date}'"""
 
-            file_name = f"{table_name}_{str(dt.year)}-{str(dt.month)}-{str(dt.day)}-{str(dt.hour)}.csv"
+            file_name = f"{table_name}_{str(dt.year)}-{str(dt.month)}-{str(dt.day)}-{str(dt.hour)}-{str(dt.minute)}.csv"
 
             self.upload_query(table_name, file_name, query)
 
