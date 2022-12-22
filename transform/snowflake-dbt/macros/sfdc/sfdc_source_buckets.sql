@@ -38,7 +38,7 @@
         THEN 'referral'
       WHEN {{ lead_source }} in('Trial - Enterprise','Trial - GitLab.com')
         THEN 'trial'
-      WHEN {{ lead_source }} in ('Webcast','Webinar')
+      WHEN {{ lead_source }} in ('Webcast','Webinar', 'CSM Webinar')
         THEN 'virtual event'
       WHEN {{ lead_source }} in ('GitLab Subscription Portal','Web Direct')
         THEN 'web direct'

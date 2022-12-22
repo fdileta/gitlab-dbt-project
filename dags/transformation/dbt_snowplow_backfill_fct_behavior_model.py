@@ -5,6 +5,7 @@ from datetime import date, datetime
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.models import Variable
 from airflow_utils import (
     DBT_IMAGE,
     dbt_install_deps_nosha_cmd,
@@ -39,7 +40,13 @@ from kube_secrets import (
 env = os.environ.copy()
 GIT_BRANCH = env["GIT_BRANCH"]
 pod_env_vars = {**gitlab_pod_env_vars, **{}}
-
+# read model for full-refresh from Airflow Variable
+snowplow_model_to_full_refresh = Variable.get(
+    "SNOWPLOW_MODEL_TO_FULL_REFRESH", default_var="test"
+)
+snowplow_full_refresh_start_date = Variable.get(
+    "SNOWPLOW_FULL_REFRESH_START_DATE", default_var="2021-04-01"
+)
 if GIT_BRANCH in ["master", "main"]:
     target = "prod"
 else:
@@ -78,7 +85,7 @@ default_args = {
 
 # Create the DAG
 dag = DAG(
-    "dbt_snowplow_backfill",
+    "dbt_snowplow_backfill_fct_behavior_model",
     default_args=default_args,
     schedule_interval=None,
     concurrency=2,
@@ -87,13 +94,14 @@ dag = DAG(
 
 def generate_dbt_command(vars_dict):
     json_dict = json.dumps(vars_dict)
+    json_load = json.loads(json_dict)
+    json_date = json_load["year"] + "-" + json_load["month"] + "-01"
+    var_yaml = "{'incremental_backfill_date': '''" + json_date + "'''}"
 
     dbt_generate_command = f""" 
         {dbt_install_deps_nosha_cmd} &&
-        export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_4XL" &&
-        dbt run --profiles-dir profile --target {target} --models +snowplow --full-refresh --vars '{json_dict}'; ret=$?;
-        montecarlo import dbt-run --manifest target/manifest.json --run-results target/run_results.json --project-name gitlab-analysis;
-        python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
+        export SNOWFLAKE_TRANSFORM_WAREHOUSE="TRANSFORMING_XL" &&
+        dbt run --profiles-dir profile --target {target} --models {snowplow_model_to_full_refresh} --vars "{var_yaml}"; ret=$?;
         """
 
     return KubernetesPodOperator(
@@ -108,29 +116,11 @@ def generate_dbt_command(vars_dict):
     )
 
 
-dbt_snowplow_combined_cmd = f"""
-        {dbt_install_deps_nosha_cmd} &&
-        dbt run --profiles-dir profile --target {target} --models legacy.snowplow.combined; ret=$?;
-        montecarlo import dbt-run --manifest target/manifest.json --run-results target/run_results.json --project-name gitlab-analysis;
-        python ../../orchestration/upload_dbt_file_to_snowflake.py results; exit $ret
-        """
-
-dbt_snowplow_combined = KubernetesPodOperator(
-    **gitlab_defaults,
-    image=DBT_IMAGE,
-    task_id=f"dbt-snowplow-combined",
-    name=f"dbt-snowplow-combined",
-    trigger_rule="all_success",
-    secrets=task_secrets,
-    env_vars=pod_env_vars,
-    arguments=[dbt_snowplow_combined_cmd],
-    dag=dag,
-)
-
-
 dummy_operator = DummyOperator(task_id="start", dag=dag)
 
 for month in partitions(
-    datetime.strptime("2018-07-01", "%Y-%m-%d").date(), date.today(), "month"
+    datetime.strptime(snowplow_full_refresh_start_date, "%Y-%m-%d").date(),
+    date.today(),
+    "month",
 ):
-    dummy_operator >> generate_dbt_command(month) >> dbt_snowplow_combined
+    dummy_operator >> generate_dbt_command(month)

@@ -34,6 +34,11 @@ databases:
     - cbraza_prep:
         shared: no
 
+    - cleroux_prod:
+        shared: no
+    - cleroux_prep:
+        shared: no
+
     - csharp_prod:
         shared: no
     - csharp_prep:
@@ -42,6 +47,11 @@ databases:
     - david_prod:
         shared: no
     - david_prep:
+        shared: no
+
+    - ddeng_prod:
+        shared: no
+    - ddeng_prep:
         shared: no
 
     - degan_prod:
@@ -238,6 +248,10 @@ roles:
         member_of:
             - securityadmin
             - sysadmin
+    
+    - orgadmin:
+        warehouses:
+            - admin
 
     - securityadmin:
         warehouses:
@@ -257,6 +271,7 @@ roles:
             - accountadmin
             - securityadmin
             - useradmin
+            - orgadmin
         warehouses:
             - admin
         privileges:
@@ -553,28 +568,6 @@ roles:
             - analyst_core
             - snowflake_db
             - data_team_analyst
-
-    - analytics_engineer_ga:
-        member_of:
-            - analytics_engineer_core
-            - analyst_people
-            - analyst_engineering
-            - bamboohr
-            - prometheus
-            - workday
-
-    - analytics_engineer_gtm:
-        member_of:
-            - analytics_engineer_core
-            - analyst_marketing
-            - analyst_sales
-            - analyst_finance
-
-    - analytics_engineer_rd:
-        member_of:
-            - analytics_engineer_core
-            - analyst_engineering
-            - analyst_growth
 
     - data_manager:
         warehouses:
@@ -2603,6 +2596,38 @@ roles:
             - analyst_engineering
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - cleroux_prep
+                - cleroux_prod
+            schemas:
+                - cleroux_prep.*
+                - cleroux_prod.*
+            tables:
+                - cleroux_prep.*.*
+                - cleroux_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - cleroux_prep
+                    - cleroux_prod
+                write:
+                    - cleroux_prep
+                    - cleroux_prod
+            schemas:
+                read:
+                    - cleroux_prep.*
+                    - cleroux_prod.*
+                write:
+                    - cleroux_prep.*
+                    - cleroux_prod.*
+            tables:
+                read:
+                    - cleroux_prep.*.*
+                    - cleroux_prod.*.*
+                write:
+                    - cleroux_prep.*.*
+                    - cleroux_prod.*.*
 
     - cmeddaugh:
         member_of:
@@ -2708,6 +2733,38 @@ roles:
             - analyst_engineering
         warehouses:
             - dev_xs
+        owns:
+            databases:
+                - ddeng_prep
+                - ddeng_prod
+            schemas:
+                - ddeng_prep.*
+                - ddeng_prod.*
+            tables:
+                - ddeng_prep.*.*
+                - ddeng_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - ddeng_prep
+                    - ddeng_prod
+                write:
+                    - ddeng_prep
+                    - ddeng_prod
+            schemas:
+                read:
+                    - ddeng_prep.*
+                    - ddeng_prod.*
+                write:
+                    - ddeng_prep.*
+                    - ddeng_prod.*
+            tables:
+                read:
+                    - ddeng_prep.*.*
+                    - ddeng_prod.*.*
+                write:
+                    - ddeng_prep.*.*
+                    - ddeng_prod.*.*
 
     - degan:
         member_of:
@@ -2818,6 +2875,7 @@ roles:
             - analyst_core
             - data_manager
             - restricted_safe
+            - orgadmin
         warehouses:
             - dev_xs
         owns:
@@ -2932,6 +2990,8 @@ roles:
 
     - hkacmarski:
         member_of:
+            - analyst_sales
+            - bi_tool_eval_read
             - reporter
             - restricted_safe
         warehouses:
@@ -3438,12 +3498,16 @@ roles:
         member_of:
             - analyst_finance
             - analyst_people
-            - analytics_engineer_ga
+            - analytics_engineer_core
+            - analyst_people
+            - analyst_engineering
             - bamboohr
             - bamboohr_analytics
             - customers_db
             - data_team_analyst
+            - prometheus
             - restricted_safe
+            - workday 
         warehouses:
             - dev_xs
         owns:
@@ -3501,6 +3565,7 @@ roles:
     - mcooper:
         member_of:
             - analyst_finance
+            - analyst_marketing
             - bamboohr
             - customers_db
             - data_team_analyst
@@ -3545,8 +3610,10 @@ roles:
 
     - mdrussell:
         member_of:
+         - analytics_engineer_core
+         - analyst_engineering
+         - analyst_growth
          - data_team_analyst
-         - analytics_engineer_rd
          - restricted_safe
          - bi_tool_eval_read
          - zuora
@@ -3805,6 +3872,12 @@ roles:
         warehouses:
             - dev_xs
 
+    - ncregan:
+        member_of:
+            - google_search_console
+        warehouses:
+            - dev_xs
+
     - nfiguera:
         member_of:
             - analyst_sales
@@ -4034,8 +4107,13 @@ roles:
     - pempey:
         member_of:
             - engineer
-            - analytics_engineer_ga
+            - analytics_engineer_core
+            - analyst_people
+            - analyst_engineering
+            - bamboohr
             - bi_tool_eval_db
+            - prometheus
+            - workday
         warehouses:
             - dev_xs
             - dev_m
@@ -4946,6 +5024,11 @@ users:
         can_login: yes
         member_of:
             - nbelokolodov
+
+    - ncregan:
+        can_login: yes
+        member_of:
+            - ncregan
 
     - nfiguera:
         can_login: yes
