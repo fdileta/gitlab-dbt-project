@@ -63,7 +63,7 @@ def test_static_variables(utils):
         == "transformed_instance_queries.json"
     )
     assert (
-            utils.META_DATA_INSTANCE_SQL_QUERIES_FILE == "meta_data_instance_queries.json"
+        utils.META_DATA_INSTANCE_SQL_QUERIES_FILE == "meta_data_instance_queries.json"
     )
     assert utils.NAMESPACE_FILE == "usage_ping_namespace_queries.json"
     assert utils.HAVING_CLAUSE_PATTERN == re.compile(
