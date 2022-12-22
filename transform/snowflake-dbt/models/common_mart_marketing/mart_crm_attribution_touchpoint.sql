@@ -54,24 +54,31 @@
       fct_crm_attribution_touchpoint.bizible_count_custom_model,
       fct_crm_attribution_touchpoint.bizible_count_u_shaped,
       fct_crm_attribution_touchpoint.bizible_count_w_shaped,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_first_touch) AS first_net_arr,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_w_shaped) AS w_net_arr,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_u_shaped) AS u_net_arr,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_attribution_percent_full_path) AS full_net_arr,
-      (fct_crm_opportunity.net_arr * fct_crm_attribution_touchpoint.bizible_count_custom_model) AS custom_net_arr,
-      (fct_crm_opportunity.net_arr / fct_crm_attribution_touchpoint.campaigns_per_opp) AS net_arr_per_campaign,
+	  fct_crm_attribution_touchpoint.bizible_weight_full_path,
+      fct_crm_attribution_touchpoint.bizible_weight_custom_model,
+      fct_crm_attribution_touchpoint.bizible_weight_first_touch,
+      fct_crm_attribution_touchpoint.bizible_weight_lead_conversion,
+      fct_crm_attribution_touchpoint.bizible_weight_u_shaped,
+      fct_crm_attribution_touchpoint.bizible_weight_w_shaped,
+      (fct_crm_opportunity.net_arr * (fct_crm_attribution_touchpoint.bizible_weight_first_touch / 100)) AS first_net_arr,
+      (fct_crm_opportunity.net_arr * (fct_crm_attribution_touchpoint.bizible_weight_w_shaped / 100)) AS w_net_arr,
+      (fct_crm_opportunity.net_arr * (fct_crm_attribution_touchpoint.bizible_weight_u_shaped / 100)) AS u_net_arr,
+      (fct_crm_opportunity.net_arr * (fct_crm_attribution_touchpoint.bizible_weight_full_path / 100)) AS full_net_arr,
+      (fct_crm_opportunity.net_arr * (fct_crm_attribution_touchpoint.bizible_weight_custom_model / 100)) AS custom_net_arr,
+      (fct_crm_opportunity.net_arr / NULLIF(fct_crm_attribution_touchpoint.campaigns_per_opp,0)) AS net_arr_per_campaign,
       fct_crm_attribution_touchpoint.bizible_revenue_full_path,
       fct_crm_attribution_touchpoint.bizible_revenue_custom_model,
       fct_crm_attribution_touchpoint.bizible_revenue_first_touch,
       fct_crm_attribution_touchpoint.bizible_revenue_lead_conversion,
       fct_crm_attribution_touchpoint.bizible_revenue_u_shaped,
       fct_crm_attribution_touchpoint.bizible_revenue_w_shaped,
-      dim_crm_touchpoint.bizible_created_date,
+      dim_crm_touchpoint.bizible_created_date, 
 
       -- person info
       fct_crm_attribution_touchpoint.dim_crm_person_id,
       dim_crm_person.sfdc_record_id,
       dim_crm_person.sfdc_record_type,
+      dim_crm_person.marketo_lead_id,
       dim_crm_person.email_hash,
       dim_crm_person.email_domain,
       dim_crm_person.owner_id,
@@ -239,7 +246,7 @@
       fct_crm_opportunity.count_crm_attribution_touchpoints                AS crm_attribution_touchpoints_per_opp,
       fct_crm_opportunity.weighted_linear_iacv,
       fct_crm_opportunity.count_campaigns                                  AS count_campaigns_per_opp,
-      (fct_crm_opportunity.iacv / fct_crm_opportunity.count_campaigns)     AS iacv_per_campaign,
+      (fct_crm_opportunity.iacv / NULLIF(fct_crm_opportunity.count_campaigns,0))     AS iacv_per_campaign,
 
       -- bizible influenced
        CASE
@@ -284,10 +291,10 @@
     --linear attribution Net_Arr of an opp / all touches (count_touches) for each opp - weighted by the number of touches in the given bucket (campaign,channel,etc)
 
     SELECT
-      dim_crm_opportunity_id,
+      dim_crm_opportunity_id, 
       net_arr,
       COUNT(dim_crm_touchpoint_id) AS touchpoints_per_opportunity,
-      net_arr/touchpoints_per_opportunity AS weighted_linear_net_arr
+      net_arr/NULLIF(touchpoints_per_opportunity,0) AS weighted_linear_net_arr
     FROM  joined
     GROUP BY 1,2
 
@@ -296,7 +303,7 @@
     SELECT
       joined.*,
       linear_base.touchpoints_per_opportunity,
-      (joined.opps_per_touchpoint / linear_base.touchpoints_per_opportunity) AS l_weight,
+      (joined.opps_per_touchpoint / NULLIF(linear_base.touchpoints_per_opportunity,0)) AS l_weight,
       (joined.net_arr * l_weight) AS linear_net_arr
     FROM joined
     LEFT JOIN linear_base 
@@ -308,7 +315,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@michellecooper",
+    updated_by="@degan",
     created_date="2020-02-18",
-    updated_date="2022-11-29"
+    updated_date="2022-12-12"
 ) }}

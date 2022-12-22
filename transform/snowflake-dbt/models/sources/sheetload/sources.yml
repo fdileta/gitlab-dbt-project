@@ -56,6 +56,7 @@ sources:
       - name: event_dictionary_simplified
       - name: fmm_kpi_targets
       - name: fy23_quota
+      - name: ga360_customdimensions
       - name: gcp_active_cud
       - name: gitlab_contributing_organizations
       - name: gitlab_certification_tracking_dashboard
@@ -78,6 +79,7 @@ sources:
       - name: infrastructure_missing_employees
       - name: job_roles_prior_to_2020_02
       - name: kpi_status
+      - name: leading_organization_entry_dates
       - name: linkedin_recruiter
       - name: location_factor_targets
       - name: location_factor_temporary_2020_december
@@ -117,9 +119,8 @@ sources:
       - name: sisense_user_roles
       - name: social_marketing_metrics
       - name: social_marketing_topic_metrics
+      - name: toy_marketing_handbook
       - name: usage_ping_metrics_sections
       - name: values_certificate
       - name: yc_companies
       - name: xactly_credit_sheetload
-
-

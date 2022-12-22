@@ -1,8 +1,6 @@
 from os import environ as env
 
-from gitlabdata.orchestration_utils import (
-    snowflake_engine_factory,
-)
+from gitlabdata.orchestration_utils import snowflake_engine_factory
 from fire import Fire
 from query_utils import rollup_table_clone
 from typing import Dict

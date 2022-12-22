@@ -222,7 +222,6 @@ models:
         +schema: google_analytics_360
 
       google_search_console:
-        +materialized: table
         +schema: google_search_console 
 
       greenhouse:
@@ -312,6 +311,7 @@ models:
 
       zengrc:
         +schema: zengrc
+        +materialized: view
 
       zoominfo:
         +schema: zoominfo
@@ -588,6 +588,8 @@ models:
       workspace_engineering:
         +schema: workspace_engineering
         +materialized: table
+        zengrc:
+          +materialized: view
 
       workspace_people:
         +schema: workspace_people
