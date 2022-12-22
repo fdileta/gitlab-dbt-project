@@ -6,7 +6,7 @@ WITH session_custom_dims AS (
 ), ga_index_names AS (
 
 	SELECT * 
-	FROM  {{ ref('google_analytics_custom_dimension_indexes') }}
+	FROM  {{ ref('sheetload_ga360_custom_dimensions') }}
 
 ), named_dims AS(
 
