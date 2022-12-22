@@ -2,6 +2,7 @@ from api import BizibleSnowFlakeExtractor
 from os import environ as env
 import logging
 import sys
+import datetime
 from fire import Fire
 from typing import Dict, Any
 import yaml
