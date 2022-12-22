@@ -96,9 +96,12 @@ class BizibleSnowFlakeExtractor:
             query_start_date = dt
             query_end_date = dt + timedelta(hours=time_increments)
 
-            query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
-                WHERE {date_column} >= '{query_start_date}' 
-                AND {date_column} < '{query_end_date}'"""
+            if date_column != "":
+                query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}
+                    WHERE {date_column} >= '{query_start_date}' 
+                    AND {date_column} < '{query_end_date}'"""
+            else:
+                query = f"""SELECT *, SYSDATE() as uploaded_at FROM BIZIBLE_ROI_V3.GITLAB.{table_name}"""
 
             file_name = f"{table_name}_{str(dt.year)}-{str(dt.month)}-{str(dt.day)}-{str(dt.hour)}.csv"
 
