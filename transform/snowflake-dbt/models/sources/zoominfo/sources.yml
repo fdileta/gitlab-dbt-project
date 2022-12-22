@@ -13,7 +13,7 @@ sources:
 
     tables:
       - name: global
-        identifier: zi_comp_with_linkages_20220101_global         
+        identifier: zi_comp_with_linkages_20221001_global         
         description: International table, data ingested from Zoominfo inbound share.
      
       - name: techs
