@@ -257,7 +257,7 @@ class UsagePing:
 
         return metrics_data, error_data
 
-    def evaluate_saas_queries( #evaluate_saas_instance_sql_queries(
+    def evaluate_saas_instance_sql_queries(
         self, connection, saas_queries: Dict
     ) -> Tuple[Dict, Dict]:
         """
@@ -276,7 +276,7 @@ class UsagePing:
         for key, query in saas_queries.items():
             # if the 'query' is a dictionary, then recursively call
             if isinstance(query, dict):
-                results_returned, errors_returned = self.evaluate_saas_queries(
+                results_returned, errors_returned = self.evaluate_saas_instance_sql_queries(
                     connection, query
                 )
                 if results_returned:
