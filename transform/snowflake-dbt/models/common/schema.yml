@@ -4588,8 +4588,25 @@ models:
   - name: fct_performance_indicator_targets
     description: '{{ doc("fct_performance_indicator_targets") }}'
     columns:
-      - name: fct_performance_indicator_targets_id
-        description: The unique ID of a month/metric record in fct_performance_indicator_targets
+      - name: performance_indicator_targets_pk
+        description: The unique composite ID for the fct_performance_indicator_targets consisting of reporting_month and pi_metric_name
+        tests:
+          - not_null
+          - unique
+      - name: reporting_month
+        description: First day of calendar month when the target is valid for the metric (YYYY-MM-01)
+      - name: pi_metric_name
+        description: Metric associated with target. This value comes directly from the PI yaml file
+      - name: target_value
+        description: Target value for given metric on given month. This value appears in `pi_monthly_estimated_targets` in the PI yml files
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: dim_charge
     description: Dimension table for unique transactions in Zuora Billing. The table only includes recurring charges at this time. Non-recurring charges will be added in a future iteration.

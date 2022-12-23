@@ -1146,9 +1146,33 @@ For this reason `metrics_path` is not unique.
 
 {% docs fct_performance_indicator_targets %}
 
-New fact table to replace `performance_indicators_yaml_historical`.
+**Description:** Monthly performance indicator targets, based on the dates and targets provided in [performance indicator .yml files](https://gitlab.com/internal-handbook/internal-handbook.gitlab.io/-/tree/main/data/performance_indicators). This model is used to generate target values in the `[td_xmau]` and other related snippets.
 
-This new table will include all flattened target values for each metric for each month. Can just filter this fact table down in `td_xmau 2.0` snippet.
+**Data Grain:**
+- reporting_month
+- pi_metric_name
+
+**Filters Applied to Model:**
+- `pi_monthly_estimated_targets IS NOT NULL` (field from .yml file)
+
+**Business Logic in this Model:**
+- `reporting_month` is derived from the date provided in the `pi_monthly_estimated_targets` field of the .yml file
+  - Target end date: date specified in `pi_monthly_estimated_targets`
+  - Target start date: The day after the previous target end date _OR_, if a previous target is not specified, `2017-01-01` (date of earliest available product data)
+
+Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"2022-05-31":3000}`
+
+| reporting_month | target_value |
+| --- | --- |
+| 2017-01-01 | 1000 |
+| ... | 1000 |
+| 2022-02-01 | 1000 |
+| 2022-03-01 | 2000 |
+| 2022-04-01 | 3000 |
+| 2022-05-01 | 3000 |
+
+**Other Comments:**
+- More information on how to set these values on the [Product Manager Toolkit handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/product-manager-toolkit.html#how-to-show-dynamic-targets-from-pi-yaml-files)
 
 {% enddocs %}
 

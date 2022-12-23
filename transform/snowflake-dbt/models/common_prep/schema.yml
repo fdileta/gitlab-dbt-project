@@ -1875,3 +1875,28 @@ models:
         tests:
           - unique
           - not_null
+
+  - name: prep_performance_indicators_yaml
+    description: '{{ doc("prep_performance_indicators_yaml") }}'
+    columns:
+      - name: performance_indicator_pk
+        description: The unique composite ID for the prep_performance_indicators_yaml consisting of _dbt_source_relation and unique_key
+        tests:
+          - not_null
+          - unique
+      - name: _dbt_source_relation
+        description: Data source (in Snowflake) for performance indicator data (ex. `"PREP".gitlab_data_yaml.performance_indicators_ops_section_source`)
+      - name: date_first_added
+        description: This identifies when the KPI was first added. Note, since we started capturing the data on 2020-08-18, this will be the date for all performance indicators that existed before capturing.
+      - name: valid_from_date
+        description: The first date the record was valid (YYYY-MM-DD). This column can be used to order the different "versions" of a record. This value is used to dedupe records.
+      - name: valid_to_date
+        description: The last date the record was valid (YYYY-MM-DD)
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'

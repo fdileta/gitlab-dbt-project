@@ -50,7 +50,7 @@ flattened_monthly_targets AS (
 Calculate the reporting intervals for the pi_metric_name. Each row will have a start and end date
 Determine start month by checking if the previous record has a target_end_date.
   - If yes, then target_start_month = target_end_date from previous record
-  - If no, then target_start_month = a year ago from today
+  - If no, then target_start_month = 2017-01-01 (earliest available product data, an arbitrary date in the past)
 */
 
 monthly_targets_with_intervals AS (
@@ -59,7 +59,7 @@ monthly_targets_with_intervals AS (
     *,
     IFNULL(
       LAG(target_end_month) OVER (PARTITION BY pi_metric_name ORDER BY target_end_month),
-      DATEADD('month', -12, CURRENT_DATE)
+      '2017-01-01' --year of GitLab initial release date
       ) AS target_start_month
   FROM flattened_monthly_targets
 
