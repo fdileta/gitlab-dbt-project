@@ -29,6 +29,7 @@ WITH source AS (
       tab_width::VARCHAR                  AS tab_width,
       experience_level::NUMBER            AS experience_level,
       view_diffs_file_by_file::BOOLEAN    AS view_diffs_file_by_file
+      use_legacy_web_ide::BOOLEAN         AS does_use_legacy_web_ide
 
     FROM source
 
