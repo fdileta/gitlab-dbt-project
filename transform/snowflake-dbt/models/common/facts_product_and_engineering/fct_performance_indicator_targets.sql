@@ -4,7 +4,7 @@
 ) }}
 
 {{ simple_cte([
-    ('pi_targets', 'performance_indicators_yaml_historical'),
+    ('pi_targets', 'prep_performance_indicators_yaml'),
     ('dim_date', 'dim_date'),
     ])
 
@@ -12,13 +12,18 @@
 
 first_day_of_month AS (
 
-  SELECT DISTINCT first_day_of_month AS reporting_month
+  SELECT DISTINCT
+    first_day_of_month AS reporting_month
   FROM dim_date
 
 ),
 
+/* 
+Grab the most recent record of each pi_metric_name that does not have a NULL estimated target
+*/
+
 most_recent_yml_record AS (
-  -- just grabs the most recent record of each metrics_path that dont have a null estimated target
+
   SELECT *
   FROM pi_targets
   WHERE pi_monthly_estimated_targets IS NOT NULL
@@ -26,8 +31,12 @@ most_recent_yml_record AS (
 
 ),
 
+/*
+Flatten the json record from the yml file to get the target value and end month for each key:value pair
+*/
+
 flattened_monthly_targets AS (
-  -- flatten the json record from the yml file to get the target value and end month for each key:value pair
+
   SELECT
     pi_metric_name,
     d.value,
@@ -37,33 +46,41 @@ flattened_monthly_targets AS (
 
 ),
 
+/*
+Calculate the reporting intervals for the pi_metric_name. Each row will have a start and end date
+Determine start month by checking if the previous record has a target_end_date.
+  - If yes, then target_start_month = target_end_date from previous record
+  - If no, then target_start_month = a year ago from today
+*/
+
 monthly_targets_with_intervals AS (
-  -- Calculate the reporting intervals for the pi_metric_name. Each row will have a start and end date
+
   SELECT
     *,
-    -- check if the row above the current row has a target_end_date:
-    -- TRUE: then the start month = target_end_date from previous ROW_NUMBER
-    -- FALSE: then make the start_month a year ago from TODAY
-    COALESCE(
-      LAG(target_end_month) OVER (PARTITION BY 1 ORDER BY target_end_month),
+    IFNULL(
+      LAG(target_end_month) OVER (PARTITION BY pi_metric_name ORDER BY target_end_month),
       DATEADD('month', -12, CURRENT_DATE)
- ) AS target_start_month
+      ) AS target_start_month
   FROM flattened_monthly_targets
 
 ),
 
+/*
+  Join each pi_metric_name and value to the reporting_month it corresponds with
+  Join on reporting_month greater than metric start_month and reporting_month less than or equal to the target end month/ CURRENT_DATE
+*/
+
 final_targets AS (
-  -- join each metric_name and value to the reporting_month it corresponds WITH
-  -- join IF reporting_month greater than metric start_month and reporting_month less than or equal to the target end month/ CURRENT_DATE
+
   SELECT
-    {{ dbt_utils.surrogate_key(['reporting_month', 'pi_metric_name']) }} AS fct_performance_indicator_targets_id,
+    {{ dbt_utils.surrogate_key(['reporting_month', 'pi_metric_name']) }} AS performance_indicator_targets_pk,
     reporting_month,
     pi_metric_name,
     value AS target_value
   FROM first_day_of_month
   INNER JOIN monthly_targets_with_intervals
   WHERE reporting_month > target_start_month
-    AND reporting_month <= COALESCE(target_end_month, CURRENT_DATE)
+    AND reporting_month <= IFNULL(target_end_month, CURRENT_DATE)
 
 ),
 
@@ -74,11 +91,10 @@ results AS (
 
 )
 
-
 {{ dbt_audit(
     cte_ref="results",
     created_by="@dihle",
-    updated_by="@iweeks",
+    updated_by="@cbraza",
     created_date="2022-04-20",
-    updated_date="2022-05-12"
+    updated_date="2022-12-23"
 ) }}
