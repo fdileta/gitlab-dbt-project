@@ -28,11 +28,12 @@ WITH map_merged_crm_account AS (
 ), lam_corrections AS (
 
     SELECT
-      snapshot_dates.date_id                  AS snapshot_id,
-      dim_parent_crm_account_id               AS dim_parent_crm_account_id,
-      dev_count                               AS dev_count,
-      estimated_capped_lam                    AS estimated_capped_lam,
-      dim_parent_crm_account_sales_segment    AS dim_parent_crm_account_sales_segment
+      snapshot_dates.date_id                                                                                   AS snapshot_id,
+      dim_parent_crm_account_id                                                                                AS dim_parent_crm_account_id,
+      dev_count                                                                                                AS dev_count,
+      estimated_capped_lam                                                                                     AS estimated_capped_lam,
+      dim_parent_crm_account_sales_segment                                                                     AS dim_parent_crm_account_sales_segment
+      
     FROM {{ ref('driveload_lam_corrections_source') }}
     INNER JOIN snapshot_dates
         ON snapshot_dates.date_actual >= valid_from
@@ -46,9 +47,9 @@ WITH map_merged_crm_account AS (
     {%- if model_type == 'live' %}
         *
     {%- elif model_type == 'snapshot' %}
-        {{ dbt_utils.surrogate_key(['sfdc_account_snapshots_source.account_id','snapshot_dates.date_id'])}}                                        AS crm_account_snapshot_id,
-        snapshot_dates.date_id                                                                                                                     AS snapshot_id,
-        snapshot_dates.date_actual                                                                                                                 AS snapshot_date,
+        {{ dbt_utils.surrogate_key(['sfdc_account_snapshots_source.account_id','snapshot_dates.date_id'])}}    AS crm_account_snapshot_id,
+        snapshot_dates.date_id                                                                                 AS snapshot_id,
+        snapshot_dates.date_actual                                                                             AS snapshot_date,
         sfdc_account_snapshots_source.*
      {%- endif %}
     FROM
@@ -68,8 +69,8 @@ WITH map_merged_crm_account AS (
       {%- if model_type == 'live' %}
         *
       {%- elif model_type == 'snapshot' %}
-      {{ dbt_utils.surrogate_key(['sfdc_user_snapshots_source.user_id','snapshot_dates.date_id'])}}                                         AS crm_user_snapshot_id,
-      snapshot_dates.date_id                                                                                                                AS snapshot_id,
+      {{ dbt_utils.surrogate_key(['sfdc_user_snapshots_source.user_id','snapshot_dates.date_id'])}}            AS crm_user_snapshot_id,
+      snapshot_dates.date_id                                                                                   AS snapshot_id,
       sfdc_user_snapshots_source.*
       {%- endif %}
     FROM
@@ -154,7 +155,7 @@ WITH map_merged_crm_account AS (
       proposed_account_owner.name                                                                              AS proposed_crm_account_owner,
       technical_account_manager.name                                                                           AS technical_account_manager,
 
-      --descriptive attributes--descriptive attributes
+      --descriptive attributes
       sfdc_account.account_name                                                                                AS crm_account_name,
       sfdc_account.account_demographics_sales_segment                                                          AS parent_crm_account_demographics_sales_segment,
       sfdc_account.account_demographics_geo                                                                    AS parent_crm_account_demographics_geo,
@@ -232,10 +233,11 @@ WITH map_merged_crm_account AS (
       sfdc_account.forbes_2000_rank                                                                            AS forbes_2000_rank,
       sfdc_account.sales_development_rep                                                                       AS sales_development_rep,
 	  sfdc_account.admin_manual_source_number_of_employees                                                     AS admin_manual_source_number_of_employees, 
-      sfdc_account.admin_manual_source_account_address                                                         AS admin_manual_source_account_address,
+      sfdc_account.admin_manual_source_account_address                                                         AS admin_manual_source_account_address,      
 
       --degenerative dimensions
-      sfdc_account.is_sdr_target_account                                                                       AS is_sdr_target_account,      IFF(sfdc_record_type.record_type_label = 'Partner'
+      sfdc_account.is_sdr_target_account                                                                       AS is_sdr_target_account,
+      IFF(sfdc_record_type.record_type_label = 'Partner'
           AND sfdc_account.partner_type IN ('Alliance', 'Channel')
           AND sfdc_account.partner_status = 'Authorized',
           TRUE, FALSE)                                                                                         AS is_reseller,
@@ -341,30 +343,29 @@ WITH map_merged_crm_account AS (
       {{ get_date_id('sfdc_account.customer_since_date') }}                                                    AS customer_since_date_id,
       sfdc_account.customer_since_date,
       {{ get_date_id('sfdc_account.next_renewal_date') }}                                                      AS next_renewal_date_id,
-      sfdc_account.next_renewal_date,
+      sfdc_account.next_renewal_date                                                                           AS next_renewal_date,
 
       --measures
-      sfdc_account.count_active_subscription_charges,
-      sfdc_account.count_active_subscriptions,
-      sfdc_account.count_billing_accounts,
-      sfdc_account.count_licensed_users,
-      sfdc_account.count_of_new_business_won_opportunities,
-      sfdc_account.count_open_renewal_opportunities,
-      sfdc_account.count_opportunities,
-      sfdc_account.count_products_purchased,
-      sfdc_account.count_won_opportunities,
-      sfdc_account.count_concurrent_ee_subscriptions,
-      sfdc_account.count_ce_instances,
-      sfdc_account.count_active_ce_users,
-      sfdc_account.count_open_opportunities,
-      sfdc_account.count_using_ce,
-      sfdc_account.potential_arr_lam,
-      sfdc_account.carr_this_account,
-      sfdc_account.carr_account_family,
-      sfdc_account.potential_users,
-      sfdc_account.number_of_licenses_this_account,
-      sfdc_account.decision_maker_count_linkedin,
-      sfdc_account.number_of_employees,
+      sfdc_account.count_active_subscription_charges                                                           AS count_active_subscription_charges,
+      sfdc_account.count_active_subscriptions                                                                  AS count_active_subscriptions,
+      sfdc_account.count_billing_accounts                                                                      AS count_billing_accounts,
+      sfdc_account.count_licensed_users                                                                        AS count_licensed_users,
+      sfdc_account.count_of_new_business_won_opportunities                                                     AS count_of_new_business_won_opportunities,
+      sfdc_account.count_open_renewal_opportunities                                                            AS count_open_renewal_opportunities,
+      sfdc_account.count_opportunities                                                                         AS count_opportunities,
+      sfdc_account.count_products_purchased                                                                    AS count_products_purchased,
+      sfdc_account.count_won_opportunities                                                                     AS count_won_opportunities,
+      sfdc_account.count_concurrent_ee_subscriptions                                                           AS count_concurrent_ee_subscriptions,
+      sfdc_account.count_ce_instances                                                                          AS count_ce_instances,
+      sfdc_account.count_active_ce_users                                                                       AS count_active_ce_users,
+      sfdc_account.count_open_opportunities                                                                    AS count_open_opportunities,
+      sfdc_account.count_using_ce                                                                              AS count_using_ce,
+      sfdc_account.carr_this_account                                                                           AS carr_this_account,
+      sfdc_account.carr_account_family                                                                         AS carr_account_family,
+      sfdc_account.potential_users                                                                             AS potential_users,
+      sfdc_account.number_of_licenses_this_account                                                             AS number_of_licenses_this_account,
+      sfdc_account.decision_maker_count_linkedin                                                               AS decision_maker_count_linkedin,
+      sfdc_account.number_of_employees                                                                         AS number_of_employees,
       {%- if model_type == 'live' %}
       sfdc_account.lam                                                                                         AS parent_crm_account_lam,
       sfdc_account.lam_dev_count                                                                               AS parent_crm_account_lam_dev_count,
