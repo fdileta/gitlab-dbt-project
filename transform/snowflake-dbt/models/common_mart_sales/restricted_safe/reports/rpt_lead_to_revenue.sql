@@ -286,7 +286,6 @@
       opp.crm_account_focus_account,
       opp.crm_account_zi_technologies,
       opp.is_jihu_account,
-      opp.fy22_new_logo_target_list,
       opp.is_closed,
       opp.is_edu_oss,
       opp.is_ps_opp,
@@ -508,7 +507,6 @@
     cohort_base.crm_account_focus_account,
     cohort_base.crm_account_zi_technologies,
     cohort_base.is_jihu_account,
-    cohort_base.fy22_new_logo_target_list,
     cohort_base.is_closed,
     cohort_base.is_edu_oss,
     cohort_base.is_ps_opp,
@@ -657,7 +655,8 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@rkohnke",
-    updated_by="@rkohnke",
+    updated_by="@lvinueza",
     created_date="2022-07-20",
-    updated_date="2022-12-06",
+    updated_date="2022-12-21",
   ) }}
+  
