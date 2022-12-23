@@ -76,7 +76,7 @@ def get_fiscal_quarter() -> str:
     execution_date = date_parser.parse(config_dict["execution_date"])
     task_schedule = config_dict["task_schedule"]
 
-    print(
+    info(
         f"Calculating quarter based on the following task_schedule \
         and execution_date: {task_schedule} | {execution_date}"
     )
@@ -167,9 +167,9 @@ def poll_job_status(
     while True:
         status = get_job_status(job_id)
         poll_attempts += 1
-        print(f"Current status: {status}")
+        info(f"Poll attempt {poll_attempts} current status: {status}")
         if status == "DONE":
-            print(f"job_id {job_id} successfully completed, \
+            info(f"job_id {job_id} successfully completed, \
                 it is ready for export.")
             return True
 
