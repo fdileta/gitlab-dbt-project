@@ -154,6 +154,7 @@
       dim_sales_qualified_source.sales_qualified_source_name,
       dim_sales_qualified_source.sales_qualified_source_grouped,
       dim_sales_qualified_source.sqs_bucket_engagement,
+	  dim_crm_opportunity.record_type_name,
 
        -- Account fields
       dim_crm_account.crm_account_name,
@@ -603,6 +604,7 @@
       ON fct_crm_opportunity.fulfillment_partner = fulfillment_partner.dim_crm_account_id
 
 )
+
 
 {{ dbt_audit(
     cte_ref="final",
