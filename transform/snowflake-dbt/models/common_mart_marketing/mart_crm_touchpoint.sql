@@ -47,11 +47,13 @@
       fct_crm_touchpoint.bizible_count_first_touch,
       fct_crm_touchpoint.bizible_count_lead_creation_touch,
       fct_crm_touchpoint.bizible_count_u_shaped,
+      dim_crm_touchpoint.bizible_created_date,
 
       -- person info
       fct_crm_touchpoint.dim_crm_person_id,
       dim_crm_person.sfdc_record_id,
       dim_crm_person.sfdc_record_type,
+      dim_crm_person.marketo_lead_id,
       dim_crm_person.email_hash,
       dim_crm_person.email_domain,
       dim_crm_person.owner_id,
@@ -165,10 +167,6 @@
       dim_crm_account.health_number,
       dim_crm_account.health_score_color,
       dim_crm_account.dim_parent_crm_account_id,
-      dim_crm_account.parent_crm_account_demographics_sales_segment                   AS parent_crm_account_sales_segment,
-      dim_crm_account.parent_crm_account_demographics_territory                       AS parent_crm_account_sales_territory,
-      dim_crm_account.parent_crm_account_demographics_region                          AS parent_crm_account_region,
-      dim_crm_account.parent_crm_account_demographics_area                            AS parent_crm_account_area,
       dim_crm_account.parent_crm_account_industry,
       dim_crm_account.crm_account_owner_user_segment,
       dim_crm_account.record_type_id,
@@ -310,6 +308,7 @@
     ON joined.dim_crm_touchpoint_id=mql_weighted_tps.dim_crm_touchpoint_id
 
 )
+
 
 {{ dbt_audit(
     cte_ref="final",
