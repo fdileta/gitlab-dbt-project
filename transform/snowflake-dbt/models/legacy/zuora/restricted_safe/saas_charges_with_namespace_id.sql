@@ -51,8 +51,6 @@ WITH zuora_base_mrr AS (
       COALESCE(merged_accounts.dim_crm_account_id, dim_crm_account.dim_crm_account_id)  AS dim_crm_account_id,
       COALESCE(merged_accounts.dim_parent_crm_account_id,
                 dim_crm_account.dim_parent_crm_account_id)                              AS dim_parent_crm_account_id,
-      COALESCE(merged_accounts.parent_crm_account_name,
-                dim_crm_account.parent_crm_account_name)                                AS parent_crm_account_name,
       customers_db_charges.current_customer_id,
       namespaces.namespace_id
     FROM zuora_base_mrr
