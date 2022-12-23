@@ -24,6 +24,7 @@ WITH source AS (
         ping_created_at                                                                         AS ping_created_at,
         ip_address_hash                                                                         AS ip_address_hash,
         license_md5                                                                             AS license_md5,
+        license_sha256                                                                          AS license_sha256,
         original_edition                                                                        AS original_edition,
         main_edition                                                                            AS main_edition,
         product_tier                                                                            AS product_tier,
@@ -43,7 +44,7 @@ WITH source AS (
   {{ dbt_audit(
       cte_ref="flattened_high_level",
       created_by="@icooper-acp",
-      updated_by="@snalamaru",
+      updated_by="@rbacovic",
       created_date="2022-03-17",
-      updated_date="2022-05-05"
+      updated_date="2022-12-01"
   ) }}
