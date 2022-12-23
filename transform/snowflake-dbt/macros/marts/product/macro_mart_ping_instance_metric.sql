@@ -138,7 +138,7 @@
         license_subscriptions_w_latest_subscription.crm_account_name                                                                    AS crm_account_name,
         license_subscriptions_w_latest_subscription.dim_parent_crm_account_id                                                           AS dim_parent_crm_account_id,
         license_subscriptions_w_latest_subscription.parent_crm_account_sales_segment                                                    AS parent_crm_account_sales_segment,
-        license_subscriptions_w_latest_subscription.parent_crm_account_demographics_territory                                           AS parent_crm_account_sales_territory,
+        license_subscriptions_w_latest_subscription.parent_crm_account_sales_territory                                                  AS parent_crm_account_sales_territory,
         license_subscriptions_w_latest_subscription.parent_crm_account_industry                                                         AS parent_crm_account_industry,
         license_subscriptions_w_latest_subscription.technical_account_manager                                                           AS technical_account_manager,
         COALESCE(is_paid_subscription, FALSE)                                                                                           AS is_paid_subscription,

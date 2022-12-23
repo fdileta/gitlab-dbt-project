@@ -191,11 +191,11 @@ WITH edm_opty AS (
     edm_opty.account_owner_user_region,
     edm_opty.account_owner_user_area,
 
-    edm_opty.account_demographics_segment,
-    edm_opty.account_demographics_geo,
-    edm_opty.account_demographics_region,
-    edm_opty.account_demographics_area,
-    edm_opty.account_demographics_territory,
+    edm_opty.parent_crm_account_demographics_sales_segment,
+    edm_opty.parent_crm_account_demographics_geo,
+    edm_opty.parent_crm_account_demographics_region,
+    edm_opty.parent_crm_account_demographics_area,
+    edm_opty.parent_crm_account_demographics_territory,
 
     upa.account_demographics_sales_segment            AS upa_demographics_segment,
     upa.account_demographics_geo                      AS upa_demographics_geo,
