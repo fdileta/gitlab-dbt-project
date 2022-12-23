@@ -119,11 +119,7 @@
         license_subscriptions.dim_billing_account_id                                                                                    AS dim_billing_account_id,
         license_subscriptions.crm_account_name                                                                                          AS crm_account_name,
         license_subscriptions.dim_parent_crm_account_id                                                                                 AS dim_parent_crm_account_id,
-        license_subscriptions.parent_crm_account_name                                                                                   AS parent_crm_account_name,
-        license_subscriptions.parent_crm_account_billing_country                                                                        AS parent_crm_account_billing_country,
-        license_subscriptions.parent_crm_account_sales_segment                                                                          AS parent_crm_account_sales_segment,
         license_subscriptions.parent_crm_account_industry                                                                               AS parent_crm_account_industry,
-        license_subscriptions.parent_crm_account_owner_team                                                                             AS parent_crm_account_owner_team,
         license_subscriptions.parent_crm_account_sales_territory                                                                        AS parent_crm_account_sales_territory,
         license_subscriptions.technical_account_manager                                                                                 AS technical_account_manager,
         COALESCE(is_paid_subscription, FALSE)                                                                                           AS is_paid_subscription,
@@ -215,12 +211,7 @@
 
       -- account metadata
       crm_account_name,
-      parent_crm_account_name,
-      parent_crm_account_billing_country,
-      parent_crm_account_sales_segment,
       parent_crm_account_industry,
-      parent_crm_account_owner_team,
-      parent_crm_account_sales_territory,
       technical_account_manager,
 
       ping_created_at,
@@ -235,7 +226,7 @@
 {{ dbt_audit(
     cte_ref="sorted",
     created_by="@icooper-acp",
-    updated_by="@tpoole1",
+    updated_by="@lvinueza",
     created_date="2022-03-11",
-    updated_date="2022-10-13"
+    updated_date="2022-12-21"
 ) }}

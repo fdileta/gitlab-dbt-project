@@ -23,32 +23,7 @@ WITH final AS (
       prep_crm_account.technical_account_manager,
 
       ----ultimate parent crm account info
-      prep_crm_account.parent_crm_account_name,
-      prep_crm_account.parent_crm_account_sales_segment,
-      prep_crm_account.parent_crm_account_billing_country,
-      prep_crm_account.parent_crm_account_billing_country_code,
       prep_crm_account.parent_crm_account_industry,
-      prep_crm_account.parent_crm_account_sub_industry,
-      prep_crm_account.parent_crm_account_industry_hierarchy,
-      prep_crm_account.parent_crm_account_owner_team,
-      prep_crm_account.parent_crm_account_sales_territory,
-      prep_crm_account.parent_crm_account_tsp_region,
-      prep_crm_account.parent_crm_account_tsp_sub_region,
-      prep_crm_account.parent_crm_account_tsp_area,
-      prep_crm_account.parent_crm_account_gtm_strategy,
-      prep_crm_account.parent_crm_account_focus_account,
-      prep_crm_account.parent_crm_account_tsp_account_employees,
-      prep_crm_account.parent_crm_account_tsp_max_family_employees,
-      prep_crm_account.parent_crm_account_employee_count_band,
-      prep_crm_account.parent_crm_account_created_date,
-      prep_crm_account.parent_crm_account_zi_technologies,
-      prep_crm_account.parent_crm_account_zoom_info_website,
-      prep_crm_account.parent_crm_account_zoom_info_company_other_domains,
-      prep_crm_account.parent_crm_account_zoom_info_dozisf_zi_id,
-      prep_crm_account.parent_crm_account_zoom_info_parent_company_zi_id,
-      prep_crm_account.parent_crm_account_zoom_info_parent_company_name,
-      prep_crm_account.parent_crm_account_zoom_info_ultimate_parent_company_zi_id,
-      prep_crm_account.parent_crm_account_zoom_info_ultimate_parent_company_name,
       prep_crm_account.parent_crm_account_demographics_sales_segment,
       prep_crm_account.parent_crm_account_demographics_geo,
       prep_crm_account.parent_crm_account_demographics_region,
@@ -67,22 +42,11 @@ WITH final AS (
       prep_crm_account.crm_account_gtm_strategy,
       prep_crm_account.crm_account_focus_account,
       prep_crm_account.crm_account_owner_user_segment,
-      prep_crm_account.crm_account_tsp_account_employees,
-      prep_crm_account.crm_account_tsp_max_family_employees,
       prep_crm_account.crm_account_billing_country,
       prep_crm_account.crm_account_billing_country_code,
       prep_crm_account.crm_account_type,
       prep_crm_account.crm_account_industry,
       prep_crm_account.crm_account_sub_industry,
-      prep_crm_account.crm_account_owner_team,
-      prep_crm_account.crm_account_sales_territory,
-      prep_crm_account.crm_account_tsp_region,
-      prep_crm_account.crm_account_tsp_sub_region,
-      prep_crm_account.crm_account_tsp_area,
-      prep_crm_account.tsp_max_hierarchy_sales_segment,
-      prep_crm_account.crm_account_employee_count_band,
-      prep_crm_account.tsp_account_employees,
-      prep_crm_account.tsp_max_family_employees,
       prep_crm_account.partner_vat_tax_id,
       prep_crm_account.account_manager,
       prep_crm_account.business_development_rep,
@@ -117,12 +81,9 @@ WITH final AS (
       prep_crm_account.account_phone,
       prep_crm_account.zoominfo_account_phone,
       prep_crm_account.abm_tier,
-      prep_crm_account.health_score,
       prep_crm_account.health_number,
       prep_crm_account.health_score_color,
       prep_crm_account.partner_account_iban_number,
-      prep_crm_account.federal_account,
-      prep_crm_account.fy22_new_logo_target_list,
       prep_crm_account.gitlab_com_user,
       prep_crm_account.crm_account_zi_technologies,
       prep_crm_account.crm_account_zoom_info_website,
@@ -133,7 +94,6 @@ WITH final AS (
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_zi_id,
       prep_crm_account.crm_account_zoom_info_ultimate_parent_company_name,
       prep_crm_account.forbes_2000_rank,
-      prep_crm_account.parent_account_industry_hierarchy,
       prep_crm_account.sales_development_rep,
       prep_crm_account.admin_manual_source_number_of_employees,
       prep_crm_account.admin_manual_source_account_address,
@@ -143,7 +103,6 @@ WITH final AS (
       prep_crm_account.parent_crm_account_lam_dev_count,
       prep_crm_account.carr_account_family,
       prep_crm_account.carr_this_account,
-      prep_crm_account.potential_arr_lam,
 
       --degenerative dimensions
       prep_crm_account.is_sdr_target_account,
@@ -194,15 +153,12 @@ WITH final AS (
       prep_crm_account.ptc_decile,
       prep_crm_account.ptc_score_group
     FROM {{ ref('prep_crm_account') }}
-
 )
 
 {{ dbt_audit(
     cte_ref="final",
     created_by="@msendal",
-    updated_by="@rkohnke",
+    updated_by="@lvinueza",
     created_date="2020-06-01",
-    updated_date="2022-11-10"
+    updated_date="2022-12-21"
 ) }}
-
-

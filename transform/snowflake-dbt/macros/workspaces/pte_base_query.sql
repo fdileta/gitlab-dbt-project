@@ -23,18 +23,7 @@ WITH mart_arr_snapshot_bottom_up AS (
 
     SELECT dim_crm_account_id
         , COUNT(dim_subscription_id) AS num_of_subs
-        , MAX(crm_account_tsp_region) AS crm_account_tsp_region
-        , MAX(parent_crm_account_sales_segment) AS parent_crm_account_sales_segment
         , MAX(parent_crm_account_industry) AS parent_crm_account_industry
-        , MAX(parent_crm_account_billing_country) AS parent_crm_account_billing_country
-        , MAX(parent_crm_account_owner_team) AS parent_crm_account_owner_team
-        , MAX(CASE WHEN parent_crm_account_sales_territory !='Territory Not Found' THEN parent_crm_account_sales_territory END) AS parent_crm_account_sales_territory
-        , MAX(parent_crm_account_tsp_region) AS parent_crm_account_tsp_region
-        , MAX(parent_crm_account_tsp_sub_region) AS parent_crm_account_tsp_sub_region
-        , MAX(parent_crm_account_tsp_area) AS parent_crm_account_tsp_area
-        , MAX(parent_crm_account_tsp_account_employees) AS crm_account_tsp_account_employees
-        , MAX(parent_crm_account_tsp_max_family_employees) AS parent_crm_account_tsp_max_family_employees
-        , MAX(parent_crm_account_employee_count_band) AS parent_crm_account_employee_count_band
         , MAX(CASE WHEN product_tier_name LIKE '%Ultimate%' THEN 1 ELSE 0 END) AS is_ultimate_product_tier
         , MAX(CASE WHEN product_tier_name LIKE '%Premium%' THEN 1 ELSE 0 END) AS is_premium_product_tier
         , MAX(CASE WHEN product_tier_name LIKE '%Starter%' or product_tier_name LIKE '%Bronze%' THEN 1 ELSE 0 END) AS is_starter_bronze_product_tier
@@ -84,7 +73,6 @@ WITH mart_arr_snapshot_bottom_up AS (
 
     SELECT dim_crm_account_id
         , COUNT(dim_subscription_id) AS num_of_subs_prev
-        , MAX(parent_crm_account_tsp_account_employees) AS crm_account_tsp_account_employees_prev
         , SUM(mrr) AS sum_mrr_prev
         , SUM(arr) AS sum_arr_prev
         , SUM(quantity) AS license_count_prev
@@ -363,26 +351,6 @@ SELECT
     --Zuora Fields
     , p1.num_of_subs AS subs_cnt
     , p1.cancelled_subs AS cancelled_subs_cnt
-    , CASE WHEN p1.crm_account_tsp_region = 'AMER' OR p1.crm_account_tsp_region LIKE 'AMER%' OR p1.crm_account_tsp_region LIKE 'US%' THEN 'AMER'
-           WHEN p1.crm_account_tsp_region = 'EMEA' OR p1.crm_account_tsp_region LIKE 'Germany%' THEN 'EMEA'
-           WHEN p1.crm_account_tsp_region IS NULL THEN 'Unknown'
-           ELSE p1.crm_account_tsp_region END AS account_region
-    --, COALESCE(p1.crm_account_tsp_region, 'Unknown') AS account_region
-    , COALESCE(p1.parent_crm_account_sales_segment, 'Unknown') AS account_sales_segment
-    , COALESCE(p1.parent_crm_account_industry, 'Unknown') AS account_industry
-    , COALESCE(p1.parent_crm_account_billing_country, 'Unknown') AS account_billing_country
-    , COALESCE(p1.parent_crm_account_owner_team, 'Unknown') AS account_owner_team
-    , COALESCE(p1.parent_crm_account_sales_territory, 'Unknown') AS account_sales_territory
-    , CASE WHEN p1.parent_crm_account_tsp_region = 'AMER' OR p1.parent_crm_account_tsp_region LIKE 'AMER%' OR p1.parent_crm_account_tsp_region LIKE 'US%' THEN 'AMER'
-           WHEN p1.parent_crm_account_tsp_region = 'EMEA' OR p1.parent_crm_account_tsp_region LIKE 'Germany%' THEN 'EMEA'
-           WHEN p1.parent_crm_account_tsp_region IS NULL THEN 'Unknown'
-           ELSE p1.parent_crm_account_tsp_region END AS parent_account_region
-    --, COALESCE(p1.parent_crm_account_tsp_region, 'Unknown') AS parent_account_region
-    , COALESCE(p1.parent_crm_account_tsp_sub_region, 'Unknown') AS parent_account_sub_region
-    , COALESCE(p1.parent_crm_account_tsp_area, 'Unknown') AS parent_account_area
-    , p1.crm_account_tsp_account_employees AS parent_account_employees_cnt
-    , p1.parent_crm_account_tsp_max_family_employees AS parent_account_max_family_employees_cnt
-    , p1.parent_crm_account_employee_count_band AS parent_account_employee_count_band
     , p1.is_ultimate_product_tier AS is_ultimate_product_tier_flag
     , p1.is_premium_product_tier AS is_premium_product_tier_flag
     , p1.is_starter_bronze_product_tier AS is_starter_bronze_product_tier_flag

@@ -54,12 +54,7 @@
       dim_billing_account.dim_billing_account_id                                  AS dim_billing_account_id,
       dim_crm_accounts.crm_account_name                                           AS crm_account_name,
       dim_crm_accounts.dim_parent_crm_account_id                                  AS dim_parent_crm_account_id,
-      dim_crm_accounts.parent_crm_account_name                                    AS parent_crm_account_name,
-      dim_crm_accounts.parent_crm_account_billing_country                         AS parent_crm_account_billing_country,
-      dim_crm_accounts.parent_crm_account_sales_segment                           AS parent_crm_account_sales_segment,
       dim_crm_accounts.parent_crm_account_industry                                AS parent_crm_account_industry,
-      dim_crm_accounts.parent_crm_account_owner_team                              AS parent_crm_account_owner_team,
-      dim_crm_accounts.parent_crm_account_sales_territory                         AS parent_crm_account_sales_territory,
       dim_crm_accounts.technical_account_manager                                  AS technical_account_manager,
       IFF(MAX(mrr) > 0, TRUE, FALSE)                                              AS is_paid_subscription,
       MAX(IFF(product_rate_plan_name ILIKE ANY ('%edu%', '%oss%'), TRUE, FALSE))  AS is_program_subscription,
@@ -89,7 +84,7 @@
       ON dim_billing_account.dim_crm_account_id = dim_crm_accounts.dim_crm_account_id
     INNER JOIN dim_date
       ON effective_start_month <= dim_date.date_day AND effective_end_month > dim_date.date_day
-    {{ dbt_utils.group_by(n=21)}}
+    {{ dbt_utils.group_by(n=16)}}
 
 
   ), latest_subscription AS (
@@ -141,11 +136,7 @@
         license_subscriptions_w_latest_subscription.dim_billing_account_id                                                              AS dim_billing_account_id,
         license_subscriptions_w_latest_subscription.crm_account_name                                                                    AS crm_account_name,
         license_subscriptions_w_latest_subscription.dim_parent_crm_account_id                                                           AS dim_parent_crm_account_id,
-        license_subscriptions_w_latest_subscription.parent_crm_account_name                                                             AS parent_crm_account_name,
-        license_subscriptions_w_latest_subscription.parent_crm_account_billing_country                                                  AS parent_crm_account_billing_country,
         license_subscriptions_w_latest_subscription.parent_crm_account_sales_segment                                                    AS parent_crm_account_sales_segment,
-        license_subscriptions_w_latest_subscription.parent_crm_account_industry                                                         AS parent_crm_account_industry,
-        license_subscriptions_w_latest_subscription.parent_crm_account_owner_team                                                       AS parent_crm_account_owner_team,
         license_subscriptions_w_latest_subscription.parent_crm_account_sales_territory                                                  AS parent_crm_account_sales_territory,
         license_subscriptions_w_latest_subscription.technical_account_manager                                                           AS technical_account_manager,
         COALESCE(is_paid_subscription, FALSE)                                                                                           AS is_paid_subscription,
@@ -253,11 +244,8 @@
 
       -- account metadata
       crm_account_name,
-      parent_crm_account_name,
-      parent_crm_account_billing_country,
       parent_crm_account_sales_segment,
       parent_crm_account_industry,
-      parent_crm_account_owner_team,
       parent_crm_account_sales_territory,
       technical_account_manager,
 
