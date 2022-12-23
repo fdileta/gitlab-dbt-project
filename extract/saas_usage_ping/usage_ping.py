@@ -303,7 +303,7 @@ class UsagePing:
             # else keep the dict as is
             else:
                 results[key] = query
-
+            info(f"RESULT: {results}")
         return results, errors
 
     def saas_instance_sql_metrics(
