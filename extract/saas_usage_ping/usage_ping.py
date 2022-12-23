@@ -303,7 +303,7 @@ class UsagePing:
             # else keep the dict as is
             else:
                 results[key] = query
-            info(f"RESULT: {data_to_write}")
+
         return results, errors
 
     def saas_instance_sql_metrics(
@@ -493,6 +493,10 @@ class UsagePing:
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(
             metric_definition_dict=metric_definition_dict, saas_queries=saas_queries
         )
+
+        for key, value in sql_metrics.items():
+            if value == 0 or value == ' ' or value =='':
+                logging.info(F"RESULT: key: {key}, value: {value}")
 
         redis_metrics, redis_metadata = self.saas_instance_redis_metrics(
             metric_definition_dict=metric_definition_dict
