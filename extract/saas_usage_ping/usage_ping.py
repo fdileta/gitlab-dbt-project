@@ -248,14 +248,12 @@ class UsagePing:
             query_output.columns = query_output.columns.str.lower()
             # info(query_output)
             # convert 'numpy int' to 'int' so json can be written
-            metrics_data = 999 # int(query_output.loc[0, "counter_value"])
-            logging.info(f"Metrics data: {metrics_data}...")
+            metrics_data = int(query_output.loc[0, "counter_value"])
         except (KeyError, ValueError):
             metrics_data = 0
-            logging.info(f"Metrics data Key,Value ERROR")
+
         except SQLAlchemyError as e:
             error_data = str(e.__dict__["orig"])
-            logging.info(f"Metrics data SQLAlchemy ERRORL {error_data}")
 
         return metrics_data, error_data
 
@@ -278,13 +276,9 @@ class UsagePing:
         for key, query in saas_queries.items():
             # if the 'query' is a dictionary, then recursively call
             if isinstance(query, dict):
-
-                instance_sql_results = self.evaluate_saas_instance_sql_queries(
+                results_returned, errors_returned = self.evaluate_saas_queries(
                     connection, query
                 )
-
-                results_returned, errors_returned = instance_sql_results
-
                 if results_returned:
                     results[key] = results_returned
                 if errors_returned:
@@ -293,11 +287,20 @@ class UsagePing:
             elif isinstance(query, str) and query.startswith("SELECT"):
                 logging.info(f"Running ping: {key}...")
 
-                data_to_write, error_data_to_write = self.get_instance_sql_data(
-                    sql_query=query, con=connection
-                )
+                try:
+                    data_to_write = error_data_to_write = None
+                    query_output = pd.read_sql(sql=query, con=connection)
+                    # standardize column case across pandas versions
+                    query_output.columns = query_output.columns.str.lower()
+                    info(query_output)
+                    # convert 'numpy int' to 'int' so json can be written
+                    data_to_write = int(query_output.loc[0, "counter_value"])
+                except (KeyError, ValueError):
+                    data_to_write = 0
+                except SQLAlchemyError as e:
+                    error_data_to_write = str(e.__dict__["orig"])
 
-                if data_to_write:
+                if data_to_write is not None:
                     results[key] = data_to_write
 
                 if error_data_to_write:
@@ -308,6 +311,41 @@ class UsagePing:
                 results[key] = query
 
         return results, errors
+
+
+        # for key, query in saas_queries.items():
+        #     # if the 'query' is a dictionary, then recursively call
+        #     if isinstance(query, dict):
+        #
+        #         instance_sql_results = self.evaluate_saas_instance_sql_queries(
+        #             connection, query
+        #         )
+        #
+        #         results_returned, errors_returned = instance_sql_results
+        #
+        #         if results_returned:
+        #             results[key] = results_returned
+        #         if errors_returned:
+        #             errors[key] = errors_returned
+        #     # reached a 'select statement' value, run it in snowflake
+        #     elif isinstance(query, str) and query.startswith("SELECT"):
+        #         logging.info(f"Running ping: {key}...")
+        #
+        #         data_to_write, error_data_to_write = self.get_instance_sql_data(
+        #             sql_query=query, con=connection
+        #         )
+        #
+        #         if data_to_write:
+        #             results[key] = data_to_write
+        #
+        #         if error_data_to_write:
+        #             errors[key] = error_data_to_write
+        #
+        #     # else keep the dict as is
+        #     else:
+        #         results[key] = query
+        #
+        # return results, errors
 
     def saas_instance_sql_metrics(
         self, metric_definition_dict: Dict, saas_queries: Dict
