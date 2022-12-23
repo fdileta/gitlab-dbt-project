@@ -246,13 +246,16 @@ class UsagePing:
             query_output = pd.read_sql(sql=sql_query, con=con)
             # standardize column case across pandas versions
             query_output.columns = query_output.columns.str.lower()
-            info(query_output)
+            # info(query_output)
             # convert 'numpy int' to 'int' so json can be written
             metrics_data = int(query_output.loc[0, "counter_value"])
+            logging.info(f"Metrics data: {metrics_data}...")
         except (KeyError, ValueError):
             metrics_data = 0
+            logging.info(f"Metrics data Key,Value ERROR")
         except SQLAlchemyError as e:
             error_data = str(e.__dict__["orig"])
+            logging.info(f"Metrics data SQLAlchemy ERRORL {error_data}")
 
         return metrics_data, error_data
 
@@ -321,11 +324,9 @@ class UsagePing:
         saas_queries_with_valid_definitions = self.keep_valid_metric_definitions(
             saas_queries, payload_source, metric_definition_dict
         )
-        # TODO: rbacovic remove
-        saas_queries_with_valid_definitions2 = {k: saas_queries_with_valid_definitions[k] for k in list(saas_queries_with_valid_definitions)[:20]}
 
         sql_metrics, sql_metric_errors = self.evaluate_saas_instance_sql_queries(
-            connection, saas_queries_with_valid_definitions2
+            connection, saas_queries_with_valid_definitions
         )
 
         info("Processed queries")
@@ -496,9 +497,6 @@ class UsagePing:
             metric_definition_dict=metric_definition_dict, saas_queries=saas_queries
         )
 
-        # TODO: rbacovic remove
-        for key, value in sql_metrics.items():
-            logging.info(F"RESULT: key: {key}, value: {value}")
 
         redis_metrics, redis_metadata = self.saas_instance_redis_metrics(
             metric_definition_dict=metric_definition_dict
