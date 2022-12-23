@@ -35,7 +35,6 @@ WITH dim_billing_account AS (
       dim_date.date_actual                                                            AS arr_month,
       IFF(is_first_day_of_last_month_of_fiscal_quarter, fiscal_quarter_name_fy, NULL) AS fiscal_quarter_name_fy,
       IFF(is_first_day_of_last_month_of_fiscal_year, fiscal_year, NULL)               AS fiscal_year,
-      dim_crm_account.parent_crm_account_name                                         AS parent_crm_account_name,
       dim_crm_account.dim_parent_crm_account_id                                       AS dim_parent_crm_account_id,
       dim_product_detail.product_tier_name                                            AS product_tier_name,
       dim_product_detail.product_delivery_type                                        AS product_delivery_type,
@@ -58,7 +57,6 @@ WITH dim_billing_account AS (
 ), max_min_month AS (
 
     SELECT
-      parent_crm_account_name,
       dim_parent_crm_account_id,
       product_tier_name,
       product_delivery_type,
@@ -67,12 +65,11 @@ WITH dim_billing_account AS (
       --add 1 month to generate churn month
       DATEADD('month',1,MAX(arr_month))   AS date_month_end
     FROM mart_arr
-    {{ dbt_utils.group_by(n=5) }}
+    {{ dbt_utils.group_by(n=4) }}
 
 ), base AS (
 
     SELECT
-      parent_crm_account_name,
       dim_parent_crm_account_id,
       product_tier_name,
       product_delivery_type,
@@ -92,7 +89,6 @@ WITH dim_billing_account AS (
 
     SELECT
       base.arr_month,
-      base.parent_crm_account_name,
       base.dim_parent_crm_account_id,
       base.product_tier_name                                                                 AS product_tier_name,
       base.product_delivery_type                                                             AS product_delivery_type,
@@ -104,7 +100,7 @@ WITH dim_billing_account AS (
       ON base.arr_month = mart_arr.arr_month
       AND base.dim_parent_crm_account_id = mart_arr.dim_parent_crm_account_id
       AND base.product_tier_name = mart_arr.product_tier_name
-    {{ dbt_utils.group_by(n=6) }}
+    {{ dbt_utils.group_by(n=5) }}
 
 ), prior_month AS (
 
@@ -177,7 +173,6 @@ WITH dim_billing_account AS (
         'type_of_arr_change.product_tier_name']) }}
                                                                     AS primary_key,
       type_of_arr_change.arr_month,
-      type_of_arr_change.parent_crm_account_name,
       type_of_arr_change.dim_parent_crm_account_id,
       type_of_arr_change.product_tier_name,
       type_of_arr_change.product_delivery_type,

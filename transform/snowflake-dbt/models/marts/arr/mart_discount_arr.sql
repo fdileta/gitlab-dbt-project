@@ -68,29 +68,23 @@ WITH dim_date AS (
 ), combined AS (
 
     SELECT
-      {{ dbt_utils.surrogate_key(['arr_agg.dim_charge_id']) }}          AS primary_key,
-      arr_agg.dim_charge_id                                             AS dim_charge_id,
-      arr_agg.dim_subscription_id                                       AS dim_subscription_id,
-      arr_agg.effective_start_month                                     AS effective_start_month,
-      arr_agg.effective_end_month                                       AS effective_end_month,
-      DATE_TRUNC('month',dim_subscription.subscription_start_date)      AS subscription_start_month,
-      DATE_TRUNC('month',dim_subscription.subscription_end_date)        AS subscription_end_month,
-      dim_crm_opportunity.opportunity_name                              AS opportunity_name,
-      dim_crm_account_invoice.dim_parent_crm_account_id                 AS dim_parent_crm_account_id_invoice,
-      dim_crm_account_invoice.parent_crm_account_name                   AS parent_crm_account_name_invoice,
-      dim_crm_account_invoice.parent_crm_account_billing_country        AS parent_crm_account_billing_country_invoice,
-      dim_crm_account_invoice.parent_crm_account_sales_segment          AS parent_crm_account_sales_segment_invoice,
-      dim_crm_account_invoice.dim_crm_account_id                        AS dim_crm_account_id_invoice,
-      dim_crm_account_invoice.crm_account_name                          AS crm_account_name_invoice,
-      dim_crm_account_invoice.crm_account_owner_team                    AS crm_account_owner_team_invoice,
-      dim_crm_account_subscription.dim_parent_crm_account_id            AS dim_parent_crm_account_id_subscription,
-      dim_crm_account_subscription.parent_crm_account_name              AS parent_crm_account_name_subscription,
-      dim_crm_account_subscription.parent_crm_account_billing_country   AS parent_crm_account_billing_country_subscription,
-      dim_crm_account_subscription.parent_crm_account_sales_segment     AS parent_crm_account_sales_segment_subscription,
-      dim_crm_account_subscription.dim_crm_account_id                   AS dim_crm_account_id_subscription,
-      dim_crm_account_subscription.crm_account_name                     AS crm_account_name_subscription,
-      dim_crm_account_subscription.crm_account_owner_team               AS crm_account_owner_team_subscription,
-      dim_subscription.subscription_name                                AS subscription_name,
+      {{ dbt_utils.surrogate_key(['arr_agg.dim_charge_id']) }}                     AS primary_key,
+      arr_agg.dim_charge_id                                                        AS dim_charge_id,
+      arr_agg.dim_subscription_id                                                  AS dim_subscription_id,
+      arr_agg.effective_start_month                                                AS effective_start_month,
+      arr_agg.effective_end_month                                                  AS effective_end_month,
+      DATE_TRUNC('month',dim_subscription.subscription_start_date)                 AS subscription_start_month,
+      DATE_TRUNC('month',dim_subscription.subscription_end_date)                   AS subscription_end_month,
+      dim_crm_opportunity.opportunity_name                                         AS opportunity_name,
+      dim_crm_account_invoice.dim_parent_crm_account_id                            AS dim_parent_crm_account_id_invoice,
+      dim_crm_account_invoice.dim_crm_account_id                                   AS dim_crm_account_id_invoice,
+      dim_crm_account_invoice.crm_account_name                                     AS crm_account_name_invoice,
+      dim_crm_account_invoice.parent_crm_account_demographics_sales_segment        AS parent_crm_account_sales_segment_invoice,
+      dim_crm_account_subscription.dim_parent_crm_account_id                       AS dim_parent_crm_account_id_subscription,
+      dim_crm_account_subscription.dim_crm_account_id                              AS dim_crm_account_id_subscription,
+      dim_crm_account_subscription.crm_account_name                                AS crm_account_name_subscription,
+      dim_crm_account_subscription.parent_crm_account_demographics_sales_segment   AS parent_crm_account_sales_segment_subscription,
+      dim_subscription.subscription_name                                           AS subscription_name,
       IFF(dim_subscription.zuora_renewal_subscription_name != '', TRUE, FALSE)
                                                                         AS is_myb,
       arr_agg.is_paid_in_full                                           AS is_paid_in_full,
@@ -141,7 +135,7 @@ WITH dim_date AS (
     LEFT JOIN dim_crm_opportunity 
       ON dim_subscription.dim_crm_opportunity_id = dim_crm_opportunity.dim_crm_opportunity_id
     WHERE dim_crm_account_subscription.is_jihu_account != 'TRUE'
-    {{ dbt_utils.group_by(n=42) }}
+    {{ dbt_utils.group_by(n=36) }}
     ORDER BY 3 DESC
 
 ), final AS (
@@ -164,5 +158,5 @@ WITH dim_date AS (
     created_by="@iweeks",
     updated_by="@lisvinueza",
     created_date="2020-10-21",
-    updated_date="2022-08-31",
+    updated_date="2022-12-21",
 ) }}
