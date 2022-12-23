@@ -41,7 +41,6 @@ WITH mart_user_request AS (
         crm_account_health_score_color,
         parent_crm_account_sales_segment,
         technical_account_manager,
-        crm_account_owner_team,
         strategic_account_leader,
         customer_reach,
         crm_account_arr,
@@ -71,7 +70,7 @@ WITH mart_user_request AS (
        SUM(link_priority_score)                                                 AS account_priority_score
 
     FROM mart_user_request
-    {{ dbt_utils.group_by(n=44) }}
+    {{ dbt_utils.group_by(n=43) }}
 
 ), prep_issue_summary AS ( -- Then we summarise at the issue/epic grain
 
@@ -116,8 +115,6 @@ WITH mart_user_request AS (
                                                                                              AS crm_account_parent_sales_segment_array,
         ARRAY_AGG(DISTINCT technical_account_manager) WITHIN GROUP (ORDER BY technical_account_manager)
                                                                                              AS crm_account_tam_array,
-        ARRAY_AGG(DISTINCT crm_account_owner_team) WITHIN GROUP (ORDER BY crm_account_owner_team)
-                                                                                             AS crm_account_owner_team_array,
         ARRAY_AGG(DISTINCT strategic_account_leader) WITHIN GROUP (ORDER BY strategic_account_leader)
                                                                                              AS crm_account_strategic_account_leader_array,
 
@@ -183,11 +180,10 @@ WITH mart_user_request AS (
 
 )
 
-
 {{ dbt_audit(
     cte_ref="issue_summary",
     created_by="@jpeguero",
-    updated_by="@jpeguero",
+    updated_by="@lvinueza",
     created_date="2021-12-15",
-    updated_date="2022-01-05",
+    updated_date="2022-12-21",
   ) }}

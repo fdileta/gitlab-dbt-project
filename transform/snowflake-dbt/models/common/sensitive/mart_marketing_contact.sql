@@ -734,7 +734,7 @@
       marketing_contact.country,
       marketing_contact.mobile_phone,
       marketing_contact.sfdc_parent_sales_segment,
-      marketing_contact.sfdc_parent_crm_account_tsp_region,
+      marketing_contact.sfdc_parent_crm_account_region,
       marketing_contact.is_marketo_lead,
       marketing_contact.is_marketo_email_hard_bounced,
       marketing_contact.marketo_email_hard_bounced_date,

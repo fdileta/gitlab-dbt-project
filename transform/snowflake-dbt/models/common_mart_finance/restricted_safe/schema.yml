@@ -60,12 +60,8 @@ models:
         description: Name of a renewal subscription associated with the current subscription.
       - name: renewal_subscription_end_month
         description: End month of the renewal subscription associated with the current subscription.
-      - name: parent_crm_account_name
-        description: Name of the ultimate parent crm account associated with the subscription.
       - name: crm_account_name
         description: Name of the crm account associated with the subscription.
-      - name: parent_crm_account_sales_segment
-        description: Segment of the ultimate parent crm account associated with the subscription.
       - name: dim_crm_user_id
         description: Unique identifier of the account owner associated with the subscription.
       - name: user_name

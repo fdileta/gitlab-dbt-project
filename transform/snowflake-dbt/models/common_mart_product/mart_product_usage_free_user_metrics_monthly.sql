@@ -20,7 +20,6 @@
       free_user_metrics.cleaned_version,
       {{ get_keyed_nulls('crm_accounts.dim_crm_account_id') }}                      AS dim_crm_account_id,
       crm_account_name,
-      parent_crm_account_name,
       free_user_metrics.ping_date,
       -- Wave 2 & 3
       free_user_metrics.umau_28_days_user,
@@ -212,7 +211,6 @@
         'cleaned_version',
         'dim_crm_account_id',
         'crm_account_name',
-        'parent_crm_account_name',
         'ping_date',
         'umau_28_days_user',
         'action_monthly_active_users_project_repo_28_days_user',
@@ -381,7 +379,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@ischweickartDD",
-    updated_by="@mdrussell",
+    updated_by="@lvinueza",
     created_date="2021-06-14",
-    updated_date="2022-08-26"
+    updated_date="2022-12-21"
 ) }}

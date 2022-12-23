@@ -133,7 +133,6 @@ models:
       - name: dim_crm_account_id
         description: ID of the CRM account associated with the free trial.
       - name: crm_account_name
-      - name: parent_crm_account_name
       - name: ping_date
         description: Actual date when ping is executed and data is extracted into Data Warehouse. This value determinates when data is processed.
       - name: umau_28_days_user
