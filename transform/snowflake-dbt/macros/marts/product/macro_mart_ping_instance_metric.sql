@@ -57,6 +57,7 @@
       dim_crm_accounts.parent_crm_account_demographics_sales_segment              AS parent_crm_account_sales_segment,
       dim_crm_accounts.parent_crm_account_demographics_territory                  AS parent_crm_account_sales_territory,
       dim_crm_accounts.parent_crm_account_industry                                AS parent_crm_account_industry,
+      dim_crm_accounts.technical_account_manager                                  AS technical_account_manager,
       IFF(MAX(mrr) > 0, TRUE, FALSE)                                              AS is_paid_subscription,
       MAX(IFF(product_rate_plan_name ILIKE ANY ('%edu%', '%oss%'), TRUE, FALSE))  AS is_program_subscription,
       ARRAY_AGG(DISTINCT dim_product_detail.product_tier_name)
@@ -85,7 +86,7 @@
       ON dim_billing_account.dim_crm_account_id = dim_crm_accounts.dim_crm_account_id
     INNER JOIN dim_date
       ON effective_start_month <= dim_date.date_day AND effective_end_month > dim_date.date_day
-    {{ dbt_utils.group_by(n=17)}}
+    {{ dbt_utils.group_by(n=18)}}
 
 
   ), latest_subscription AS (
