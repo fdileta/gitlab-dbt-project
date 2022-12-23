@@ -12,13 +12,12 @@
 
 first_day_of_month AS (
 
-  SELECT DISTINCT
-    first_day_of_month AS reporting_month
+  SELECT DISTINCT first_day_of_month AS reporting_month
   FROM dim_date
 
 ),
 
-/* 
+/*
 Grab the most recent record of each pi_metric_name that does not have a NULL estimated target
 */
 
@@ -49,38 +48,38 @@ flattened_monthly_targets AS (
 /*
 Calculate the reporting intervals for the pi_metric_name. Each row will have a start and end date
 Determine start month by checking if the previous record has a target_end_date.
-  - If yes, then target_start_month = target_end_date from previous record
-  - If no, then target_start_month = 2017-01-01 (earliest available product data, an arbitrary date in the past)
+- If yes, then target_start_month = target_end_date from previous record
+- If no, then target_start_month = 2017-01-01 (earliest available product data, an arbitrary date in the past)
 */
 
 monthly_targets_with_intervals AS (
 
   SELECT
     *,
-    IFNULL(
+    COALESCE(
       LAG(target_end_month) OVER (PARTITION BY pi_metric_name ORDER BY target_end_month),
       '2017-01-01' --year of GitLab initial release date
-      ) AS target_start_month
+    ) AS target_start_month
   FROM flattened_monthly_targets
 
 ),
 
 /*
   Join each pi_metric_name and value to the reporting_month it corresponds with
-  Join on reporting_month greater than metric start_month and reporting_month less than or equal to the target end month/ CURRENT_DATE
+  Join on reporting_month greater than metric start_month and reporting_month less than or equal to the target end month/CURRENT_DATE
 */
 
 final_targets AS (
 
   SELECT
     {{ dbt_utils.surrogate_key(['reporting_month', 'pi_metric_name']) }} AS performance_indicator_targets_pk,
-    reporting_month,
-    pi_metric_name,
-    value AS target_value
+    reporting_month                                                      AS reporting_month,
+    pi_metric_name                                                       AS pi_metric_name,
+    value                                                                AS target_value
   FROM first_day_of_month
   INNER JOIN monthly_targets_with_intervals
   WHERE reporting_month > target_start_month
-    AND reporting_month <= IFNULL(target_end_month, CURRENT_DATE)
+    AND reporting_month <= COALESCE(target_end_month, CURRENT_DATE)
 
 ),
 

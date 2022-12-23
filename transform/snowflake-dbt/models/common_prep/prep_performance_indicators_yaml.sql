@@ -37,11 +37,11 @@ WITH unioned AS (
 
 final AS (
 
-  SELECT 
+  SELECT
     {{ dbt_utils.surrogate_key(['_dbt_source_relation', 'unique_key']) }} AS performance_indicator_pk,
     *
   FROM unioned
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY unique_key ORDER BY valid_from_date) = 1 
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY unique_key ORDER BY valid_from_date) = 1
 
 )
 
