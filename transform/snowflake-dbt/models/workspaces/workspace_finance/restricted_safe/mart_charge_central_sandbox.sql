@@ -87,19 +87,11 @@
       dim_crm_account.dim_crm_account_id                                              AS dim_crm_account_id,
       dim_crm_account.crm_account_name                                                AS crm_account_name,
       dim_crm_account.dim_parent_crm_account_id                                       AS dim_parent_crm_account_id,
-      dim_crm_account.parent_crm_account_name                                         AS parent_crm_account_name,
-      dim_crm_account.parent_crm_account_billing_country                              AS parent_crm_account_billing_country,
-      dim_crm_account.parent_crm_account_sales_segment                                AS parent_crm_account_sales_segment,
+      dim_crm_account.parent_crm_account_demographics_sales_segment                   AS parent_crm_account_sales_segment,
+      dim_crm_account.parent_crm_account_demographics_territory                       AS parent_crm_account_sales_territory,
+      dim_crm_account.parent_crm_account_demographics_region                          AS parent_crm_account_region,
+      dim_crm_account.parent_crm_account_demographics_area                            AS parent_crm_account_area,
       dim_crm_account.parent_crm_account_industry                                     AS parent_crm_account_industry,
-      dim_crm_account.parent_crm_account_owner_team                                   AS parent_crm_account_owner_team,
-      dim_crm_account.parent_crm_account_sales_territory                              AS parent_crm_account_sales_territory,
-      dim_crm_account.parent_crm_account_tsp_region                                   AS parent_crm_account_tsp_region,
-      dim_crm_account.parent_crm_account_tsp_sub_region                               AS parent_crm_account_tsp_sub_region,
-      dim_crm_account.parent_crm_account_tsp_area                                     AS parent_crm_account_tsp_area,
-      dim_crm_account.crm_account_tsp_region                                          AS crm_account_tsp_region,
-      dim_crm_account.crm_account_tsp_sub_region                                      AS crm_account_tsp_sub_region,
-      dim_crm_account.crm_account_tsp_area                                            AS crm_account_tsp_area,
-      dim_crm_account.health_score                                                    AS health_score,
       dim_crm_account.health_score_color                                              AS health_score_color,
       dim_crm_account.health_number                                                   AS health_number,
       dim_crm_account.is_jihu_account                                                 AS is_jihu_account,
@@ -186,7 +178,7 @@
 {{ dbt_audit(
     cte_ref="mart_charge",
     created_by="@michellecooper",
-    updated_by="@michellecooper",
+    updated_by="@lvinueza",
     created_date="2022-04-13",
-    updated_date="2022-04-13"
+    updated_date="2022-12-21"
 ) }}

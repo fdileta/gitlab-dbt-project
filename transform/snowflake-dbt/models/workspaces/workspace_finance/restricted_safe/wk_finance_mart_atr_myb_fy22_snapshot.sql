@@ -97,9 +97,8 @@ WITH dim_billing_account AS (
      opportunity.dim_crm_opportunity_id,
      fct_charge.dim_subscription_id,
      fct_charge.dim_product_detail_id,
-     dim_crm_account.parent_crm_account_name,
      dim_crm_account.crm_account_name,
-     dim_crm_account.parent_crm_account_sales_segment,
+     dim_crm_account.parent_crm_account_demographics_sales_segment,
      dim_product_detail.product_tier_name,
      dim_product_detail.product_delivery_type,
      dim_subscription.subscription_name,
@@ -289,9 +288,8 @@ WITH dim_billing_account AS (
       base.subscription_start_month,
       base.subscription_end_month,
       base.myb_subscription_end_month,
-      base.parent_crm_account_name,
       base.crm_account_name,
-      base.parent_crm_account_sales_segment,
+      base.parent_crm_account_demographics_sales_segment,
       base.product_tier_name,
       base.product_delivery_type,
       combined.renewal_type,
@@ -320,7 +318,7 @@ WITH dim_billing_account AS (
 {{ dbt_audit(
     cte_ref="renewal_report",
     created_by="@iweeks",
-    updated_by="@iweeks",
+    updated_by="@lvinueza",
     created_date="2021-03-15",
-    updated_date="2021-08-05"
+    updated_date="2022-12-21"
 ) }}

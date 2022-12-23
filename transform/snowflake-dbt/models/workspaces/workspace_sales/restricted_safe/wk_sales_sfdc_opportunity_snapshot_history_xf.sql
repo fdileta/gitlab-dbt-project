@@ -370,7 +370,6 @@ WITH date_details AS (
       edm_snapshot_opty.crm_account_name                         AS account_name,
       
       edm_snapshot_opty.dim_parent_crm_account_id                AS ultimate_parent_account_id,
-      edm_snapshot_opty.parent_crm_account_name                  AS ultimate_parent_account_name,
       edm_snapshot_opty.is_jihu_account,
       edm_snapshot_opty.account_owner_user_segment,
       edm_snapshot_opty.account_owner_user_geo,
@@ -470,20 +469,7 @@ WITH date_details AS (
           THEN sfdc_opportunity_xf.stage_1_fiscal_quarter_date 
         ELSE NULL
       END                                               AS stage_1_fiscal_quarter_date,
-      
-      ------------------------------------------------------------------------------------------------------
-      ------------------------------------------------------------------------------------------------------
-
-      -- account driven fields
-      sfdc_accounts_xf.tsp_region,
-      sfdc_accounts_xf.tsp_sub_region,
-      sfdc_accounts_xf.ultimate_parent_sales_segment,
-      sfdc_accounts_xf.tsp_max_hierarchy_sales_segment,
-
       opportunity_owner.name                                     AS opportunity_owner,
-      
-      sfdc_accounts_xf.ultimate_parent_id, -- same is ultimate_parent_account_id?
-
       upa.account_demographics_sales_segment                     AS upa_demographics_segment,
       upa.account_demographics_geo                               AS upa_demographics_geo,
       upa.account_demographics_region                            AS upa_demographics_region,
