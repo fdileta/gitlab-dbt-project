@@ -321,7 +321,9 @@ class UsagePing:
         saas_queries_with_valid_definitions = self.keep_valid_metric_definitions(
             saas_queries, payload_source, metric_definition_dict
         )
-
+        # TODO: rbacovic remove
+        saas_queries_with_valid_definitions = {k: saas_queries_with_valid_definitions[k] for k in list(saas_queries_with_valid_definitions)[:20
+                                                                                                  ]}
         sql_metrics, sql_metric_errors = self.evaluate_saas_instance_sql_queries(
             connection, saas_queries_with_valid_definitions
         )
@@ -494,9 +496,9 @@ class UsagePing:
             metric_definition_dict=metric_definition_dict, saas_queries=saas_queries
         )
 
+        # TODO: rbacovic remove
         for key, value in sql_metrics.items():
-            if value == 0 or value == ' ' or value =='':
-                logging.info(F"RESULT: key: {key}, value: {value}")
+            logging.info(F"RESULT: key: {key}, value: {value}")
 
         redis_metrics, redis_metadata = self.saas_instance_redis_metrics(
             metric_definition_dict=metric_definition_dict
