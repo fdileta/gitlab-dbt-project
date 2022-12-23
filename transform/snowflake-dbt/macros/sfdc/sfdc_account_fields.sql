@@ -139,7 +139,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.account_id                                                                                  AS dim_crm_account_id,
 
       --surrogate keys
-      ultimate_parent_account.account_id                                                                       AS dim_parent_crm_account_id,
+      sfdc_account.ultimate_parent_account_id                                                                  AS dim_parent_crm_account_id,
       sfdc_account.owner_id                                                                                    AS dim_crm_user_id,
       map_merged_crm_account.dim_crm_account_id                                                                AS merged_to_account_id,
       sfdc_account.record_type_id                                                                              AS record_type_id,
