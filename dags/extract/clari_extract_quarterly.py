@@ -47,13 +47,13 @@ dag = DAG(
     schedule_interval="0 12 1 2,5,8,11 *",
     start_date=datetime(2021, 12, 17),
     catchup=True,
-    max_active_runs=2,
+    max_active_runs=1,
 )
 
 bash_task = BashOperator(
     dag=dag,
     task_id='bash_task',
-    bash_command="echo '{{ execution_date }}'",
+    bash_command="echo '{{ execution_date }}' '{{ next_execution_date }}'",
 )
 
 clari_extract_command = (
@@ -76,6 +76,7 @@ clari_task = KubernetesPodOperator(
     ],
     env_vars={
         **pod_env_vars,
+        # If today is 11/1, the {{ execution_date }} will be 8/1
         "execution_date": "{{ execution_date }}",
         "task_schedule": TASK_SCHEDULE,
     },

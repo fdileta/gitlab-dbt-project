@@ -55,6 +55,8 @@ def _calc_fiscal_quarter(date_time: datetime) -> str:
 def _get_previous_fiscal_quarter(date_time: datetime) -> str:
     """
     Based on datetime object, return it's Gitlab previous fiscal quarter o
+
+    This function isn't currently used. Instead, DAG will control the date.
     """
     current_fiscal_quarter = _calc_fiscal_quarter(date_time)
     current_quarter_int = int(current_fiscal_quarter[-1])
@@ -67,11 +69,12 @@ def _get_previous_fiscal_quarter(date_time: datetime) -> str:
 
 def get_fiscal_quarter() -> str:
     """
-    Based on the DAG execution date and task_schedule,
-    return the correct fiscal quarter.
+    Return the fiscal quarter based on the passed in dag 'execution_date'
 
-    For daily DAG runs, return the current fiscal quarter
+    The goal is for daily DAG runs, return the current fiscal quarter
     and for quarterly runs, return the previous fiscal quarter
+
+    That logic though is handled within the DAG itself.
     """
     execution_date = date_parser.parse(config_dict["execution_date"])
     task_schedule = config_dict["task_schedule"]
@@ -81,11 +84,11 @@ def get_fiscal_quarter() -> str:
         and execution_date: {task_schedule} | {execution_date}"
     )
 
-    if task_schedule == "daily":
-        return _calc_fiscal_quarter(execution_date)
+    # if task_schedule == "daily":
+    return _calc_fiscal_quarter(execution_date)
 
     # else quarterly task schedule
-    return _get_previous_fiscal_quarter(execution_date)
+    # return _get_previous_fiscal_quarter(execution_date)
 
 
 def make_request(

@@ -41,18 +41,18 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    f'clari_extractv6-{TASK_SCHEDULE}',
+    f'clari_extractv7-{TASK_SCHEDULE}',
     default_args=default_args,
     schedule_interval="0 8 * * *",
-    start_date=datetime(2022, 12, 17),
+    start_date=datetime(2022, 12, 22),
     catchup=True,
-    max_active_runs=2,
+    max_active_runs=1,
 )
 
 bash_task = BashOperator(
     dag=dag,
     task_id='bash_task',
-    bash_command="echo '{{ execution_date }}'",
+    bash_command="echo '{{ execution_date }}' '{{ next_execution_date }}'",
 )
 
 clari_extract_command = (
@@ -75,7 +75,8 @@ clari_task = KubernetesPodOperator(
     ],
     env_vars={
         **pod_env_vars,
-        "execution_date": "{{ execution_date }}",
+        # if today is 8/11, the { next_execution_date } is also 8/11
+        "execution_date": "{{ next_execution_date }}",
         "task_schedule": TASK_SCHEDULE,
     },
     affinity=get_affinity(False),
