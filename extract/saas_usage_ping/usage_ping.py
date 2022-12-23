@@ -276,35 +276,19 @@ class UsagePing:
         for key, query in saas_queries.items():
             # if the 'query' is a dictionary, then recursively call
             if isinstance(query, dict):
-                results_returned, errors_returned = self.evaluate_saas_instance_sql_queries(
-                    connection, query
-                )
+                (
+                    results_returned,
+                    errors_returned,
+                ) = self.evaluate_saas_instance_sql_queries(connection, query)
                 if results_returned:
                     results[key] = results_returned
                 if errors_returned:
                     errors[key] = errors_returned
             # reached a 'select statement' value, run it in snowflake
             elif isinstance(query, str) and query.startswith("SELECT"):
-                # logging.info(f"Running ping: {key}...")
-                #
-                # try:
-                #     data_to_write = error_data_to_write = None
-                    # query_output = pd.read_sql(sql=query, con=connection)
-                    # # standardize column case across pandas versions
-                    # query_output.columns = query_output.columns.str.lower()
-                    # info(query_output)
-                    # # convert 'numpy int' to 'int' so json can be written
-                    # data_to_write = int(query_output.loc[0, "counter_value"])
 
-
-                # except (KeyError, ValueError):
-                #     data_to_write = 0
-                # except SQLAlchemyError as e:
-                #     error_data_to_write = str(e.__dict__["orig"])
-
-                #
                 data_to_write = error_data_to_write = None
-                
+
                 data_to_write, error_data_to_write = self.get_instance_sql_data(
                     sql_query=query, con=connection
                 )
@@ -508,7 +492,6 @@ class UsagePing:
         sql_metrics, sql_metric_errors = self.saas_instance_sql_metrics(
             metric_definition_dict=metric_definition_dict, saas_queries=saas_queries
         )
-
 
         redis_metrics, redis_metadata = self.saas_instance_redis_metrics(
             metric_definition_dict=metric_definition_dict
