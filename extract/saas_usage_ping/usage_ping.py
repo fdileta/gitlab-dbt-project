@@ -322,8 +322,8 @@ class UsagePing:
             saas_queries, payload_source, metric_definition_dict
         )
         # TODO: rbacovic remove
-        saas_queries_with_valid_definitions = {k: saas_queries_with_valid_definitions[k] for k in list(saas_queries_with_valid_definitions)[:20
-                                                                                                  ]}
+        saas_queries_with_valid_definitions = {k: saas_queries_with_valid_definitions[k] for k in list(saas_queries_with_valid_definitions)[:20]}
+
         sql_metrics, sql_metric_errors = self.evaluate_saas_instance_sql_queries(
             connection, saas_queries_with_valid_definitions
         )
