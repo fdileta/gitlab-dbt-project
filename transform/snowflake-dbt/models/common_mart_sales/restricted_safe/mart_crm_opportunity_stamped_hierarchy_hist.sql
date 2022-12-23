@@ -158,16 +158,6 @@
 
        -- Account fields
       dim_crm_account.crm_account_name,
-      dim_crm_account.parent_crm_account_name,
-      dim_crm_account.parent_crm_account_demographics_sales_segment AS account_demographics_segment,
-      dim_crm_account.parent_crm_account_demographics_geo AS account_demographics_geo,
-      dim_crm_account.parent_crm_account_demographics_region AS account_demographics_region,
-      dim_crm_account.parent_crm_account_demographics_area AS account_demographics_area,
-      dim_crm_account.parent_crm_account_demographics_territory AS account_demographics_territory,
-      dim_crm_account.parent_crm_account_gtm_strategy,
-      dim_crm_account.parent_crm_account_focus_account,
-      dim_crm_account.parent_crm_account_sales_segment,
-      dim_crm_account.parent_crm_account_zi_technologies,
       dim_crm_account.parent_crm_account_demographics_sales_segment,
       dim_crm_account.parent_crm_account_demographics_geo,
       dim_crm_account.parent_crm_account_demographics_region,
@@ -184,7 +174,6 @@
       dim_crm_account.crm_account_focus_account,
       dim_crm_account.crm_account_zi_technologies,
       dim_crm_account.is_jihu_account,
-      dim_crm_account.fy22_new_logo_target_list,
 
       -- Flags
       fct_crm_opportunity.is_won,
@@ -647,7 +636,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@jeanpeguero",
-    updated_by="@rkohnke",
+    updated_by="@lvinueza",
     created_date="2022-02-28",
-    updated_date="2022-11-21"
+    updated_date="2022-12-21"
   ) }}

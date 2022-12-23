@@ -132,16 +132,6 @@ final AS (
 
     -- account fields
     dim_crm_account.crm_account_name,
-    dim_crm_account.parent_crm_account_name,
-    dim_crm_account.parent_crm_account_demographics_sales_segment AS account_demographics_segment,
-    dim_crm_account.parent_crm_account_demographics_geo AS account_demographics_geo,
-    dim_crm_account.parent_crm_account_demographics_region AS account_demographics_region,
-    dim_crm_account.parent_crm_account_demographics_area AS account_demographics_area,
-    dim_crm_account.parent_crm_account_demographics_territory AS account_demographics_territory,
-    dim_crm_account.parent_crm_account_gtm_strategy,
-    dim_crm_account.parent_crm_account_focus_account,
-    dim_crm_account.parent_crm_account_sales_segment,
-    dim_crm_account.parent_crm_account_zi_technologies,
     dim_crm_account.parent_crm_account_demographics_sales_segment,
     dim_crm_account.parent_crm_account_demographics_geo,
     dim_crm_account.parent_crm_account_demographics_region,
@@ -253,8 +243,6 @@ final AS (
     fct_crm_opportunity.lead_source,
     fct_crm_opportunity.dr_partner_deal_type,
     fct_crm_opportunity.partner_account,
-    partner_account.crm_account_name AS partner_account_name,
-    partner_account.gitlab_partner_program  AS partner_gitlab_program,
     fct_crm_opportunity.calculated_partner_track,
     fct_crm_opportunity.dr_status,
     fct_crm_opportunity.distributor,
@@ -533,10 +521,11 @@ final AS (
 
 )
 
+
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@jpeguero",
+    updated_by="@lvinueza",
     created_date="2022-05-05",
-    updated_date="2022-10-20"
+    updated_date="2022-12-21"
   ) }}

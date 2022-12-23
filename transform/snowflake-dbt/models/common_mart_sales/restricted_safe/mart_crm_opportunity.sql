@@ -158,16 +158,6 @@
 
        -- Account fields
       dim_crm_account.crm_account_name,
-      dim_crm_account.parent_crm_account_name,
-      dim_crm_account.parent_crm_account_demographics_sales_segment AS account_demographics_segment,
-      dim_crm_account.parent_crm_account_demographics_geo AS account_demographics_geo,
-      dim_crm_account.parent_crm_account_demographics_region AS account_demographics_region,
-      dim_crm_account.parent_crm_account_demographics_area AS account_demographics_area,
-      dim_crm_account.parent_crm_account_demographics_territory AS account_demographics_territory,
-      dim_crm_account.parent_crm_account_gtm_strategy,
-      dim_crm_account.parent_crm_account_focus_account,
-      dim_crm_account.parent_crm_account_sales_segment,
-      dim_crm_account.parent_crm_account_zi_technologies,
       dim_crm_account.parent_crm_account_demographics_sales_segment,
       dim_crm_account.parent_crm_account_demographics_geo,
       dim_crm_account.parent_crm_account_demographics_region,
@@ -184,7 +174,6 @@
       dim_crm_account.crm_account_focus_account,
       dim_crm_account.crm_account_zi_technologies,
       dim_crm_account.is_jihu_account,
-      dim_crm_account.fy22_new_logo_target_list,
       dim_crm_account.admin_manual_source_number_of_employees,
       dim_crm_account.admin_manual_source_account_address,
 
@@ -615,20 +604,10 @@
       ON fct_crm_opportunity.fulfillment_partner = fulfillment_partner.dim_crm_account_id
 
 )
-
 {{ dbt_audit(
     cte_ref="final",
     created_by="@iweeks",
-    updated_by="@rkohnke",
+    updated_by="@lvinueza",
     created_date="2020-12-07",
-    updated_date="2022-11-30"
+    updated_date="2022-12-21"
   ) }}
-
-
-
-
-
-
-
-
-

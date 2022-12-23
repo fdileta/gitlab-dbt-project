@@ -107,7 +107,6 @@
     {{ dbt_utils.surrogate_key(['retention_subs.dim_parent_crm_account_id','retention_month']) }}
                                                 AS fct_retention_id,
       retention_subs.dim_parent_crm_account_id  AS dim_parent_crm_account_id,
-      dim_crm_account.crm_account_name         AS parent_crm_account_name,
       retention_month,
       IFF(is_first_day_of_last_month_of_fiscal_year, fiscal_year, NULL)               AS retention_fiscal_year,
       IFF(is_first_day_of_last_month_of_fiscal_quarter, fiscal_quarter_name_fy, NULL) AS retention_fiscal_quarter,
@@ -151,5 +150,5 @@
     created_by="@paul_armstrong",
     updated_by="@lisvinueza",
     created_date="2021-06-02",
-    updated_date="2022-08-19"
+    updated_date="2022-12-21"
 ) }}
