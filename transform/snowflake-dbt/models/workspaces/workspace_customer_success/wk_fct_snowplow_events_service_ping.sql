@@ -8,14 +8,14 @@
 WITH redis_clicks AS (
   SELECT
     event_id,
-    derived_tstamp, 
+    behavior_at, 
     gsc_pseudonymized_user_id,
     gsc_namespace_id,
     gsc_project_id,
     gsc_plan,
     contexts
-  FROM {{ ref('snowplow_structured_events_all') }}
-  WHERE derived_tstamp >= '2022-11-01' -- no events added to SP context before Nov 2022
+  FROM {{ ref('fct_behavior_structured_event') }}
+  WHERE behavior_at >= '2022-11-01' -- no events added to SP context before Nov 2022
 ),
 
 namespaces AS (
@@ -35,7 +35,7 @@ joined AS (
 final AS (
   SELECT
     joined.event_id,
-    joined.derived_tstamp,
+    joined.behavior_at,
     joined.gsc_pseudonymized_user_id,
     joined.gsc_namespace_id,
     joined.gsc_project_id,
@@ -47,7 +47,7 @@ final AS (
   WHERE flat_contexts.value['schema']::VARCHAR = 'iglu:com.gitlab/gitlab_service_ping/jsonschema/1-0-0'
   {% if is_incremental() %}
   
-      AND joined.derived_tstamp >= (SELECT MAX(derived_tstamp) FROM {{this}})
+      AND joined.behavior_at >= (SELECT MAX(behavior_at) FROM {{this}})
   
   {% endif %}
 )

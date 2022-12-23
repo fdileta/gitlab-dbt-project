@@ -17,7 +17,7 @@ WITH events AS (
 
 final AS (
   SELECT
-    DATE_TRUNC('month', derived_tstamp) AS date_month,
+    DATE_TRUNC('month', behavior_at) AS date_month,
     ultimate_parent_namespace_id,
     metrics_path,
     COUNT(DISTINCT gsc_pseudonymized_user_id) AS distinct_users

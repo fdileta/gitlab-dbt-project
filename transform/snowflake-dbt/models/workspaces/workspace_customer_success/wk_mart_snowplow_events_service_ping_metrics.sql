@@ -20,7 +20,7 @@ metric_bridge AS (
 joined AS (
   SELECT
     service_ping_events.event_id,
-    service_ping_events.derived_tstamp,
+    service_ping_events.behavior_at,
     service_ping_events.gsc_pseudonymized_user_id,
     service_ping_events.gsc_namespace_id,
     service_ping_events.gsc_project_id,
