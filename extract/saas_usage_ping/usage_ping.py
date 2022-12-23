@@ -248,7 +248,7 @@ class UsagePing:
             query_output.columns = query_output.columns.str.lower()
             # info(query_output)
             # convert 'numpy int' to 'int' so json can be written
-            metrics_data = int(query_output.loc[0, "counter_value"])
+            metrics_data = 999 # int(query_output.loc[0, "counter_value"])
             logging.info(f"Metrics data: {metrics_data}...")
         except (KeyError, ValueError):
             metrics_data = 0
