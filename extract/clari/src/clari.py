@@ -158,7 +158,9 @@ def get_job_status(job_id: str) -> str:
 
 
 def poll_job_status(
-    job_id: str, wait_interval_seconds: int = 30, max_poll_attempts: int = 5
+    job_id: str,
+    wait_interval_seconds: int = 30,
+    max_poll_attempts: int = 5
 ) -> bool:
     """
     Polls the API for the status of the job with the specified ID,
@@ -172,13 +174,17 @@ def poll_job_status(
         poll_attempts += 1
         info(f"Poll attempt {poll_attempts} current status: {status}")
         if status == "DONE":
-            info(f"job_id {job_id} successfully completed, \
-                it is ready for export.")
+            info(
+                f"job_id {job_id} successfully completed, \
+                it is ready for export."
+            )
             return True
 
         if status in ["ABORTED", "FAILED", "CANCELLED"]:
-            raise Exception(f"job_id {job_id} failed to complete \
-                with {status} status")
+            raise Exception(
+                f"job_id {job_id} failed to complete \
+                with {status} status"
+            )
 
         if poll_attempts >= max_poll_attempts:  # (SCHEDULED, STARTED) status
             raise TimeoutError(
@@ -204,12 +210,16 @@ def results_dict_to_dataframe(
     returns a dataframe with the following cols:
         - jsontext
         - api_fiscal_quarter_name
+        - dag_schedule
         - uploaded_at
     """
-    dataframe = pd.DataFrame(columns=["jsontext", "api_fiscal_quarter_name"])
+    dataframe = pd.DataFrame(
+        columns=["jsontext", "api_fiscal_quarter_name", "dag_schedule"]
+    )
     dataframe.loc[0] = [
         json.dumps(results_dict),
         fiscal_quarter.replace("_", "-"),  # match dim table formatting
+        config_dict["task_schedule"],
     ]
     return dataframe
 
@@ -230,13 +240,37 @@ def upload_dataframe_to_snowflake(dataframe: pd.DataFrame) -> None:
     loader_engine.dispose()
 
 
+def check_valid_quarter(
+    original_fiscal_quarter: str, results_dict: Dict[Any, Any]
+) -> None:
+    """
+    If the desired fiscal quarter does not have any corresponding data,
+    the Clari API returns the current quarter.
+
+    In this case, abort the program so as not to duplicate data.
+    """
+    api_fiscal_quarter = results_dict['timePeriods'][0]['timePeriodId']
+    if api_fiscal_quarter != original_fiscal_quarter:
+        raise ValueError(
+            f'The data returned from the API \
+        has an api_fiscal_quarter of {api_fiscal_quarter}\n \
+        This does not match the original \
+        fiscal quarter {original_fiscal_quarter}. \
+        Most likely the original quarter has no data. Aborting...'
+        )
+
+
 def main() -> None:
     """Main driver function"""
     fiscal_quarter = get_fiscal_quarter()
     info(f"Processing fiscal_quarter: {fiscal_quarter}")
+
     job_id = start_export_report(fiscal_quarter)
     poll_job_status(job_id)
+
     results_dict = get_report_results(job_id)
+    check_valid_quarter(fiscal_quarter, results_dict)
+
     dataframe = results_dict_to_dataframe(results_dict, fiscal_quarter)
     upload_dataframe_to_snowflake(dataframe)
 
