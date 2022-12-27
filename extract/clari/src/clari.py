@@ -74,7 +74,7 @@ def get_fiscal_quarter() -> str:
     The goal is for daily DAG runs, return the current fiscal quarter
     and for quarterly runs, return the previous fiscal quarter
 
-    That logic though is handled within the DAG itself.
+    That logic though is handled within the daily/quarterly DAG's
     """
     execution_date = date_parser.parse(config_dict["execution_date"])
     task_schedule = config_dict["task_schedule"]
@@ -96,8 +96,8 @@ def make_request(
     url: str,
     headers: Optional[Dict[Any, Any]] = None,
     params: Optional[Dict[Any, Any]] = None,
-    timeout: int = 120,
-    data: Optional[Dict[Any, Any]] = None,
+    json: Optional[Dict[Any, Any]] = None,
+    timeout: int = 60,
     current_retry_count: int = 0,
     max_retry_count: int = 5,
 ) -> requests.models.Response:
@@ -111,7 +111,7 @@ def make_request(
             )
         elif request_type == "POST":
             response = requests.post(
-                url, headers=headers, params=params, timeout=timeout, data=data
+                url, headers=headers, json=json, timeout=timeout
             )
         else:
             raise ValueError("Invalid request type")
@@ -125,14 +125,14 @@ def make_request(
             current_retry_count += 1
             # Make the request again
             return make_request(
-                request_type,
-                url,
-                headers,
-                params,
-                timeout,
-                data,
-                current_retry_count,
-                max_retry_count,
+                request_type=request_type,
+                url=url,
+                headers=headers,
+                params=params,
+                json=json,
+                timeout=timeout,
+                current_retry_count=current_retry_count,
+                max_retry_count=max_retry_count,
             )
         error(f"request exception for url {url}, see below")
         raise
@@ -145,8 +145,8 @@ def start_export_report(fiscal_quarter: str) -> str:
     forecast_id = "net_arr"
     forecast_url = f"{BASE_URL}/export/forecast/{forecast_id}"
 
-    params = {"timePeriod": fiscal_quarter, "includeHistorical": True}
-    response = make_request("POST", forecast_url, HEADERS, params)
+    json = {"timePeriod": fiscal_quarter, "includeHistorical": True}
+    response = make_request("POST", forecast_url, HEADERS, json=json)
     return response.json()["jobId"]
 
 
@@ -154,13 +154,12 @@ def get_job_status(job_id: str) -> str:
     """Returns the status of the job with the specified ID."""
     job_status_url = f"{BASE_URL}/export/jobs/{job_id}"
     response = make_request("GET", job_status_url, HEADERS)
-    return response.json()["job"]["status"]
+    info(f'\njobStatus response:\n {response.json()["job"]}')
+    return response.json()["job"]
 
 
 def poll_job_status(
-    job_id: str,
-    wait_interval_seconds: int = 30,
-    max_poll_attempts: int = 5
+    job_id: str, wait_interval_seconds: int = 30, max_poll_attempts: int = 5
 ) -> bool:
     """
     Polls the API for the status of the job with the specified ID,
@@ -170,7 +169,7 @@ def poll_job_status(
     """
     poll_attempts = 0
     while True:
-        status = get_job_status(job_id)
+        status = get_job_status(job_id)["status"]
         poll_attempts += 1
         info(f"Poll attempt {poll_attempts} current status: {status}")
         if status == "DONE":
@@ -244,19 +243,21 @@ def check_valid_quarter(
     original_fiscal_quarter: str, results_dict: Dict[Any, Any]
 ) -> None:
     """
-    If the desired fiscal quarter does not have any corresponding data,
-    the Clari API returns the current quarter.
+    Double check that the data returned from the API
+    matches the quarter the user is looking for
 
-    In this case, abort the program so as not to duplicate data.
+    This is a good double-check because if the API endpoint does not
+    recognize some parameter, it defaults to the current quarter
+    which may not be the intention
     """
-    api_fiscal_quarter = results_dict['timePeriods'][0]['timePeriodId']
+    api_fiscal_quarter = results_dict["timePeriods"][0]["timePeriodId"]
     if api_fiscal_quarter != original_fiscal_quarter:
         raise ValueError(
-            f'The data returned from the API \
+            f"The data returned from the API \
         has an api_fiscal_quarter of {api_fiscal_quarter}\n \
         This does not match the original \
         fiscal quarter {original_fiscal_quarter}. \
-        Most likely the original quarter has no data. Aborting...'
+        Most likely the original quarter has no data. Aborting..."
         )
 
 

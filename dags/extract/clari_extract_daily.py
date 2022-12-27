@@ -44,7 +44,7 @@ dag = DAG(
     f'clari_extractv7-{TASK_SCHEDULE}',
     default_args=default_args,
     schedule_interval="0 8 * * *",
-    start_date=datetime(2022, 12, 22),
+    start_date=datetime(2022, 12, 26),
     catchup=True,
     max_active_runs=1,
 )
