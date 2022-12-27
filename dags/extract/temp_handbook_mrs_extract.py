@@ -51,7 +51,12 @@ container_cmd = f"""
 """
 
 # Create the DAG
-dag = DAG("backfill_handbook_mrs", default_args=default_args, schedule_interval="0 2 * * *")
+dag = DAG("backfill_handbook_mrs", default_args=default_args, schedule_interval=None)
+
+
+def run_this_func(ds, **kwargs):
+    print("Remotely received value of {} for key=message".
+          format(kwargs['dag_run'].conf['message']))
 
 # Task 1
 part_of_product_mrs_run = KubernetesPodOperator(
@@ -70,8 +75,8 @@ part_of_product_mrs_run = KubernetesPodOperator(
     env_vars={
         **pod_env_vars,
         **{
-            "START": "{{ dag_run.conf['START'] }}",
-            "END": "{{ dag_run.conf['END'] }}",
+            "START": '{{ dag_run.conf["START"] }}',
+            "END": '{{ dag_run.conf["END"] }}',
         },
     },  # merge the dictionaries into one
     affinity=get_affinity(False),
