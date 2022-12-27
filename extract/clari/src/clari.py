@@ -23,10 +23,9 @@ from typing import Any, Dict, Optional
 from dateutil import parser as date_parser
 
 import requests
-import pandas as pd
 
 from gitlabdata.orchestration_utils import (
-    dataframe_uploader,
+    snowflake_stage_load_copy_remove,
     snowflake_engine_factory,
 )
 
@@ -96,7 +95,7 @@ def make_request(
     url: str,
     headers: Optional[Dict[Any, Any]] = None,
     params: Optional[Dict[Any, Any]] = None,
-    json: Optional[Dict[Any, Any]] = None,
+    json_body: Optional[Dict[Any, Any]] = None,
     timeout: int = 60,
     current_retry_count: int = 0,
     max_retry_count: int = 5,
@@ -111,7 +110,7 @@ def make_request(
             )
         elif request_type == "POST":
             response = requests.post(
-                url, headers=headers, json=json, timeout=timeout
+                url, headers=headers, json=json_body, timeout=timeout
             )
         else:
             raise ValueError("Invalid request type")
@@ -129,7 +128,7 @@ def make_request(
                 url=url,
                 headers=headers,
                 params=params,
-                json=json,
+                json_body=json_body,
                 timeout=timeout,
                 current_retry_count=current_retry_count,
                 max_retry_count=max_retry_count,
@@ -145,8 +144,8 @@ def start_export_report(fiscal_quarter: str) -> str:
     forecast_id = "net_arr"
     forecast_url = f"{BASE_URL}/export/forecast/{forecast_id}"
 
-    json = {"timePeriod": fiscal_quarter, "includeHistorical": True}
-    response = make_request("POST", forecast_url, HEADERS, json=json)
+    json_body = {"timePeriod": fiscal_quarter, "includeHistorical": True}
+    response = make_request("POST", forecast_url, HEADERS, json_body=json_body)
     return response.json()["jobId"]
 
 
@@ -159,7 +158,9 @@ def get_job_status(job_id: str) -> str:
 
 
 def poll_job_status(
-    job_id: str, wait_interval_seconds: int = 30, max_poll_attempts: int = 5
+    job_id: str,
+    wait_interval_seconds: int = 30,
+    max_poll_attempts: int = 5
 ) -> bool:
     """
     Polls the API for the status of the job with the specified ID,
@@ -202,41 +203,29 @@ def get_report_results(job_id: str) -> Dict[Any, Any]:
     return response.json()
 
 
-def results_dict_to_dataframe(
-    results_dict: Dict[Any, Any], fiscal_quarter: str
-) -> pd.DataFrame:
+def upload_results_dict(results_dict: Dict[Any, Any],
+                        fiscal_quarter: str) -> Dict[Any, Any]:
     """
-    returns a dataframe with the following cols:
-        - jsontext
-        - api_fiscal_quarter_name
-        - dag_schedule
-        - uploaded_at
+    Uploads the results_dict to Snowflake
     """
-    dataframe = pd.DataFrame(
-        columns=["jsontext", "api_fiscal_quarter_name", "dag_schedule"]
-    )
-    dataframe.loc[0] = [
-        json.dumps(results_dict),
-        fiscal_quarter.replace("_", "-"),  # match dim table formatting
-        config_dict["task_schedule"],
-    ]
-    return dataframe
-
-
-def upload_dataframe_to_snowflake(dataframe: pd.DataFrame) -> None:
-    """Uploads Clari dataframe to Snowflake"""
-    info("Uploading dataframe to Snowflake...")
+    upload_dict = {
+        "data": results_dict,
+        "api_fiscal_quarter": fiscal_quarter.replace("_", "-"),
+        "dag_schedule": config_dict["task_schedule"]
+    }
     loader_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    dataframe_uploader(
-        dataframe,
+    with open("clari.json", "w", encoding="utf8") as upload_file:
+        json.dump(upload_dict, upload_file)
+
+    snowflake_stage_load_copy_remove(
+        "clari.json",
+        "clari.clari_load",
+        "clari.net_arr",
         loader_engine,
-        table_name="net_arr",
-        schema="clari",
-        add_uploaded_at=True,
     )
-    info("Successfully uploaded report data to Snowflake")
     loader_engine.dispose()
+    return upload_dict
 
 
 def check_valid_quarter(
@@ -272,8 +261,7 @@ def main() -> None:
     results_dict = get_report_results(job_id)
     check_valid_quarter(fiscal_quarter, results_dict)
 
-    dataframe = results_dict_to_dataframe(results_dict, fiscal_quarter)
-    upload_dataframe_to_snowflake(dataframe)
+    upload_results_dict(results_dict, fiscal_quarter)
 
 
 if __name__ == "__main__":
