@@ -55,8 +55,12 @@ dag = DAG("backfill_handbook_mrs", default_args=default_args, schedule_interval=
 
 
 def run_this_func(ds, **kwargs):
-    print("Remotely received value of {} for key=message".
-          format(kwargs['dag_run'].conf['message']))
+    print(
+        "Remotely received value of {} for key=message".format(
+            kwargs["dag_run"].conf["message"]
+        )
+    )
+
 
 # Task 1
 part_of_product_mrs_run = KubernetesPodOperator(
