@@ -29,7 +29,6 @@ SELECT
     mart.dim_crm_person_primary_contact_id                   AS primary_contact_id,
     mart.record_type_id,
     mart.partner_vat_tax_id,
-    mart.federal_account,
     mart.gitlab_com_user,
     mart.account_manager,
     mart.account_owner,
@@ -144,7 +143,6 @@ SELECT
     mart.last_activity_date,
     mart.dbt_updated_at                                             AS _last_dbt_run,
     mart.technical_account_manager,
-    mart.parent_crm_account_name                                    AS ultimate_parent_account_name,
 
     sfdc_record_type.record_type_name,
     sfdc_record_type.business_process_id,
