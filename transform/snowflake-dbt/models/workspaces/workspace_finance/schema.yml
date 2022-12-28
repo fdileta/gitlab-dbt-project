@@ -1172,7 +1172,7 @@ models:
       - name: finance_sku_type
         description: implements high-;eve; sku buckets (Compute. Storage, etc...)
       - name: finance_sku_subtype
-        description: implements sku buckets. one bucket should be one usage unit (wip)
+        description: implements sku sub-buckets
       - name: usage_unit
         description: usage unit (seconds, bytes-seconds, etc...)
       - name: usage_amount

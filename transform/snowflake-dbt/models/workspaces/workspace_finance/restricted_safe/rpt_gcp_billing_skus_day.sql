@@ -8,6 +8,7 @@ WITH export as (
 
 SELECT * FROM {{ ref('gcp_billing_export_xf') }}
 WHERE invoice_month >= '2022-01-01'
+
 )
 SELECT 
     date(export.usage_end_time) as day,
@@ -116,7 +117,7 @@ SELECT
     sum(export.usage_amount) as usage_amount,
     sum(export.total_cost) AS net_cost
   FROM export 
-  group by 1, 2, 3, 4, 5, 6, 7
+  {{ dbt_utils.group_by(n=7) }} 
 
 
 
