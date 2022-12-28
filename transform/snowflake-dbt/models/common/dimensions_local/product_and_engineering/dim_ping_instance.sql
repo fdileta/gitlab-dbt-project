@@ -17,9 +17,9 @@ raw_flattened AS (
 
   SELECT
     raw_usage_data_id,
-    REPLACE(REPLACE(REPLACE(LOWER((raw_usage_data_payload:settings.collected_data_categories::TEXT)),'"',''),'[',''),']','') collected_data_categories
-  FROM prep_ping_instance,
-    LATERAL FLATTEN(input=> raw_usage_data_payload,RECURSIVE => true)
+    REPLACE(REPLACE(REPLACE(LOWER((raw_usage_data_payload['settings']['collected_data_categories']::VARCHAR)),'"',''),'[',''),']','') collected_data_categories
+  FROM prep_ping_instance
+  INNER JOIN LATERAL FLATTEN(input=> raw_usage_data_payload,RECURSIVE => true)
   WHERE key = 'settings'
     AND value LIKE '%collected_data_categories%'
 
@@ -30,7 +30,7 @@ usage_data_w_date AS (
   SELECT
     prep_ping_instance.*,
     dim_date.date_id                                                                AS dim_ping_date_id,
-    TO_DATE(prep_ping_instance.raw_usage_data_payload:license_trial_ends_on::TEXT)  AS license_trial_ends_on
+    prep_ping_instance.raw_usage_data_payload['license_trial_ends_on']::DATE  AS license_trial_ends_on
   FROM prep_ping_instance
   LEFT JOIN dim_date
     ON TO_DATE(ping_created_at) = dim_date.date_day
