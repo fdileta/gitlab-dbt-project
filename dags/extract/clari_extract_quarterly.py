@@ -76,7 +76,7 @@ clari_task = KubernetesPodOperator(
     ],
     env_vars={
         **pod_env_vars,
-        # If today is 11/1, the {{ execution_date }} will be 8/1
+        # If today is 11/1, the {{ execution_date }} will be 8/1. Kicks off prev quarter request
         "execution_date": "{{ execution_date }}",
         "task_schedule": TASK_SCHEDULE,
     },

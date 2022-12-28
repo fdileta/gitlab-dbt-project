@@ -8,8 +8,7 @@ There are actually 3 endpoints that need to be called:
 2. job status endpoint: poll until the job is 'DONE'
 3. results endpoint: returns the report as a json object
 
-The resulting json object is converted to a dataframe and
-then uploaded to Snowflake.
+The resulting json object is saved to a file and uploaded to Snowflake
 """
 
 import os
@@ -98,7 +97,7 @@ def make_request(
     json_body: Optional[Dict[Any, Any]] = None,
     timeout: int = 60,
     current_retry_count: int = 0,
-    max_retry_count: int = 5,
+    max_retry_count: int = 3,
 ) -> requests.models.Response:
     """Generic function that handles making GET and POST requests"""
     if current_retry_count >= max_retry_count:
@@ -210,6 +209,7 @@ def upload_results_dict(results_dict: Dict[Any, Any],
     """
     upload_dict = {
         "data": results_dict,
+        # update fiscal_quarter formatting to conform with dim table
         "api_fiscal_quarter": fiscal_quarter.replace("_", "-"),
         "dag_schedule": config_dict["task_schedule"]
     }
