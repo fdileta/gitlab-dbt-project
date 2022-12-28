@@ -19,7 +19,7 @@ ANALYST_IMAGE = "registry.gitlab.com/gitlab-data/data-image/analyst-image:v1.0.1
 
 SALES_ANALYTICS_SSH_REPO = "git@gitlab.com:gitlab-com/sales-team/field-operations/sales-strategy-and-analytics-business-intelligence.git"
 SALES_ANALYTICS_HTTP_REPO = "https://gitlab.com/gitlab-com/sales-team/field-operations/sales-strategy-and-analytics-business-intelligence.git"
-SALES_ANALYTICS_NOTEBOOKS_PATH = "jupyter_etls"
+SALES_ANALYTICS_NOTEBOOKS_PATH = "sales-strategy-and-analytics-business-intelligence/jupyter_etls/"
 
 
 def get_sales_analytics_notebooks(frequency: str) -> Dict:
