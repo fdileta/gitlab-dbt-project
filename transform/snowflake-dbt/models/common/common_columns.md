@@ -1096,6 +1096,8 @@ The timestamp when this row became invalidated. The most recent snapshot record 
 
 An attribute of an opportunity to designate what type or order it is. This is stamped on the close date of the opportunity. In its latest version, Order Type has logic incorporated to filter out additional CI Minutes and credits as First Order, per the [Salesforce Documentation](https://gitlab.my.salesforce.com/00N4M00000Ib7ly?setupid=OpportunityFields).
 
+{% enddocs %}
+
 {% docs order_type %}
 
 An attribute of an opportunity to designate what type or order it is. This is stamped on the close date of the opportunity. In its latest version, Order Type has logic incorporated to filter out additional CI Minutes and credits as First Order, per the [Salesforce Documentation](https://gitlab.my.salesforce.com/00N4M00000Ib7ly?setupid=OpportunityFields).
