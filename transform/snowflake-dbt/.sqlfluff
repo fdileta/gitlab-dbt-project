@@ -34,7 +34,7 @@ capitalisation_policy = upper
 
 [sqlfluff:rules:L030]
 # Function names
-capitalisation_policy = upper
+extended_capitalisation_policy = upper
 
 [sqlfluff:rules:L040]
 # Null & Boolean Literals
