@@ -52,7 +52,7 @@ dag = DAG(
     default_args=default_args,
     # At 12:00 on day-of-month 1 in February, May, August, and November
     schedule_interval="0 12 1 2,5,8,11 *",
-    start_date=datetime(2021, 12, 17),
+    start_date=datetime(2019, 12, 17),
     catchup=True,
     max_active_runs=1,
 )
