@@ -16,7 +16,10 @@ DBT_IMAGE = "registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.20"
 PERMIFROST_IMAGE = "registry.gitlab.com/gitlab-data/permifrost:v0.13.1"
 ANALYST_IMAGE = "registry.gitlab.com/gitlab-data/data-image/analyst-image:v1.0.13"
 
-SALES_ANALYTICS_NOTEBOOKS_PATH = "analytics/sales_analytics_notebooks"
+
+SALES_ANALYTICS_SSH_REPO = "git@gitlab.com:gitlab-com/sales-team/field-operations/sales-strategy-and-analytics-business-intelligence.git"
+SALES_ANALYTICS_HTTP_REPO = "https://gitlab.com/gitlab-com/sales-team/field-operations/sales-strategy-and-analytics-business-intelligence.git"
+SALES_ANALYTICS_NOTEBOOKS_PATH = "jupyter_etls"
 
 
 def get_sales_analytics_notebooks(frequency: str) -> Dict:
@@ -322,6 +325,24 @@ clone_repo_cmd = f"""
     cd analytics &&
     git checkout $GIT_COMMIT &&
     cd .."""
+
+clone_sales_analytics_repo_cmd = f"""
+    {data_test_ssh_key_cmd} &&
+    if [[ -z "$GIT_COMMIT" ]]; then
+        export GIT_COMMIT="HEAD"
+    fi
+    if [[ -z "$GIT_DATA_TESTS_PRIVATE_KEY" ]]; then
+        export REPO="{SALES_ANALYTICS_HTTP_REPO}";
+        else
+        export REPO="{SALES_ANALYTICS_SSH_REPO}";
+    fi &&
+    echo "git clone -b remove-folder-from-daily-notebooks --single-branch --depth 1 $REPO" &&
+    git clone -b remove-folder-from-daily-notebooks --single-branch --depth 1 $REPO &&
+    echo "checking out commit $GIT_COMMIT" &&
+    cd jupyter_etls &&
+    git checkout $GIT_COMMIT &&
+    cd .."""
+
 
 clone_repo_sha_cmd = f"""
     {data_test_ssh_key_cmd} &&

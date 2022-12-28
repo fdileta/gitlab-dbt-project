@@ -13,7 +13,7 @@ from airflow_utils import (
     gitlab_defaults,
     gitlab_pod_env_vars,
     slack_failed_task,
-    clone_repo_cmd,
+    clone_sales_analytics_repo_cmd,
     SALES_ANALYTICS_NOTEBOOKS_PATH,
     get_sales_analytics_notebooks,
 )
@@ -64,7 +64,7 @@ start = DummyOperator(task_id="Start", dag=dag)
 for notebook, task_name in notebooks.items():
     # Set the command for the container for loading the data
     container_cmd_load = f"""
-        {clone_repo_cmd} &&
+        {clone_sales_analytics_repo_cmd} &&
         cd {WEEKLY_NOTEBOOKS_PATH} &&
         papermill {notebook} -p is_local_development False
         """
