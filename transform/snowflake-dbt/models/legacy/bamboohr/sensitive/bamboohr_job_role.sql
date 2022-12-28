@@ -3,9 +3,10 @@ WITH source AS (
   SELECT *
   FROM {{ ref ('blended_employee_mapping_source') }}
   WHERE sort_order = 1
+
 ),
 
-stage AS (
+intermediate AS (
 
   SELECT
     employee_number,
@@ -36,35 +37,15 @@ stage AS (
     {{ dbt_utils.surrogate_key(['employee_id', 'job_role', 'job_grade', 
                                 'cost_center', 'jobtitle_speciality', 
                                 'gitlab_username', 'pay_frequency', 
-                                'sales_geo_differential']) }} AS unique_key,
-    LEAD(unique_key) OVER (PARTITION BY employee_id 
-      ORDER BY effective_date DESC) as prior_unique_key
+                                'sales_geo_differential']) }} AS unique_key
   FROM source
-  WHERE
-    CASE
-      WHEN source_system = 'workday'
-        AND uploaded_at::date >= '2022-06-16'
-        THEN 1
-      WHEN source_system = 'bamboohr'
-        AND uploaded_at::date <= '2022-06-16'
-        THEN 1
-      ELSE 0
-      END = 1
-
-),
-
-intermediate AS (
-
-  SELECT *
-  FROM stage
-  WHERE 
-    CASE
-      WHEN unique_key != prior_unique_key
-        THEN 1
-      WHEN prior_unique_key IS NULL
-        THEN 1
-      ELSE 0
-      END = 1
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY unique_key
+    ORDER BY DATE_TRUNC('day', effective_date) ASC, DATE_TRUNC('hour', effective_date) DESC) = 1
+  /*
+  This type of filtering does not account for a change back to a previous value
+  and will return incorrect ranges for effective values.  This can be solved with a
+  gaps and islands solution
+  */
 
 ),
 
