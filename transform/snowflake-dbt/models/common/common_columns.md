@@ -1088,6 +1088,6 @@ The timestamp when this snapshot row was first inserted. This column can be used
 
 {% docs dbt_valid_to %}
 
-The timestamp when this row became invalidated. The most recent snapshot record will have `dbt_valid_to` set to null.
+The timestamp when this row became invalidated. The most recent snapshot record will have `dbt_valid_to` set to null. When a new snapshot record is created, `dbt_valid_to` is updated and will match the new record's `dbt_valid_from` timestamp.
 
 {% enddocs %}
