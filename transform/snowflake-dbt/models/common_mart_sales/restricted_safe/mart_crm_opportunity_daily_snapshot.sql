@@ -243,6 +243,8 @@ final AS (
     fct_crm_opportunity.lead_source,
     fct_crm_opportunity.dr_partner_deal_type,
     fct_crm_opportunity.partner_account,
+    partner_account.crm_account_name AS partner_account_name,
+    partner_account.gitlab_partner_program  AS partner_gitlab_program,
     fct_crm_opportunity.calculated_partner_track,
     fct_crm_opportunity.dr_status,
     fct_crm_opportunity.distributor,
