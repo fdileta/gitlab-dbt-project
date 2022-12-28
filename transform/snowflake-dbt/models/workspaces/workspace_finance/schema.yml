@@ -1170,7 +1170,7 @@ models:
       - name: gcp_sku_description
         description: gcp sku full name
       - name: finance_sku_type
-        description: implements high-;eve; sku buckets (Compute. Storage, etc...)
+        description: implements high-level sku buckets (Compute. Storage, etc...)
       - name: finance_sku_subtype
         description: implements sku sub-buckets
       - name: usage_unit
