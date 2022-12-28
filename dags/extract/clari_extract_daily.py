@@ -1,3 +1,6 @@
+"""
+Run daily Clari extract
+"""
 import os
 from datetime import datetime, timedelta
 
@@ -27,7 +30,7 @@ from kubernetes_helpers import get_affinity, get_toleration
 env = os.environ.copy()
 GIT_BRANCH = env["GIT_BRANCH"]
 pod_env_vars = {**gitlab_pod_env_vars, **{}}
-TASK_SCHEDULE = 'daily'
+TASK_SCHEDULE = "daily"
 
 # Define the default arguments for the DAG
 default_args = {
@@ -41,7 +44,7 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    f'clari_extractv7-{TASK_SCHEDULE}',
+    f"clari_extractv7-{TASK_SCHEDULE}",
     default_args=default_args,
     schedule_interval="0 8 * * *",
     start_date=datetime(2022, 12, 26),
@@ -51,13 +54,12 @@ dag = DAG(
 
 bash_task = BashOperator(
     dag=dag,
-    task_id='bash_task',
+    task_id="bash_task",
     bash_command="echo '{{ execution_date }}' '{{ next_execution_date }}'",
 )
 
 clari_extract_command = (
-    f"{clone_and_setup_extraction_cmd} && "
-    f"python clari/src/clari.py"
+    f"{clone_and_setup_extraction_cmd} && " f"python clari/src/clari.py"
 )
 
 clari_task = KubernetesPodOperator(
@@ -75,8 +77,7 @@ clari_task = KubernetesPodOperator(
     ],
     env_vars={
         **pod_env_vars,
-        # if today's physical date is 8/11, the { next_execution_date } is also 8/11. Kick's off today's quarter in the request.
-        "execution_date": "{{ next_execution_date }}",
+        "execution_date": "{{ next_execution_date }}",  # run today's quarter
         "task_schedule": TASK_SCHEDULE,
     },
     affinity=get_affinity(False),

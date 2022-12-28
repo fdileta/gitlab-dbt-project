@@ -1,3 +1,10 @@
+"""
+Run quarterly clari DAG
+
+The 'quarterly' DAG is necessary for two reasons:
+1. Late Arriving events: As soon as a new quarter begins, the daily DAG will begin requesting the data for the new *quarter*. However, the previous quarter predictions may still not be finalized, so this quarterly DAG will be an additional and final run after the quarter closes to bring in any updated records.
+2. Backfills
+"""
 import os
 from datetime import datetime, timedelta
 
@@ -27,7 +34,7 @@ from kubernetes_helpers import get_affinity, get_toleration
 env = os.environ.copy()
 GIT_BRANCH = env["GIT_BRANCH"]
 pod_env_vars = {**gitlab_pod_env_vars, **{}}
-TASK_SCHEDULE = 'quarterly'
+TASK_SCHEDULE = "quarterly"
 
 # Define the default arguments for the DAG
 default_args = {
@@ -41,7 +48,7 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    f'clari_extractv6-{TASK_SCHEDULE}',
+    f"clari_extractv6-{TASK_SCHEDULE}",
     default_args=default_args,
     # At 12:00 on day-of-month 1 in February, May, August, and November
     schedule_interval="0 12 1 2,5,8,11 *",
@@ -52,13 +59,12 @@ dag = DAG(
 
 bash_task = BashOperator(
     dag=dag,
-    task_id='bash_task',
+    task_id="bash_task",
     bash_command="echo '{{ execution_date }}' '{{ next_execution_date }}'",
 )
 
 clari_extract_command = (
-    f"{clone_and_setup_extraction_cmd} && "
-    f"python clari/src/clari.py"
+    f"{clone_and_setup_extraction_cmd} && " f"python clari/src/clari.py"
 )
 
 clari_task = KubernetesPodOperator(

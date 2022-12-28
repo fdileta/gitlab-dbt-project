@@ -157,9 +157,7 @@ def get_job_status(job_id: str) -> str:
 
 
 def poll_job_status(
-    job_id: str,
-    wait_interval_seconds: int = 30,
-    max_poll_attempts: int = 5
+    job_id: str, wait_interval_seconds: int = 30, max_poll_attempts: int = 5
 ) -> bool:
     """
     Polls the API for the status of the job with the specified ID,
@@ -202,8 +200,9 @@ def get_report_results(job_id: str) -> Dict[Any, Any]:
     return response.json()
 
 
-def upload_results_dict(results_dict: Dict[Any, Any],
-                        fiscal_quarter: str) -> Dict[Any, Any]:
+def upload_results_dict(
+    results_dict: Dict[Any, Any], fiscal_quarter: str
+) -> Dict[Any, Any]:
     """
     Uploads the results_dict to Snowflake
     """
@@ -211,7 +210,7 @@ def upload_results_dict(results_dict: Dict[Any, Any],
         "data": results_dict,
         # update fiscal_quarter formatting to conform with dim table
         "api_fiscal_quarter": fiscal_quarter.replace("_", "-"),
-        "dag_schedule": config_dict["task_schedule"]
+        "dag_schedule": config_dict["task_schedule"],
     }
     loader_engine = snowflake_engine_factory(config_dict, "LOADER")
 
