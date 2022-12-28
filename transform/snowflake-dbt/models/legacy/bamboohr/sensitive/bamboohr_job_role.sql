@@ -2,7 +2,7 @@ WITH source AS (
 
   SELECT *
   FROM {{ ref ('blended_employee_mapping_source') }}
-
+  WHERE sort_order = 1
 ),
 
 stage AS (
