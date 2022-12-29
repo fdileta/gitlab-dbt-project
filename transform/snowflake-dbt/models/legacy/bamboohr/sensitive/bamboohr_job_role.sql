@@ -61,7 +61,7 @@ final AS (
     *,
     LEAD(DATEADD('day', -1, DATE_TRUNC('day', effective_date))) OVER (PARTITION BY employee_number
       ORDER BY effective_date) AS next_effective_date
-  FROM intermediate
+  FROM filtered
   WHERE effective_date >= '2020-02-27'  --1st day we started capturing job role
 
 )
