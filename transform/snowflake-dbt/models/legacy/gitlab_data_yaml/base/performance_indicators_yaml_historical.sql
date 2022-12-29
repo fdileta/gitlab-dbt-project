@@ -1,3 +1,8 @@
+{{ config(
+    materialized='table',
+    tags=["mnpi_exception", "product"]
+) }}
+
 WITH source AS (
 
   SELECT
