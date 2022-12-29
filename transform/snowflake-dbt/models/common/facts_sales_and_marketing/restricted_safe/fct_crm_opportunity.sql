@@ -100,7 +100,7 @@
       {{ get_keyed_nulls('sfdc_opportunity.dim_crm_user_id') }}                                                             AS dim_crm_user_id,
       {{ get_keyed_nulls('prep_crm_account.dim_crm_user_id') }}                                                             AS dim_crm_account_user_id,
       {{ get_keyed_nulls('order_type.dim_order_type_id') }}                                                                 AS dim_order_type_id,
-      {{ get_keyed_nulls('order_type_live.order_type_id') }}                                                                AS dim_order_type_live_id,
+      {{ get_keyed_nulls('order_type_live.dim_order_type_id') }}                                                            AS dim_order_type_live_id,
       {{ get_keyed_nulls('dr_partner_engagement.dim_dr_partner_engagement_id') }}                                           AS dim_dr_partner_engagement_id,
       {{ get_keyed_nulls('alliance_type.dim_alliance_type_id') }}                                                           AS dim_alliance_type_id,
       {{ get_keyed_nulls('alliance_type_current.dim_alliance_type_id') }}                                                   AS dim_alliance_type_current_id,
