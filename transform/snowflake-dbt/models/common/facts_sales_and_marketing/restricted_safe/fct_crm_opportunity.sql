@@ -245,7 +245,7 @@
     LEFT JOIN order_type
       ON sfdc_opportunity.order_type = order_type.order_type_name
     LEFT JOIN order_type AS order_type_live
-      ON sfdc_opportunity.order_type_live = order_type.order_type_name
+      ON sfdc_opportunity.order_type_live = order_type_live.order_type_name
     LEFT JOIN deal_path
       ON sfdc_opportunity.deal_path = deal_path.deal_path_name
     LEFT JOIN sales_segment
