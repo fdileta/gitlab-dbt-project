@@ -37,15 +37,13 @@ intermediate AS (
     {{ dbt_utils.surrogate_key(['employee_id', 'job_role', 'job_grade', 
                                 'cost_center', 'jobtitle_speciality', 
                                 'gitlab_username', 'pay_frequency', 
-                                'sales_geo_differential']) }} AS unique_key
+                                'sales_geo_differential']) }} AS unique_key,
+    LAG(unique_key, 1, '')
+      OVER (PARTITION BY employee_id ORDER BY uploaded_at) AS lag_unique_key,
+    CONDITIONAL_TRUE_EVENT(unique_key != lag_unique_key)
+      OVER ( PARTITION BY employee_id ORDER BY uploaded_at) AS unique_key_group 
   FROM source
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY unique_key
-    ORDER BY DATE_TRUNC('day', effective_date) ASC, DATE_TRUNC('hour', effective_date) DESC) = 1
-  /*
-  This type of filtering does not account for a change back to a previous value
-  and will return incorrect ranges for effective values.  This can be solved with a
-  gaps and islands solution
-  */
+  QUALIFY unique_key != lag_unique_key
 
 ),
 
