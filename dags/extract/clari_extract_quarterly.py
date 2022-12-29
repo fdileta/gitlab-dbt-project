@@ -1,9 +1,5 @@
 """
 Run quarterly clari DAG
-
-The 'quarterly' DAG is necessary for two reasons:
-1. Late Arriving events: As soon as a new quarter begins, the daily DAG will begin requesting the data for the new *quarter*. However, the previous quarter predictions may still not be finalized, so this quarterly DAG will be an additional and final run after the quarter closes to bring in any updated records.
-2. Backfills
 """
 import os
 from datetime import datetime, timedelta
@@ -48,19 +44,19 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    f"clari_extractv6-{TASK_SCHEDULE}",
+    f"clari_extract_{TASK_SCHEDULE}v1",
     default_args=default_args,
-    # At 12:00 on day-of-month 1 in February, May, August, and November
-    schedule_interval="0 12 1 2,5,8,11 *",
-    start_date=datetime(2019, 12, 17),
-    catchup=True,
+    # At 8:00 on day-of-month 1 in February, May, August, and November
+    schedule_interval="0 8 1 2,5,8,11 *",
+    start_date=datetime(2022, 7, 1), # first quarter will be 2022-Q4
+    catchup=False, # don't enable backfill functionality, API not idempotent
     max_active_runs=1,
 )
 
 bash_task = BashOperator(
     dag=dag,
     task_id="bash_task",
-    bash_command="echo '{{ execution_date }}' '{{ next_execution_date }}'",
+    bash_command="echo '{{ execution_date }}' || '{{ next_execution_date }}'",
 )
 
 clari_extract_command = (
@@ -82,8 +78,8 @@ clari_task = KubernetesPodOperator(
     ],
     env_vars={
         **pod_env_vars,
-        # If today is 11/1, the {{ execution_date }} will be 8/1. Kicks off prev quarter request
-        "execution_date": "{{ execution_date }}",
+        # Run today's quarter
+        "execution_date": "{{ next_execution_date }}",
         "task_schedule": TASK_SCHEDULE,
     },
     affinity=get_affinity(False),

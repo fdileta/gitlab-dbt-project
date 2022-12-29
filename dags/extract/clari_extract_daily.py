@@ -44,7 +44,7 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    f"clari_extract_{TASK_SCHEDULE}",
+    f"clari_extract_{TASK_SCHEDULE}v1",
     default_args=default_args,
     schedule_interval="0 8 * * *",
     start_date=datetime(2022, 12, 26),
@@ -72,7 +72,7 @@ clari_task = KubernetesPodOperator(
     ],
     env_vars={
         **pod_env_vars,
-        "execution_date": "{{ next_execution_date }}",  # run today's quarter
+        "execution_date": "{{ execution_date }}",  # run yest's quarter
         "task_schedule": TASK_SCHEDULE,
     },
     affinity=get_affinity(False),
