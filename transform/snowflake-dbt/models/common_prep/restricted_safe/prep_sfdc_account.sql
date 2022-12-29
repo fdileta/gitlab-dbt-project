@@ -40,7 +40,7 @@ WITH sfdc_account AS (
       END                                                                                   AS sales_segment_grouped,     
       sfdc_account.billing_country,
       sfdc_account.df_industry,
-      sfdc_account.sfdc_account.account_demographics_territory
+      sfdc_account.account_demographics_territory
     FROM sfdc_account
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
