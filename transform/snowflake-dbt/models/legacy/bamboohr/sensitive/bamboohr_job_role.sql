@@ -43,8 +43,16 @@ intermediate AS (
     CONDITIONAL_TRUE_EVENT(unique_key != lag_unique_key)
       OVER ( PARTITION BY employee_id ORDER BY uploaded_at) AS unique_key_group 
   FROM source
-  QUALIFY unique_key != lag_unique_key
 
+),
+
+filtered AS (
+  
+  SELECT *
+  FROM intermediate
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY unique_key,unique_key_group
+    ORDER BY DATE_TRUNC('day', effective_date) ASC, DATE_TRUNC('hour', effective_date) DESC) = 1
+  
 ),
 
 final AS (
