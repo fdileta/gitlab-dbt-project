@@ -36,7 +36,7 @@
       FALSE AS is_first_order_available
     FROM upa_base 
     LEFT JOIN first_order_opps
-      ON upa_base.dim_crm_account_id=first_order_opps.dim_crm_account_id
+      ON upa_base.dim_crm_account_id = first_order_opps.dim_crm_account_id
     WHERE dim_crm_opportunity_id IS NOT NULL
 
 ), person_order_type_base AS (
@@ -51,18 +51,20 @@
       mart_crm_opportunity.close_date,
       mart_crm_opportunity.order_type,
       CASE 
-         WHEN is_first_order_available = False AND mart_crm_opportunity.order_type = '1. New - First Order' THEN '3. Growth'
-         WHEN is_first_order_available = False AND mart_crm_opportunity.order_type != '1. New - First Order' THEN mart_crm_opportunity.order_type
-      ELSE '1. New - First Order'
+        WHEN is_first_order_available = False AND mart_crm_opportunity.order_type = '1. New - First Order' 
+          THEN '3. Growth'
+        WHEN is_first_order_available = False AND mart_crm_opportunity.order_type != '1. New - First Order' 
+          THEN mart_crm_opportunity.order_type
+        ELSE '1. New - First Order'
       END AS person_order_type,
       ROW_NUMBER() OVER( PARTITION BY email_hash ORDER BY person_order_type) AS person_order_type_number
     FROM mart_crm_person
     FULL JOIN upa_base
-      ON mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
+      ON mart_crm_person.dim_crm_account_id = upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps
       ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
     FULL JOIN mart_crm_opportunity
-      ON upa_base.dim_parent_crm_account_id=mart_crm_opportunity.dim_parent_crm_account_id
+      ON upa_base.dim_parent_crm_account_id = mart_crm_opportunity.dim_parent_crm_account_id
 
 ), person_order_type_final AS (
 
@@ -77,7 +79,7 @@
       person_order_type_base.dim_crm_account_id,
       person_order_type_base.person_order_type
     FROM person_order_type_base
-    WHERE person_order_type_number=1
+    WHERE person_order_type_number = 1
 
 ), mql_order_type_base AS (
 
@@ -85,24 +87,26 @@
       mart_crm_person.sfdc_record_id,
       mart_crm_person.email_hash, 
       CASE 
-         WHEN mql_date_lastest_pt < mart_crm_opportunity.close_date THEN mart_crm_opportunity.order_type
-         WHEN mql_date_lastest_pt > mart_crm_opportunity.close_date THEN '3. Growth'
-      ELSE null
+        WHEN mql_date_lastest_pt < mart_crm_opportunity.close_date 
+          THEN mart_crm_opportunity.order_type
+        WHEN mql_date_lastest_pt > mart_crm_opportunity.close_date 
+          THEN '3. Growth'
+        ELSE NULL
       END AS mql_order_type_historical,
       ROW_NUMBER() OVER( PARTITION BY mart_crm_person.email_hash ORDER BY mql_order_type_historical) AS mql_order_type_number
     FROM mart_crm_person
-    FULL JOIN upa_base ON 
-    mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
-    LEFT JOIN accounts_with_first_order_opps ON
-    upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
-    FULL JOIN mart_crm_opportunity ON
-    upa_base.dim_parent_crm_account_id=mart_crm_opportunity.dim_parent_crm_account_id
+    FULL JOIN upa_base 
+      ON mart_crm_person.dim_crm_account_id = upa_base.dim_crm_account_id
+    LEFT JOIN accounts_with_first_order_opps 
+      ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
+    FULL JOIN mart_crm_opportunity 
+      ON upa_base.dim_parent_crm_account_id = mart_crm_opportunity.dim_parent_crm_account_id
     
 ), mql_order_type_final AS (
   
   SELECT *
   FROM mql_order_type_base
-  WHERE mql_order_type_number=1
+  WHERE mql_order_type_number = 1
     
 ), inquiry_order_type_base AS (
 
@@ -112,16 +116,16 @@
       CASE 
          WHEN true_inquiry_date < mart_crm_opportunity.close_date THEN mart_crm_opportunity.order_type
          WHEN true_inquiry_date > mart_crm_opportunity.close_date THEN '3. Growth'
-      ELSE null
+      ELSE NULL
       END AS inquiry_order_type_historical,
       ROW_NUMBER() OVER( PARTITION BY mart_crm_person.email_hash ORDER BY inquiry_order_type_historical) AS inquiry_order_type_number
     FROM mart_crm_person
-    FULL JOIN upa_base ON 
-    mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
-    LEFT JOIN accounts_with_first_order_opps ON
-    upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
-    FULL JOIN mart_crm_opportunity ON
-    upa_base.dim_parent_crm_account_id=mart_crm_opportunity.dim_parent_crm_account_id
+    FULL JOIN upa_base 
+      ON mart_crm_person.dim_crm_account_id = upa_base.dim_crm_account_id
+    LEFT JOIN accounts_with_first_order_opps 
+      ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
+    FULL JOIN mart_crm_opportunity 
+      ON upa_base.dim_parent_crm_account_id = mart_crm_opportunity.dim_parent_crm_account_id
 
 ), inquiry_order_type_final AS (
   
@@ -144,10 +148,10 @@
     inquiry_order_type_final.inquiry_order_type_historical,
     mql_order_type_final.mql_order_type_historical
   FROM person_order_type_final
-  LEFT JOIN inquiry_order_type_final ON
-  person_order_type_final.email_hash=inquiry_order_type_final.email_hash
-  LEFT JOIN mql_order_type_final ON
-  person_order_type_final.email_hash=mql_order_type_final.email_hash
+  LEFT JOIN inquiry_order_type_final 
+    ON person_order_type_final.email_hash=inquiry_order_type_final.email_hash
+  LEFT JOIN mql_order_type_final 
+    ON person_order_type_final.email_hash=mql_order_type_final.email_hash
 
   ), cohort_base AS (
 
@@ -212,7 +216,9 @@
       mart_crm_person.leandata_matched_account_sales_segment,
       map_alternative_lead_demographics.employee_count_segment_custom,
       map_alternative_lead_demographics.employee_bucket_segment_custom,
+      COALESCE(map_alternative_lead_demographics.employee_count_segment_custom, map_alternative_lead_demographics.employee_bucket_segment_custom) AS inferred_employee_segment,
       map_alternative_lead_demographics.geo_custom,
+      UPPER(map_alternative_lead_demographics.geo_custom) AS inferred_geo,
       accounts_with_first_order_opps.is_first_order_available,
       order_type_final.person_order_type,
       order_type_final.inquiry_order_type_historical,
@@ -350,17 +356,17 @@
       opp_user.user_role_name AS opp_user_role_name
     FROM mart_crm_person
     LEFT JOIN upa_base
-    ON mart_crm_person.dim_crm_account_id=upa_base.dim_crm_account_id
+    ON mart_crm_person.dim_crm_account_id = upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps
       ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
     FULL JOIN mart_crm_opportunity
       ON upa_base.dim_parent_crm_account_id=mart_crm_opportunity.dim_parent_crm_account_id
     LEFT JOIN order_type_final
-      ON mart_crm_person.email_hash=order_type_final.email_hash
+      ON mart_crm_person.email_hash = order_type_final.email_hash
     LEFT JOIN map_alternative_lead_demographics
-    ON mart_crm_person.dim_crm_person_id=map_alternative_lead_demographics.dim_crm_person_id
+      ON mart_crm_person.dim_crm_person_id = map_alternative_lead_demographics.dim_crm_person_id
     LEFT JOIN dim_crm_user opp_user 
-    ON mart_crm_opportunity.dim_crm_user_id=opp_user.dim_crm_user_id
+      ON mart_crm_opportunity.dim_crm_user_id = opp_user.dim_crm_user_id
 
 ), cohort AS (
   
@@ -378,9 +384,9 @@
     --person attributes
     cohort_base.email_hash,
     CASE 
-      WHEN cohort_base.person_order_type IS null AND cohort_base.opp_order_type IS null 
+      WHEN cohort_base.person_order_type IS NULL AND cohort_base.opp_order_type IS NULL 
         THEN 'Missing order_type_name'
-      WHEN cohort_base.person_order_type IS null 
+      WHEN cohort_base.person_order_type IS NULL 
         THEN cohort_base.opp_order_type
       ELSE person_order_type
     END                                                                                   AS person_order_type,
@@ -440,7 +446,9 @@
     cohort_base.is_inquiry,
     cohort_base.employee_count_segment_custom,
     cohort_base.employee_bucket_segment_custom,
+    cohort_base.inferred_employee_segment,
     cohort_base.geo_custom,
+    cohort_base.inferred_geo,
    
     --opportunity attributes
     cohort_base.opp_created_date,
@@ -572,9 +580,9 @@
     cohort_base.opp_user_role_name,
     cohort_base.record_type_name,
     CASE
-      WHEN rpt_crm_touchpoint_combined.dim_crm_touchpoint_id IS NOT null 
+      WHEN rpt_crm_touchpoint_combined.dim_crm_touchpoint_id IS NOT NULL 
         THEN cohort_base.dim_crm_opportunity_id
-      ELSE null
+      ELSE NULL
     END AS influenced_opportunity_id,
   
     --touchpoint attributes
@@ -691,5 +699,5 @@
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-10-05",
-    updated_date="2022-12-22",
+    updated_date="2022-12-27",
   ) }}
