@@ -1175,7 +1175,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% docs fct_ping_instance_metric %}
 
-**Description:** Atomic level instance Service Ping data by ping and metric for all metrics, including basic identifiers for easy joins out ot dimension tables
+**Description:** Atomic level instance Service Ping data by ping and metric for all metrics, including basic identifiers for easy joins out to dimension tables
 - The data includes a single row per ping and metric
 - Includes installation, instance, date, product, billing, and subscription identifiers
 
@@ -1211,7 +1211,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% docs fct_ping_instance_metric_rolling_13_months %}
 
-**Description:** Atomic level instance Service Ping data by ping and metric for all metrics for the last 13 months, including basic identifiers for easy joins out ot dimension tables. This model is filtered to the last rolling 13 months to improve query performance during data exploration and analysis.
+**Description:** Atomic level instance Service Ping data by ping and metric for all metrics for the last 13 months, including basic identifiers for easy joins out to dimension tables. This model filters `fct_ping_instance_metric` to the last 13 months to improve query performance during data exploration and analysis.
 - The data includes a single row per ping and metric
 - Includes installation, instance, date, product, billing, and subscription identifiers
 
@@ -1249,7 +1249,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% docs fct_ping_instance_metric_rolling_6_months %}
 
-**Description:** Atomic level instance Service Ping data by ping and metric for all metrics for the last 6 months, including basic identifiers for easy joins out ot dimension tables. This model is filtered to the last rolling 6 months to improve query performance during data exploration and analysis.
+**Description:** Atomic level instance Service Ping data by ping and metric for all metrics for the last 6 months, including basic identifiers for easy joins out to dimension tables. This model filters `fct_ping_instance_metric` to the last 6 months to improve query performance during data exploration and analysis.
 - The data includes a single row per ping and metric
 - Includes installation, instance, date, product, billing, and subscription identifiers
 
@@ -1287,7 +1287,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% docs fct_ping_instance %}
 
-**Description:** Atomic level instance Service Ping data by ping, including basic identifiers for easy joins out ot dimension tables. Metrics are not included in this model
+**Description:** Atomic level instance Service Ping data by ping, including basic identifiers for easy joins out to dimension tables. Metrics are not included in this model
 - Atomic (lowest grain) data with a single record per ping
 - Includes installation, instance, date, product, billing, and subscription identifiers
 
@@ -1320,7 +1320,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% docs fct_ping_instance_metric_7_day %}
 
-**Description:** Atomic level instance Service Ping data by ping and metric for 7-day metrics, including basic identifiers for easy joins out ot dimension tables
+**Description:** Atomic level instance Service Ping data by ping and metric for 7-day metrics, including basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
 - The data includes a single row per ping and metric
 - Includes installation, instance, date, product, billing, and subscription identifiers
 
@@ -1329,8 +1329,6 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 - metrics_path
 
 **Filters Applied to Model:**
-- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
-- `Inherited` - `version NOT LIKE '%VERSION%`
 - Include 7-day metrics (`time_frame = '7d'`)
 
 **Business Logic in this Model:**
@@ -1351,7 +1349,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% docs fct_ping_instance_metric_28_day %}
 
-**Description:** Atomic level instance Service Ping data by ping and metric for 28-day metrics, including basic identifiers for easy joins out ot dimension tables
+**Description:** Atomic level instance Service Ping data by ping and metric for 28-day metrics, including basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
 - The data includes a single row per ping and metric
 - Includes installation, instance, date, product, billing, and subscription identifiers
 
@@ -1360,8 +1358,6 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 - metrics_path
 
 **Filters Applied to Model:**
-- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
-- `Inherited` - `version NOT LIKE '%VERSION%`
 - Include 28-day metrics (`time_frame = '28d'`)
 
 **Business Logic in this Model:**
@@ -1382,7 +1378,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% docs fct_ping_instance_metric_monthly %}
 
-**Description:** Atomic level instance Service Ping data for the last ping of the month per installation by ping and metric for 28-day and all-time metrics. This includes basic identifiers for easy joins out to dimension tables
+**Description:** Atomic level instance Service Ping data for the last ping of the month per installation by ping and metric for 28-day and all-time metrics. This includes basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
 - The data includes a single row per ping and metric
 - Includes installation, instance, date, product, billing, and subscription identifiers
 
@@ -1391,8 +1387,6 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 - metrics_path
 
 **Filters Applied to Model:**
-- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
-- `Inherited` - `version NOT LIKE '%VERSION%`
 - Exclude metrics that timed out during ping generation (`has_timed_out = FALSE`)
 - Include 28-day and all-time metrics (`time_frame IN ('28d', 'all')`)
 - Include metrics from the 'Last Ping of the Month' pings (`is_last_ping_of_month = TRUE`)
@@ -1416,7 +1410,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% docs fct_ping_instance_metric_weekly %}
 
-**Description:** Atomic level instance Service Ping data for the last ping of the week per installation by ping and metric for 7-day metrics. This includes basic identifiers for easy joins out to dimension tables
+**Description:** Atomic level instance Service Ping data for the last ping of the week per installation by ping and metric for 7-day metrics. This includes basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
 - The data includes a single row per ping and metric
 - Includes installation, instance, date, product, billing, and subscription identifiers
 
@@ -1425,8 +1419,6 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 - metrics_path
 
 **Filters Applied to Model:**
-- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
-- `Inherited` - `version NOT LIKE '%VERSION%`
 - Exclude metrics that timed out during ping generation (`has_timed_out = FALSE`)
 - Include 7-day metrics (`time_frame = '7d'`)
 - Include metrics from the 'Last Ping of the Week' pings (`is_last_ping_of_week = TRUE`)
@@ -1459,8 +1451,6 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 - metrics_path
 
 **Filters:**
-- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
-- `Inherited` - `version NOT LIKE '%VERSION%`
 - Include all-time metrics (`time_frame = 'all'`)
 
 **Business Logic in this Model:**
