@@ -44,10 +44,12 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    f"clari_extract_{TASK_SCHEDULE}v1",
+    # TODO: rename this in production
+    f"clari_extract_{TASK_SCHEDULE}v2",
     default_args=default_args,
-    # At 8:00 on day-of-month 1 in February, May, August, and November
-    schedule_interval="0 8 1 2,5,8,11 *",
+    # At 8:05 on day-of-month 1 in February, May, August, and November
+    schedule_interval="5 8 1 2,5,8,11 *",
+    # TODO: in producton update start_date to (2022, 10, 1)
     start_date=datetime(2022, 7, 1), # first quarter will be 2022-Q4
     catchup=False, # don't enable backfill functionality, API not idempotent
     max_active_runs=1,
@@ -63,11 +65,35 @@ clari_extract_command = (
     f"{clone_and_setup_extraction_cmd} && " f"python clari/src/clari.py"
 )
 
-clari_task = KubernetesPodOperator(
+clari_task_previous_quarter = KubernetesPodOperator(
     **gitlab_defaults,
     image=DATA_IMAGE,
-    task_id=f"clari-extract-{TASK_SCHEDULE}",
-    name=f"clari-extract-{TASK_SCHEDULE}",
+    task_id=f"clari_extract_{TASK_SCHEDULE}_previous_quarter",
+    name=f"clari_extract_{TASK_SCHEDULE}_previous_quarter",
+    secrets=[
+        SNOWFLAKE_ACCOUNT,
+        SNOWFLAKE_LOAD_ROLE,
+        SNOWFLAKE_LOAD_USER,
+        SNOWFLAKE_LOAD_WAREHOUSE,
+        SNOWFLAKE_LOAD_PASSWORD,
+        CLARI_API_KEY,
+    ],
+    env_vars={
+        **pod_env_vars,
+        "execution_date": "{{ execution_date }}", # Run previous quarter
+        "task_schedule": TASK_SCHEDULE,
+    },
+    affinity=get_affinity(False),
+    tolerations=get_toleration(False),
+    arguments=[clari_extract_command],
+    dag=dag,
+)
+
+clari_task_new_quarter = KubernetesPodOperator(
+    **gitlab_defaults,
+    image=DATA_IMAGE,
+    task_id=f"clari_extract_{TASK_SCHEDULE}_new_quarter",
+    name=f"clari_extract_{TASK_SCHEDULE}_new_quarter",
     secrets=[
         SNOWFLAKE_ACCOUNT,
         SNOWFLAKE_LOAD_ROLE,
@@ -88,4 +114,4 @@ clari_task = KubernetesPodOperator(
     dag=dag,
 )
 
-bash_task >> clari_task
+clari_task_previous_quarter >> clari_task_new_quarter

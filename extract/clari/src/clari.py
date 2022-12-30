@@ -146,6 +146,7 @@ def get_forecast(fiscal_quarter: str) -> str:
     params = {"timePeriod": fiscal_quarter}
     forecast_url = f"{BASE_URL}/forecast/{FORECAST_ID}"
     response = make_request("GET", forecast_url, HEADERS, params=params)
+    info('Response successfully obtained from GET forecast API (latest week only)')
     return response.json()
 
 
