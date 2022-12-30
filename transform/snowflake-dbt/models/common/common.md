@@ -1450,7 +1450,7 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 - dim_ping_instance_id
 - metrics_path
 
-**Filters:**
+**Filters Applied to Model:**
 - Include all-time metrics (`time_frame = 'all'`)
 
 **Business Logic in this Model:**
