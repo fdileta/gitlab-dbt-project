@@ -378,7 +378,14 @@ The name (URL) of the host. This appears as `hostname` in the ping payload.
 
 {% docs ping_delivery_type %}
 
-How the product is delivered to the installation (Self-Managed, SaaS)
+How the product is delivered to the installation (Self-Managed, SaaS). `ping_delivery_type` is determined using dim_instance_id/uuid and is defined as 
+
+``` sql
+CASE
+  WHEN dim_instance_id = 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f' THEN 'SaaS' --dim_instance_id is synonymous with uuid
+  ELSE 'Self-Managed'
+END AS ping_delivery_type
+```
 
 {% enddocs %}
 
@@ -426,19 +433,40 @@ The id of the major minor version, defined as `major_version*100 + minor_version
 
 {% docs version_is_prerelease %}
 
-Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details [here](https://docs.gitlab.com/ee/policy/maintenance.html)
+Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details [here](https://docs.gitlab.com/ee/policy/maintenance.html). This is defined as `IFF(version ILIKE '%-pre', TRUE, FALSE)`.
 
 {% enddocs %}
 
-{% docs is_internal %}
+{% docs is_internal_ping_model %}
 
-Boolean flag set to True if the installation meets our defined "internal" criteria. However, this field seems to also capture some Self-Managed customers, so the best way to identify a gitlab.com installation is using `ping_delivery_type`
+Boolean flag set to True if the installation meets our defined "internal" criteria. However, this field seems to also capture some Self-Managed customers, so the best way to identify a gitlab.com installation is using `ping_delivery_type = 'SaaS'`. `is_internal` is defined as
+
+``` sql
+CASE
+  WHEN ping_delivery_type = 'SaaS'                  THEN TRUE
+  WHEN installation_type = 'gitlab-development-kit' THEN TRUE
+  WHEN hostname = 'gitlab.com'                      THEN TRUE
+  WHEN hostname ILIKE '%.gitlab.com'                THEN TRUE
+  ELSE FALSE 
+END AS is_internal 
+```
 
 {% enddocs %}
 
-{% docs is_staging %}
+{% docs is_staging_ping_model %}
 
-Boolean flag which is set to True if the installations meets our defined "staging" criteria (i.e., `staging` is in the host name). This is a directional identification and is not exhaustive of all staging installations
+Boolean flag which is set to True if the installations meets our defined "staging" criteria (i.e., `staging` is in the host name). This is a directional identification and is not exhaustive of all staging installations. `is_staging` is defined as
+
+``` sql
+CASE
+  WHEN hostname ILIKE 'staging.%' THEN TRUE
+  WHEN hostname IN (
+    'staging.gitlab.com',
+    'dr.gitlab.com'
+    )                             THEN TRUE
+  ELSE FALSE 
+END AS is_staging
+```
 
 {% enddocs %}
 
@@ -516,7 +544,7 @@ Boolean flag set to True if the subscription has a MRR > 0 on the month of ping 
 
 {% docs is_program_subscription %}
 
-Boolean flag set to True if the subscription is under an EDU or OSS Program
+Boolean flag set to True if the subscription is under an EDU or OSS Program. This is defined as `IFF(product_rate_plan_name ILIKE ANY ('%edu%', '%oss%'), TRUE, FALSE)`
 
 {% enddocs %}
 
