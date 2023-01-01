@@ -837,8 +837,6 @@ WITH date_details AS (
 
       -- account driven fields
       sfdc_accounts_xf.account_name,
-      sfdc_accounts_xf.tsp_region,
-      sfdc_accounts_xf.tsp_sub_region,
       sfdc_accounts_xf.ultimate_parent_sales_segment,
       sfdc_accounts_xf.ultimate_parent_account_id,
       upa.account_name                        AS ultimate_parent_account_name,

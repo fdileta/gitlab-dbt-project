@@ -40,7 +40,7 @@ SELECT
     mart.crm_account_type                                    AS account_type,
     mart.crm_account_industry                                AS industry,
     mart.crm_account_sub_industry                            AS sub_industry,
-    mart.parent_crm_account_industry_hierarchy,
+    mart.parent_crm_account_industry,
     mart.account_tier,
     mart.customer_since_date,
     mart.carr_this_account,
