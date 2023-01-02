@@ -81,6 +81,8 @@ SELECT
   ptpt_score_date,
   ptpt_past_score_group,
 
+  marketo_lead_id,
+
   -- METADATA COLUMNS FOR USE IN PUMP (NOT INTEGRATION)
   last_changed
 

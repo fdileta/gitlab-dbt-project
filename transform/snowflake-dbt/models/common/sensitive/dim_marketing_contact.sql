@@ -255,6 +255,7 @@ WITH sfdc_lead AS (
       COALESCE(zuora.country, marketo_lead.country, sfdc.country, customer_db.country)                                   AS country,
       sfdc.parent_crm_account_sales_segment                                                                              AS sfdc_parent_sales_segment,
       COALESCE(sfdc.parent_crm_account_tsp_region, sfdc.tsp_region, sfdc.crm_person_region)                              AS sfdc_parent_crm_account_tsp_region,
+      marketo_lead.marketo_lead_id                                                                                       AS marketo_lead_id,
       IFF(marketo_lead.email_address IS NOT NULL, TRUE, FALSE)                                                           AS is_marketo_lead,
       COALESCE(marketo_lead.is_marketo_email_bounced, FALSE)                                                             AS is_marketo_email_hard_bounced,
       marketo_lead.marketo_email_bounced_date                                                                            AS marketo_email_hard_bounced_date,
@@ -333,5 +334,5 @@ WITH sfdc_lead AS (
     created_by="@rmistry",
     updated_by="@jpeguero",
     created_date="2021-01-19",
-    updated_date="2022-08-31"
+    updated_date="2023-01-02"
 ) }}

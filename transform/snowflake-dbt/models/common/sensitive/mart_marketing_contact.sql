@@ -735,6 +735,7 @@
       marketing_contact.mobile_phone,
       marketing_contact.sfdc_parent_sales_segment,
       marketing_contact.sfdc_parent_crm_account_tsp_region,
+      marketing_contact.marketo_lead_id,
       marketing_contact.is_marketo_lead,
       marketing_contact.is_marketo_email_hard_bounced,
       marketing_contact.marketo_email_hard_bounced_date,
@@ -918,7 +919,8 @@
       'ptpt_score_date',
       'ptpt_past_score_group',
       'is_member_of_public_ultimate_parent_namespace',
-      'is_member_of_private_ultimate_parent_namespace'
+      'is_member_of_private_ultimate_parent_namespace',
+      'marketo_lead_id'
       ]
 ) }}
 
