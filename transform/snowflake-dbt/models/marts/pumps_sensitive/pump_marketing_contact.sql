@@ -82,6 +82,7 @@ SELECT
   ptpt_past_score_group,
 
   marketo_lead_id,
+  is_current_saas_trial,
 
   -- METADATA COLUMNS FOR USE IN PUMP (NOT INTEGRATION)
   last_changed
