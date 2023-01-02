@@ -65,14 +65,14 @@ WITH
         b as (
       SELECT labels.source_primary_key
       FROM resource_labels
-      WHERE 
+      WHERE
         labels.resource_label_key = 'pet_name'
         AND labels.resource_label_value ilike '%patroni-%'
         )
     SELECT a.source_primary_key,
         'databases' as service
-    FROM a 
-    JOIN b 
+    FROM a
+    JOIN b
     ON a.source_primary_key = b.source_primary_key
   ),
   rule_8_ids AS ( -- ci costs are lower here than in the report because credits were excluded?
@@ -122,7 +122,7 @@ WITH
         , '37C4-203D-1024'
         , '9E8A-BB82-26BF'
     )
-    and 
+    and
     export.resource_labels ilike '%lfs%'
   ),
   rule_5_ids AS (
@@ -169,7 +169,7 @@ WITH
         , 'gitlab-release-registry'
         , 'gitlab-stgsub-registry'
         , 'gitlab-testbed-registry'
-    ) 
+    )
   ),
   rule_2_ids AS (
   SELECT
@@ -197,7 +197,7 @@ WITH
         'file-marquee',
         'file-praefect',
         'file-zfs',
-        'file-zfs-single-zone' ) 
+        'file-zfs-single-zone')
   ),
   billing_base_rules as (
         SELECT
@@ -312,23 +312,22 @@ WITH
         export.source_primary_key = rule_1_ids.source_primary_key
         -- -- -- -- -- -- 
         WHERE
-        invoice_month = '2022-11-01' 
-        GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14)
+        invoice_month = '2022-11-01'
+       {{ dbt_utils.group_by(n=14) }})
 SELECT
         billing_base_rules.day as day,
         billing_base_rules.project_id as gcp_project_id,
         billing_base_rules.service as gcp_service_description,
         billing_base_rules.sku_description as gcp_sku_description,
         coalesce(service_coeff.gitlab_service, concat(coalesce(billing_base_rules.rule_1, ''),
-                                                            coalesce(billing_base_rules.rule_2, ''), 
-                                                            coalesce(billing_base_rules.rule_3, ''), 
-                                                            coalesce(billing_base_rules.rule_4, ''), 
-                                                            coalesce(billing_base_rules.rule_5, ''), 
-                                                            coalesce(billing_base_rules.rule_6, ''), 
-                                                            coalesce(billing_base_rules.rule_7, ''), 
-                                                            coalesce(billing_base_rules.rule_8, ''), 
-                                                            coalesce(billing_base_rules.rule_9, ''), 
+                                                            coalesce(billing_base_rules.rule_2, ''),
+                                                            coalesce(billing_base_rules.rule_3, ''),
+                                                            coalesce(billing_base_rules.rule_4, ''),
+                                                            coalesce(billing_base_rules.rule_5, ''),
+                                                            coalesce(billing_base_rules.rule_6, ''),
+                                                            coalesce(billing_base_rules.rule_7, ''),
+                                                            coalesce(billing_base_rules.rule_8, ''),
+                                                            coalesce(billing_base_rules.rule_9, ''),
                                                             coalesce(billing_base_rules.rule_10, ''))) as gitlab_service,
         sum(billing_base_rules.net_cost) * ifnull(service_coeff.coeff, 1) as net_cost
 FROM billing_base_rules LEFT JOIN service_coeff
@@ -342,6 +341,4 @@ FROM billing_base_rules LEFT JOIN service_coeff
         or billing_base_rules.rule_8 = service_coeff.gitlab_service
         or billing_base_rules.rule_9 = service_coeff.gitlab_service
         or billing_base_rules.rule_10 = service_coeff.gitlab_service
-group by 1,2,3,4,5, service_coeff.coeff
-
-
+group by 1, 2, 3, 4, 5, service_coeff.coeff

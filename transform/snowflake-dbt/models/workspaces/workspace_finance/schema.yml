@@ -1156,13 +1156,13 @@ models:
       - name: product_tier_name 
         tests:
           - not_null
-  - name: rpt_gcp_billing_service_mapping
+  - name: rpt_gcp_billing_service_mapping_daily
     description: GCP Billing Service mapping https://gitlab.com/gitlab-org/quality/engineering-analytics/finops-analysis/-/issues/12
     columns:
       - name: day
         description: date
       - name: gcp_project_id
-        description: GCP project id - the PRoject id the resource is running in
+        description: GCP project id - the project id the resource is running in
       - name: gcp_service_description
         description: cloud service used by the resource
       - name: gcp_sku_description
