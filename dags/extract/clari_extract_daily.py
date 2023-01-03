@@ -44,7 +44,7 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    f"clari_extract_{TASK_SCHEDULE}v1",
+    f"clari_extract_{TASK_SCHEDULE}",
     default_args=default_args,
     schedule_interval="0 8 * * *",
     start_date=datetime(2022, 12, 26),

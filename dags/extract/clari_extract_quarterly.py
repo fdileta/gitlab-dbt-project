@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
-from airflow.operators.bash_operator import BashOperator
 
 from airflow_utils import (
     DATA_IMAGE,
@@ -44,25 +43,18 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    # TODO: rename this in production
-    f"clari_extract_{TASK_SCHEDULE}v2",
+    f"clari_extract_{TASK_SCHEDULE}",
     default_args=default_args,
     # At 8:05 on day-of-month 1 in February, May, August, and November
     schedule_interval="5 8 1 2,5,8,11 *",
-    # TODO: in producton update start_date to (2022, 10, 1)
-    start_date=datetime(2022, 7, 1), # first quarter will be 2022-Q4
-    catchup=False, # don't enable backfill functionality, API not idempotent
+    start_date=datetime(2022, 10, 1),  # first quarter will be FY2023-Q4
+    catchup=False,  # don't enable backfill functionality, API not idempotent
     max_active_runs=1,
 )
 
-bash_task = BashOperator(
-    dag=dag,
-    task_id="bash_task",
-    bash_command="echo '{{ execution_date }}' || '{{ next_execution_date }}'",
-)
-
 clari_extract_command = (
-    f"{clone_and_setup_extraction_cmd} && " f"python clari/src/clari.py"
+    f"{clone_and_setup_extraction_cmd} && "
+    f"python clari/src/clari.py"
 )
 
 clari_task_previous_quarter = KubernetesPodOperator(
@@ -80,7 +72,7 @@ clari_task_previous_quarter = KubernetesPodOperator(
     ],
     env_vars={
         **pod_env_vars,
-        "execution_date": "{{ execution_date }}", # Run previous quarter
+        "execution_date": "{{ execution_date }}",  # Run previous quarter
         "task_schedule": TASK_SCHEDULE,
     },
     affinity=get_affinity(False),
@@ -105,8 +97,10 @@ clari_task_new_quarter = KubernetesPodOperator(
     env_vars={
         **pod_env_vars,
         # Run today's quarter
-        "execution_date": "{{ next_execution_date }}",
-        "task_schedule": TASK_SCHEDULE,
+        "execution_date":
+            "{{ next_execution_date }}",
+        "task_schedule":
+            TASK_SCHEDULE,
     },
     affinity=get_affinity(False),
     tolerations=get_toleration(False),

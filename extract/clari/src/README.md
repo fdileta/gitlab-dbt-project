@@ -21,25 +21,34 @@ CREATE OR REPLACE TABLE raw.clari.net_arr (
 
 
 ### API process
-There are two forecast API endpoints, [Clari Docs](https://developer.clari.com/default/documentation/external_spec), and two DAG's that call each endpoint (described in more detail below in 'DAG' section.
+The Clari API per [docs](https://developer.clari.com/default/documentation/external_spec) has two forecast API endpoints.
+
+Correspondingly, there are two DAG's that call each endpoint (described in more detail below in 'DAG' section.
 
 Both endpoints return a  final JSON object that is uploaded to Snowflake.
 
-#### Current week forecast
-The `/forecast/{forecastId}` endpoint only returns the latest week of each quarter. Called by the 'Daily' DAG.
+#### Current week forecast endpoint
+The `/forecast/{forecastId}` endpoint accepts a `timePeriod` parameter which is the quarter in which to return data. 
 
-#### Historical forecast
+Regardless of which quarter is requested, the endpoint only returns the latest week available for that quarter. 
+
+The 'Daily' DAG uses this endpoint.
+
+#### Historical forecast endpoint
 To get 'historical' data, 3 endpoints need to be called
 1. export endpoint: start the `net_arr` export
+    - Like the previous endpoint, this one takes in a quarter parameter
 2. job status endpoint: poll until the job is 'DONE'
 3. results endpoint: returns the report as a JSON object
 
+This endpoint is different from the previous one because it returns every week of the quarter, not just the latest week.
+
 Called by the 'Quarterly' DAG.
 
-## DAG
+## DAG's
 
 ### Backfills
-Backfills are strongly discouraged/prohibited. 
+Backfills are strongly **discouraged/prohibited**. 
 
 The Clari API forecast endpoint is NOT idempotent, that is, there is no guarantee that calling the endpoint with the same parameters will generate the same result.
 
@@ -48,13 +57,16 @@ Support has confirmed the following:
 
 That means regardless of the quarter, a forecast is generated only, and for only **currently active** employees. Once an employee becomes inactive, it is no longer possible to retrieve their previously forecasted values from the API.
 
-Since backfills are discouraged, there is no mechanism provided to perform them.
+Since backfills are discouraged, there is no mechanism provided to retrieve data prior to the DAG start_date.
+
+Historical data (data before `FY23-Q4`) will instead be based on data obtained from the old `driveload` process.
 
 
 ### Daily DAG
 The Daily DAG has the following attributes:
 1. Calls the 'current week forecast' endpoint
-1. is scheduled to run daily at 8:00am UTC to ensure that the latest updates have been captured, but before the dbt-run has started. 
+    - The reasoning behind using the current week forecast is to prevent needlessly including duplicates for that quarter.
+1. is scheduled to run daily at 8:00am UTC to ensure that the latest updates (discussed in more detail later section) have been captured, but before the dbt-run has started. 
 1. The Daily DAG will use the `{{ execution_date }}` for the fiscal quarter, this will correspond to **yesterday's** fiscal quarter.
 
 ### Quarterly DAG
@@ -64,12 +76,12 @@ The Quarterly DAG has the following attributes:
 
 It will consist of two tasks:
 - Previous quarter
-    - It will use the ` {{ execution_date }} `, which means the fiscal_quarter will correspond to the previous quarter.
+    - It will use the ` {{ execution_date }} `, which means the fiscal_quarter will correspond to the **previous quarter**.
     - This is necessary to refresh any records that were updated. There is a corner-case for a small subset of records where the previous week's data is updated on the first day of the new week.
 - New quarter: 
-    - It will use the ` {{ next_execution_date }} `, which means the fiscal_quarter will correspond to the 1st day of quarter when it's actually run.
-    - This is necessary to capture all weeks- not just the current week- corresponding to the new quarter.
-    - As an example, 'Week 1' of Q1 might begin on Jan 25, rather than the expected Feb 1st, and you may lose that first week if 'isHistorical=False'.
+    - It will use the ` {{ next_execution_date }} `, which means the fiscal_quarter will correspond to the **current quarter**.
+    - This is necessary to capture all weeks of the new quarter. The first week of entries returned by the API unintuitively starts prior to the actual quarter start date. By the time it's a new quarter, the API will be returning week 2 entries for that quarter.
+        - As an example, 'Week 1' of Q1 might begin on Jan 25, rather than the expected Feb 1st, and you may lose that first week if 'isHistorical=False'.
 
 
 Originally, the quarterly DAG was also created for backfills, all that needs to be done is to set the `start_date` of the DAG to when the user wants to start backfilling, but as discussed above, backfills should not be done.
