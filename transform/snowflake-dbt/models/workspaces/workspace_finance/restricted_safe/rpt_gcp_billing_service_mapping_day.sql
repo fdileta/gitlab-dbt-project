@@ -25,7 +25,7 @@ resource_labels as (
   SELECT 1, 'haproxy', 0.24 UNION ALL
   SELECT 2, 'package', 0.5 UNION ALL --122k intersecting on {package, registry storage} so setting 50/50 split TODO: better ssot?
   SELECT 2, 'registry storage', 0.5
-  
+
   ),
   rule_10_ids AS (
   SELECT
