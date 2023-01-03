@@ -104,8 +104,6 @@ final AS (
       INNER JOIN dim_gitlab_releases --limit to valid versions
           ON mart_ping_instance_metric_monthly.major_minor_version = dim_gitlab_releases.major_minor_version
 
-      -- Removing pre-releases
-      --AND version_is_prerelease = FALSE
 
 )
 
