@@ -3,10 +3,11 @@ Based on the DAG `execution_date` and `task_schedule`
 derives the fiscal_quarter.
 
 The fiscal_quarter is used to request the `net_arr` Clari endpoint.
-There are actually 3 endpoints that need to be called:
-1. export endpoint: start the `net_arr` export
-2. job status endpoint: poll until the job is 'DONE'
-3. results endpoint: returns the report as a json object
+
+There are two possible endpoints as described in the README,
+one is a current week forecast, and the other is a historical quarter forecast.
+
+Which endpoint to call is determind by which DAG  it is (daily vs quarterly)
 
 The resulting json object is saved to a file and uploaded to Snowflake
 """
