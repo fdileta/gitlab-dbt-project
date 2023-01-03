@@ -37,7 +37,12 @@ FORECAST_ID = "net_arr"
 
 def _calc_fiscal_quarter(date_time: datetime) -> str:
     """Based on datetime object, return it's Gitlab fiscal quarter"""
-    fiscal_year = date_time.year + 1
+    # edge-case, fiscal-year doesn't change in Jan, still Q4
+    if date_time.month == 1:
+        fiscal_year = date_time.year
+    else:
+        fiscal_year = date_time.year + 1
+
     if date_time.month in [2, 3, 4]:
         fiscal_quarter = 1
     elif date_time.month in [5, 6, 7]:
