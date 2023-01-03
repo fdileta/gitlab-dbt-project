@@ -28,7 +28,7 @@ final AS (
     SELECT
       fct_ping_instance_metric.metrics_path,
       dim_ping_instance.ping_edition,
-      dim_ping_instance.version_is_prerelease
+      dim_ping_instance.version_is_prerelease,
       dim_ping_instance.major_minor_version_id ,
       dim_ping_metric.time_frame
     FROM fct_ping_instance_metric
