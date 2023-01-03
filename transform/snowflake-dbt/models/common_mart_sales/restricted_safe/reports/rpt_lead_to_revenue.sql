@@ -583,13 +583,13 @@
       WHEN rpt_crm_touchpoint_combined.dim_crm_touchpoint_id IS NOT NULL 
         THEN cohort_base.dim_crm_opportunity_id
       ELSE NULL
-    END AS influenced_opportunity_id,
+    END                                                                                 AS influenced_opportunity_id,
     CASE
-      WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_opportunity_id = cohort_base.dim_crm_opportunity_id
-      THEN TRUE
+      WHEN rpt_crm_touchpoint_combined.dim_crm_opportunity_id = cohort_base.dim_crm_opportunity_id
+        THEN TRUE
       ELSE FALSE
     END AS is_bizible_attribution_opportunity,
-    rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_opportunity_id as bizible_attribution_opportunity_id,
+    rpt_crm_touchpoint_combined.dim_crm_opportunity_id                                  AS bizible_attribution_opportunity_id,
   
     --touchpoint attributes
     rpt_crm_touchpoint_combined.bizible_touchpoint_date,
