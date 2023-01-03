@@ -582,6 +582,12 @@
       WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_touchpoint_id IS NOT null THEN cohort_base.dim_crm_opportunity_id
       ELSE null
     END AS influenced_opportunity_id,
+    CASE
+      WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_opportunity_id = cohort_base.dim_crm_opportunity_id
+      THEN TRUE
+      ELSE FALSE
+    END AS is_bizible_attribution_opportunity,
+    rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_opportunity_id as bizible_attribution_opportunity_id,
   
     --touchpoint data
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_date_normalized,
@@ -657,7 +663,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@rkohnke",
-    updated_by="@rkohnke",
+    updated_by="@degan",
     created_date="2022-07-20",
-    updated_date="2022-12-06",
+    updated_date="2022-12-22",
   ) }}

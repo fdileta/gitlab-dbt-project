@@ -444,13 +444,13 @@ Boolean flag which is set to True if the installations meets our defined "stagin
 
 {% docs is_trial_ping_model %}
 
-Boolean flag which is set to True if the installation has a valid trial license at Service Ping creation. This appears as `license_trial` in the ping payload. There are cases where `is_trial` can be True even when an installation is outside of a trial period, so be cautious using this field.
+Boolean flag which is set to True if the installation has a valid trial license at Service Ping creation. This is defined as `IFF(ping_created_at < license_trial_ends_on, TRUE, FALSE)`.
 
 {% enddocs %}
 
 {% docs license_trial_ping_model %}
 
-Boolean flag which is set to True if the installation has a valid trial license at Service Ping creation. There are cases where `is_trial` can be True even when an installation is outside of a trial period, so be cautious using this field.
+Boolean flag which is set to True if the installation has a valid trial license at Service Ping creation. This field can be NULL if no license information is provided. There are cases where `license_trial = TRUE` even when an installation is outside of a trial period, so be cautious using this field. 
 
 {% enddocs %}
 
@@ -1093,6 +1093,6 @@ The timestamp when this snapshot row was first inserted. This column can be used
 
 {% docs dbt_valid_to %}
 
-The timestamp when this row became invalidated. The most recent snapshot record will have `dbt_valid_to` set to null.
+The timestamp when this row became invalidated. The most recent snapshot record will have `dbt_valid_to` set to null. When a new snapshot record is created, `dbt_valid_to` is updated and will match the new record's `dbt_valid_from` timestamp.
 
 {% enddocs %}

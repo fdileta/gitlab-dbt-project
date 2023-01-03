@@ -1,5 +1,9 @@
+"""
+Sheetload dataframe utils unit
+"""
+
 import time
-from logging import error, info
+from logging import info
 
 import numpy as np
 import pandas as pd
