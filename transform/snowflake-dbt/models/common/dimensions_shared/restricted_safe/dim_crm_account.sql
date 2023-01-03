@@ -160,5 +160,5 @@ WITH final AS (
     created_by="@msendal",
     updated_by="@lvinueza",
     created_date="2020-06-01",
-    updated_date="2022-12-21"
+    updated_date="2023-01-03"
 ) }}
