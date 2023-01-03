@@ -15,16 +15,17 @@ resource_labels as (
 
   SELECT * FROM {{ ref('gcp_billing_export_resource_labels') }}
 
-)
+),
 
 -- RULE DESCRIPTION @ https://docs.google.com/spreadsheets/d/1Fx7Ah2wphM3GoAkPDFBT-89tia3Mgd4BrfWxAj9B-5Q/edit#gid=957450334
 -- This query tags each cost line (daily agg) from the billing export with the service tag found @ https://docs.google.com/spreadsheets/d/1UQ2Vuo0wZUtbeSiKhnKpuID-fHTPcQadJslbC2i3KTA/edit#gid=1230668564
-WITH
-  service_coeff as(
+  service_coeff as (
+
   SELECT 1 as relationship_id, 'gitaly networking' as gitlab_service, 0.76 as coeff UNION ALL
   SELECT 1, 'haproxy', 0.24 UNION ALL
   SELECT 2, 'package', 0.5 UNION ALL --122k intersecting on {package, registry storage} so setting 50/50 split TODO: better ssot?
   SELECT 2, 'registry storage', 0.5
+  
   ),
   rule_10_ids AS (
   SELECT
