@@ -283,7 +283,6 @@ mart AS (
     source_company_accounts.number_of_accounts,
     source_company_accounts.number_of_parent_accounts,
     source_company_accounts.list_of_accounts,
-    source_company_accounts.list_of_parent_accounts,
     direct_company_account.crm_account_id AS actual_crm_account_id,
     direct_company_account.source_company_id AS actual_company_id,
     CASE
