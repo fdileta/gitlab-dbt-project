@@ -1,62 +1,16 @@
 """
 Module is used to transform SQL syntax from Postgres to Snowflake style
 """
-import json
-from typing import Any, Dict, List, Callable
 from logging import info
+from typing import Any, Callable, Dict, List
 
-from os import environ as env
-import re
 import sqlparse
 from sqlparse.sql import Token, TokenList
 from sqlparse.tokens import Whitespace
-
-import requests
-
-META_API_COLUMNS = [
-    "recorded_at",
-    "version",
-    "edition",
-    "recording_ce_finished_at",
-    "recording_ee_finished_at",
-    "uuid",
-]
-
-TRANSFORMED_INSTANCE_QUERIES_FILE = "transformed_instance_queries.json"
-META_DATA_INSTANCE_QUERIES_FILE = "meta_data_instance_queries.json"
-HAVING_CLAUSE_PATTERN = re.compile(
-    "HAVING.*COUNT.*APPROVAL_PROJECT_RULES_USERS.*APPROVALS_REQUIRED", re.IGNORECASE
-)
-
-METRICS_EXCEPTION = (
-    "counts.clusters_platforms_eks",
-    "counts.clusters_platforms_gke",
-    "usage_activity_by_stage.configure.clusters_platforms_gke",
-    "usage_activity_by_stage.configure.clusters_platforms_eks",
-    "usage_activity_by_stage_monthly.configure.clusters_platforms_gke",
-    "usage_activity_by_stage_monthly.configure.clusters_platforms_eks",
-    "usage_activity_by_stage.release.users_creating_deployment_approvals",
-    "usage_activity_by_stage_monthly.release.users_creating_deployment_approvals",
-)
+from utils import Utils
 
 
-def get_sql_query_map(private_token: str = None) -> Dict[Any, Any]:
-    """
-    Routine to get data from RestFUL API and return as a dict
-    """
-    headers = {
-        "PRIVATE-TOKEN": private_token,
-    }
-
-    url = "https://gitlab.com/api/v4/usage_data/queries"
-
-    response = requests.get(url=url, headers=headers)
-
-    response.raise_for_status()
-
-    source_json_data = json.loads(response.text)
-
-    return source_json_data
+utils = Utils()
 
 
 def get_trimmed_token(token: List[str]) -> List[str]:
@@ -416,7 +370,7 @@ def get_transformed_having_clause(postgres_sql: str) -> str:
     """
     snowflake_having_clause = postgres_sql
 
-    if HAVING_CLAUSE_PATTERN.findall(snowflake_having_clause):
+    if utils.HAVING_CLAUSE_PATTERN.findall(snowflake_having_clause):
 
         snowflake_having_clause = postgres_sql.replace(
             "(approval_project_rules_users)", "(approval_project_rules_users.id)"
@@ -485,45 +439,23 @@ def transform(json_data: Dict[Any, Any]) -> Dict[Any, Any]:
     return transformed
 
 
-def keep_meta_data(json_data: dict) -> dict:
-    """
-    Pick up meta data we want to expose in Snowflake from the original file
-
-    param json_file: json file downloaded from API
-    return: dict
-    """
-
-    meta_data = {
-        meta_api_column: json_data.get(meta_api_column, "")
-        for meta_api_column in META_API_COLUMNS
-    }
-
-    return meta_data
-
-
-def save_to_json_file(file_name: str, json_data: dict) -> None:
-    """
-    param file_name: str
-    param json_data: dict
-    return: None
-    """
-    with open(file=file_name, mode="w", encoding="utf-8") as wr_file:
-        json.dump(json_data, wr_file)
-
-
 if __name__ == "__main__":
-    config_dict = env.copy()
-    payload = get_sql_query_map(
-        private_token=config_dict["GITLAB_ANALYTICS_PRIVATE_TOKEN"]
-    )
 
-    final_sql__dict = transform(payload)
-    final_meta_data = keep_meta_data(payload)
+    url = "https://gitlab.com/api/v4/usage_data/queries"
+
+    json_payload = utils.get_response_as_dict(url=url)
+
+    final_sql__dict = transform(json_data=json_payload)
+    final_meta_data = utils.keep_meta_data(json_data=json_payload)
+
     info("Processed final sql queries")
 
-    save_to_json_file(
-        file_name=TRANSFORMED_INSTANCE_QUERIES_FILE, json_data=final_sql__dict
+    utils.save_to_json_file(
+        file_name=utils.TRANSFORMED_INSTANCE_SQL_QUERIES_FILE, json_data=final_sql__dict
     )
-    save_to_json_file(
-        file_name=META_DATA_INSTANCE_QUERIES_FILE, json_data=final_meta_data
+
+    utils.save_to_json_file(
+        file_name=utils.META_DATA_INSTANCE_SQL_QUERIES_FILE, json_data=final_meta_data
     )
+
+    info("Done with - Processed final sql queries")
