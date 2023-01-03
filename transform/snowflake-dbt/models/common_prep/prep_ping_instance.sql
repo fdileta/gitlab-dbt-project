@@ -66,7 +66,7 @@
     LEFT JOIN raw_usage_data
       ON usage_data.raw_usage_data_id = raw_usage_data.raw_usage_data_id
     WHERE usage_data.ping_created_at <= (SELECT MAX(created_at) FROM raw_usage_data)
-      AND NOT(dim_installation_id = '8b52effca410f0a380b0fcffaa1260e7' AND ping_created_at >= '2022-12-01') --excluding GitLab SaaS pings from 2022-12-01 and after
+      AND NOT(dim_installation_id = '8b52effca410f0a380b0fcffaa1260e7' AND ping_created_at >= '2023-01-01') --excluding GitLab SaaS pings from 2023-01-01 and after
 
 ), automated_service_ping AS (
 
@@ -148,7 +148,7 @@
       raw_usage_data_payload,
       ping_type
     FROM automated_instance_service_ping
-    WHERE created_at >= '2022-12-01' --start using the automated SaaS Service Ping in for Dec 2022 reporting
+    WHERE created_at >= '2023-01-01' --start using the automated SaaS Service Ping in for Jan 2023 reporting
 
 ), final AS (
 
@@ -165,5 +165,5 @@
     created_by="@icooper-acp",
     updated_by="@mdrussell",
     created_date="2022-03-17",
-    updated_date="2022-12-07"
+    updated_date="2023-01-01"
 ) }}
