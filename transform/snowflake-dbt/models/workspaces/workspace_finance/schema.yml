@@ -1111,6 +1111,10 @@ models:
     description: Zuora Revenue Unleased POB Report downloaded quarterly
   - name: driveload_zuora_revenue_unbill_rollforward_report
     description: Zuora Revenue Unbill Rollforward Report downloaded quarterly
+  - name: driveload_zuora_revenue_waterfall_report_with_wf_type_adjustments
+  - name: driveload_zuora_revenue_waterfall_report_with_wf_type_unbilled_revenue
+  - name: driveload_zuora_revenue_waterfall_report_with_wf_type_net_revenue_with_mje_flag_y
+  - name: driveload_zuora_revenue_billing_waterfall_report_with_additional_columns
   - name: netsuite_currency_exchange_rates
     description: Exchange rate between a transaction currency and base currency on a given day provided by Netsuite.
     columns:
