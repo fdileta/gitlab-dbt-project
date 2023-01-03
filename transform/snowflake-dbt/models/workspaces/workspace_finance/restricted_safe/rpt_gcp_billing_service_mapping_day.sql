@@ -14,7 +14,6 @@ WITH export AS (
 resource_labels as (
 
   SELECT * FROM {{ ref('gcp_billing_export_resource_labels') }}
-  WHERE invoice_month >= '2022-01-01'
 
 )
 
