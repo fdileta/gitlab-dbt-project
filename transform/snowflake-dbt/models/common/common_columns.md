@@ -378,7 +378,7 @@ The name (URL) of the host. This appears as `hostname` in the ping payload.
 
 {% docs ping_delivery_type %}
 
-How the product is delivered to the installation (Self-Managed, SaaS). `ping_delivery_type` is determined using dim_instance_id/uuid and is defined as 
+How the product is delivered to the installation (Self-Managed, SaaS). Currently, GitLab Dedicated installations are assigned a delivery type of `Self-Managed`. `ping_delivery_type` is determined using dim_instance_id/uuid and is defined as 
 
 ``` sql
 CASE
