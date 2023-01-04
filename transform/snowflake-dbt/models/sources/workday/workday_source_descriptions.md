@@ -206,6 +206,25 @@ A custom report built in workday for the transition between BambooHR and Workday
 
 {% enddocs %}
 
+{% docs supervisory_organization %}
+
+A custom report built in Workday for the creation of the Supervisory Organizations model. Supervisory organizations are the primary foundation of Workday, as they show who reports to whom
+
+| Workday Notes         |                                                                                                                                                                    |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|TEAM_ID                | The unique organization identifier                                                                                                                                 |
+|TEAM_HIERARCHY_LEVEL   | Team level within the hierarchy. Organizations can be organized into hierarchies and enable reporting at different levels in the hierarchy                         |
+|TEAM_MEMBERS_COUNT     | Number of team members in the organization                                                                                                                         |
+|TEAM_MANAGER_INHERITED |                                                                                                                                                                    |
+|TEAM_INACTIVATED       | Boolean. Tracks inactive teams.                                                                                                                                    |
+|TEAM_MANAGER_NAME      | Organization's manager name                                                                                                                                        |
+|TEAM_NAME              | Organization's name                                                                                                                                                |
+|TEAM_MANAGER_NAME_ID   | Organization's manager employee ID                                                                                                                                 |
+|TEAM_SUPERIOR_TEAM_ID  | Organization's superior team ID                                                                                                                                    |
+|TEAM_INACTIVATED_DATE  | Date the organization became inactive                                                                                                                              |
+
+{% enddocs %}
+
 ## Columns
 
 {% docs workday_employee_id %}
