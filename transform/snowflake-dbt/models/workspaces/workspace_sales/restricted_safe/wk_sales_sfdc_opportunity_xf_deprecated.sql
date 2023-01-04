@@ -242,7 +242,7 @@ we can delete this connection and use the mart table directly.
       sfdc_opportunity_xf.platform_partner,
 
       CASE
-        WHEN sfdc_opportunity_xf.deal_path = 'Channel' 
+        WHEN (sfdc_opportunity_xf.deal_path = 'Channel' OR sfdc_opportunity_xf.deal_path = 'Partner') 
           THEN REPLACE(COALESCE(sfdc_opportunity_xf.partner_track,partner_account.partner_track, resale_account.partner_track,'Open'),'select','Select')
         ELSE 'Direct' 
       END                                                                                           AS calculated_partner_track,
@@ -263,11 +263,13 @@ we can delete this connection and use the mart table directly.
           THEN 'Direct'
         WHEN sfdc_opportunity_xf.deal_path = 'Web Direct'
           THEN 'Web Direct' 
-        WHEN sfdc_opportunity_xf.deal_path = 'Channel' 
-            AND sfdc_opportunity_xf.sales_qualified_source = 'Channel Generated' 
+        WHEN (sfdc_opportunity_xf.deal_path = 'Channel' OR sfdc_opportunity_xf.deal_path = 'Partner') 
+            AND (sfdc_opportunity_xf.sales_qualified_source = 'Channel Generated' 
+                OR  sfdc_opportunity_xf.sales_qualified_source = 'Partner Generated') 
           THEN 'Partner Sourced'
-        WHEN sfdc_opportunity_xf.deal_path = 'Channel' 
-            AND sfdc_opportunity_xf.sales_qualified_source != 'Channel Generated' 
+        WHEN (sfdc_opportunity_xf.deal_path = 'Channel' OR sfdc_opportunity_xf.deal_path = 'Partner') 
+            AND (sfdc_opportunity_xf.sales_qualified_source != 'Channel Generated' 
+                OR sfdc_opportunity_xf.sales_qualified_source = 'Partner Generated') 
           THEN 'Partner Co-Sell'
       END                                                         AS deal_path_engagement,
 
