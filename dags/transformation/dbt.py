@@ -106,6 +106,8 @@ def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
     :return: Bool, false if it is the first Sunday of the month.
     """
     next_run = croniter(exclude_schedule).get_next(datetime)
+    print(timestamp)
+    print(next_run)
     # Excludes the first sunday of every month, this is captured by the regular full refresh.
     if next_run.date() == timestamp.date():
         return False
