@@ -77,9 +77,8 @@ for e in events:
         env_vars={
             **pod_env_vars,
             "START_TIME": "{{ execution_date }}",
-            "START_DATE_AIRFLOW": "{{ start_date }}",
-            "END_DATE_AIRFLOW": "{{ end_date }}",
             "END_TIME": "{{ next_execution_date }}",
+            "SCHEDULE": "{{ schedule_interval }}",
         },
         affinity=get_affinity(False),
         tolerations=get_toleration(False),

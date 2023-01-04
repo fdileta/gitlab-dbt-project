@@ -8,6 +8,7 @@ from logging import info, basicConfig, getLogger, error
 from os import environ as env
 from typing import Dict, List
 from dateutil import parser as date_parser
+from croniter import croniter
 
 import requests
 from requests.exceptions import SSLError
@@ -156,8 +157,10 @@ def load_event_logs(event: str, full_refresh: bool = False):
 
     info(f"Start {config_dict['START_TIME']}")
     info(f"END {config_dict['END_TIME']}")
-    info(f"AIRFLOW Start {config_dict['START_DATE_AIRFLOW']}")
-    info(f"AIRFLOW END {config_dict['END_DATE_AIRFLOW']}")
+    info(f"schedule {config_dict['schedule_interval']}")
+    next_run = croniter(exclude_schedule).get_next(datetime)
+    info(next_run.get_next(datetime))
+
     info(
         f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}"
     )
