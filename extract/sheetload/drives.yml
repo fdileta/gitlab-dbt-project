@@ -76,7 +76,7 @@ folders:
     table_replace_append: 1
   - name: zuora_revenue_billing_waterfall_report_with_additional_columns
     owner: '@michellecooper'
-    folder_name: zuora_revenue_billing_waterfall_report_with_additional_columns
+    folder_name: zuora_revenue_billing_waterfall_with_additional_columns
     table_name: zuora_revenue_billing_waterfall_report_with_additional_columns
     table_replace_append: 1
   - name: marketing_press_sov
