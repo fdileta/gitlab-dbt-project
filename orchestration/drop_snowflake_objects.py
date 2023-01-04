@@ -45,12 +45,13 @@ def get_list_of_dev_schemas(engine: Engine) -> List[str]:
 def get_list_of_clones(engine: Engine) -> List[str]:
     """
     Get a list of all databases besides the ones to keep.
-    This will delete clones for open MRs, so users may need to rerun the review job.
+    This will delete clones for MRs that didn't have any activity for over 7 days, so users may need to rerun the review job.
     """
 
     query = """
     SELECT DATABASE_NAME as database_name
     FROM INFORMATION_SCHEMA.DATABASES
+    WHERE LAST_ALTERED < CURRENT_DATE -7
     """
 
     try:
