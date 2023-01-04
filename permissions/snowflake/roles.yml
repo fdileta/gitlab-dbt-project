@@ -2527,7 +2527,6 @@ roles:
             - reporter
             - restricted_safe
             - xactly
-
         warehouses:
             - dev_xs
 
@@ -3004,7 +3003,6 @@ roles:
             - restricted_safe
             - salesforce
             - xactly
-
         warehouses:
             - dev_xs
 
@@ -3063,10 +3061,6 @@ roles:
             - data_science_readonly
         warehouses:
             - dev_xs
-
-    - jameson: # De provisioned as part of Quarterly audit and security check.
-        member_of: []
-        warehouses: []
 
     - jbudreski:
         member_of:
@@ -3157,10 +3151,6 @@ roles:
                 write:
                     - jkim_prep.*.*
                     - jkim_prod.*.*
-
-    - joshua:
-        member_of: []
-        warehouses: []
 
     - jpeguero:
         member_of:
@@ -3489,10 +3479,6 @@ roles:
             - zoominfo_inbound
         warehouses:
             - dev_xs
-
-    - laddula:
-        member_of: []
-        warehouses: []
 
     - lvinueza:
         member_of:
@@ -3830,10 +3816,6 @@ roles:
                 write:
                     - mvilain_prep.*.*
                     - mvilain_prod.*.*
-
-    - mwalker:
-        member_of: []
-        warehouses: []
 
     - mwawrzyniak:
         member_of:
@@ -4737,18 +4719,10 @@ users:
         member_of:
             - alu
 
-    - amartin:
-        can_login: no
-        member_of: []
-
     - aperez:
         can_login: yes
         member_of:
             - aperez
-
-    - ashaikh:
-        can_login: no
-        member_of: []
 
     - bi_tool_eval:
         can_login: yes
@@ -4810,10 +4784,6 @@ users:
         member_of:
             - degan
 
-    - dfelton:
-        can_login: no
-        member_of: []
-
     - dgupta:
         can_login: yes
         member_of:
@@ -4871,14 +4841,6 @@ users:
         can_login: yes
         member_of:
             - hselim
-        
-    - ian:
-        can_login: no
-        member_of: []
-
-    - isharan:
-        can_login: no
-        member_of: []
 
     - iweeks:
         can_login: yes
@@ -4905,10 +4867,6 @@ users:
         member_of:
             - jkim
 
-    - joshua:
-        can_login: no
-        member_of: []
-
     - jpeguero:
         can_login: yes
         member_of:
@@ -4931,10 +4889,6 @@ users:
         can_login: yes
         member_of:
             - jstemmer
-
-    - judume:
-        can_login: no
-        member_of: []
 
     - juwong:
         can_login: yes
@@ -4970,14 +4924,6 @@ users:
         can_login: yes
         member_of:
             - kkarthikeyan
-
-    - laddula:
-        can_login: no
-        member_of: []
-
-    - lmai:
-        can_login: no
-        member_of: []
 
     - lvinueza:
         can_login: yes
@@ -5101,10 +5047,6 @@ users:
             - periscope
             - reporter
 
-    - periscope_sensitive:
-        can_login: no
-        member_of: []
-
     - permission_bot:
         can_login: yes
         member_of:
@@ -5178,10 +5120,6 @@ users:
         can_login: yes
         member_of:
             - srehm
-
-    - statimatla:
-        can_login: no
-        member_of: []
 
     - stitch:
         can_login: yes
