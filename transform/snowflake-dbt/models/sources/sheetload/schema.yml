@@ -721,3 +721,5 @@ models:
       tests:
         - not_null
         - unique
+- name: sheetload_fy24_placeholder_target_source
+  description: Placeholder targets loaded to test the new target structure ahead of the new fiscal year.
