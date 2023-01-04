@@ -3703,6 +3703,13 @@ roles:
                     - mlaanen_prep.*.*
                     - mlaanen_prod.*.*
 
+    - mnohr:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - mpetersen:
         member_of:
             - analyst_growth
@@ -4999,6 +5006,11 @@ users:
         can_login: yes
         member_of:
             - mlaanen
+
+    - mnohr:
+        can_login: yes
+        member_of:
+            - mnohr
 
     - mpetersen:
         can_login: yes
