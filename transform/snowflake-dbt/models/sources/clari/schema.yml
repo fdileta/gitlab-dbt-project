@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: net_arr_entries_source
+    description: Forecast entries for each user
+    columns:
+      - name: currency
+      - name: field_id
+        tests:
+            - not_null
+      - name: forecast_value
+      - name: is_updated
+      - name: time_frame_id
+        tests:
+            - not_null
+      - name: fiscal_quarter
+        tests:
+          - not_null
+      - name: updated_by
+      - name: updated_on
+      - name: user_id
+        tests:
+          - not_null
