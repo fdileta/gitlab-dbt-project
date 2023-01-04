@@ -17,7 +17,7 @@
 
     SELECT
     dim_ping_instance_id,
- dim_instance_id,
+    dim_instance_id,
     metrics_path
     FROM PROD.common.fct_ping_instance_metric
 
@@ -31,11 +31,11 @@ final AS (
       dim_ping_instance.ping_edition,
       dim_ping_instance.version_is_prerelease,
       dim_ping_instance.major_minor_version_id ,
-    major_minor_version,
-    major_version,
-    minor_version,
+      major_minor_version,
+      major_version,
+      minor_version,
       dim_ping_metric.time_frame,
-    dim_installation_id
+      dim_installation_id
     FROM fct_ping_instance_metric
     INNER JOIN dim_ping_metric
       ON fct_ping_instance_metric.metrics_path = dim_ping_metric.metrics_path
@@ -51,15 +51,8 @@ final AS (
 , transformed AS (
 
     SELECT DISTINCT
-       md5(cast(coalesce(cast(metrics_path as 
-    varchar
-), '') || '-' || coalesce(cast(ping_edition as 
-    varchar
-), '') || '-' || coalesce(cast(version_is_prerelease as 
-    varchar
-), '') as 
-    varchar
-))                                                   AS ping_metric_first_last_versions_id,      metrics_path                                                                                                                               AS metrics_path,
+      {{ dbt_utils.surrogate_key(['metrics_path', 'ping_edition', 'version_is_prerelease']) }} AS ping_metric_first_last_versions_id,
+      metrics_path                                                                                                                               AS metrics_path,
       ping_edition                                                                                                                               AS ping_edition,
       version_is_prerelease                                                                                                                      AS version_is_prerelease,
       -- Grab first major/minor edition where metric/edition was present
