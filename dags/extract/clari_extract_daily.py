@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
-from airflow.operators.bash_operator import BashOperator
 
 from airflow_utils import (
     DATA_IMAGE,
@@ -53,8 +52,7 @@ dag = DAG(
 )
 
 clari_extract_command = (
-    f"{clone_and_setup_extraction_cmd} && "
-    f"python clari/src/clari.py"
+    f"{clone_and_setup_extraction_cmd} && " f"python clari/src/clari.py"
 )
 
 clari_task = KubernetesPodOperator(

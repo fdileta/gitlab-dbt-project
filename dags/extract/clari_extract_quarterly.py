@@ -53,8 +53,7 @@ dag = DAG(
 )
 
 clari_extract_command = (
-    f"{clone_and_setup_extraction_cmd} && "
-    f"python clari/src/clari.py"
+    f"{clone_and_setup_extraction_cmd} && " f"python clari/src/clari.py"
 )
 
 clari_task_previous_quarter = KubernetesPodOperator(
@@ -97,10 +96,8 @@ clari_task_new_quarter = KubernetesPodOperator(
     env_vars={
         **pod_env_vars,
         # Run today's quarter
-        "execution_date":
-            "{{ next_execution_date }}",
-        "task_schedule":
-            TASK_SCHEDULE,
+        "execution_date": "{{ next_execution_date }}",
+        "task_schedule": TASK_SCHEDULE,
     },
     affinity=get_affinity(False),
     tolerations=get_toleration(False),

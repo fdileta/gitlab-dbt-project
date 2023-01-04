@@ -146,13 +146,14 @@ def make_request(
 def get_forecast(fiscal_quarter: str) -> str:
     """
     Make a GET request to /forecast/{forecastId} endpoint
-    This endpoint has less options, i.e can't return historical weeks, but easier to use.
+    This endpoint has less options, i.e can't return historical weeks,
+    but easier to use.
     Will be used for the Daily DAG run
     """
     params = {"timePeriod": fiscal_quarter}
     forecast_url = f"{BASE_URL}/forecast/{FORECAST_ID}"
     response = make_request("GET", forecast_url, HEADERS, params=params)
-    info('Response successfully obtained from GET forecast API (latest week only)')
+    info("Successful response from GET forecast API (latest week only)")
     return response.json()
 
 
@@ -163,9 +164,7 @@ def start_export_report(fiscal_quarter: str) -> str:
     export_forecast_url = f"{BASE_URL}/export/forecast/{FORECAST_ID}"
 
     json_body = {"timePeriod": fiscal_quarter, "includeHistorical": True}
-    response = make_request(
-        "POST", export_forecast_url, HEADERS, json_body=json_body
-    )
+    response = make_request("POST", export_forecast_url, HEADERS, json_body=json_body)
     return response.json()["jobId"]
 
 
@@ -178,9 +177,7 @@ def get_job_status(job_id: str) -> str:
 
 
 def poll_job_status(
-    job_id: str,
-    wait_interval_seconds: int = 30,
-    max_poll_attempts: int = 5
+    job_id: str, wait_interval_seconds: int = 30, max_poll_attempts: int = 5
 ) -> bool:
     """
     Polls the API for the status of the job with the specified ID,
@@ -223,8 +220,9 @@ def get_report_results(job_id: str) -> Dict[Any, Any]:
     return response.json()
 
 
-def upload_results_dict(results_dict: Dict[Any, Any],
-                        fiscal_quarter: str) -> Dict[Any, Any]:
+def upload_results_dict(
+    results_dict: Dict[Any, Any], fiscal_quarter: str
+) -> Dict[Any, Any]:
     """
     Uploads the results_dict to Snowflake
     """
@@ -277,11 +275,11 @@ def main() -> None:
     info(f"Processing fiscal_quarter: {fiscal_quarter}")
 
     # Daily DAG, only return the latest week
-    if config_dict["task_schedule"] == 'daily':
+    if config_dict["task_schedule"] == "daily":
         results_dict = get_forecast(fiscal_quarter)
 
     # Quarterly DAG, return first few weeks of new quarter
-    elif config_dict["task_schedule"] == 'quarterly':
+    elif config_dict["task_schedule"] == "quarterly":
         job_id = start_export_report(fiscal_quarter)
         poll_job_status(job_id)
         results_dict = get_report_results(job_id)
