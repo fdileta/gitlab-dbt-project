@@ -91,7 +91,7 @@ dag = DAG(
     "dbt",
     description="This DAG is responsible for doing incremental model refresh",
     default_args=default_args,
-    schedule_interval="10 13 * * *",
+    schedule_interval="45 8 * * *",
 )
 dag.doc_md = __doc__
 
@@ -106,8 +106,6 @@ def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
     :return: Bool, false if it is the first Sunday of the month.
     """
     next_run = croniter(exclude_schedule).get_next(datetime)
-    print(timestamp)
-    print(next_run)
     # Excludes the first sunday of every month, this is captured by the regular full refresh.
     if next_run.date() == timestamp.date():
         return False
@@ -115,12 +113,12 @@ def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
     return True
 
 
-# NB - this needs to be after the job run starts (schedule interval) to successfully evaluate.
-evaluation_schedule = "* * * * WED#1"
+# NB - Only the date is needed from this schedule, this is configured to exclude the first Sunday of the month
+exclusion_schedule = "* * * * SUN#1"
 
 dbt_evaluate_run_date_task = ShortCircuitOperator(
     task_id="evaluate_dbt_run_date",
-    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), evaluation_schedule),
+    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), exclusion_schedule),
     dag=dag,
 )
 
