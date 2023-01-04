@@ -166,9 +166,9 @@ models:
     description: This model shows the job role an employee is in and when their role changes. The data for this table comes from bamboohr_id_emmployee_number_mapping raw. We started capturing data points not in other reports starting 2020.02.27
     tests:
       - dbt_utils.unique_combination_of_columns:
-        combination_of_columns:
-          - employee_number
-          - effective_date
+          combination_of_columns:
+            - employee_number
+            - effective_date
     columns:
       - name: employee_number
         tests:
