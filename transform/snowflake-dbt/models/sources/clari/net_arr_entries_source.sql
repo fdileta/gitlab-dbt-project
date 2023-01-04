@@ -1,6 +1,6 @@
 {{ config({
     "materialized": "incremental",
-    "unique_key": "id"
+    "unique_key": "entries_id"
     })
 }}
 
@@ -18,17 +18,16 @@ WITH
   ),
   parsed AS (
     SELECT
-      -- primary data
-      concat_ws('-', fiscal_quarter, time_frame_id, user_id, field_id) AS id,
-      value:forecastValue::NUMBER (38, 1) forecast_value,
-
-      -- Foreign keys
+      -- foreign keys
       REPLACE(value:timePeriodId, '_', '-')::varchar fiscal_quarter,
       value:timeFrameId::varchar time_frame_id,
       value:userId::varchar user_id,
       value:fieldId::varchar field_id,
 
-      -- Logical info
+      -- primary key, must be after aliased cols are derived else sql error
+      concat_ws('-', fiscal_quarter, time_frame_id, user_id, field_id) as entries_id,
+      -- logical info
+      value:forecastValue::number (38, 1) forecast_value,
       value:currency::variant currency,
       value:isUpdated::boolean is_updated,
       value:updatedBy::varchar updated_by,
@@ -52,6 +51,8 @@ WITH
     ORDER BY
       time_frame_id
   )
+
+
 SELECT
   *
 FROM
