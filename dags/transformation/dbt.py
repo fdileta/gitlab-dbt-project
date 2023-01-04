@@ -91,8 +91,7 @@ dag = DAG(
     "dbt",
     description="This DAG is responsible for doing incremental model refresh",
     default_args=default_args,
-    schedule_interval="55 11 * * *",
-    start_date=datetime(2019, 1, 1, 0, 0, 0),
+    schedule_interval="10 12 * * *",
 )
 dag.doc_md = __doc__
 
