@@ -155,7 +155,9 @@ def load_event_logs(event: str, full_refresh: bool = False):
         end_date = start_date + datetime.timedelta(hours=13)
 
     info(f"Start {config_dict['START_TIME']}")
-    info(f"Start {config_dict['END_TIME']}")
+    info(f"END {config_dict['END_TIME']}")
+    info(f"AIRFLOW Start {config_dict['START_DATE_AIRFLOW']}")
+    info(f"AIRFLOW END {config_dict['END_DATE_AIRFLOW']}")
     info(
         f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}"
     )
