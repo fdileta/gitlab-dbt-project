@@ -117,7 +117,7 @@ def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
 
 dbt_evaluate_run_date_task = ShortCircuitOperator(
     task_id="evaluate_dbt_run_date",
-    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "45 8 * * SUN#1"),
+    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "45 8 * * WED#1"),
     dag=dag,
 )
 
