@@ -5,22 +5,22 @@ models:
   description: '{{ doc("rpt_event_xmau_metric_monthly") }}'
   columns:
     - name: xmau_metric_monthly_id
-      description: the unique ID of a monthly xMAU metric in rpt_xmau_metric_monthly
+      description: The unique composite ID of a monthly xMAU metric in the rpt_xmau_metric_monthly model consisting of event_calendar_month, user_group, section_name, stage_name, and group_name
       tests:
         - not_null
         - unique
     - name: event_calendar_month
       description: '{{ doc("event_calendar_month") }}'
-    - name: is_smau
-      description: '{{ doc("is_smau") }}'
-    - name: is_gmau
-      description: '{{ doc("is_gmau") }}'
     - name: is_umau
       description: '{{ doc("is_umau") }}'
-    - name: stage_name
-      description: '{{ doc("stage_name") }}'
+    - name: is_gmau
+      description: '{{ doc("is_gmau") }}'
+    - name: is_smau
+      description: '{{ doc("is_smau") }}'
     - name: section_name
       description: '{{ doc("section_name") }}'
+    - name: stage_name
+      description: '{{ doc("stage_name") }}'
     - name: group_name
       description: '{{ doc("group_name") }}'
     - name: user_group
@@ -57,21 +57,21 @@ models:
     - name: event_calendar_year
       description: '{{ doc("event_calendar_year") }}'
     - name: plan_id_at_event_month
-      description: '{{ doc("plan_id_at_event_date") }}'
+      description: '{{ doc("plan_id_at_event_month") }}'
     - name: event_name
       description: '{{ doc("event_name") }}'
-    - name: is_smau
-      description: '{{ doc("is_smau") }}'
-    - name: is_gmau
-      description: '{{ doc("is_gmau") }}'
-    - name: is_umau
-      description: '{{ doc("is_umau") }}'
     - name: stage_name
       description: '{{ doc("stage_name") }}'
     - name: section_name
       description: '{{ doc("section_name") }}'
     - name: group_name
       description: '{{ doc("group_name") }}'
+    - name: is_smau
+      description: '{{ doc("is_smau") }}'
+    - name: is_gmau
+      description: '{{ doc("is_gmau") }}'
+    - name: is_umau
+      description: '{{ doc("is_umau") }}'
     - name: event_count
       description: '{{ doc("event_count") }}'
     - name: ultimate_parent_namespace_count
@@ -315,7 +315,7 @@ models:
       tests:
         - not_null
         - unique
-      description: the unique composite ID for the rpt_ping_metric_totals_w_estimates_monthly model consisting of reporting_month, metrics_path, estimation_grain, ping_edition_product_tier, and service_ping_delivery_type
+      description: The unique composite ID for the rpt_ping_metric_totals_w_estimates_monthly model consisting of ping_created_date_month, metrics_path, ping_edition, estimation_grain, ping_edition_product_tier, and ping_delivery_type
     - name: metrics_path
       description: '{{ doc("metrics_path") }}'
     - name: ping_created_date_month
@@ -365,7 +365,6 @@ models:
     - name: model_updated_date
       description: '{{ doc("model_updated_date") }}'
 
-
 - name: rpt_ping_subscriptions_reported_counts_monthly
   description: ' {{ doc("rpt_ping_subscriptions_reported_counts_monthly") }} '
   columns:
@@ -392,7 +391,6 @@ models:
       description: '{{ doc("model_created_date") }}'
     - name: model_updated_date
       description: '{{ doc("model_updated_date") }}'
-
 
 - name: rpt_ping_subscriptions_on_versions_counts_monthly
   description: ' {{ doc("rpt_ping_subscriptions_on_versions_counts_monthly") }} '
@@ -1200,15 +1198,129 @@ models:
 - name: rpt_event_xmau_metric_monthly_snapshot_model
   description: Simpler incremental version of the rpt_event_xmau_metric_monthly snapshot model
   columns:
-      - name: xmau_metric_monthly_snapshot_id
-        tests:
-          - not_null
-        tags: ["mnpi_exception","edm_snapshot", "product"]
+    - name: xmau_metric_monthly_snapshot_id
+      tests:
+        - not_null
+      tags: ["mnpi_exception","edm_snapshot", "product"]
+      description: The unique composite ID for the rpt_event_xmau_metric_monthly_snapshot_model model consisting of snapshot_id and xmau_metric_monthly_id
+    - name: snapshot_id
+      description: '{{ doc("snapshot_id") }}'
+    - name: snapshot_date
+      description: '{{ doc("snapshot_date") }}'
+    - name: xmau_metric_monthly_id
+      description: The composite ID of a monthly xMAU metric in the rpt_xmau_metric_monthly model consisting of event_calendar_month, user_group, section_name, stage_name, and group_name
+    - name: event_calendar_month
+      description: '{{ doc("event_calendar_month") }}'
+    - name: is_umau
+      description: '{{ doc("is_umau") }}'
+    - name: is_gmau
+      description: '{{ doc("is_gmau") }}'
+    - name: is_smau
+      description: '{{ doc("is_smau") }}'
+    - name: section_name
+      description: '{{ doc("section_name") }}'
+    - name: stage_name
+      description: '{{ doc("stage_name") }}'
+    - name: group_name
+      description: '{{ doc("group_name") }}'
+    - name: user_group
+      description: '{{ doc("user_group") }}'
+    - name: event_name_array
+      description: '{{ doc("event_name_array") }}'
+    - name: event_count
+      description: '{{ doc("event_count") }}'
+    - name: ultimate_parent_namespace_count
+      description: '{{ doc("ultimate_parent_namespace_count") }}'
+    - name: user_count
+      description: '{{ doc("user_count") }}'
+    - name: created_by
+      description: '{{ doc("created_by") }}'
+    - name: updated_by
+      description: '{{ doc("updated_by") }}'
+    - name: model_created_date
+      description: '{{ doc("model_created_date") }}'
+    - name: model_updated_date
+      description: '{{ doc("model_updated_date") }}'
+    - name: dbt_created_at
+      description: '{{ doc("dbt_created_at_snapshot_model") }}'
+    - name: dbt_scd_id
+      description: '{{ doc("dbt_scd_id") }}'
+    - name: dbt_updated_at
+      description: '{{ doc("dbt_updated_at_snapshot_model") }}'
+    - name: dbt_valid_from
+      description: '{{ doc("dbt_valid_from") }}'
+    - name: dbt_valid_to
+      description: '{{ doc("dbt_valid_to") }}'
 
 - name: rpt_ping_metric_totals_w_estimates_monthly_snapshot_model
   description: Simpler incremental version of the rpt_ping_metric_totals_w_estimates_monthly snapshot model
   columns:
-      - name: ping_metric_totals_w_estimates_monthly_snapshot_id
-        tests:
-          - not_null
-        tags: ["mnpi_exception","edm_snapshot", "product"]
+    - name: ping_metric_totals_w_estimates_monthly_snapshot_id
+      tests:
+        - not_null
+      tags: ["mnpi_exception","edm_snapshot", "product"]
+      description: The unique composite ID for the rpt_ping_metric_totals_w_estimates_monthly_snapshot_model model consisting of snapshot_id and ping_metric_totals_w_estimates_monthly_id
+    - name: snapshot_id
+      description: '{{ doc("snapshot_id") }}'
+    - name: snapshot_date
+      description: '{{ doc("snapshot_date") }}'
+    - name: ping_metric_totals_w_estimates_monthly_id
+      description: The composite ID for the rpt_ping_metric_totals_w_estimates_monthly model consisting of ping_created_date_month, metrics_path, ping_edition, estimation_grain, ping_edition_product_tier, and ping_delivery_type
+    - name: metrics_path
+      description: '{{ doc("metrics_path") }}'
+    - name: ping_created_date_month
+      description: '{{ doc("ping_created_date_month") }}'
+    - name: ping_delivery_type
+      description: '{{ doc("ping_delivery_type") }}'
+    - name: ping_edition
+      description: '{{ doc("ping_edition") }}'
+    - name: ping_product_tier
+      description: '{{ doc("ping_product_tier") }}'
+    - name: ping_edition_product_tier
+      description: '{{ doc("ping_edition_product_tier") }}'
+    - name: stage_name
+      description: '{{ doc("stage_name") }}'
+    - name: section_name
+      description: '{{ doc("section_name") }}'
+    - name: group_name
+      description: '{{ doc("group_name") }}'
+    - name: is_smau
+      description: '{{ doc("is_smau") }}'
+    - name: is_gmau
+      description: '{{ doc("is_gmau") }}'
+    - name: is_paid_gmau
+      description: '{{ doc("is_paid_gmau") }}'
+    - name: is_umau
+      description: '{{ doc("is_umau") }}'
+    - name: reporting_count
+      description: '{{ doc("reporting_count_estimation_model") }}'
+    - name: not_reporting_count
+      description: '{{ doc("not_reporting_count_estimation_model") }}'
+    - name: percent_reporting
+      description: '{{ doc("percent_reporting_estimation_model") }}'
+    - name: estimation_grain
+      description: '{{ doc("estimation_grain") }}'
+    - name: total_usage_with_estimate
+      description: '{{ doc("total_usage_with_estimate") }}'
+    - name: estimated_usage
+      description: '{{ doc("estimated_usage") }}'
+    - name: recorded_usage
+      description: '{{ doc("recorded_usage_estimation_model") }}'
+    - name: created_by
+      description: '{{ doc("created_by") }}'
+    - name: updated_by
+      description: '{{ doc("updated_by") }}'
+    - name: model_created_date
+      description: '{{ doc("model_created_date") }}'
+    - name: model_updated_date
+      description: '{{ doc("model_updated_date") }}'
+    - name: dbt_created_at
+      description: '{{ doc("dbt_created_at_snapshot_model") }}'
+    - name: dbt_scd_id
+      description: '{{ doc("dbt_scd_id") }}'
+    - name: dbt_updated_at
+      description: '{{ doc("dbt_updated_at_snapshot_model") }}'
+    - name: dbt_valid_from
+      description: '{{ doc("dbt_valid_from") }}'
+    - name: dbt_valid_to
+      description: '{{ doc("dbt_valid_to") }}'

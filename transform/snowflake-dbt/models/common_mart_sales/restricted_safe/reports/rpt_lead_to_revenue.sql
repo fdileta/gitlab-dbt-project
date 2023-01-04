@@ -238,7 +238,7 @@
       opp.new_logo_count,
       opp.net_arr,
       opp.amount,
-	  opp.record_type_name,
+	    opp.record_type_name,
       opp.invoice_number,
       opp.is_net_arr_closed_deal,
       opp.crm_opp_owner_sales_segment_stamped,
@@ -253,6 +253,8 @@
       opp.record_type_id,
       opp.ssp_id,
       opp.dim_crm_account_id AS opp_dim_crm_account_id,
+      opp.crm_account_name,
+      opp.parent_crm_account_name,
       opp.opportunity_name,
       opp.stage_name,
       opp.reason_for_loss,
@@ -474,6 +476,8 @@
     cohort_base.record_type_id,
     cohort_base.ssp_id,
     cohort_base.opportunity_name,
+    cohort_base.crm_account_name,
+    cohort_base.parent_crm_account_name,
     cohort_base.stage_name,
     cohort_base.reason_for_loss,
     cohort_base.reason_for_loss_details,
@@ -578,6 +582,12 @@
       WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_touchpoint_id IS NOT null THEN cohort_base.dim_crm_opportunity_id
       ELSE null
     END AS influenced_opportunity_id,
+    CASE
+      WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_opportunity_id = cohort_base.dim_crm_opportunity_id
+      THEN TRUE
+      ELSE FALSE
+    END AS is_bizible_attribution_opportunity,
+    rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_opportunity_id as bizible_attribution_opportunity_id,
   
     --touchpoint data
     rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_date_normalized,
@@ -655,5 +665,5 @@
     created_by="@rkohnke",
     updated_by="@degan",
     created_date="2022-07-20",
-    updated_date="2022-11-29",
+    updated_date="2022-12-22",
   ) }}

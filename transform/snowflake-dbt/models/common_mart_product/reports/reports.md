@@ -1,132 +1,207 @@
 {% docs rpt_event_xmau_metric_monthly %}
 
-**Description:** GitLab.com Usage Event Report Data with Monthly Totals for Valid Free and Paid Events for User Type Events that are Used in xMAU Metrics
-- [Targets and Actions](https://docs.gitlab.com/ee/api/events.html) activity by Users and [Namespaces](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/namespace/) within the GitLab.com application are captured and refreshed periodically throughout the day.  Targets are objects ie. issue, milestone, merge_request and Actions have effect on Targets, ie. approved, closed, commented, created, etc.  
+**Description:** GitLab.com (SaaS) xMAU metrics by month and user group (total, free, paid), sourced from the gitlab.com db replica. This model is used for xMAU/PI reporting and is the source for paid SaaS xMAU in the `[td_xmau]` snippet.
 
 **Data Grain:**
 - event_calendar_month
 - user_group
 - section_name
 - stage_name
-- group_name (plan_was_paid_at_event_date)
+- group_name
 
-**Filters:**
-- Use Valid Events Only for standard analysis and reporting:
+**Filters Applied to Model:**
+- Include events that occurred on the last 28 days of the calendar month
+- Include events used in xMAU reporting (SMAU, GMAU, UMAU)
+- Exclude events not associated with a user (`is_null_user = FALSE`) 
+- Exclude the current month
+- `Inherited` - Include valid events for standard analysis and reporting:
   - Remove Events where the Event Created Datetime < the User Created Datetime.
     - These are usually events from projects that were created before the User and then imported in by the User after the User is created.  
-  - Keep Events where User Id = NULL.  These do not point to a particular User, ie. 'milestones' 
   - Remove Events from blocked users
-- Rolling 24mos of Data
-- Include rows where the Event_Date is within 28 days of the Last Day of the Month
-- Include User Type Events 
-- Include Events used in Metrics (umau, gmau, smau)  
+- `Inherited` - Rolling 24mos of Data
 
 **Business Logic in this Model:** 
-- Valid events where the Event Create DateTime is >= User Create DateTime
-- Events from blocked users are excluded
+- The Last Plan Id of the Month for the Namespace is used for the `user_group` attribution
+- Usage is aggregated by xMAU metric instead of `event_name`. Metrics spanning multiple events are aggregated and deduped for ease of reporting. See `event_name_array` for all events included in the metric.
+- `group_name` will be NULL if the metric spans events associated with multiple groups. (This is necessary for the metrics to aggregate properly)
+- `stage_name IS NULL` for UMAU events
 - Aggregated Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
   - Events that are 29,30 or 31 days prior to the Last Day of the Month will Not be included in these totals
-  - This is intended to match the instance-level service ping metrics by getting a 28-day count
-- The Last Plan Id of the Month for the Namespace is used for the Calculations and Reporting.
+  - This is intended to match the installation-level Service Ping metrics by getting a 28-day count
 
 **Other Comments:**
-- Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
+- The [Definitive Guide to xMAU Analysis](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/) contains additional information about xMAU reporting
+- Not all stages are captured in the model. This is due to limitations in replicating Service Ping counters using the gitlab.com db Postgres replica
 
 {% enddocs %}
 
 {% docs rpt_event_plan_monthly %}
 
-**Description:** GitLab.com Usage Event Report Data with Monthly Totals for Valid Events
-- [Targets and Actions](https://docs.gitlab.com/ee/api/events.html) activity by Users and [Namespaces](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/namespace/) within the GitLab.com application are captured and refreshed periodically throughout the day.  Targets are objects ie. issue, milestone, merge_request and Actions have effect on Targets, ie. approved, closed, commented, created, etc.  
+**Description:** GitLab.com (SaaS) usage by event, plan, and month, sourced from the gitlab.com db replica.
 
 **Data Grain:**
 - event_calendar_month
+- plan_id_at_event_month
 - event_name
-- user_group (plan_was_paid_at_event_date)
 
-**Filters:**
-- Use Valid Events Only for standard analysis and reporting:
+**Filters Applied to Model:**
+- Include events that occurred on the last 28 days of the calendar month
+- Exclude the current month
+- `Inherited` - Include valid events for standard analysis and reporting:
   - Remove Events where the Event Created Datetime < the User Created Datetime.
     - These are usually events from projects that were created before the User and then imported in by the User after the User is created.  
-  - Keep Events where User Id = NULL.  These do not point to a particular User, ie. 'milestones' 
   - Remove Events from blocked users
-- Rolling 24mos of Data
-- Include rows where the Event_Date is within 28 days of the Last Day of the Month to Count Events  
+  - Include events where `dim_user_id IS NULL`. These do not point to a particular User, ie. 'milestones'
+- `Inherited` - Rolling 24mos of Data
 
 **Business Logic in this Model:** 
-- Valid events where the Event Create DateTime is >= User Create DateTime
-- Events from blocked users are excluded
-- Aggregated Event, Namespace and User Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
+- The Last Plan Id of the Month for the Namespace is used for the `plan_id_at_event_month` attribution
+- Usage is aggregated by `event_name`, meaning you cannot dedupe user or namespace counts across multiple events using this model.
+  - Since some xMAU metrics aggregate across multiple events, use [`rpt_event_xmau_metric_monthly`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.rpt_event_xmau_metric_monthly) for xMAU reporting
+- Not all events have a user associated with them (ex: 'milestones'), and not all events have a namespace associated with them (ex: 'users_created'). Therefore it is expected that `user_count = 0` or `ultimate_parent_namespace_count = 0` for these events.
+- Aggregated Counts are based on the Event Date being within the Last Day of the Month and 27 days prior to the Last Day of the Month (total 28 days)
   - Events that are 29,30 or 31 days prior to the Last Day of the Month will Not be included in these totals
-  - This is intended to match the instance-level month over month service ping metrics by getting a 28-day count
-- Latest Plan ID is the last plan ID in the Month for a Namespace.  This value is derived from the 28-day events as well.  
+  - This is intended to match the installation-level Service Ping metrics by getting a 28-day count
+
+**Tips for Use:**
+- The model currently exposes a plan_id, but not a plan_name. It is recommended to JOIN to [`prep_gitlab_dotcom_plan`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.prep_gitlab_dotcom_plan) to map the IDs to names. (Issue to add the plan_name to this model [here](https://gitlab.com/gitlab-data/analytics/-/issues/15172))
+
+Example query to map plan_id to plan_name
+
+```
+SELECT
+  event_calendar_month,
+  plan_id_at_event_month,
+  prep_gitlab_dotcom_plan.plan_name_modified AS plan_name_at_event_month, --plan_name_modified maps to current plan names
+  event_name,
+  user_count
+FROM common_mart_product.rpt_event_plan_monthly
+JOIN common_prep.prep_gitlab_dotcom_plan
+  ON rpt_event_plan_monthly.plan_id_at_event_month = prep_gitlab_dotcom_plan.dim_plan_id
+ORDER BY 1,2,3,4
+;
+```
 
 **Other Comments:**
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
 
 {% enddocs %}
 
-
 {% docs rpt_ping_metric_first_last_versions %}
 
-**Description:**  First and Last Versions for Ping Metrics by Edition and Prerelease
-- This table provides First and Last Application Versions along with Installation Counts by Metric, Ping Edition and Prerelease.    
+**Description:** First and last versions of GitLab that a Service Ping metric appeared on a Self-Managed installation by Edition and Prerelease. For xMAU/PI reporting, this model is used to determine the version in which a metric was introduced.
+- This table provides First and Last Application Versions along with Installation Counts by Metric, Ping Edition and Prerelease.
 
 **Data Grain:**
 - metrics_path
 - ping_edition
 - version_is_prerelease
 
-**Filters:**
-- Metrics from GitLab Service Pings will not be considered
-- `Forwarded` - Only 28 Day and All-Time metrics  
-- `Forwarded` - Only Metrics from the 'Last Ping of the Month' pings 
+**Filters Applied to Model:**
+- Exclude GitLab.com (SaaS) Service Pings
+- Include metrics appearing on valid versions (those found in `dim_gitlab_releases`)
+- `Inherited` - Include 28 Day and All-Time metrics  
+- `Inherited` - Include metrics from the 'Last Ping of the Month' pings 
 
 **Business Logic in this Model:** 
-- `First Versions` - The earliest version found for each Metrics_Path, Ping_Edition and Version_Is_Prerelease 
-- `Last Versions` - The latest version found for each Metrics_Path, Ping_Edition and Version_Is_Prerelease 
-- `is_last_ping_of_month` = last ping (Instance_id and Host_id) sent for the Month
-- `major_minor_version` = major_version || '.' || minor_version 
+- `First Versions` - The earliest (minimum) version found for each metrics_path, ping_edition, and version_is_prerelease
+- `Last Versions` - The latest (maximum/most recent) version found for each metrics_path, ping_edition, and version_is_prerelease
 - `major_minor_version_id` = major_version * 100 + minor_version
 - `version_is_prerelease` = version LIKE '%-pre'
 
+**Tips for Use:**
+- In the _vast_ majority of use cases, pre-release versions (`version_is_prerelease = TRUE`) can add more confusion than benefit. It is highly recommended to exclude those records during analysis.
+- This model can easily be joined to [`dim_ping_metric`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_ping_metric) in order to get additional attributes about the metric (`time_frame`, `group_name`, `is_smau`, etc)
+- This model can easily be joined to [`dim_gitlab_releases`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_gitlab_releases) to get the release date for a version
+
+Example query
+
+```
+SELECT
+  stage_name,
+  rpt_ping_metric_first_last_versions.metrics_path,
+  ping_edition,
+  first_major_minor_version_with_counter,
+  release_date AS first_major_minor_version_release_date
+FROM common_mart_product.rpt_ping_metric_first_last_versions
+JOIN common.dim_ping_metric
+  ON rpt_ping_metric_first_last_versions.metrics_path = dim_ping_metric.metrics_path
+JOIN common.dim_gitlab_releases
+  ON rpt_ping_metric_first_last_versions.first_major_minor_version_with_counter = dim_gitlab_releases.major_minor_version
+WHERE version_is_prerelease = FALSE
+  AND is_smau = TRUE
+ORDER BY 1,2,3
+;
+```
+
 **Other Comments:**
-- Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
-- The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+- Metrics can be introduced on different versions for CE and EE.
+- The `milestone` field of the [metrics dictionary](https://metrics.gitlab.com/) can also be used to identify the version when a metric was instrumented, but there are a couple of limitations. First, many metrics are just labeled `< 13.9`, so there is a lack of more detail for older metrics. Second, since metrics can be introduced on different versions for CE and EE, `milestone` could be incorrect for one edition/distribution.
+- First/last version is dependent on the metric appearing in a Service Ping payload. There are cases where this value is incorrect due to installations somehow sending the metrics from previous versions, but there is no other complete SSOT for when a metric was introduced.
 
 {% enddocs %}
 
 {% docs rpt_ping_latest_subscriptions_monthly %}
 
-**Description:**  Self-Managed Service Pings with Latest Subscriptions, ARR Charges and Ping Counts by Installation, Month
-- Latest Subscription, Version, ARR, MRR and Ping Count information in included. 
+**Description:** Self-Managed subscriptions by month and installation (if the subscription sent a ping that month). For xMAU/PI reporting, this model is used to determine the total number of active Self-Managed subscriptions on a given month and what percent of subscriptions sent a ping from a given version. It can also be used to determine what percent of subscriptions sent a ping on a given month, etc. 
+- The version an installation is reporting on (major_minor_version_id), seat count (licensed_user_count), and count of pings sent that month (ping_count) are also included
+- Unpaid subscriptions (ex: OSS, EDU) are _included_ in this model
 
 **Data Grain:**
 - ping_created_date_month
-- dim_installation_id
+- latest_subscription_id
+- dim_installation_id (only populated if subscription sent a ping that month)
 
-**Filters:**
-- Include `ping_delivery_type = 'Self-Managed'`
+_Important caveat:_ The grain of this model is slightly different depending on whether a subscription sent a ping that month. It is advised to look at the `MAX()` value, grouped by `latest_subscription_id`.
+- If a subscription sent a ping that month, there is 1 record per subscription per installation reporting. (Note: a subscription can be associated with > 1 installation, so a single subscription could have multiple records for a given month)
+- If a subscription did not send a ping that month, there is 1 record per subscription where `dim_installation_id IS NULL`
+
+Example query
+
+```
+WITH subscription_level AS (
+
+  SELECT
+    ping_created_date_month,
+    latest_subscription_id,
+    COUNT(dim_installation_id) AS installation_count,
+    MAX(has_sent_pings) AS has_sent_pings,
+    MAX(licensed_user_count) AS seat_count
+  FROM common_mart_product.rpt_ping_latest_subscriptions_monthly
+  GROUP BY 1,2
+
+)
+
+SELECT
+  ping_created_date_month,
+  COUNT(latest_subscription_id) AS subscription_count,
+  COUNT(IFF(has_sent_pings = TRUE, latest_subscription_id, NULL)) AS sent_ping_count,
+  DIV0(sent_ping_count, subscription_count) AS subscription_ping_opt_in_rate
+FROM subscription_level
+GROUP BY 1
+ORDER BY 1
+;
+```
+
+**Filters Applied to Model:**
+- Include subscriptions where:
+  - `product_delivery_type = 'Self-Managed'` 
+  - `subscription_status IN ('Active','Cancelled')`
+  - `product_tier_name <> 'Storage'`
+- `major_minor_version_id`, `version_is_prerelease`, and `instance_user_count` look at 'Last Ping of the Month' pings
+- Exclude the current month
 
 **Business Logic in this Model:**
-- MRR, ARR and Licensed_User_Count is limited to:
-  - product_delivery_type = `Self-Managed` 
-  - subscription_status IN (`Active`,`Cancelled`)
-  - product_tier_name <> `Storage`
-
-**Other Comments:**
-- Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
-- The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+- If a ping is received from an installation with a license mapped to a subscription but no corresponding record is found in `fct_charge`, a record is still included in the model where `is_missing_charge_subscription = FALSE`. In this case, the most recent record available in `fct_charge` is used to determine the number of seats associated with the subscription.
+- For a given month, all records associated with a subscription will have the same seat count (`licensed_user_count`) since that value is tied to the subscription, not an installation
 
 {% enddocs %}
 
 {% docs rpt_ping_subscriptions_on_versions_estimate_factors_monthly %}
 
-**Description:**  Estimated Usage Percents for Subscriptions on a Version by Metric and Month  
-- These estimations are used for determining usage for Implementations that do not send Service Pings. 
-- Multiple Estimation methods are in this data and utilized by a Macro.   
+**Description:** Self-Managed subscriptions and seats that sent a ping from a version of GitLab with a given metric instrumented on a given month. The totals are specific to the month, metric, edition, _and_ grain. These totals are used to generate inputs for the `metric/version check - subscription based estimation` (our "official" methodology) and `metric/version check - seat based estimation` estimation_grains for xMAU/PI reporting.
+
+_Note: This model is not expected to be used much (if at all) for analysis. The main purpose of the model is to create inputs for the estimation lineage._
 
 **Data Grain:**
 - ping_created_date_month
@@ -134,42 +209,34 @@
 - ping_edition
 - estimation_grain
 
-**Filters:**
-- Includes metrics for 28 Day timeframe
-- Include metrics from pings with `ping_delivery_type = 'Self-Managed'`
-- `Forwarded` - Include Metrics on Valid versions
-- `Forwarded` - Metrics from GitLab Service Pings will not be considered
-- `Forwarded` - Include Metrics from the 'Last Ping of the Month' pings
+**Filters Applied to Model:**
+- `Inherited` - Include subscriptions where:
+  - `product_delivery_type = 'Self-Managed'` 
+  - `subscription_status IN ('Active','Cancelled')`
+  - `product_tier_name <> 'Storage'`
+- `Inherited` - Include metrics for 28 Day and All-Time time frames
+- `Inherited` - Include metrics from the 'Last Ping of the Month' pings
+- `Inherited` - Exclude metrics that timed out during ping generation
+- `Inherited` - Exclude the current month
 
 **Business Logic in this Model:**
-- There are multiple estimation Grains in this model
-  - A macro is used to determine which `estimation_grain` to use from this report.  
+- There are multiple estimation grains in this model, `metric/version check - subscription based estimation` and `metric/version check - seat based estimation`
 - `estimation_grain` - tells which method is used to measure the `percent_reporting` %:
-  - 'reported metric - seat based estimation' is from licensed_users seat counts
-  - 'reported metric - subscription based estimation' is derived from subscription counts
-- `percent_reporting` - reporting_count / (reporting_count + not_reporting_count) 
-  - 'reporting_count' of Service Ping History (active Users or active Subscriptions)
-  - 'not_reporting_count' not reporting for the Month (active Users or active Subscriptions)
-- `Subscriptions on Valid Versions Estimate Percent Calculation`:
-  - (Version Subscriptions) / (All Subscriptions Reporting + All Subscriptions Not Reporting) 
-  - (Version Users) / (All Users Reporting + All Users Not Reporting)  
-- MRR, ARR and Licensed_User_Count is limited to:
-  - product_delivery_type = `Self-Managed` 
-  - subscription_status IN (`Active`,`Cancelled`)
-  - product_tier_name <> `Storage`
-
-**Other Comments:**
-- Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
-- The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+  - `metric/version check - subscription based estimation` looks at how many subscriptions sent a ping from a version of GitLab with the metric instrumented (_this is the "official" methodology used for xMAU/PI reporting_)
+  - `metric/version check - seat based estimation` looks at how many seats are associated with subscriptions that sent a ping from a version of GitLab with the metric instrumented
+- `percent_reporting` is defined as `reporting_count / (reporting_count + not_reporting_count)`
+- `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
+- Subscription and seat totals are specific to the month, metric, edition, _and_ grain
+- `percent_reporting`, `reporting_count`, and `not_reporting_count` are specific to the month, metric, edition, _and_ grain
+- The [Self-Managed Estimation Algorithm handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/estimation-xmau-algorithm.html) contains more details about the estimation methodology
 
 {% enddocs %}
 
 {% docs rpt_ping_metric_estimate_factors_monthly %}
 
-**Description:**  Estimated Usage Percents for All Reported Subscriptions and Subscriptions on Versions by Metric and Month  
-- These estimations are used for determining usage for Implementations that do not send Service Pings. 
-- Multiple Estimation methods are in this data and utilized by a Macro.   
+**Description:** The UNION of [`rpt_ping_subscriptions_on_versions_estimate_factors_monthly`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.rpt_ping_subscriptions_on_versions_estimate_factors_monthly) and [`rpt_ping_subscriptions_reported_estimate_factors_monthly`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.rpt_ping_subscriptions_reported_estimate_factors_monthly). This model contains inputs to be used in estimated uplift in the final xMAU/PI reporting model.
+
+_Note: This model is not expected to be used much (if at all) for analysis. The main purpose of the model is to create inputs for the estimation lineage._
 
 **Data Grain:**
 - ping_created_date_month
@@ -177,51 +244,33 @@
 - ping_edition
 - estimation_grain
 
-**Filters for Subscriptions on a Version:**
-- Includes metrics for 28 Day timeframe
-- Include metrics from pings with `ping_delivery_type = 'Self-Managed'`
-- `Forwarded` - Include Metrics on Valid versions
-- `Forwarded` - Metrics from GitLab Service Pings will not be considered
-- `Forwarded` - Include Metrics from the 'Last Ping of the Month' pings
-
-**Filters for All Reported Subscriptions:**
-- `Forwarded` - Include `ping_delivery_type = 'Self-Managed'`
-- `Forwarded` - Include metrics from pings with `ping_delivery_type = 'Self-Managed'`
-- `Forwarded` - Includes metrics for 28 Day and All-Time timeframes
-- `Forwarded` - Include only the `Last Pings of the Month`
+**Filters Applied to Model:**
+- `Inherited`- Include subscriptions where:
+  - `product_delivery_type = 'Self-Managed'` 
+  - `subscription_status IN ('Active','Cancelled')`
+  - `product_tier_name <> 'Storage'`
+- `Inherited` - Include metrics for 28 Day and All-Time time frames
+- `Inherited` - Include metrics from the 'Last Ping of the Month' pings
+- `Inherited` - Exclude metrics that timed out during ping generation
+- `Inherited` - Exclude the current month
 
 **Business Logic in this Model:**
-- There are multiple estimation Grains in this model
-  - A macro is used to determine which `estimation_grain` to use from this report.  
 - `estimation_grain` - tells which method is used to measure the `percent_reporting` %:
-  - 'reported metric - seat based estimation' is from licensed_users seat counts
-  - 'reported metric - subscription based estimation' is derived from subscription counts
-- `percent_reporting` - reporting_count / (reporting_count + not_reporting_count) 
-  - 'reporting_count' of Service Ping History (active Users or active Subscriptions)
-  - 'not_reporting_count' not reporting for the Month (active Users or active Subscriptions)
-- `Subscriptions on Valid Versions Estimate Percent Calculation`:
-  - (Version Subscriptions) / (All Subscriptions Reporting + All Subscriptions Not Reporting) 
-  - (Version Users) / (All Users Reporting + All Users Not Reporting)  
-- `Subscriptions (All) Estimate Percent Calculation`:
-  - (All Subscriptions) / (All Subscriptions Reporting + All Subscriptions Not Reporting) 
-  - (All Users) / (All Users Reporting + All Users Not Reporting) 
-- MRR, ARR and Licensed_User_Count is limited to:
-  - product_delivery_type = `Self-Managed` 
-  - subscription_status IN (`Active`,`Cancelled`)
-  - product_tier_name <> `Storage`
-
-**Other Comments:**
-- Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
-- The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+  - `metric/version check - subscription based estimation` looks at how many subscriptions sent a ping from a version of GitLab with the metric instrumented (_this is the "official" methodology used for xMAU/PI reporting_)
+  - `metric/version check - seat based estimation` looks at how many seats are associated with subscriptions that sent a ping from a version of GitLab with the metric instrumented
+  - `reported metric - subscription based estimation` looks at how subscriptions reported the metric
+  - `reported metric - seat based estimation` looks at how many seats are associated with subscriptions that reported the metric
+- `percent_reporting` is defined as `reporting_count / (reporting_count + not_reporting_count)`
+- `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
+- The [Self-Managed Estimation Algorithm handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/estimation-xmau-algorithm.html) contains more details about the estimation methodology
 
 {% enddocs %}
 
 {% docs rpt_ping_subscriptions_reported_estimate_factors_monthly %}
 
-**Description:**  Estimated Usage Percents for All Subscriptions by Metric and Month  
-- These estimations are used for determining usage for Implementations that do not sent Service Pings. 
-- Multiple Estimation methods are in this data and utilized by a Macro.   
+**Description:** Self-Managed subscriptions and seats that report a given metric on a given month. The totals are specific to the month, metric, and grain, but will be the same across editions. These totals are used to generate inputs for the `reported metric - subscription based estimation` and `reported metric - seat based estimation` estimation_grains for xMAU/PI reporting.
+
+_Note: This model is not expected to be used much (if at all) for analysis. The main purpose of the model is to create inputs for the estimation lineage._
 
 **Data Grain:**
 - ping_created_date_month
@@ -229,39 +278,31 @@
 - ping_edition
 - estimation_grain
 
-**Filters:**
-- `Forwarded` - Include `ping_delivery_type = 'Self-Managed'`
-- `Forwarded` - Include metrics from pings with `ping_delivery_type = 'Self-Managed'`
-- `Forwarded` - Includes metrics for 28 Day and All-Time timeframes
-- `Forwarded` - Include only the `Last Pings of the Month`
+**Filters Applied to Model:**
+- `Inherited` - Include subscriptions where:
+  - `product_delivery_type = 'Self-Managed'` 
+  - `subscription_status IN ('Active','Cancelled')`
+  - `product_tier_name <> 'Storage'`
+- `Inherited` - Include metrics for 28 Day and All-Time time frames
+- `Inherited` - Include metrics from the 'Last Ping of the Month' pings
+- `Inherited` - Exclude metrics that timed out during ping generation
+- `Inherited` - Exclude the current month
 
 **Business Logic in this Model:**
-- There are multiple estimation Grains in this model
-  - A macro is used to determine which `estimation_grain` to use for this data.  
+- There are multiple estimation Grains in this model, `reported metric - subscription based estimation` and `reported metric - seat based estimation`
 - `estimation_grain` - tells which method is used to measure the `percent_reporting` %:
-  - 'reported metric - seat based estimation' is from licensed_users seat counts
-  - 'reported metric - subscription based estimation' is derived from subscription counts
-- `percent_reporting` - reporting_count / (reporting_count + not_reporting_count) 
-  - 'reporting_count' of Service Ping History (active Users or active Subscriptions)
-  - 'not_reporting_count' not reporting for the Month (active Users or active Subscriptions)
-- `Subscriptions (All) Estimate Percent Calculation`:
-  - (All Subscriptions) / (All Subscriptions Reporting + All Subscriptions Not Reporting) 
-  - (All Users) / (All Users Reporting + All Users Not Reporting) 
-- MRR, ARR and Licensed_User_Count is limited to:
-  - product_delivery_type = `Self-Managed` 
-  - subscription_status IN (`Active`,`Cancelled`)
-  - product_tier_name <> `Storage`
-
-**Other Comments:**
-- Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
-- The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+  - `reported metric - subscription based estimation` looks at how subscriptions reported the metric
+  - `reported metric - seat based estimation` looks at how many seats are associated with subscriptions that reported the metric
+- `percent_reporting` is defined as `reporting_count / (reporting_count + not_reporting_count)`
+- `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
+- For a given month, metric, and grain, `percent_reporting`, `reporting_count`, and `not_reporting_count` is the same across all editions
+- The [Self-Managed Estimation Algorithm handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/estimation-xmau-algorithm.html) contains more details about the estimation methodology
 
 {% enddocs %}
 
 {% docs rpt_ping_metric_totals_w_estimates_monthly %}
 
-**Description:**  Usage totals and estimations for Reported and Non-Reported Instances by Month, Metric, Edition, Estimate Grain, Product Tier and Delivery Type     
+**Description:** Total, recorded, and estimated usage for Self-Managed and SaaS Service Ping metrics. This model is used for xMAU/PI reporting and is the source for Service Ping data in the `[td_xmau]` snippet. You can read more about our estimation methodology on [this handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/estimation-xmau-algorithm.html)
 
 **Data Grain:**
 - ping_created_date_month
@@ -271,37 +312,30 @@
 - ping_edition_product_tier
 - ping_delivery_type
 
-**Filters:**
-- Include metrics for 28 Day timeframes
-- `Forwarded` - Include Metrics from the 'Last Ping of the Month' pings
+**Filters Applied to Model:**
+- `Inherited` - Include metrics for 28 Day and All-Time time frames
+- `Inherited` - Include metrics from the 'Last Ping of the Month' pings
+- `Inherited` - Exclude metrics that timed out during ping generation
+- `Inherited` - Exclude the current month
 
 **Business Logic in this Model:**
-- `ping_delivery_type` = 'SaaS' WHERE UUID/Instance_id = ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f ELSE 'Self-Managed'
-- `is_last_ping_of_month` = last ping (Instance_id and Host_id) sent for the Month
-- There are multiple estimation Grains in this model
-  - A macro is used to determine which `estimation_grain` to use for this report.  
 - `estimation_grain` - tells which method is used to measure the `percent_reporting` %:
-  - 'reported metric - seat based estimation' is from licensed_users seat counts
-  - 'reported metric - subscription based estimation' is derived from subscription counts
-  - 'SaaS' is included for SaaS usage data
-- `percent_reporting` - reporting_count / (reporting_count + not_reporting_count) 
-  - 'reporting_count' of Service Ping History (active Users or active Subscriptions)
-  - 'not_reporting_count' not reporting for the Month (active Users or active Subscriptions)
-- `Subscriptions on Valid Versions Estimate Percent Calculation`:
-  - (Version Subscriptions) / (All Subscriptions Reporting + All Subscriptions Not Reporting) 
-  - (Version Users) / (All Users Reporting + All Users Not Reporting)  
-- `Subscriptions (All) Estimate Percent Calculation`:
-  - (All Subscriptions) / (All Subscriptions Reporting + All Subscriptions Not Reporting) 
-  - (All Users) / (All Users Reporting + All Users Not Reporting) 
-- `Estimation Description`:  (There are different methods for Measuring Usage and Estimated Usage, ie. by Subscriptions Counts or User Counts.  The method used will be shown in the `estimation_grain`.)
-  - Reporting_count -  Count of Subscriptions or Users that are Reporting for a Metric
-  - Not_reporting_count - Count of Subscriptions or Users Not Reporting for a Metric
-  - Percent_Reporting - Percent of Subscriptons or Users Reporting from Total Subscriptions or Users
-  - Total_usage_with_estimate - (Recorded_usage + (Recorded_usage * (1-Percent_reporting))) / Percent_reporting
-  - Estimated_usage - Total_usage_with_estimates - Recorded_usage
-  - Recorded_Usage - Actual usage value for the Metric
+  - `metric/version check - subscription based estimation` looks at how many subscriptions sent a ping from a version of GitLab with the metric instrumented (_this is the "official" methodology used for xMAU/PI reporting_)
+  - `metric/version check - seat based estimation` looks at how many seats are associated with subscriptions that sent a ping from a version of GitLab with the metric instrumented
+  - `reported metric - subscription based estimation` looks at how subscriptions reported the metric
+  - `reported metric - seat based estimation` looks at how many seats are associated with subscriptions that reported the metric
+  - `SaaS` looks at recorded SaaS/gitlab.com usage, there is no additional estimation logic
+- `percent_reporting` is defined as `reporting_count / (reporting_count + not_reporting_count)`
+- `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
+- For a given month, metric, delivery, edition, and grain, `percent_reporting`, `reporting_count`, and `not_reporting_count` is the same across all tiers
+
+**Tips for Use:**
+- The "official" estimation_grain is `metric/version check - subscription based estimation`
+- The estimation_grain for SaaS is `SaaS`. Therefore, to pull in the values used for xMAU/PI reporting, you want to use the filter `estimation_grain IN ('metric/version check - subscription based estimation', 'SaaS')`
 
 **Other Comments:**
+- The [Definitive Guide to xMAU Analysis](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/) contains additional information about xMAU reporting
+- The [Self-Managed Estimation Algorithm handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/estimation-xmau-algorithm.html) contains more details about the estimation methodology
 - Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
 - The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
 - [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
@@ -310,57 +344,50 @@
 
 {% docs rpt_ping_subscriptions_reported_counts_monthly %}
 
-**Description:**  Ping Metrics by Edition and Month with Subscription, ARR and User Totals by Installation and Month  
-- Latest Subscription, Version, ARR, MRR and Ping Count information in included. 
+**Description:** Total Self-Managed subscriptions and seats by month. This model determines the total possible number of subscriptions on a given month and is the same across all records for a given month (there is no difference across metrics or editions). For xMAU/PI reporting, this model is used to determine the total number of active Self-Managed subscriptions and seats on a given month.
+
+_Note: This model is not expected to be used much (if at all) for analysis. The main purpose of the model is to create inputs for the estimation lineage._
 
 **Data Grain:**
 - ping_created_date_month
 - metrics_path
 - ping_edition
 
-**Filters:**
-- `Forwarded` - Include metrics from pings with `ping_delivery_type = 'Self-Managed'`
+**Filters Applied to Model:**
+- `Inherited` - Include subscriptions where:
+  - `product_delivery_type = 'Self-Managed'` 
+  - `subscription_status IN ('Active','Cancelled')`
+  - `product_tier_name <> 'Storage'`
+- `Inherited` - Exclude the current month
 
 **Business Logic in this Model:**
-- `Forwarded` - ARR and Licensed_User_Count is limited to:
-  - product_delivery_type = `Self-Managed` 
-  - subscription_status IN (`Active`,`Cancelled`)
-  - product_tier_name <> `Storage`
-
-**Other Comments:**
-- Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
-- The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+- For a given month, the count of subscriptions and seats is the same across every metric and edition (every record)
 
 {% enddocs %}
 
 {% docs rpt_ping_subscriptions_on_versions_counts_monthly %}
 
-**Description:**  Ping Metrics Totals for Subscriptions on Valid Versions by Edition and Month  
-- Latest Subscription, Version, ARR, MRR and Ping Count information in included. 
+**Description:** Self-Managed subscriptions and seats sending a ping from a version of GitLab with the metric instrumented by month. The counts of subscriptions and seats are specific to the metric and month, but the same across editions. This model is used as an input for the `metric/version check` estimation grains in xMAU/PI reporting.
+
+_Note: This model is not expected to be used much (if at all) for analysis. The main purpose of the model is to create inputs for the estimation lineage._
 
 **Data Grain:**
 - ping_created_date_month
 - metrics_path
 - ping_edition
 
-**Filters:**
-- Include Metrics on Valid versions
-- `Forwarded` - Metrics from GitLab Service Pings will not be considered
-- `Forwarded` - Only 28 Day and All-Time metrics  
-- `Forwarded` - Only Metrics from the 'Last Ping of the Month' pings
-- `Forwarded` - Utilizing 'self_managed' pings only for Metrics listing
+**Filters Applied to Model:**
+- `Inherited` - Subscriptions and seats are limited to:
+  - `product_delivery_type = 'Self-Managed'` 
+  - `subscription_status IN ('Active','Cancelled')`
+  - `product_tier_name <> 'Storage'`
+- `Inherited` - Include 28 Day and All-Time metrics  
+- `Inherited` - Include Metrics from the 'Last Ping of the Month' pings
+- `Inherited` - Exclude the current month
 
 **Business Logic in this Model:**
-- `Forwarded` - ARR and Licensed_User_Count is limited to:
-  - product_delivery_type = `Self-Managed` 
-  - subscription_status IN (`Active`,`Cancelled`)
-  - product_tier_name <> `Storage`
-
-**Other Comments:**
-- Service Ping data is Sums, Counts and Percents of Usage (called metrics) along with the Server Instance Configuration information is collected at a point in time for each Instance and sent to GitLab Corporate.  This is normally done on a weekly basis.  The Instance Owner determines whether this data will be sent or not and how much will be sent.  Implementations can be Customer Hosted (Self-Managed) or GitLab Hosted (referred to as SaaS or Dotcom data).  Multiple Instances can be hosted on Self-Managed Implementations like GitLab Implementations. 
-- The different types of Service Pings are shown here for the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping) and the [GitLab Hosted Implementation Service Pings](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+- "Version of GitLab with the metric instrumented" is dependent on the first and last versions where a metric appears in a Self-Managed ping payload. These values come from [`rpt_ping_metric_first_last_versions`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.rpt_ping_metric_first_last_versions). The version is specific to both the `ping_edition` and `version_is_prerelease`
+- For a given month and metric, the count of subscriptions and seats is the same across editions
 
 {% enddocs %}
 
@@ -405,15 +432,12 @@
 
 {% docs rpt_ping_metric_totals_w_estimates_monthly_snapshot_model %}
 
-Simpler incremental version of the rpt_ping_metric_totals_w_estimates_monthly snapshot model.
+Simpler incremental version of the rpt_ping_metric_totals_w_estimates_monthly snapshot model. See [rpt_ping_metric_totals_w_estimates_monthly](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.rpt_ping_metric_totals_w_estimates_monthly) for more information about the model being snapshotted.
 
 {% enddocs %}
 
 {% docs rpt_event_xmau_metric_monthly_snapshot_model %}
 
-Simpler incremental version of the rpt_event_xmau_metric_monthly snapshot model.
+Simpler incremental version of the rpt_event_xmau_metric_monthly snapshot model. See [rpt_event_xmau_metric_monthly](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.rpt_event_xmau_metric_monthly) for more information about the model being snapshotted.
 
 {% enddocs %}
-
-
-
