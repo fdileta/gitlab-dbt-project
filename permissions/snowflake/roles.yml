@@ -4372,6 +4372,18 @@ roles:
         warehouses:
             - dev_xs
 
+    - smishra:
+        member_of:
+            - adaptive
+            - analyst_finance
+            - customers_db
+            - analyst_marketing
+            - data_team_analyst
+            - restricted_safe
+            - xactly
+        warehouses:
+            - dev_xs
+
     - snalamaru:
         member_of:
             - engineer
@@ -5139,6 +5151,11 @@ users:
         can_login: yes
         member_of:
             - smccormack
+
+    - smishra:
+        can_login: yes
+        member_of:
+            - smishra
 
     - snalamaru:
         can_login: yes
