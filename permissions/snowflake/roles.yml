@@ -2527,7 +2527,6 @@ roles:
             - reporter
             - restricted_safe
             - xactly
-
         warehouses:
             - dev_xs
 
@@ -3004,7 +3003,6 @@ roles:
             - restricted_safe
             - salesforce
             - xactly
-
         warehouses:
             - dev_xs
 
