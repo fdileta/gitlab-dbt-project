@@ -92,6 +92,7 @@ dag = DAG(
     description="This DAG is responsible for doing incremental model refresh",
     default_args=default_args,
     schedule_interval="45 8 * * *",
+    start_date=datetime(2019, 1, 1, 0, 0, 0),
 )
 dag.doc_md = __doc__
 
@@ -117,7 +118,7 @@ def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
 
 dbt_evaluate_run_date_task = ShortCircuitOperator(
     task_id="evaluate_dbt_run_date",
-    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "45 8 * * WED#1"),
+    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "9 * * WED#1"),
     dag=dag,
 )
 
