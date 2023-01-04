@@ -3877,6 +3877,7 @@ roles:
             - xactly
             - sales_analytics
             - data_science_readonly
+            - marketo
         warehouses:
             - dev_xs
         owns:
