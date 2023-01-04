@@ -143,7 +143,7 @@ def make_request(
         raise
 
 
-def get_forecast(fiscal_quarter: str) -> str:
+def get_forecast(fiscal_quarter: str) -> Dict[Any, Any]:
     """
     Make a GET request to /forecast/{forecastId} endpoint
     This endpoint has less options, i.e can't return historical weeks,
@@ -168,7 +168,7 @@ def start_export_report(fiscal_quarter: str) -> str:
     return response.json()["jobId"]
 
 
-def get_job_status(job_id: str) -> str:
+def get_job_status(job_id: str) -> Dict[Any, Any]:
     """Returns the status of the job with the specified ID."""
     job_status_url = f"{BASE_URL}/export/jobs/{job_id}"
     response = make_request("GET", job_status_url, HEADERS)
