@@ -41,7 +41,7 @@ final AS (
       ON fct_ping_instance_metric.metrics_path = dim_ping_metric.metrics_path
     INNER JOIN dim_ping_instance
       ON fct_ping_instance_metric.dim_ping_instance_id = dim_ping_instance.dim_ping_instance_id
-      WHERE 
+    WHERE 
       -- Removing SaaS
       fct_ping_instance_metric.dim_instance_id != 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f'
 
