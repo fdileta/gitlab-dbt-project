@@ -40,7 +40,7 @@ default_args = {
 dag = DAG(
     "mailgun_extract",
     default_args=default_args,
-    schedule_interval="15 * * * *",
+    schedule_interval="0 */12 * * *",
     concurrency=2,
 )
 
@@ -78,7 +78,6 @@ for e in events:
             **pod_env_vars,
             "START_TIME": "{{ execution_date }}",
             "END_TIME": "{{ next_execution_date }}",
-            "LAST_TIME": "{{ prev_execution_date }}",
         },
         affinity=get_affinity(False),
         tolerations=get_toleration(False),

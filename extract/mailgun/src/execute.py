@@ -150,13 +150,12 @@ def load_event_logs(event: str, full_refresh: bool = False):
     else:
         # This extends the time window to handle late processing on the API.
         start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
-            hours=1
+            hours=2
         )
-        end_date = start_date + datetime.timedelta(hours=13)
+        end_date = date_parser.parse(config_dict["END_TIME"]) - datetime.timedelta(
+                hours=1
+        )
 
-    info(f"Start {config_dict['START_TIME']}")
-    info(f"END {config_dict['END_TIME']}")
-    info(f"LAST_TIME {config_dict['LAST_TIME']}")
 
     info(
         f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}"
