@@ -234,7 +234,7 @@ enriched AS (
         THEN 'Director+'
       WHEN 'Leader'
         THEN 'Director+'
-      WHEN 'Chief Executive Offer'
+      WHEN 'Chief Executive Officer'
         THEN 'Director+'
       ELSE IFF(date_details.date_actual BETWEEN '2019-11-01' AND '2020-02-27'
              AND job_info_mapping_historical.job_role IS NOT NULL,
