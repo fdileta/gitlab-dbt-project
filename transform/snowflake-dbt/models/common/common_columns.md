@@ -1091,3 +1091,22 @@ The timestamp when this snapshot row was first inserted. This column can be used
 The timestamp when this row became invalidated. The most recent snapshot record will have `dbt_valid_to` set to null. When a new snapshot record is created, `dbt_valid_to` is updated and will match the new record's `dbt_valid_from` timestamp.
 
 {% enddocs %}
+
+{% docs order_type_name %}
+
+An attribute of an opportunity to designate what type or order it is. This is stamped on the close date of the opportunity. In its latest version, Order Type has logic incorporated to filter out additional CI Minutes and credits as First Order, per the [Salesforce Documentation](https://gitlab.my.salesforce.com/00N4M00000Ib7ly?setupid=OpportunityFields).
+
+{% enddocs %}
+
+{% docs order_type %}
+
+An attribute of an opportunity to designate what type or order it is. This is stamped on the close date of the opportunity. In its latest version, Order Type has logic incorporated to filter out additional CI Minutes and credits as First Order, per the [Salesforce Documentation](https://gitlab.my.salesforce.com/00N4M00000Ib7ly?setupid=OpportunityFields).
+
+{% enddocs %}
+
+{% docs order_type_live %}
+
+The current Order Type of an opportunity, potentially after it has been stamped on its close date. Per the [documentation in Salesforce](https://gitlab.my.salesforce.com/00N4M00000Ib8Ok?setupid=OpportunityFields), This field is used to track movement of values post deal close and is for analysis purposes only.
+
+{% enddocs %}
+

@@ -611,7 +611,7 @@ models:
           - unique
         tags: [ "tdf", "order_type", "common", "sales_funnel" ]
       - name: order_type_name
-        description: Opportunity source name
+        description: '{{ doc("order_type_name") }}'
         tests:
           - not_null
           - unique
@@ -4836,6 +4836,10 @@ models:
         description: Grouping of stage names where all stages with numbers <=2 are in Pipeline and all above are +3 Pipeline.
       - name: stage_name_4plus
         description: Grouping of stage names where all stages with numbers <=3 are in Pipeline and all above are +4 Pipeline.
+      - name: order_type
+        description: '{{ doc("order_type") }}'
+      - name: order_type_live
+        description: '{{ doc("order_type_live") }}'
 
   - name: fct_charge
     description: '{{ doc("fct_charge") }}'
@@ -5101,6 +5105,10 @@ models:
         description: Total net ARR in the pipeline in stage 4 or later.
       - name: segment_order_type_iacv_to_net_arr_ratio
         description: The ratio of incremental annual contract value to net ARR assigned to this opportunity based on its segment and order type. This field is a helper used to map old IACV values to new net ARR values, which were updated for all opportunities closed prior to 2021-02-01.
+      - name: dim_order_type_id
+        description: '{{ doc("order_type") }}'
+      - name: dim_order_type_live_id
+        description: '{{ doc("order_type_live") }}'
 
   - name: fct_crm_opportunity_daily_snapshot
     description: '{{ doc("fct_crm_opportunity_daily_snapshot") }}'
