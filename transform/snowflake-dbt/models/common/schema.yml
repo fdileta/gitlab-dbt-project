@@ -3295,9 +3295,9 @@ models:
       - name: is_saas_dedicated
         description: '{{ doc("is_saas_dedicated") }}'
       - name: is_internal
-        description: '{{ doc("is_internal") }}'
+        description: '{{ doc("is_internal_ping_model") }}'
       - name: is_staging
-        description: '{{ doc("is_staging") }}'
+        description: '{{ doc("is_staging_ping_model") }}'
       - name: is_last_ping_of_month
         description: '{{ doc("is_last_ping_of_month") }}'
       - name: is_last_ping_of_week
@@ -3442,50 +3442,57 @@ models:
           - not_null
         description: The unique composite ID for the service_ping_instance_metric model consisting of dim_ping_instance_id and metrics_path
       - name: dim_ping_instance_id
-        description: The unqiue id of a service ping instance in the dim_ping_instance model.
-      - name: dim_product_tier_id
-        description: The unique id of a Product Tier in the dim_product_tier model.
-      - name: dim_location_country_id
-      - name: dim_ping_date_id
-        description: The unique id of a country from the dim_location_country model
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
-      - name: dim_date_id
-        description: The unqiue id of a date in the dim_date model.
-      - name: dim_license_id
-        description:  The unique id of a license from the dim_license model.
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+        description: '{{ doc("metrics_path") }}'
       - name: metric_value
-        description: The value associated with the metric path
-      - name: dim_installation_id
-        description: The unique identifier of the installation, easily joined to dim_installation. This id is the combination of dim_host_id and dim_instance_id and is considered the unique identifier of the instance for reporting and analysis
-      - name: ping_created_at
-        description: The time when the ping was created
-      - name: ping_created_at_date
-        description: The date when the ping was created
-      - name: data_source
-        description: The source application where the data was extracted from.
+        description: '{{ doc("metric_value") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
-      - name: dim_subscripton_id
-        description: The unique id of a subscription from the dim_subscription model
-      - name: dim_subscripton_license_id
-        description: The unique id of a license subscription
-      - name: time_frame
-        description: The time frame associated with the metric, as defined in the metric definition YAML file
+        description: '{{ doc("has_timed_out") }}'
+      - name: dim_product_tier_id
+        description: '{{ doc("dim_product_tier_id_ping_model") }}'
+      - name: dim_subscription_id
+        description: '{{ doc("dim_subscription_id_ping_model") }}'
+      - name: dim_location_country_id
+        description: '{{ doc("dim_location_country_id_ping_model") }}'
+      - name: dim_ping_date_id
+        description: '{{ doc("dim_ping_date_id") }}'
+      - name: dim_instance_id
+        description: '{{ doc("dim_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_installation_id
+        description: '{{ doc("dim_installation_id") }}'
+      - name: dim_license_id
+        description:  '{{ doc("dim_license_id") }}'
       - name: license_md5
-        description: The md5 hash of the license file.
+        description: '{{ doc("license_md5") }}'
       - name: license_sha256
-        description: The sha256 hash of the license file.
+        description: '{{ doc("license_sha256") }}'
+      - name: ping_created_at
+        description: '{{ doc("ping_created_at") }}'
+      - name: ping_created_date
+        description: '{{ doc("ping_created_date") }}'
+      - name: umau_value
+        description: '{{ doc("umau_value") }}'
+      - name: dim_subscription_license_id
+        description: '{{ doc("dim_subscription_license_id") }}'
       - name: is_license_mapped_to_subscription
-        description: Data quality flag to check if the license table has a value in both license_id and subscription_id
+        description: '{{ doc("is_license_mapped_to_subscription") }}'
       - name: is_license_subscription_id_valid
-        description: Data quality flag to check if the subscription_id in the license table is valid (does it exist in the subscription table?)
+        description: '{{ doc("is_license_subscription_id_valid") }}'
       - name: is_service_ping_license_in_customerDot
-        description: Data quality flag to check if the license from service ping exist in CustomerDot.
+        description: '{{ doc("is_service_ping_license_in_customerDot") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: fct_ping_instance_metric_rolling_6_months
     description: '{{ doc("fct_ping_instance_metric_rolling_6_months") }}'
@@ -3520,6 +3527,8 @@ models:
         description:  '{{ doc("dim_license_id") }}'
       - name: license_md5
         description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
       - name: ping_created_at
         description: '{{ doc("ping_created_at") }}'
       - name: ping_created_date
@@ -3578,6 +3587,8 @@ models:
         description:  '{{ doc("dim_license_id") }}'
       - name: license_md5
         description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
       - name: ping_created_at
         description: '{{ doc("ping_created_at") }}'
       - name: ping_created_date
@@ -4328,6 +4339,8 @@ models:
         description:  '{{ doc("dim_license_id") }}'
       - name: license_md5
         description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
       - name: ping_created_at
         description: '{{ doc("ping_created_at") }}'
       - name: ping_created_date
@@ -4500,6 +4513,8 @@ models:
         description:  '{{ doc("dim_license_id") }}'
       - name: license_md5
         description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
       - name: ping_created_at
         description: '{{ doc("ping_created_at") }}'
       - name: ping_created_date
@@ -4562,6 +4577,8 @@ models:
         description:  '{{ doc("dim_license_id") }}'
       - name: license_md5
         description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
       - name: ping_created_at
         description: '{{ doc("ping_created_at") }}'
       - name: ping_created_date
