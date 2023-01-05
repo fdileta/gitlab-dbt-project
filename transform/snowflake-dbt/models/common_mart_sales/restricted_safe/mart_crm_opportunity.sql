@@ -223,7 +223,7 @@
       fct_crm_opportunity.is_downgrade,
       dim_crm_opportunity.critical_deal_flag,
 
-      -- crm opp owner/account owner fields stamped at SAO date
+      -- crm opp owner/account owner fields stamped at SAO date (only used for reporting on opps with close date < 2022-02-01)
       dim_crm_opportunity.sao_crm_opp_owner_stamped_name,
       dim_crm_opportunity.sao_crm_account_owner_stamped_name,
       dim_crm_opportunity.sao_crm_opp_owner_sales_segment_stamped,

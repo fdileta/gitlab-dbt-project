@@ -66,9 +66,9 @@
 **Tips for Use:**
 - The model currently exposes a plan_id, but not a plan_name. It is recommended to JOIN to [`prep_gitlab_dotcom_plan`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.prep_gitlab_dotcom_plan) to map the IDs to names. (Issue to add the plan_name to this model [here](https://gitlab.com/gitlab-data/analytics/-/issues/15172))
 
-<details> <summary> Example query to map plan_id to plan_name </summary>
+Example query to map plan_id to plan_name
 
-``` sql
+```
 SELECT
   event_calendar_month,
   plan_id_at_event_month,
@@ -81,8 +81,6 @@ JOIN common_prep.prep_gitlab_dotcom_plan
 ORDER BY 1,2,3,4
 ;
 ```
-
-</details>
 
 **Other Comments:**
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
@@ -111,8 +109,34 @@ ORDER BY 1,2,3,4
 - `major_minor_version_id` = major_version * 100 + minor_version
 - `version_is_prerelease` = version LIKE '%-pre'
 
+**Tips for Use:**
+- In the _vast_ majority of use cases, pre-release versions (`version_is_prerelease = TRUE`) can add more confusion than benefit. It is highly recommended to exclude those records during analysis.
+- This model can easily be joined to [`dim_ping_metric`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_ping_metric) in order to get additional attributes about the metric (`time_frame`, `group_name`, `is_smau`, etc)
+- This model can easily be joined to [`dim_gitlab_releases`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_gitlab_releases) to get the release date for a version
+
+Example query
+
+```
+SELECT
+  stage_name,
+  rpt_ping_metric_first_last_versions.metrics_path,
+  ping_edition,
+  first_major_minor_version_with_counter,
+  release_date AS first_major_minor_version_release_date
+FROM common_mart_product.rpt_ping_metric_first_last_versions
+JOIN common.dim_ping_metric
+  ON rpt_ping_metric_first_last_versions.metrics_path = dim_ping_metric.metrics_path
+JOIN common.dim_gitlab_releases
+  ON rpt_ping_metric_first_last_versions.first_major_minor_version_with_counter = dim_gitlab_releases.major_minor_version
+WHERE version_is_prerelease = FALSE
+  AND is_smau = TRUE
+ORDER BY 1,2,3
+;
+```
+
 **Other Comments:**
-- The `milestone` field of the [metrics dictionary](https://metrics.gitlab.com/) can also be used to identify the version when a metric was instrumented, but there a couple of limitations. First, many metrics are just labeled `< 13.9`, so there is a lack of more detail for older metrics. Second, metrics can be introduced on different versions for CE and EE, so `milestone` could be incorrect for one edition/distribution.
+- Metrics can be introduced on different versions for CE and EE.
+- The `milestone` field of the [metrics dictionary](https://metrics.gitlab.com/) can also be used to identify the version when a metric was instrumented, but there are a couple of limitations. First, many metrics are just labeled `< 13.9`, so there is a lack of more detail for older metrics. Second, since metrics can be introduced on different versions for CE and EE, `milestone` could be incorrect for one edition/distribution.
 - First/last version is dependent on the metric appearing in a Service Ping payload. There are cases where this value is incorrect due to installations somehow sending the metrics from previous versions, but there is no other complete SSOT for when a metric was introduced.
 
 {% enddocs %}
@@ -132,9 +156,9 @@ _Important caveat:_ The grain of this model is slightly different depending on w
 - If a subscription sent a ping that month, there is 1 record per subscription per installation reporting. (Note: a subscription can be associated with > 1 installation, so a single subscription could have multiple records for a given month)
 - If a subscription did not send a ping that month, there is 1 record per subscription where `dim_installation_id IS NULL`
 
-<details><summary>Example query</summary>
+Example query
 
-``` sql
+```
 WITH subscription_level AS (
 
   SELECT
@@ -158,8 +182,6 @@ GROUP BY 1
 ORDER BY 1
 ;
 ```
-
-</details>
 
 **Filters Applied to Model:**
 - Include subscriptions where:
@@ -202,10 +224,10 @@ _Note: This model is not expected to be used much (if at all) for analysis. The 
 - `estimation_grain` - tells which method is used to measure the `percent_reporting` %:
   - `metric/version check - subscription based estimation` looks at how many subscriptions sent a ping from a version of GitLab with the metric instrumented (_this is the "official" methodology used for xMAU/PI reporting_)
   - `metric/version check - seat based estimation` looks at how many seats are associated with subscriptions that sent a ping from a version of GitLab with the metric instrumented
-- `percent_reporting = reporting_count / (reporting_count + not_reporting_count)`
-  - `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
+- `percent_reporting` is defined as `reporting_count / (reporting_count + not_reporting_count)`
+- `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
 - Subscription and seat totals are specific to the month, metric, edition, _and_ grain
-- `percent_reporting`, `reporting_count`, and `not_reporting_count` is specific to the month, metric, edition, _and_ grain
+- `percent_reporting`, `reporting_count`, and `not_reporting_count` are specific to the month, metric, edition, _and_ grain
 - The [Self-Managed Estimation Algorithm handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/estimation-xmau-algorithm.html) contains more details about the estimation methodology
 
 {% enddocs %}
@@ -238,8 +260,8 @@ _Note: This model is not expected to be used much (if at all) for analysis. The 
   - `metric/version check - seat based estimation` looks at how many seats are associated with subscriptions that sent a ping from a version of GitLab with the metric instrumented
   - `reported metric - subscription based estimation` looks at how subscriptions reported the metric
   - `reported metric - seat based estimation` looks at how many seats are associated with subscriptions that reported the metric
-- `percent_reporting = reporting_count / (reporting_count + not_reporting_count)`
-  - `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
+- `percent_reporting` is defined as `reporting_count / (reporting_count + not_reporting_count)`
+- `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
 - The [Self-Managed Estimation Algorithm handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/estimation-xmau-algorithm.html) contains more details about the estimation methodology
 
 {% enddocs %}
@@ -271,8 +293,8 @@ _Note: This model is not expected to be used much (if at all) for analysis. The 
 - `estimation_grain` - tells which method is used to measure the `percent_reporting` %:
   - `reported metric - subscription based estimation` looks at how subscriptions reported the metric
   - `reported metric - seat based estimation` looks at how many seats are associated with subscriptions that reported the metric
-- `percent_reporting = reporting_count / (reporting_count + not_reporting_count)`
-  - `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
+- `percent_reporting` is defined as `reporting_count / (reporting_count + not_reporting_count)`
+- `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
 - For a given month, metric, and grain, `percent_reporting`, `reporting_count`, and `not_reporting_count` is the same across all editions
 - The [Self-Managed Estimation Algorithm handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/estimation-xmau-algorithm.html) contains more details about the estimation methodology
 
@@ -303,8 +325,8 @@ _Note: This model is not expected to be used much (if at all) for analysis. The 
   - `reported metric - subscription based estimation` looks at how subscriptions reported the metric
   - `reported metric - seat based estimation` looks at how many seats are associated with subscriptions that reported the metric
   - `SaaS` looks at recorded SaaS/gitlab.com usage, there is no additional estimation logic
-- `percent_reporting = reporting_count / (reporting_count + not_reporting_count)`
-  - `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
+- `percent_reporting` is defined as `reporting_count / (reporting_count + not_reporting_count)`
+- `reporting_count` and `not_reporting_count` are defined by the `estimation_grain` (either count of subscriptions or count of seats)
 - For a given month, metric, delivery, edition, and grain, `percent_reporting`, `reporting_count`, and `not_reporting_count` is the same across all tiers
 
 **Tips for Use:**

@@ -113,9 +113,12 @@ def dbt_evaluate_run_date(timestamp: datetime, exclude_schedule: str) -> bool:
     return True
 
 
+# NB - Only the date is needed from this schedule, this is configured to exclude the first Sunday of the month
+exclusion_schedule = "* * * * SUN#1"
+
 dbt_evaluate_run_date_task = ShortCircuitOperator(
     task_id="evaluate_dbt_run_date",
-    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), "45 8 * * SUN#1"),
+    python_callable=lambda: dbt_evaluate_run_date(datetime.now(), exclusion_schedule),
     dag=dag,
 )
 
