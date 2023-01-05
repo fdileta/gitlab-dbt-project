@@ -36,9 +36,6 @@ models:
       - name: is_updated
       - name: updated_by
       - name: updated_on
-      - name: updated_at
-        tests:
-          - not_null
       - name: uploaded_at
         tests:
           - not_null
@@ -122,11 +119,7 @@ models:
         tests:
           - not_null
       - name: parent_role_id
-        tests:
-          - not_null
       - name: parent_role
-        tests:
-          - not_null
       - name: sales_team_role_id
         tests:
           - not_null

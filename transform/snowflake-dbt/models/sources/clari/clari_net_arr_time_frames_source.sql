@@ -1,11 +1,4 @@
--- non-incremental, so that 'week_number' can be built correctly
-/*
-{{ config({
-    "materialized": "incremental",
-    "unique_key": "time_frame_id"
-    })
-}}
-*/
+-- non-incremental, so that 'week_number' field can be calculated correctly
 
 WITH
   source AS (
