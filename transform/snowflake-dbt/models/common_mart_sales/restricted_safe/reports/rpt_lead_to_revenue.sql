@@ -1,22 +1,20 @@
-{{ simple_cte([
-    ('opportunity_base','mart_crm_opportunity'),
-    ('person_base','mart_crm_person'),
-    ('dim_crm_person','dim_crm_person'),
-    ('mart_crm_opportunity_stamped_hierarchy_hist','mart_crm_opportunity_stamped_hierarchy_hist'),
-    ('rpt_sfdc_bizible_tp_opp_linear_blended','rpt_sfdc_bizible_tp_opp_linear_blended'),
+ {{ simple_cte([
+    ('mart_crm_opportunity','mart_crm_opportunity'),
+    ('mart_crm_person','mart_crm_person'),
     ('dim_crm_account','dim_crm_account'),
+    ('rpt_crm_touchpoint_combined', 'rpt_crm_touchpoint_combined'), 
+    ('dim_date', 'dim_date'),
     ('map_alternative_lead_demographics','map_alternative_lead_demographics'),
-    ('dim_crm_user','dim_crm_user')
+    ('dim_crm_user', 'dim_crm_user')
 ]) }}
 
-, upa_base AS ( --pulls every account and it's UPA
-  
+, upa_base AS ( 
     SELECT 
       dim_parent_crm_account_id,
       dim_crm_account_id
     FROM dim_crm_account
 
-), first_order_opps AS ( -- pulls only FO CW Opps and their UPA/Account ID
+), first_order_opps AS ( 
 
     SELECT
       dim_parent_crm_account_id,
@@ -25,11 +23,11 @@
       close_date,
       is_sao,
       sales_accepted_date
-    FROM opportunity_base
+    FROM mart_crm_opportunity
     WHERE is_won = true
       AND order_type = '1. New - First Order'
 
-), accounts_with_first_order_opps AS ( -- shows only UPA/Account with a FO Available Opp on it
+), accounts_with_first_order_opps AS ( 
 
     SELECT
       upa_base.dim_parent_crm_account_id,
@@ -38,38 +36,41 @@
       FALSE AS is_first_order_available
     FROM upa_base 
     LEFT JOIN first_order_opps
-      ON upa_base.dim_crm_account_id=first_order_opps.dim_crm_account_id
+      ON upa_base.dim_crm_account_id = first_order_opps.dim_crm_account_id
     WHERE dim_crm_opportunity_id IS NOT NULL
 
 ), person_order_type_base AS (
 
     SELECT DISTINCT
-      person_base.email_hash, 
-      person_base.dim_crm_account_id,
-      person_base.mql_date_lastest_pt,
+      mart_crm_person.email_hash, 
+      mart_crm_person.sfdc_record_id,
+      mart_crm_person.dim_crm_account_id,
+      mart_crm_person.mql_date_lastest_pt,
       upa_base.dim_parent_crm_account_id,
-      opportunity_base.dim_crm_opportunity_id,
-      opportunity_base.close_date,
-      opportunity_base.order_type,
+      mart_crm_opportunity.dim_crm_opportunity_id,
+      mart_crm_opportunity.close_date,
+      mart_crm_opportunity.order_type,
       CASE 
-         WHEN is_first_order_available = False AND opportunity_base.order_type = '1. New - First Order' THEN '3. Growth'
-         WHEN is_first_order_available = False AND opportunity_base.order_type != '1. New - First Order' THEN opportunity_base.order_type
-      ELSE '1. New - First Order'
+        WHEN is_first_order_available = False AND mart_crm_opportunity.order_type = '1. New - First Order' 
+          THEN '3. Growth'
+        WHEN is_first_order_available = False AND mart_crm_opportunity.order_type != '1. New - First Order' 
+          THEN mart_crm_opportunity.order_type
+        ELSE '1. New - First Order'
       END AS person_order_type,
       ROW_NUMBER() OVER( PARTITION BY email_hash ORDER BY person_order_type) AS person_order_type_number
-    FROM person_base
+    FROM mart_crm_person
     FULL JOIN upa_base
-      ON person_base.dim_crm_account_id=upa_base.dim_crm_account_id
+      ON mart_crm_person.dim_crm_account_id = upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps
       ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
-    FULL JOIN opportunity_base
-      ON upa_base.dim_parent_crm_account_id=opportunity_base.dim_parent_crm_account_id
+    FULL JOIN mart_crm_opportunity
+      ON upa_base.dim_parent_crm_account_id = mart_crm_opportunity.dim_parent_crm_account_id
 
 ), person_order_type_final AS (
 
     SELECT DISTINCT
       person_order_type_base.email_hash,
-      dim_crm_person.sfdc_record_id,
+      person_order_type_base.sfdc_record_id,
       person_order_type_base.mql_date_lastest_pt,
       person_order_type_base.dim_crm_opportunity_id,
       person_order_type_base.close_date,
@@ -78,57 +79,53 @@
       person_order_type_base.dim_crm_account_id,
       person_order_type_base.person_order_type
     FROM person_order_type_base
-    INNER JOIN dim_crm_person ON
-    person_order_type_base.email_hash=dim_crm_person.email_hash
-    WHERE person_order_type_number=1
+    WHERE person_order_type_number = 1
 
 ), mql_order_type_base AS (
 
     SELECT DISTINCT
-      dim_crm_person.sfdc_record_id,
-      person_base.email_hash, 
+      mart_crm_person.sfdc_record_id,
+      mart_crm_person.email_hash, 
       CASE 
-         WHEN mql_date_lastest_pt < opportunity_base.close_date THEN opportunity_base.order_type
-         WHEN mql_date_lastest_pt > opportunity_base.close_date THEN '3. Growth'
-      ELSE null
+        WHEN mql_date_lastest_pt < mart_crm_opportunity.close_date 
+          THEN mart_crm_opportunity.order_type
+        WHEN mql_date_lastest_pt > mart_crm_opportunity.close_date 
+          THEN '3. Growth'
+        ELSE NULL
       END AS mql_order_type_historical,
-      ROW_NUMBER() OVER( PARTITION BY person_base.email_hash ORDER BY mql_order_type_historical) AS mql_order_type_number
-    FROM person_base
-    INNER JOIN dim_crm_person ON
-    person_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
-    FULL JOIN upa_base ON 
-    person_base.dim_crm_account_id=upa_base.dim_crm_account_id
-    LEFT JOIN accounts_with_first_order_opps ON
-    upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
-    FULL JOIN opportunity_base ON
-    upa_base.dim_parent_crm_account_id=opportunity_base.dim_parent_crm_account_id
+      ROW_NUMBER() OVER( PARTITION BY mart_crm_person.email_hash ORDER BY mql_order_type_historical) AS mql_order_type_number
+    FROM mart_crm_person
+    FULL JOIN upa_base 
+      ON mart_crm_person.dim_crm_account_id = upa_base.dim_crm_account_id
+    LEFT JOIN accounts_with_first_order_opps 
+      ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
+    FULL JOIN mart_crm_opportunity 
+      ON upa_base.dim_parent_crm_account_id = mart_crm_opportunity.dim_parent_crm_account_id
     
 ), mql_order_type_final AS (
   
   SELECT *
   FROM mql_order_type_base
-  WHERE mql_order_type_number=1
+  WHERE mql_order_type_number = 1
     
 ), inquiry_order_type_base AS (
 
     SELECT DISTINCT
-      dim_crm_person.sfdc_record_id,
-      person_base.email_hash, 
+      mart_crm_person.sfdc_record_id,
+      mart_crm_person.email_hash, 
       CASE 
-         WHEN true_inquiry_date < opportunity_base.close_date THEN opportunity_base.order_type
-         WHEN true_inquiry_date > opportunity_base.close_date THEN '3. Growth'
-      ELSE null
+         WHEN true_inquiry_date < mart_crm_opportunity.close_date THEN mart_crm_opportunity.order_type
+         WHEN true_inquiry_date > mart_crm_opportunity.close_date THEN '3. Growth'
+      ELSE NULL
       END AS inquiry_order_type_historical,
-      ROW_NUMBER() OVER( PARTITION BY person_base.email_hash ORDER BY inquiry_order_type_historical) AS inquiry_order_type_number
-    FROM person_base
-    INNER JOIN dim_crm_person ON
-    person_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
-    FULL JOIN upa_base ON 
-    person_base.dim_crm_account_id=upa_base.dim_crm_account_id
-    LEFT JOIN accounts_with_first_order_opps ON
-    upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
-    FULL JOIN opportunity_base ON
-    upa_base.dim_parent_crm_account_id=opportunity_base.dim_parent_crm_account_id
+      ROW_NUMBER() OVER( PARTITION BY mart_crm_person.email_hash ORDER BY inquiry_order_type_historical) AS inquiry_order_type_number
+    FROM mart_crm_person
+    FULL JOIN upa_base 
+      ON mart_crm_person.dim_crm_account_id = upa_base.dim_crm_account_id
+    LEFT JOIN accounts_with_first_order_opps 
+      ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
+    FULL JOIN mart_crm_opportunity 
+      ON upa_base.dim_parent_crm_account_id = mart_crm_opportunity.dim_parent_crm_account_id
 
 ), inquiry_order_type_final AS (
   
@@ -151,250 +148,252 @@
     inquiry_order_type_final.inquiry_order_type_historical,
     mql_order_type_final.mql_order_type_historical
   FROM person_order_type_final
-  LEFT JOIN inquiry_order_type_final ON
-  person_order_type_final.email_hash=inquiry_order_type_final.email_hash
-  LEFT JOIN mql_order_type_final ON
-  person_order_type_final.email_hash=mql_order_type_final.email_hash
+  LEFT JOIN inquiry_order_type_final 
+    ON person_order_type_final.email_hash=inquiry_order_type_final.email_hash
+  LEFT JOIN mql_order_type_final 
+    ON person_order_type_final.email_hash=mql_order_type_final.email_hash
 
   ), cohort_base AS (
 
     SELECT DISTINCT
-      person_base.email_hash,
-      person_base.email_domain_type,
-      person_base.true_inquiry_date,
-      person_base.mql_date_lastest_pt,
-      person_base.status,
-      person_base.lead_source,
-      person_base.dim_crm_person_id,
-      person_base.dim_crm_account_id,
-      person_base.dim_crm_user_id,
-      person_base.mql_date_first_pt,
-      person_base.created_date_pt,
-      person_base.created_date,
-      person_base.mql_date_first,
-      person_base.lead_created_date,
-      person_base.lead_created_date_pt,
-      person_base.contact_created_date,
-      person_base.contact_created_date_pt,
-      person_base.inquiry_date,
-      person_base.inquiry_date_pt,
-      person_base.inquiry_inferred_date,
-      person_base.inquiry_inferred_date_pt,
-      person_base.accepted_date,
-      person_base.accepted_date_pt,
-      person_base.qualifying_date,
-      person_base.qualifying_date_pt,
-      person_base.converted_date,
-      person_base.converted_date_pt,
-      person_base.worked_date,
-      person_base.worked_date_pt,
-      person_base.email_domain,
-      person_base.is_valuable_signup,
-      person_base.was_converted_lead,
-      person_base.source_buckets,
-      person_base.crm_partner_id,
-      person_base.partner_prospect_id,
-      person_base.sales_segment_name AS person_sales_segment_name,
-      person_base.sales_segment_grouped AS person_sales_segment_grouped,
-      person_base.person_score,
-      person_base.behavior_score,
-      person_base.marketo_last_interesting_moment,
-      person_base.marketo_last_interesting_moment_date,
-      person_base.account_demographics_segment_region_grouped,
-      person_base.account_demographics_upa_country,
-      person_base.account_demographics_upa_state,
-      person_base.account_demographics_upa_postal_code,
-      person_base.zoominfo_company_employee_count,
-      person_base.is_lead_source_trial,
-      person_base.is_inquiry,
-      person_base.is_mql,
-      dim_crm_person.sfdc_record_id,
-      person_base.account_demographics_sales_segment,
-      person_base.account_demographics_sales_segment_grouped,
-      person_base.account_demographics_region,
-      person_base.account_demographics_geo,
-      person_base.account_demographics_area,
-      person_base.account_demographics_territory,
-      dim_crm_person.employee_bucket,
-      dim_crm_person.leandata_matched_account_sales_segment,
+      mart_crm_person.email_hash,
+      mart_crm_person.email_domain_type,
+      mart_crm_person.is_valuable_signup,
+      mart_crm_person.true_inquiry_date,
+      mart_crm_person.mql_date_lastest_pt,
+      mart_crm_person.status,
+      mart_crm_person.lead_source,
+      mart_crm_person.dim_crm_person_id,
+      mart_crm_person.dim_crm_account_id,
+      mart_crm_person.dim_crm_user_id,
+      mart_crm_person.mql_date_first_pt,
+      mart_crm_person.created_date_pt,
+      mart_crm_person.created_date,
+      mart_crm_person.mql_date_first,
+      mart_crm_person.lead_created_date,
+      mart_crm_person.lead_created_date_pt,
+      mart_crm_person.contact_created_date,
+      mart_crm_person.contact_created_date_pt,
+      mart_crm_person.inquiry_date,
+      mart_crm_person.inquiry_date_pt,
+      mart_crm_person.inquiry_inferred_date,
+      mart_crm_person.inquiry_inferred_date_pt,
+      mart_crm_person.accepted_date,
+      mart_crm_person.accepted_date_pt,
+      mart_crm_person.qualifying_date,
+      mart_crm_person.qualifying_date_pt,
+      mart_crm_person.converted_date,
+      mart_crm_person.converted_date_pt,
+      mart_crm_person.worked_date,
+      mart_crm_person.worked_date_pt,
+      mart_crm_person.email_domain,
+      mart_crm_person.was_converted_lead,
+      mart_crm_person.source_buckets,
+      mart_crm_person.crm_partner_id,
+      mart_crm_person.partner_prospect_id,
+      mart_crm_person.sales_segment_name AS person_sales_segment_name,
+      mart_crm_person.sales_segment_grouped AS person_sales_segment_grouped,
+      mart_crm_person.person_score,
+      mart_crm_person.behavior_score,
+      mart_crm_person.marketo_last_interesting_moment,
+      mart_crm_person.marketo_last_interesting_moment_date,
+      mart_crm_person.account_demographics_segment_region_grouped,
+      mart_crm_person.account_demographics_upa_country,
+      mart_crm_person.account_demographics_upa_state,
+      mart_crm_person.account_demographics_upa_postal_code,
+      mart_crm_person.zoominfo_company_employee_count,
+      mart_crm_person.is_lead_source_trial,
+      mart_crm_person.is_inquiry,
+      mart_crm_person.is_mql,
+      mart_crm_person.sfdc_record_id,
+      mart_crm_person.account_demographics_sales_segment,
+      mart_crm_person.account_demographics_sales_segment_grouped,
+      mart_crm_person.account_demographics_region,
+      mart_crm_person.account_demographics_geo,
+      mart_crm_person.account_demographics_area,
+      mart_crm_person.account_demographics_territory,
+      mart_crm_person.employee_bucket,
+      mart_crm_person.leandata_matched_account_sales_segment,
       map_alternative_lead_demographics.employee_count_segment_custom,
-	    map_alternative_lead_demographics.employee_bucket_segment_custom,
-	    map_alternative_lead_demographics.geo_custom,
-      is_first_order_available,
+      map_alternative_lead_demographics.employee_bucket_segment_custom,
+      COALESCE(map_alternative_lead_demographics.employee_count_segment_custom, map_alternative_lead_demographics.employee_bucket_segment_custom) AS inferred_employee_segment,
+      map_alternative_lead_demographics.geo_custom,
+      UPPER(map_alternative_lead_demographics.geo_custom) AS inferred_geo,
+      accounts_with_first_order_opps.is_first_order_available,
       order_type_final.person_order_type,
       order_type_final.inquiry_order_type_historical,
       order_type_final.mql_order_type_historical,
-      opp.order_type AS opp_order_type,
-      opp.sales_qualified_source_name,
-      opp.deal_path_name,
-      opp.sales_type,
-      opp.dim_crm_opportunity_id,
-      opp.dim_parent_crm_account_id AS opp_dim_parent_crm_account_id,
-      opp.sales_accepted_date,
-      opp.created_date AS opp_created_date,
-      opp.close_date,
-      opp.is_won,
-      opp.is_sao,
-      opp.new_logo_count,
-      opp.net_arr,
-      opp.amount,
-	    opp.record_type_name,
-      opp.invoice_number,
-      opp.is_net_arr_closed_deal,
-      opp.crm_opp_owner_sales_segment_stamped,
-      opp.crm_opp_owner_region_stamped,
-      opp.crm_opp_owner_area_stamped,
-      opp.crm_opp_owner_geo_stamped,
-      opp.parent_crm_account_demographics_upa_country,
-      opp.parent_crm_account_demographics_territory,
-      opp.dim_crm_user_id AS opp_dim_crm_user_id,
-      opp.duplicate_opportunity_id,
-      opp.merged_crm_opportunity_id,
-      opp.record_type_id,
-      opp.ssp_id,
-      opp.dim_crm_account_id AS opp_dim_crm_account_id,
-      opp.crm_account_name,
-      opp.parent_crm_account_name,
-      opp.opportunity_name,
-      opp.stage_name,
-      opp.reason_for_loss,
-      opp.reason_for_loss_details,
-      opp.risk_type,
-      opp.risk_reasons,
-      opp.downgrade_reason,
-      opp.closed_buckets,
-      opp.opportunity_category,
-      opp.source_buckets AS opp_source_buckets,
-      opp.opportunity_sales_development_representative,
-      opp.opportunity_business_development_representative,
-      opp.opportunity_development_representative,
-      opp.sdr_or_bdr,
-      opp.sdr_pipeline_contribution,
-      opp.sales_path,
-      opp.opportunity_deal_size,
-      opp.primary_campaign_source_id AS opp_primary_campaign_source_id,
-      opp.net_new_source_categories AS opp_net_new_source_categories,
-      opp.deal_path_engagement,
-      opp.forecast_category_name,
-      opp.opportunity_owner,
-      opp.churn_contraction_type,
-      opp.churn_contraction_net_arr_bucket,
-      opp.owner_id AS opp_owner_id,
-      opp.order_type_grouped AS opp_order_type_grouped,
-      opp.sales_qualified_source_grouped,
-      opp.crm_account_gtm_strategy,
-      opp.crm_account_focus_account,
-      opp.crm_account_zi_technologies,
-      opp.is_jihu_account,
-      opp.fy22_new_logo_target_list,
-      opp.is_closed,
-      opp.is_edu_oss,
-      opp.is_ps_opp,
-      opp.is_win_rate_calc,
-      opp.is_net_arr_pipeline_created,
-      opp.is_new_logo_first_order,
-      opp.is_closed_won,
-      opp.is_web_portal_purchase,
-      opp.is_lost,
-      opp.is_open,
-      opp.is_renewal,
-      opp.is_duplicate,
-      opp.is_refund,
-      opp.is_deleted,
-      opp.is_excluded_from_pipeline_created,
-      opp.is_contract_reset,
-      opp.is_booked_net_arr,
-      opp.is_downgrade,
-      opp.critical_deal_flag,
-      opp.crm_user_sales_segment AS opp_crm_user_sales_segment,
-      opp.crm_user_sales_segment_grouped AS opp_crm_user_sales_segment_grouped,
-      opp.crm_user_geo AS opp_crm_user_geo,
-      opp.crm_user_region AS opp_crm_user_region,
-      opp.crm_user_area AS opp_crm_user_area,
-      opp.crm_user_sales_segment_region_grouped AS opp_crm_user_sales_segment_region_grouped,
-      opp.crm_account_user_sales_segment,
-      opp.crm_account_user_sales_segment_grouped,
-      opp.crm_account_user_geo,
-      opp.crm_account_user_region,
-      opp.crm_account_user_area,
-      opp.crm_account_user_sales_segment_region_grouped,
-      opp.sao_crm_opp_owner_sales_segment_stamped,
-      opp.sao_crm_opp_owner_sales_segment_stamped_grouped,
-      opp.sao_crm_opp_owner_geo_stamped,
-      opp.sao_crm_opp_owner_region_stamped,
-      opp.sao_crm_opp_owner_area_stamped,
-      opp.sao_crm_opp_owner_segment_region_stamped_grouped,
-      opp.crm_opp_owner_sales_segment_stamped_grouped,
-      opp.crm_opp_owner_sales_segment_region_stamped_grouped,
-      opp.opportunity_owner_user_segment,
-      opp.opportunity_owner_user_geo,
-      opp.opportunity_owner_user_region,
-      opp.opportunity_owner_user_area,
-      opp.report_opportunity_user_segment,
-      opp.report_opportunity_user_geo,
-      opp.report_opportunity_user_region,
-      opp.report_opportunity_user_area,
-      opp.report_user_segment_geo_region_area,
-      opp.lead_source AS opp_lead_source,
-      opp.is_public_sector_opp,
-      opp.is_registration_from_portal,
-      opp.stage_0_pending_acceptance_date,
-      opp.stage_1_discovery_date,
-      opp.stage_2_scoping_date,
-      opp.stage_3_technical_evaluation_date,
-      opp.stage_4_proposal_date,
-      opp.stage_5_negotiating_date,
-      opp.stage_6_awaiting_signature_date_date,
-      opp.stage_6_closed_won_date,
-      opp.stage_6_closed_lost_date,
-      opp.subscription_start_date,
-      opp.subscription_end_date,
-      opp.pipeline_created_date,
-      opp.churned_contraction_deal_count,
-      opp.churned_contraction_net_arr,
-      opp.calculated_deal_count,
-      opp.days_in_stage,
+      mart_crm_opportunity.order_type AS opp_order_type,
+      mart_crm_opportunity.sales_qualified_source_name,
+      mart_crm_opportunity.deal_path_name,
+      mart_crm_opportunity.sales_type,
+      mart_crm_opportunity.dim_crm_opportunity_id,
+      mart_crm_opportunity.dim_parent_crm_account_id AS opp_dim_parent_crm_account_id,
+      mart_crm_opportunity.sales_accepted_date,
+      mart_crm_opportunity.created_date AS opp_created_date,
+      mart_crm_opportunity.close_date,
+      mart_crm_opportunity.is_won,
+      mart_crm_opportunity.is_sao,
+      mart_crm_opportunity.new_logo_count,
+      mart_crm_opportunity.net_arr,
+      mart_crm_opportunity.amount,
+      mart_crm_opportunity.record_type_name,
+      mart_crm_opportunity.invoice_number,
+      mart_crm_opportunity.is_net_arr_closed_deal,
+      mart_crm_opportunity.crm_opp_owner_sales_segment_stamped,
+      mart_crm_opportunity.crm_opp_owner_region_stamped,
+      mart_crm_opportunity.crm_opp_owner_area_stamped,
+      mart_crm_opportunity.crm_opp_owner_geo_stamped,
+      mart_crm_opportunity.parent_crm_account_demographics_upa_country,
+      mart_crm_opportunity.parent_crm_account_demographics_territory,
+      mart_crm_opportunity.dim_crm_user_id AS opp_dim_crm_user_id,
+      mart_crm_opportunity.duplicate_opportunity_id,
+      mart_crm_opportunity.merged_crm_opportunity_id,
+      mart_crm_opportunity.record_type_id,
+      mart_crm_opportunity.ssp_id,
+      mart_crm_opportunity.dim_crm_account_id AS opp_dim_crm_account_id,
+      mart_crm_opportunity.crm_account_name,
+      mart_crm_opportunity.parent_crm_account_name,
+      mart_crm_opportunity.opportunity_name,
+      mart_crm_opportunity.stage_name,
+      mart_crm_opportunity.reason_for_loss,
+      mart_crm_opportunity.reason_for_loss_details,
+      mart_crm_opportunity.risk_type,
+      mart_crm_opportunity.risk_reasons,
+      mart_crm_opportunity.downgrade_reason,
+      mart_crm_opportunity.closed_buckets,
+      mart_crm_opportunity.opportunity_category,
+      mart_crm_opportunity.source_buckets AS opp_source_buckets,
+      mart_crm_opportunity.opportunity_sales_development_representative,
+      mart_crm_opportunity.opportunity_business_development_representative,
+      mart_crm_opportunity.opportunity_development_representative,
+      mart_crm_opportunity.sdr_or_bdr,
+      mart_crm_opportunity.sdr_pipeline_contribution,
+      mart_crm_opportunity.sales_path,
+      mart_crm_opportunity.opportunity_deal_size,
+      mart_crm_opportunity.primary_campaign_source_id AS opp_primary_campaign_source_id,
+      mart_crm_opportunity.net_new_source_categories AS opp_net_new_source_categories,
+      mart_crm_opportunity.deal_path_engagement,
+      mart_crm_opportunity.forecast_category_name,
+      mart_crm_opportunity.opportunity_owner,
+      mart_crm_opportunity.churn_contraction_type,
+      mart_crm_opportunity.churn_contraction_net_arr_bucket,
+      mart_crm_opportunity.owner_id AS opp_owner_id,
+      mart_crm_opportunity.order_type_grouped AS opp_order_type_grouped,
+      mart_crm_opportunity.sales_qualified_source_grouped,
+      mart_crm_opportunity.crm_account_gtm_strategy,
+      mart_crm_opportunity.crm_account_focus_account,
+      mart_crm_opportunity.crm_account_zi_technologies,
+      mart_crm_opportunity.is_jihu_account,
+      mart_crm_opportunity.fy22_new_logo_target_list,
+      mart_crm_opportunity.is_closed,
+      mart_crm_opportunity.is_edu_oss,
+      mart_crm_opportunity.is_ps_opp,
+      mart_crm_opportunity.is_win_rate_calc,
+      mart_crm_opportunity.is_net_arr_pipeline_created,
+      mart_crm_opportunity.is_new_logo_first_order,
+      mart_crm_opportunity.is_closed_won,
+      mart_crm_opportunity.is_web_portal_purchase,
+      mart_crm_opportunity.is_lost,
+      mart_crm_opportunity.is_open,
+      mart_crm_opportunity.is_renewal,
+      mart_crm_opportunity.is_duplicate,
+      mart_crm_opportunity.is_refund,
+      mart_crm_opportunity.is_deleted,
+      mart_crm_opportunity.is_excluded_from_pipeline_created,
+      mart_crm_opportunity.is_contract_reset,
+      mart_crm_opportunity.is_booked_net_arr,
+      mart_crm_opportunity.is_downgrade,
+      mart_crm_opportunity.critical_deal_flag,
+      mart_crm_opportunity.crm_user_sales_segment AS opp_crm_user_sales_segment,
+      mart_crm_opportunity.crm_user_sales_segment_grouped AS opp_crm_user_sales_segment_grouped,
+      mart_crm_opportunity.crm_user_geo AS opp_crm_user_geo,
+      mart_crm_opportunity.crm_user_region AS opp_crm_user_region,
+      mart_crm_opportunity.crm_user_area AS opp_crm_user_area,
+      mart_crm_opportunity.crm_user_sales_segment_region_grouped AS opp_crm_user_sales_segment_region_grouped,
+      mart_crm_opportunity.crm_account_user_sales_segment,
+      mart_crm_opportunity.crm_account_user_sales_segment_grouped,
+      mart_crm_opportunity.crm_account_user_geo,
+      mart_crm_opportunity.crm_account_user_region,
+      mart_crm_opportunity.crm_account_user_area,
+      mart_crm_opportunity.crm_account_user_sales_segment_region_grouped,
+      mart_crm_opportunity.sao_crm_opp_owner_sales_segment_stamped,
+      mart_crm_opportunity.sao_crm_opp_owner_sales_segment_stamped_grouped,
+      mart_crm_opportunity.sao_crm_opp_owner_geo_stamped,
+      mart_crm_opportunity.sao_crm_opp_owner_region_stamped,
+      mart_crm_opportunity.sao_crm_opp_owner_area_stamped,
+      mart_crm_opportunity.sao_crm_opp_owner_segment_region_stamped_grouped,
+      mart_crm_opportunity.crm_opp_owner_sales_segment_stamped_grouped,
+      mart_crm_opportunity.crm_opp_owner_sales_segment_region_stamped_grouped,
+      mart_crm_opportunity.opportunity_owner_user_segment,
+      mart_crm_opportunity.opportunity_owner_user_geo,
+      mart_crm_opportunity.opportunity_owner_user_region,
+      mart_crm_opportunity.opportunity_owner_user_area,
+      mart_crm_opportunity.report_opportunity_user_segment,
+      mart_crm_opportunity.report_opportunity_user_geo,
+      mart_crm_opportunity.report_opportunity_user_region,
+      mart_crm_opportunity.report_opportunity_user_area,
+      mart_crm_opportunity.report_user_segment_geo_region_area,
+      mart_crm_opportunity.lead_source AS opp_lead_source,
+      mart_crm_opportunity.is_public_sector_opp,
+      mart_crm_opportunity.is_registration_from_portal,
+      mart_crm_opportunity.stage_0_pending_acceptance_date,
+      mart_crm_opportunity.stage_1_discovery_date,
+      mart_crm_opportunity.stage_2_scoping_date,
+      mart_crm_opportunity.stage_3_technical_evaluation_date,
+      mart_crm_opportunity.stage_4_proposal_date,
+      mart_crm_opportunity.stage_5_negotiating_date,
+      mart_crm_opportunity.stage_6_awaiting_signature_date_date,
+      mart_crm_opportunity.stage_6_closed_won_date,
+      mart_crm_opportunity.stage_6_closed_lost_date,
+      mart_crm_opportunity.subscription_start_date,
+      mart_crm_opportunity.subscription_end_date,
+      mart_crm_opportunity.pipeline_created_date,
+      mart_crm_opportunity.churned_contraction_deal_count,
+      mart_crm_opportunity.churned_contraction_net_arr,
+      mart_crm_opportunity.calculated_deal_count,
+      mart_crm_opportunity.days_in_stage,
       opp_user.user_role_name AS opp_user_role_name
-    FROM person_base
-    INNER JOIN dim_crm_person
-      ON person_base.dim_crm_person_id=dim_crm_person.dim_crm_person_id
+    FROM mart_crm_person
     LEFT JOIN upa_base
-    ON person_base.dim_crm_account_id=upa_base.dim_crm_account_id
+    ON mart_crm_person.dim_crm_account_id = upa_base.dim_crm_account_id
     LEFT JOIN accounts_with_first_order_opps
       ON upa_base.dim_parent_crm_account_id = accounts_with_first_order_opps.dim_parent_crm_account_id
-    FULL JOIN mart_crm_opportunity_stamped_hierarchy_hist opp
-      ON upa_base.dim_parent_crm_account_id=opp.dim_parent_crm_account_id
+    FULL JOIN mart_crm_opportunity
+      ON upa_base.dim_parent_crm_account_id=mart_crm_opportunity.dim_parent_crm_account_id
     LEFT JOIN order_type_final
-      ON person_base.email_hash=order_type_final.email_hash
-	LEFT JOIN map_alternative_lead_demographics
-	  ON person_base.dim_crm_person_id=map_alternative_lead_demographics.dim_crm_person_id
-	LEFT JOIN dim_crm_user opp_user 
-		ON opp.dim_crm_user_id=opp_user.dim_crm_user_id
+      ON mart_crm_person.email_hash = order_type_final.email_hash
+    LEFT JOIN map_alternative_lead_demographics
+      ON mart_crm_person.dim_crm_person_id = map_alternative_lead_demographics.dim_crm_person_id
+    LEFT JOIN dim_crm_user opp_user 
+      ON mart_crm_opportunity.dim_crm_user_id = opp_user.dim_crm_user_id
 
-), fo_inquiry_with_tp AS (
+), cohort AS (
   
   SELECT DISTINCT
   
-    --Key IDs
-    cohort_base.email_hash,
+    -- surrogate keys
     cohort_base.dim_crm_person_id,
     cohort_base.dim_crm_opportunity_id,
-    rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_touchpoint_id,
-    cohort_base.sfdc_record_id,
+    rpt_crm_touchpoint_combined.dim_crm_touchpoint_id,
     cohort_base.dim_crm_account_id,
     cohort_base.opp_dim_crm_account_id,
     cohort_base.opp_dim_parent_crm_account_id,
+    cohort_base.sfdc_record_id,
   
-    --person data
+    --person attributes
+    cohort_base.email_hash,
     CASE 
-      WHEN cohort_base.person_order_type IS null AND cohort_base.opp_order_type IS null THEN 'Missing order_type_name'
-      WHEN cohort_base.person_order_type IS null THEN cohort_base.opp_order_type
+      WHEN cohort_base.person_order_type IS NULL AND cohort_base.opp_order_type IS NULL 
+        THEN 'Missing order_type_name'
+      WHEN cohort_base.person_order_type IS NULL 
+        THEN cohort_base.opp_order_type
       ELSE person_order_type
-    END AS person_order_type,
+    END                                                                                   AS person_order_type,
     cohort_base.inquiry_order_type_historical,
     cohort_base.mql_order_type_historical,
     cohort_base.lead_source,    
-    cohort_base.status AS crm_person_status,
+    cohort_base.status                                                                    AS crm_person_status,
     cohort_base.email_domain_type,
     cohort_base.is_valuable_signup,
     cohort_base.is_mql,
@@ -447,9 +446,11 @@
     cohort_base.is_inquiry,
     cohort_base.employee_count_segment_custom,
     cohort_base.employee_bucket_segment_custom,
+    cohort_base.inferred_employee_segment,
     cohort_base.geo_custom,
+    cohort_base.inferred_geo,
    
-    --opportunity data
+    --opportunity attributes
     cohort_base.opp_created_date,
     cohort_base.sales_accepted_date,
     cohort_base.close_date,
@@ -577,93 +578,132 @@
     cohort_base.calculated_deal_count,
     cohort_base.days_in_stage,
     cohort_base.opp_user_role_name,
-	cohort_base.record_type_name,
+    cohort_base.record_type_name,
     CASE
-      WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_touchpoint_id IS NOT null THEN cohort_base.dim_crm_opportunity_id
-      ELSE null
-    END AS influenced_opportunity_id,
+      WHEN rpt_crm_touchpoint_combined.dim_crm_touchpoint_id IS NOT NULL 
+        THEN cohort_base.dim_crm_opportunity_id
+      ELSE NULL
+    END                                                                                 AS influenced_opportunity_id,
     CASE
-      WHEN rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_opportunity_id = cohort_base.dim_crm_opportunity_id
-      THEN TRUE
+      WHEN rpt_crm_touchpoint_combined.dim_crm_opportunity_id = cohort_base.dim_crm_opportunity_id
+        THEN TRUE
       ELSE FALSE
     END AS is_bizible_attribution_opportunity,
-    rpt_sfdc_bizible_tp_opp_linear_blended.dim_crm_opportunity_id as bizible_attribution_opportunity_id,
+    rpt_crm_touchpoint_combined.dim_crm_opportunity_id                                  AS bizible_attribution_opportunity_id,
   
-    --touchpoint data
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_date_normalized,
-    rpt_sfdc_bizible_tp_opp_linear_blended.gtm_motion,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_integrated_campaign_grouping,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_marketing_channel_path,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_marketing_channel,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_campaign_name,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_form_url,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_landing_page,
-    rpt_sfdc_bizible_tp_opp_linear_blended.is_dg_influenced,
-    rpt_sfdc_bizible_tp_opp_linear_blended.is_fmm_influenced,
-    rpt_sfdc_bizible_tp_opp_linear_blended.mql_sum,
-    rpt_sfdc_bizible_tp_opp_linear_blended.inquiry_sum,
-    rpt_sfdc_bizible_tp_opp_linear_blended.accepted_sum,
-    rpt_sfdc_bizible_tp_opp_linear_blended.linear_opp_created,
-    rpt_sfdc_bizible_tp_opp_linear_blended.linear_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.linear_sao,
-    rpt_sfdc_bizible_tp_opp_linear_blended.pipeline_linear_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_linear,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_linear_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.w_shaped_sao,
-    rpt_sfdc_bizible_tp_opp_linear_blended.pipeline_w_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_w,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_w_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.u_shaped_sao,
-    rpt_sfdc_bizible_tp_opp_linear_blended.pipeline_u_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_u,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_u_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.first_sao,
-    rpt_sfdc_bizible_tp_opp_linear_blended.pipeline_first_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_first,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_first_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.custom_sao,
-    rpt_sfdc_bizible_tp_opp_linear_blended.pipeline_custom_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_custom,
-    rpt_sfdc_bizible_tp_opp_linear_blended.won_custom_net_arr,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_position,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_source,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_touchpoint_type,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_content,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_ad_group_name,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_form_url_raw,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_landing_page_raw,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_medium,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_referrer_page_raw,
-    rpt_sfdc_bizible_tp_opp_linear_blended.bizible_salesforce_campaign,
-	rpt_sfdc_bizible_tp_opp_linear_blended.dim_campaign_id,
-	rpt_sfdc_bizible_tp_opp_linear_blended.campaign_rep_role_name,
-    rpt_sfdc_bizible_tp_opp_linear_blended.touchpoint_segment,
-    rpt_sfdc_bizible_tp_opp_linear_blended.pipe_name
+    --touchpoint attributes
+    rpt_crm_touchpoint_combined.bizible_touchpoint_date,
+    rpt_crm_touchpoint_combined.gtm_motion,
+    rpt_crm_touchpoint_combined.bizible_integrated_campaign_grouping,
+    rpt_crm_touchpoint_combined.bizible_marketing_channel_path,
+    rpt_crm_touchpoint_combined.bizible_marketing_channel,
+    rpt_crm_touchpoint_combined.bizible_ad_campaign_name,
+    rpt_crm_touchpoint_combined.bizible_form_url,
+    rpt_crm_touchpoint_combined.bizible_landing_page,
+    rpt_crm_touchpoint_combined.is_dg_influenced,
+    rpt_crm_touchpoint_combined.is_fmm_influenced,
+    rpt_crm_touchpoint_combined.mql_sum,
+    rpt_crm_touchpoint_combined.inquiry_sum,
+    rpt_crm_touchpoint_combined.accepted_sum,
+    rpt_crm_touchpoint_combined.linear_opp_created,
+    rpt_crm_touchpoint_combined.linear_net_arr,
+    rpt_crm_touchpoint_combined.linear_sao,
+    rpt_crm_touchpoint_combined.pipeline_linear_net_arr,
+    rpt_crm_touchpoint_combined.won_linear,
+    rpt_crm_touchpoint_combined.won_linear_net_arr,
+    rpt_crm_touchpoint_combined.w_shaped_sao,
+    rpt_crm_touchpoint_combined.pipeline_w_net_arr,
+    rpt_crm_touchpoint_combined.won_w,
+    rpt_crm_touchpoint_combined.won_w_net_arr,
+    rpt_crm_touchpoint_combined.u_shaped_sao,
+    rpt_crm_touchpoint_combined.pipeline_u_net_arr,
+    rpt_crm_touchpoint_combined.won_u,
+    rpt_crm_touchpoint_combined.won_u_net_arr,
+    rpt_crm_touchpoint_combined.first_sao,
+    rpt_crm_touchpoint_combined.pipeline_first_net_arr,
+    rpt_crm_touchpoint_combined.won_first,
+    rpt_crm_touchpoint_combined.won_first_net_arr,
+    rpt_crm_touchpoint_combined.custom_sao,
+    rpt_crm_touchpoint_combined.pipeline_custom_net_arr,
+    rpt_crm_touchpoint_combined.won_custom,
+    rpt_crm_touchpoint_combined.won_custom_net_arr,
+    rpt_crm_touchpoint_combined.bizible_touchpoint_position,
+    rpt_crm_touchpoint_combined.bizible_touchpoint_source,
+    rpt_crm_touchpoint_combined.bizible_touchpoint_type,
+    rpt_crm_touchpoint_combined.bizible_ad_content,
+    rpt_crm_touchpoint_combined.bizible_ad_group_name,
+    rpt_crm_touchpoint_combined.bizible_form_url_raw,
+    rpt_crm_touchpoint_combined.bizible_landing_page_raw,
+    rpt_crm_touchpoint_combined.bizible_medium,
+    rpt_crm_touchpoint_combined.bizible_referrer_page,
+    rpt_crm_touchpoint_combined.bizible_referrer_page_raw,
+    rpt_crm_touchpoint_combined.bizible_salesforce_campaign,
+    rpt_crm_touchpoint_combined.dim_campaign_id,
+    rpt_crm_touchpoint_combined.campaign_rep_role_name,
+    rpt_crm_touchpoint_combined.touchpoint_segment,
+    rpt_crm_touchpoint_combined.pipe_name,
+
+     --inquiry_date fields
+    inquiry_date.fiscal_year                     AS inquiry_date_range_year,
+    inquiry_date.fiscal_quarter_name_fy          AS inquiry_date_range_quarter,
+    DATE_TRUNC(month, inquiry_date.date_actual)  AS inquiry_date_range_month,
+    inquiry_date.first_day_of_week               AS inquiry_date_range_week,
+    inquiry_date.date_id                         AS inquiry_date_range_id,
+  
+    --mql_date fields
+    mql_date.fiscal_year                     AS mql_date_range_year,
+    mql_date.fiscal_quarter_name_fy          AS mql_date_range_quarter,
+    DATE_TRUNC(month, mql_date.date_actual)  AS mql_date_range_month,
+    mql_date.first_day_of_week               AS mql_date_range_week,
+    mql_date.date_id                         AS mql_date_range_id,
+  
+    --opp_create_date fields
+    opp_create_date.fiscal_year                     AS opportunity_created_date_range_year,
+    opp_create_date.fiscal_quarter_name_fy          AS opportunity_created_date_range_quarter,
+    DATE_TRUNC(month, opp_create_date.date_actual)  AS opportunity_created_date_range_month,
+    opp_create_date.first_day_of_week               AS opportunity_created_date_range_week,
+    opp_create_date.date_id                         AS opportunity_created_date_range_id,
+  
+    --sao_date fields
+    sao_date.fiscal_year                     AS sao_date_range_year,
+    sao_date.fiscal_quarter_name_fy          AS sao_date_range_quarter,
+    DATE_TRUNC(month, sao_date.date_actual)  AS sao_date_range_month,
+    sao_date.first_day_of_week               AS sao_date_range_week,
+    sao_date.date_id                         AS sao_date_range_id,
+  
+    --closed_date fields
+    closed_date.fiscal_year                     AS closed_date_range_year,
+    closed_date.fiscal_quarter_name_fy          AS closed_date_range_quarter,
+    DATE_TRUNC(month, closed_date.date_actual)  AS closed_date_range_month,
+    closed_date.first_day_of_week               AS closed_date_range_week,
+    closed_date.date_id                         AS closed_date_range_id
+  
   FROM cohort_base
-  LEFT JOIN rpt_sfdc_bizible_tp_opp_linear_blended
-    ON rpt_sfdc_bizible_tp_opp_linear_blended.email_hash=cohort_base.email_hash
-
-), final_prep AS (
-
-    SELECT 
-	fo_inquiry_with_tp.*,
-    COALESCE(employee_count_segment_custom,employee_bucket_segment_custom) AS inferred_employee_segment,
-    UPPER(geo_custom) AS inferred_geo
-    FROM fo_inquiry_with_tp
+  LEFT JOIN rpt_crm_touchpoint_combined
+    ON rpt_crm_touchpoint_combined.email_hash = cohort_base.email_hash
+  LEFT JOIN dim_date AS inquiry_date 
+    ON cohort_base.true_inquiry_date = inquiry_date.date_day
+  LEFT JOIN dim_date AS mql_date
+    ON cohort_base.mql_date_lastest_pt = mql_date.date_day
+  LEFT JOIN dim_date AS opp_create_date
+    ON cohort_base.opp_created_date = opp_create_date.date_day
+  LEFT JOIN dim_date AS sao_date
+    ON cohort_base.sales_accepted_date = sao_date.date_day
+  LEFT JOIN dim_date AS closed_date
+    ON cohort_base.close_date=closed_date.date_day
 
 ), final AS (
 
-  SELECT *
-  FROM final_prep
+    SELECT DISTINCT *
+    FROM cohort
 
 )
 
 
 {{ dbt_audit(
     cte_ref="final",
-    created_by="@rkohnke",
-    updated_by="@degan",
-    created_date="2022-07-20",
-    updated_date="2022-12-22",
+    created_by="@michellecooper",
+    updated_by="@michellecooper",
+    created_date="2022-10-05",
+    updated_date="2022-12-27",
   ) }}
