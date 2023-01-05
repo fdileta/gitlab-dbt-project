@@ -30,7 +30,7 @@ parsed AS (
     value:fieldId::varchar AS field_id,
     -- logical info
     CONCAT_WS(' | ', fiscal_quarter, time_frame_id, user_id, field_id) AS entries_id,
-    value:forecastValue::number (38, 1) AS forecast_value,
+    value:forecastValue::number(38, 1) AS forecast_value,
     value:currency::variant AS currency,
     value:isUpdated::boolean AS is_updated,
     value:updatedBy::varchar AS updated_by,
