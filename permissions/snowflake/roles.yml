@@ -248,6 +248,10 @@ roles:
         member_of:
             - securityadmin
             - sysadmin
+    
+    - orgadmin:
+        warehouses:
+            - admin
 
     - securityadmin:
         warehouses:
@@ -267,6 +271,7 @@ roles:
             - accountadmin
             - securityadmin
             - useradmin
+            - orgadmin
         warehouses:
             - admin
         privileges:
@@ -563,28 +568,6 @@ roles:
             - analyst_core
             - snowflake_db
             - data_team_analyst
-
-    - analytics_engineer_ga:
-        member_of:
-            - analytics_engineer_core
-            - analyst_people
-            - analyst_engineering
-            - bamboohr
-            - prometheus
-            - workday
-
-    - analytics_engineer_gtm:
-        member_of:
-            - analytics_engineer_core
-            - analyst_marketing
-            - analyst_sales
-            - analyst_finance
-
-    - analytics_engineer_rd:
-        member_of:
-            - analytics_engineer_core
-            - analyst_engineering
-            - analyst_growth
 
     - data_manager:
         warehouses:
@@ -2544,7 +2527,6 @@ roles:
             - reporter
             - restricted_safe
             - xactly
-
         warehouses:
             - dev_xs
 
@@ -2892,6 +2874,7 @@ roles:
             - analyst_core
             - data_manager
             - restricted_safe
+            - orgadmin
         warehouses:
             - dev_xs
         owns:
@@ -3006,6 +2989,8 @@ roles:
 
     - hkacmarski:
         member_of:
+            - analyst_sales
+            - bi_tool_eval_read
             - reporter
             - restricted_safe
         warehouses:
@@ -3018,7 +3003,6 @@ roles:
             - restricted_safe
             - salesforce
             - xactly
-
         warehouses:
             - dev_xs
 
@@ -3078,10 +3062,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - jameson: # De provisioned as part of Quarterly audit and security check.
-        member_of: []
-        warehouses: []
-
     - jbudreski:
         member_of:
             - reporter
@@ -3137,6 +3117,7 @@ roles:
             - xactly
             - sales_analytics
             - data_science_readonly
+            - marketo
         warehouses:
             - dev_xs
         owns:
@@ -3171,10 +3152,6 @@ roles:
                 write:
                     - jkim_prep.*.*
                     - jkim_prod.*.*
-
-    - joshua:
-        member_of: []
-        warehouses: []
 
     - jpeguero:
         member_of:
@@ -3504,20 +3481,20 @@ roles:
         warehouses:
             - dev_xs
 
-    - laddula:
-        member_of: []
-        warehouses: []
-
     - lvinueza:
         member_of:
             - analyst_finance
             - analyst_people
-            - analytics_engineer_ga
+            - analytics_engineer_core
+            - analyst_people
+            - analyst_engineering
             - bamboohr
             - bamboohr_analytics
             - customers_db
             - data_team_analyst
+            - prometheus
             - restricted_safe
+            - workday 
         warehouses:
             - dev_xs
         owns:
@@ -3575,6 +3552,7 @@ roles:
     - mcooper:
         member_of:
             - analyst_finance
+            - analyst_marketing
             - bamboohr
             - customers_db
             - data_team_analyst
@@ -3619,8 +3597,10 @@ roles:
 
     - mdrussell:
         member_of:
+         - analytics_engineer_core
+         - analyst_engineering
+         - analyst_growth
          - data_team_analyst
-         - analytics_engineer_rd
          - restricted_safe
          - bi_tool_eval_read
          - zuora
@@ -3709,6 +3689,13 @@ roles:
                 write:
                     - mlaanen_prep.*.*
                     - mlaanen_prod.*.*
+
+    - mnohr:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
 
     - mpetersen:
         member_of:
@@ -3831,10 +3818,6 @@ roles:
                     - mvilain_prep.*.*
                     - mvilain_prod.*.*
 
-    - mwalker:
-        member_of: []
-        warehouses: []
-
     - mwawrzyniak:
         member_of:
             - analyst_growth
@@ -3894,6 +3877,7 @@ roles:
             - xactly
             - sales_analytics
             - data_science_readonly
+            - marketo
         warehouses:
             - dev_xs
         owns:
@@ -4114,8 +4098,13 @@ roles:
     - pempey:
         member_of:
             - engineer
-            - analytics_engineer_ga
+            - analytics_engineer_core
+            - analyst_people
+            - analyst_engineering
+            - bamboohr
             - bi_tool_eval_db
+            - prometheus
+            - workday
         warehouses:
             - dev_xs
             - dev_m
@@ -4371,6 +4360,18 @@ roles:
             - reporter
             - restricted_safe
             - workday
+        warehouses:
+            - dev_xs
+
+    - smishra:
+        member_of:
+            - adaptive
+            - analyst_finance
+            - customers_db
+            - analyst_marketing
+            - data_team_analyst
+            - restricted_safe
+            - xactly
         warehouses:
             - dev_xs
 
@@ -4720,18 +4721,10 @@ users:
         member_of:
             - alu
 
-    - amartin:
-        can_login: no
-        member_of: []
-
     - aperez:
         can_login: yes
         member_of:
             - aperez
-
-    - ashaikh:
-        can_login: no
-        member_of: []
 
     - bi_tool_eval:
         can_login: yes
@@ -4793,10 +4786,6 @@ users:
         member_of:
             - degan
 
-    - dfelton:
-        can_login: no
-        member_of: []
-
     - dgupta:
         can_login: yes
         member_of:
@@ -4854,14 +4843,6 @@ users:
         can_login: yes
         member_of:
             - hselim
-        
-    - ian:
-        can_login: no
-        member_of: []
-
-    - isharan:
-        can_login: no
-        member_of: []
 
     - iweeks:
         can_login: yes
@@ -4888,10 +4869,6 @@ users:
         member_of:
             - jkim
 
-    - joshua:
-        can_login: no
-        member_of: []
-
     - jpeguero:
         can_login: yes
         member_of:
@@ -4914,10 +4891,6 @@ users:
         can_login: yes
         member_of:
             - jstemmer
-
-    - judume:
-        can_login: no
-        member_of: []
 
     - juwong:
         can_login: yes
@@ -4953,14 +4926,6 @@ users:
         can_login: yes
         member_of:
             - kkarthikeyan
-
-    - laddula:
-        can_login: no
-        member_of: []
-
-    - lmai:
-        can_login: no
-        member_of: []
 
     - lvinueza:
         can_login: yes
@@ -5001,6 +4966,11 @@ users:
         can_login: yes
         member_of:
             - mlaanen
+
+    - mnohr:
+        can_login: yes
+        member_of:
+            - mnohr
 
     - mpetersen:
         can_login: yes
@@ -5079,10 +5049,6 @@ users:
             - periscope
             - reporter
 
-    - periscope_sensitive:
-        can_login: no
-        member_of: []
-
     - permission_bot:
         can_login: yes
         member_of:
@@ -5142,6 +5108,11 @@ users:
         member_of:
             - smccormack
 
+    - smishra:
+        can_login: yes
+        member_of:
+            - smishra
+
     - snalamaru:
         can_login: yes
         member_of:
@@ -5151,10 +5122,6 @@ users:
         can_login: yes
         member_of:
             - srehm
-
-    - statimatla:
-        can_login: no
-        member_of: []
 
     - stitch:
         can_login: yes

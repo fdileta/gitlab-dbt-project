@@ -44,3 +44,6 @@ sources:
 
       - name: job_info
         description: '{{ doc("workday_job_info") }}'
+
+      - name: supervisory_organization
+        description: '{{ doc("supervisory_organization") }}'
