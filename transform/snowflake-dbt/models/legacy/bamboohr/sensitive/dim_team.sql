@@ -50,7 +50,7 @@ cleaned AS (
 
     SELECT 
     recursive_hierarchy.*,
-    IFF(recursive_hierarchy.team_id IS NOT NULL,
+    IFF(recursive_hierarchy.team_inactivated_date IS NOT NULL,
           TRUE, FALSE)                                              AS is_currently_valid 
     FROM recursive_hierarchy
 
