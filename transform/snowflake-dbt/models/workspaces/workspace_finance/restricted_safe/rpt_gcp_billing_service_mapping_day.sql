@@ -63,11 +63,11 @@ resource_labels as (
             AND lower(sku_description) != 'Network Egress via Carrier Peering Network - Americas Based' -- #8
         ),
         b as (
-      SELECT labels.source_primary_key
+      SELECT resource_labels.source_primary_key
       FROM resource_labels
       WHERE
-        labels.resource_label_key = 'pet_name'
-        AND labels.resource_label_value ilike '%patroni-%'
+        resource_labels.resource_label_key = 'pet_name'
+        AND resource_labels.resource_label_value ilike '%patroni-%'
         )
     SELECT a.source_primary_key,
         'databases' as service
@@ -127,7 +127,7 @@ resource_labels as (
   ),
   rule_5_ids AS (
     SELECT
-        DISTINCT labels.source_primary_key,
+        DISTINCT resource_labels.source_primary_key,
         'artifacts' AS service
     FROM
         resource_labels
@@ -152,7 +152,7 @@ resource_labels as (
   ),
   rule_3_ids AS (
         SELECT
-        DISTINCT labels.source_primary_key,
+        DISTINCT resource_labels.source_primary_key,
         'registry storage' AS service
     FROM
         resource_labels
@@ -184,13 +184,13 @@ resource_labels as (
   ),
   rule_1_ids AS (
     SELECT
-        DISTINCT labels.source_primary_key,
+        DISTINCT resource_labels.source_primary_key,
         'gitaly compute and storage' AS service
     FROM
         resource_labels
     WHERE
-        labels.resource_label_key = 'pet_name'
-        AND labels.resource_label_value IN ( 'craig-file-test',
+        resource_labels.resource_label_key = 'pet_name'
+        AND resource_labels.resource_label_value IN ( 'craig-file-test',
         'file',
         'file-cny',
         'file-hdd',
