@@ -59,7 +59,7 @@ final AS (
         recursive_hierarchy.team_manager_name_id,
         recursive_hierarchy.team_superior_team_id,
         recursive_hierarchy.team_inactivated_date,
-        IFF(recursive_hierarchy.team_inactivated_date IS NULL,
+        IFF(recursive_hierarchy.team_inactivated IS NULL,
           TRUE, FALSE)                                                                   AS is_currently_valid,
         NULLIF(recursive_hierarchy.upstream_organizations[0],'')::VARCHAR                AS hierarchy_level_1,
         NULLIF(recursive_hierarchy.upstream_organizations[1],'')::VARCHAR                AS hierarchy_level_2,
