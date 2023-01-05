@@ -7,19 +7,31 @@ models:
       - name: fiscal_quarter
         tests:
           - not_null
+          - relationships:
+            to: ref('clari_net_arr_time_periods_source')
+            field: fiscal_quarter
       - name: time_frame_id
         tests:
-            - not_null
+          - not_null
+          - relationships:
+            to: ref('clari_net_arr_time_frames_source')
+            field: time_frame_id
       - name: user_id
         tests:
           - not_null
+          - relationships:
+            to: ref('clari_net_arr_users_source')
+            field: user_id
       - name: field_id
         tests:
-            - not_null
+          - not_null
+          - relationships:
+            to: ref('clari_net_arr_fields_source')
+            field: field_id
       - name: entries_id
         tests:
-            - not_null
-            - unique
+          - not_null
+          - unique
       - name: forecast_value
       - name: currency
       - name: is_updated
