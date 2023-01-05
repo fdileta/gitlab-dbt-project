@@ -14,7 +14,7 @@ WITH
       jsontext:api_fiscal_quarter AS fiscal_quarter,
       uploaded_at
     FROM
-      {{ source('clari', 'clari_net_arr') }},
+      {{ source('clari', 'net_arr') }},
       LATERAL FLATTEN(input => jsontext:data:timeFrames)
   ),
   parsed AS (

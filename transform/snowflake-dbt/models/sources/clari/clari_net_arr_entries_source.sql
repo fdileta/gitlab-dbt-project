@@ -10,7 +10,7 @@ WITH
       value,
       uploaded_at
     FROM
-      {{ source('clari', 'clari_net_arr') }},
+      {{ source('clari', 'net_arr') }},
       LATERAL FLATTEN(input => jsontext:data:entries)
     {% if is_incremental() %}
       WHERE uploaded_at > (SELECT MAX(uploaded_at) FROM {{this}})
@@ -21,7 +21,7 @@ WITH
       -- foreign keys
       REPLACE(value:timePeriodId, '_', '-')::varchar fiscal_quarter,
       -- there can be the same timeFrameId across quarters
-      concat(value:timeFrameId::varchar , '_', fiscal_quarter) as time_frame_id
+      concat(value:timeFrameId::varchar , '_', fiscal_quarter) as time_frame_id,
       value:userId::varchar user_id,
       value:fieldId::varchar field_id,
 
