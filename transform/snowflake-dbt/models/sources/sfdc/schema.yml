@@ -16,8 +16,6 @@ models:
         tags: ["tdf", "sfdc"]
         tests:
           - not_null
-      - name: tsp_max_hierarchy_sales_segment
-        description: Maximum account sales segment within the account hierarchy.
       - name: division_sales_segment
         description: Sales segment of the specific account.
       - name: ultimate_parent_sales_segment
