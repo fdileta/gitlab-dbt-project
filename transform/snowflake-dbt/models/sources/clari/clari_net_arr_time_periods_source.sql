@@ -10,7 +10,7 @@ WITH
       value,
       uploaded_at
     FROM
-      {{ source('clari', 'net_arr') }},
+      {{ source('clari', 'clari_net_arr') }},
       LATERAL FLATTEN(input => jsontext:data:timePeriods)
 
       {% if is_incremental() %}

@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: net_arr_entries_source
+  - name: clari_net_arr_entries_source
     description: Forecast entries for each combination of fiscal_quarter/week/user/field
     columns:
       - name: fiscal_quarter
@@ -28,3 +28,106 @@ models:
       - name: updated_at
         tests:
             - not_null
+      - name: uploaded_at
+        tests:
+            - not_null
+  - name: clari_net_arr_fields_source
+    description: Dim table for forecast fields
+    columns:
+      - name: field_id
+        tests:
+          - not_null
+          - unique
+      - name: field_name
+        tests:
+            - not_null
+      - name: field_type
+        tests:
+            - not_null
+      - name: uploaded_at
+        tests:
+            - not_null
+  - name: clari_net_arr_time_frames_source
+    description: Dim table for time frames, i.e the weeks in a fiscal quarter
+    columns:
+      - name: fiscal_quarter
+        tests:
+          - not_null
+      - name: time_frame_id
+        tests:
+          - not_null
+          - unique
+      - name: week_start_date
+        tests:
+          - not_null
+      - name: week_end_date
+        tests:
+          - not_null
+      - name: week_number
+        tests:
+          - not_null
+      - name: uploaded_at
+        tests:
+          - not_null
+  - name: clari_net_arr_time_periods_source
+    description: Dim table for fiscal quarter
+    columns:
+      - name: fiscal_quarter
+        tests:
+          - not_null
+          - unique
+      - name: fiscal_quarter_start_date
+        tests:
+          - not_null
+      - name: fiscal_quarter_end_date
+        tests:
+          - not_null
+      - name: quarter
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: crm_id
+        tests:
+          - not_null
+      - name: time_period_type
+        tests:
+          - not_null
+      - name: uploaded_at
+        tests:
+          - not_null
+  - name: clari_net_arr_time_users_source
+    description: Dim table for users
+    columns:
+      - name: user_id
+        tests:
+          - not_null
+          - unique
+      - name: crm_user_id
+        tests:
+          - not_null
+      - name: email
+        tests:
+          - not_null
+      - name: parent_role_id
+        tests:
+          - not_null
+      - name: parent_role
+        tests:
+          - not_null
+      - name: sales_team_role_id
+        tests:
+          - not_null
+      - name: sales_team_role
+        tests:
+          - not_null
+      - name: user_full_name
+        tests:
+          - not_null
+      - name: scope_id
+        tests:
+          - not_null
+      - name: uploaded_at
+        tests:
+          - not_null

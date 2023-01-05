@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: clari
+  - name: clari_net_arr
     database: '{{ env_var("SNOWFLAKE_LOAD_DATABASE") }}'
     schema: clari
     loader: Airflow
