@@ -14,6 +14,7 @@ WITH handbook_categories AS (
     FROM handbook_categories
     WHERE ARRAY_CONTAINS('engineering'::VARIANT, merge_request_department_list) 
       OR ARRAY_CONTAINS('support'::VARIANT, merge_request_department_list)
+      OR ARRAY_CONTAINS('security'::VARIANT, merge_request_department_list)
 
 )
 SELECT *
