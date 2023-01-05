@@ -36,6 +36,7 @@ final AS (
     fct_crm_opportunity.deal_path AS deal_path_name,
     fct_crm_opportunity.order_type,
     fct_crm_opportunity.order_type_grouped,
+    fct_crm_opportunity.order_type_live,
     fct_crm_opportunity.dr_partner_engagement AS dr_partner_engagement_name,
     fct_crm_opportunity.alliance_type AS alliance_type_name,
     fct_crm_opportunity.alliance_type_short AS alliance_type_short_name,

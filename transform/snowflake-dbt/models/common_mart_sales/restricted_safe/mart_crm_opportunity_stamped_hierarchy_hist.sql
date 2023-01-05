@@ -147,6 +147,7 @@
       dim_deal_path.deal_path_name,
       dim_order_type.order_type_name                                       AS order_type,
       dim_order_type.order_type_grouped,
+      dim_order_type_live.order_type_name                                  AS order_type_live,
       dim_dr_partner_engagement.dr_partner_engagement_name,
       dim_alliance_type_current.alliance_type_name,
       dim_alliance_type_current.alliance_type_short_name,
@@ -556,6 +557,8 @@
       ON fct_crm_opportunity.dim_deal_path_id = dim_deal_path.dim_deal_path_id
     LEFT JOIN dim_order_type
       ON fct_crm_opportunity.dim_order_type_id = dim_order_type.dim_order_type_id
+    LEFT JOIN dim_order_type AS dim_order_type_live 
+      ON fct_crm_opportunity.dim_order_type_live_id = dim_order_type_live.dim_order_type_id
     LEFT JOIN dim_dr_partner_engagement
       ON fct_crm_opportunity.dim_dr_partner_engagement_id = dim_dr_partner_engagement.dim_dr_partner_engagement_id
     LEFT JOIN dim_alliance_type AS dim_alliance_type_current

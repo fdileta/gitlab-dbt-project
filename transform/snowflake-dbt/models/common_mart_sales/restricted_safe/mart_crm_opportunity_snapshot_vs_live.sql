@@ -64,6 +64,8 @@
     mart_crm_opportunity.order_type AS order_type_live,
     mart_crm_opportunity_daily_snapshot.order_type_grouped AS order_type_grouped_snapshot,
     mart_crm_opportunity.order_type_grouped AS order_type_grouped_live,
+    mart_crm_opportunity_daily_snapshot.order_type_live AS order_type_live_snapshot,
+    mart_crm_opportunity.order_type_live AS order_type_live_live,
     mart_crm_opportunity_daily_snapshot.dr_partner_engagement_name AS dr_partner_engagement_name_snapshot,
     mart_crm_opportunity.dr_partner_engagement_name AS dr_partner_engagement_name_live,
     mart_crm_opportunity_daily_snapshot.alliance_type_name AS alliance_type_name_snapshot,
