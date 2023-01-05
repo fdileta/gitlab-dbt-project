@@ -17,9 +17,9 @@ recursive_hierarchy AS (
         root.team_manager_name_id,
         root.team_superior_team_id,
         root.team_inactivated_date,
-        TO_ARRAY(root.valid_to)                   AS valid_to_list,
-        TO_ARRAY(root.valid_from)                 AS valid_from_list,
-        TO_ARRAY(root.team_id)                    AS upstream_organizations
+        TO_ARRAY(root.valid_to)                                                          AS valid_to_list,
+        TO_ARRAY(root.valid_from)                                                        AS valid_from_list,
+        TO_ARRAY(root.team_id)                                                           AS upstream_organizations
     FROM supervisory_orgs AS root
     WHERE team_superior_team_id IS NULL
 
@@ -36,9 +36,9 @@ recursive_hierarchy AS (
         iter.team_manager_name_id,
         iter.team_superior_team_id,
         iter.team_inactivated_date,
-        ARRAY_APPEND(anchor.valid_to_list, iter.valid_to)           AS valid_to_list,
-        ARRAY_APPEND(anchor.valid_from_list, iter.valid_from)       AS valid_from_list,
-        ARRAY_APPEND(anchor.upstream_organizations, iter.team_id)   AS upstream_organizations
+        ARRAY_APPEND(anchor.valid_to_list, iter.valid_to)                                AS valid_to_list,
+        ARRAY_APPEND(anchor.valid_from_list, iter.valid_from)                            AS valid_from_list,
+        ARRAY_APPEND(anchor.upstream_organizations, iter.team_id)                        AS upstream_organizations
     FROM recursive_hierarchy AS anchor
     INNER JOIN supervisory_orgs AS iter
         ON iter.team_superior_team_id = anchor.team_id
@@ -46,18 +46,36 @@ recursive_hierarchy AS (
       
 ),
 
-cleaned AS (
+final AS (
 
     SELECT 
-    recursive_hierarchy.*,
-    IFF(recursive_hierarchy.team_inactivated_date IS NULL,
-          TRUE, FALSE)                                              AS is_currently_valid 
+        recursive_hierarchy.team_id, 
+        recursive_hierarchy.team_hierarchy_level,
+        recursive_hierarchy.team_members_count,
+        recursive_hierarchy.team_manager_inherited,
+        recursive_hierarchy.team_inactivated,
+        recursive_hierarchy.team_name, 
+        recursive_hierarchy.team_manager_name, 
+        recursive_hierarchy.team_manager_name_id,
+        recursive_hierarchy.team_superior_team_id,
+        recursive_hierarchy.team_inactivated_date,
+        IFF(recursive_hierarchy.team_inactivated_date IS NULL,
+          TRUE, FALSE)                                                                   AS is_currently_valid,
+        NULLIF(recursive_hierarchy.upstream_organizations[0],'')::VARCHAR                AS hierarchy_level_1,
+        NULLIF(recursive_hierarchy.upstream_organizations[1],'')::VARCHAR                AS hierarchy_level_2,
+        NULLIF(recursive_hierarchy.upstream_organizations[2],'')::VARCHAR                AS hierarchy_level_3,
+        NULLIF(recursive_hierarchy.upstream_organizations[3],'')::VARCHAR                AS hierarchy_level_4,
+        NULLIF(recursive_hierarchy.upstream_organizations[4],'')::VARCHAR                AS hierarchy_level_5,
+        NULLIF(recursive_hierarchy.upstream_organizations[5],'')::VARCHAR                AS hierarchy_level_6,
+        NULLIF(recursive_hierarchy.upstream_organizations[6],'')::VARCHAR                AS hierarchy_level_7,
+        NULLIF(recursive_hierarchy.upstream_organizations[7],'')::VARCHAR                AS hierarchy_level_8,
+        NULLIF(recursive_hierarchy.upstream_organizations[8],'')::VARCHAR                AS hierarchy_level_9
     FROM recursive_hierarchy
 
 )
 
 SELECT * 
-FROM cleaned
+FROM final
 
 
 
