@@ -51,7 +51,7 @@ def get_list_of_clones(engine: Engine) -> List[str]:
     query = """
     SELECT DATABASE_NAME as database_name
     FROM INFORMATION_SCHEMA.DATABASES
-    WHERE LAST_ALTERED < CURRENT_DATE -7
+    WHERE LAST_ALTERED < CURRENT_DATE -14
     """
 
     try:
