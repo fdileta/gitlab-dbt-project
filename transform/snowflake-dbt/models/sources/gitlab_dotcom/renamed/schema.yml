@@ -874,6 +874,10 @@ models:
         tags: ["tdf","gitlab_dotcom"]
         tests:
           - not_null
+      - name: uploaded_at
+        tags: ["tdf","gitlab_dotcom"]
+        tests:
+          - not_null
 
   - name: gitlab_dotcom_issue_metrics_source
     description: Base model for Gitlab.com issue metrics

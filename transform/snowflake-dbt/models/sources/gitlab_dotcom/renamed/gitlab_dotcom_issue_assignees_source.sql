@@ -2,7 +2,8 @@ WITH source AS (
 
   SELECT DISTINCT
     user_id,
-    issue_id
+    issue_id,
+    _uploaded_at
   FROM {{ source('gitlab_dotcom', 'issue_assignees') }}
 
 ), renamed AS (
