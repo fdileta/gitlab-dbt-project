@@ -176,9 +176,9 @@ WITH map_merged_crm_account AS (
         ELSE 'Non - Focus Account'
       END                                                                                                      AS crm_account_focus_account,
       CASE
-         WHEN sfdc_account.parent_crm_account_demographics_max_family_employee > 2000 THEN 'Employees > 2K'
-         WHEN sfdc_account.parent_crm_account_demographics_max_family_employee <= 2000 AND sfdc_account.parent_crm_account_demographics_max_family_employee > 1500 THEN 'Employees > 1.5K'
-         WHEN sfdc_account.parent_crm_account_demographics_max_family_employee <= 1500 AND sfdc_account.parent_crm_account_demographics_max_family_employee > 1000  THEN 'Employees > 1K'
+         WHEN sfdc_account.account_demographics_max_family_employee > 2000 THEN 'Employees > 2K'
+         WHEN sfdc_account.account_demographics_max_family_employee <= 2000 AND sfdc_account.account_demographics_max_family_employee > 1500 THEN 'Employees > 1.5K'
+         WHEN sfdc_account.account_demographics_max_family_employee <= 1500 AND sfdc_account.account_demographics_max_family_employee > 1000  THEN 'Employees > 1K'
          ELSE 'Employees < 1K'
       END                                                                                                      AS crm_account_employee_count_band,
       sfdc_account.account_owner_user_segment                                                                  AS crm_account_owner_user_segment,
