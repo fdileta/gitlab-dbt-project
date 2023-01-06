@@ -45,7 +45,7 @@ def get_list_of_dev_schemas(engine: Engine) -> List[str]:
 def get_list_of_clones(engine: Engine) -> List[str]:
     """
     Get a list of all databases besides the ones to keep.
-    This will delete clones for MRs that didn't have any activity for over 7 days, so users may need to rerun the review job.
+    This will delete clones for MRs that are older than 7 days, so users may need to rerun the review job.
     """
 
     query = """
