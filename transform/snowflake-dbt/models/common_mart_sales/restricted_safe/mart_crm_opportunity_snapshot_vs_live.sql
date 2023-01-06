@@ -11,7 +11,6 @@
     mart_crm_opportunity_daily_snapshot.crm_opportunity_snapshot_id,
     mart_crm_opportunity_daily_snapshot.dim_crm_opportunity_id,
     mart_crm_opportunity_daily_snapshot.snapshot_date,
-    mart_crm_opportunity_daily_snapshot.snapshot_date,
     mart_crm_opportunity_daily_snapshot.snapshot_month,
     mart_crm_opportunity_daily_snapshot.snapshot_fiscal_year,
     mart_crm_opportunity_daily_snapshot.snapshot_fiscal_quarter_name,
@@ -34,5 +33,5 @@
     created_by="@michellecooper",
     updated_by="@michellecooper",
     created_date="2022-08-08",
-    updated_date="2022-11-14"
+    updated_date="2022-01-05"
 ) }}
