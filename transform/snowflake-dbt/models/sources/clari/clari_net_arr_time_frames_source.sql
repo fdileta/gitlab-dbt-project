@@ -19,12 +19,13 @@ parsed AS (
     value:startDate::date AS week_start_date,
     -- dense_rank() for dups prior to qualify
     value:endDate::date AS week_end_date,
+    -- start week from 0
     DENSE_RANK() OVER (
       PARTITION BY
         fiscal_quarter
       ORDER BY
         time_frame_id
-    ) AS week_number
+    ) - 1 AS week_number
   FROM
     source
   -- remove dups in case of overlapping data from daily/quarter loads
