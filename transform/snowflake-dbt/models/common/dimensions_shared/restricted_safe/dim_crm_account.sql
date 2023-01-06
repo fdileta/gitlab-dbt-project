@@ -47,6 +47,7 @@ WITH final AS (
       prep_crm_account.crm_account_type,
       prep_crm_account.crm_account_industry,
       prep_crm_account.crm_account_sub_industry,
+      prep_crm_account.crm_account_employee_count_band,
       prep_crm_account.partner_vat_tax_id,
       prep_crm_account.account_manager,
       prep_crm_account.business_development_rep,
