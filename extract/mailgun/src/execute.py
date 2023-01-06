@@ -152,9 +152,7 @@ def load_event_logs(event: str, full_refresh: bool = False):
         start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
             hours=2
         )
-        end_date = date_parser.parse(config_dict["END_TIME"]) - datetime.timedelta(
-                hours=1
-        )
+        end_date = start_date + datetime.timedelta(hours=13)
 
 
     info(
