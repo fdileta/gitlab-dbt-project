@@ -59,6 +59,7 @@
       dim_crm_account.crm_account_type,
       dim_crm_account.crm_account_industry,
       dim_crm_account.crm_account_sub_industry,
+      dim_crm_account.crm_account_employee_count_band,
       dim_crm_account.partner_vat_tax_id,
       dim_crm_account.account_manager,
       dim_crm_account.business_development_rep,
