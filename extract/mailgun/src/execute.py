@@ -146,7 +146,7 @@ def load_event_logs(event: str, full_refresh: bool = False):
 
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
-        end_date = datetime.now()
+        end_date = datetime.datetime.now()
     else:
         # This extends the time window to handle late processing on the API.
         start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
