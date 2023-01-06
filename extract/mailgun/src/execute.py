@@ -154,7 +154,6 @@ def load_event_logs(event: str, full_refresh: bool = False):
         )
         end_date = start_date + datetime.timedelta(hours=13)
 
-
     info(
         f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}"
     )
