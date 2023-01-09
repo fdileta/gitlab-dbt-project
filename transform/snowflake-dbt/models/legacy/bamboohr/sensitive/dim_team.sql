@@ -18,7 +18,7 @@ recursive_hierarchy AS (
         root.team_superior_team_id,
         root.team_inactivated_date,
         root.valid_from,
-        IFNULL(root.valid_to, CURRENT_DATE())                                                                                                 AS valid_to,
+        root.valid_to,
         TO_ARRAY(root.valid_to)                                                                                                               AS valid_to_list,
         TO_ARRAY(root.valid_from)                                                                                                             AS valid_from_list,
         TO_ARRAY(root.team_id)                                                                                                                AS upstream_organizations
@@ -39,7 +39,7 @@ recursive_hierarchy AS (
         iter.team_superior_team_id,
         iter.team_inactivated_date,
         iter.valid_from,
-        IFNULL(iter.valid_to, CURRENT_DATE())                                                                                                 AS valid_to,
+        iter.valid_to,
         ARRAY_APPEND(anchor.valid_to_list, iter.valid_to)                                                                                     AS valid_to_list,
         ARRAY_APPEND(anchor.valid_from_list, iter.valid_from)                                                                                 AS valid_from_list,
         ARRAY_APPEND(anchor.upstream_organizations, iter.team_id)                                                                             AS upstream_organizations
@@ -64,8 +64,6 @@ final AS (
         recursive_hierarchy.team_manager_name_id,
         recursive_hierarchy.team_superior_team_id,
         recursive_hierarchy.team_inactivated_date,
-        IFF(recursive_hierarchy.team_inactivated IS NULL,
-          TRUE, FALSE)                                                                                                                        AS is_currently_valid,
         IFF(recursive_hierarchy.upstream_organizations[0] IS NULL, '--', recursive_hierarchy.upstream_organizations[0])::VARCHAR              AS hierarchy_level_1,
         IFF(recursive_hierarchy.upstream_organizations[1] IS NULL, '--', recursive_hierarchy.upstream_organizations[1])::VARCHAR              AS hierarchy_level_2,
         IFF(recursive_hierarchy.upstream_organizations[2] IS NULL, '--', recursive_hierarchy.upstream_organizations[2])::VARCHAR              AS hierarchy_level_3,
@@ -76,8 +74,11 @@ final AS (
         IFF(recursive_hierarchy.upstream_organizations[7] IS NULL, '--', recursive_hierarchy.upstream_organizations[7])::VARCHAR              AS hierarchy_level_8,
         IFF(recursive_hierarchy.upstream_organizations[8] IS NULL, '--', recursive_hierarchy.upstream_organizations[8])::VARCHAR              AS hierarchy_level_9,
         recursive_hierarchy.upstream_organizations                                                                                            AS hierarchy_levels_array,
-        recursive_hierarchy.valid_from_list[ARRAY_SIZE(recursive_hierarchy.valid_from_list) - 1]                                              AS valid_from,
-        recursive_hierarchy.valid_to_list[ARRAY_SIZE(recursive_hierarchy.valid_to_list) - 1]                                                  AS valid_to
+        recursive_hierarchy.valid_from_list[ARRAY_SIZE(recursive_hierarchy.valid_from_list) - 1]::TIMESTAMP                                   AS valid_from,
+        recursive_hierarchy.valid_to_list[ARRAY_SIZE(recursive_hierarchy.valid_to_list) - 1]::TIMESTAMP                                       AS valid_to,
+
+        IFF(recursive_hierarchy.team_inactivated IS NULL,
+          TRUE, FALSE)                                                                                                                        AS is_currently_valid
     FROM recursive_hierarchy
 
 )
