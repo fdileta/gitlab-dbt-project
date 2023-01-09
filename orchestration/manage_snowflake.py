@@ -152,6 +152,10 @@ class SnowflakeManager:
 
             if include_stages:
                 self.clone_stages(create_db, database, schema)
+    
+    def grant_clones(self):
+
+        logging.info("hello world")
 
     def delete_clones(self):
         """
