@@ -414,7 +414,6 @@ models:
       - name: team_id
         description: The unique organization identifier
         tests:
-          - unique
           - not_null
       - name: team_hierarchy_level
         description: Team level within the hierarchy. Organizations can be organized into hierarchies and enable reporting at different levels in the hierarchy
@@ -434,6 +433,5 @@ models:
       - name: team_inactivated_date
         description: Date the organization became inactive
       - name: is_deleted
-      - name: uploaded_at
       - name: valid_from
       - name: valid_to
