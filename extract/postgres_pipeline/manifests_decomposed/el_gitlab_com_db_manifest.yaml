@@ -2014,6 +2014,7 @@ tables:
       , view_diffs_file_by_file
       , id
       , gitpod_enabled
+      , use_legacy_web_ide
       FROM user_preferences
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp

@@ -217,40 +217,29 @@ enriched AS (
     IFF(
       employee_directory.hire_date < employment_status_records_check.employment_status_first_value,
       'Active', employment_status.employment_status) AS employment_status,
-    CASE
-      WHEN (LEFT(department_info.job_title, 5) = 'Staff'
-        OR LEFT(department_info.job_title, 13) = 'Distinguished'
-        OR LEFT(department_info.job_title, 9) = 'Principal')
-        AND COALESCE(
-          job_role.job_grade, job_info_mapping_historical.job_grade
-        ) IN ('8', '9', '9.5', '10')
-        THEN 'Staff'
-      WHEN department_info.job_title ILIKE '%Fellow%' THEN 'Staff'
-      WHEN
-        COALESCE(
-          job_role.job_grade, job_info_mapping_historical.job_grade
-        ) IN ('11', '12', '14', '15', 'CXO')
-        THEN 'Senior Leadership'
-      WHEN COALESCE(job_role.job_grade, job_info_mapping_historical.job_grade) LIKE '%C%'
-        THEN 'Senior Leadership'
-      WHEN (department_info.job_title LIKE '%VP%'
-        OR department_info.job_title LIKE '%Chief%'
-        OR department_info.job_title LIKE '%Senior Director%')
-        AND COALESCE(job_role.job_role,
-          job_info_mapping_historical.job_role,
-          department_info.job_role) = 'Leader'
-        THEN 'Senior Leadership'
-      WHEN COALESCE(job_role.job_grade, job_info_mapping_historical.job_grade) = '10'
-        THEN 'Manager'
-      WHEN COALESCE(job_role.job_role,
-        job_info_mapping_historical.job_role,
-        department_info.job_role) = 'Manager'
-        THEN 'Manager'
-      WHEN COALESCE(direct_reports.total_direct_reports, 0) = 0
+    CASE IFF(
+           date_details.date_actual BETWEEN '2019-11-01' AND '2020-02-27'
+           AND job_info_mapping_historical.job_role IS NOT NULL,
+           job_info_mapping_historical.job_role,
+           COALESCE(job_role.job_role, department_info.job_role))
+      WHEN 'Intern'
         THEN 'Individual Contributor'
-      ELSE COALESCE(job_role.job_role,
-        job_info_mapping_historical.job_role,
-        department_info.job_role) END AS job_role_modified,
+      WHEN 'Individual Contributor'
+        THEN 'Individual Contributor'
+      WHEN 'Manager'
+        THEN 'Manager'
+      WHEN 'Director'
+        THEN 'Director+'
+      WHEN 'Vice President'
+        THEN 'Director+'
+      WHEN 'Leader'
+        THEN 'Director+'
+      WHEN 'Chief Executive Officer'
+        THEN 'Director+'
+      ELSE IFF(date_details.date_actual BETWEEN '2019-11-01' AND '2020-02-27'
+             AND job_info_mapping_historical.job_role IS NOT NULL,
+             job_info_mapping_historical.job_role,
+             COALESCE(job_role.job_role, department_info.job_role)) END AS job_role_modified,
     IFF(promotion.compensation_change_reason IS NOT NULL, TRUE, FALSE) AS is_promotion,
     ROW_NUMBER() OVER
     (PARTITION BY employee_directory.employee_id ORDER BY date_details.date_actual) AS tenure_days

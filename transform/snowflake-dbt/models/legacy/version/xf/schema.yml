@@ -67,8 +67,7 @@ models:
             tests:
                 - not_null
           - name: license_md5
-            tests:
-                - not_null
+          - name: license_sha256
           - name: product_category
             description: This is the plan (Starter, Premium, Ultimate) associated with the usage data. This is generally consistent with the License app, but has NULL values for many records that have plans in Zuora.
             

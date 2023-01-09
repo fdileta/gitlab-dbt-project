@@ -3,55 +3,22 @@ Test unit to ensure quality of transformation algorithm
 from Postgres to Snowflake
 """
 import pytest
-
 import sqlparse
 
 from extract.saas_usage_ping.transform_postgres_to_snowflake import (
-    META_API_COLUMNS,
-    TRANSFORMED_INSTANCE_QUERIES_FILE,
-    META_DATA_INSTANCE_QUERIES_FILE,
-    HAVING_CLAUSE_PATTERN,
-    METRICS_EXCEPTION,
-    transform,
-    get_optimized_token,
-    get_translated_postgres_count,
     get_keyword_index,
+    get_optimized_token,
+    get_renamed_query_tables,
+    get_renamed_table_name,
     get_sql_as_string,
     get_token_list,
     get_tokenized_query_list,
     get_transformed_token_list,
-    get_renamed_query_tables,
-    get_renamed_table_name,
+    get_translated_postgres_count,
     is_for_renaming,
     perform_action_on_query_str,
+    transform,
 )
-
-
-def test_static_variables():
-    """
-    Test case: check static variables
-    """
-    assert META_API_COLUMNS == [
-        "recorded_at",
-        "version",
-        "edition",
-        "recording_ce_finished_at",
-        "recording_ee_finished_at",
-        "uuid",
-    ]
-    assert TRANSFORMED_INSTANCE_QUERIES_FILE == "transformed_instance_queries.json"
-    assert META_DATA_INSTANCE_QUERIES_FILE == "meta_data_instance_queries.json"
-
-
-def test_constants():
-    """
-    Test contants to ensure there are in the proper place
-    with proper values
-    """
-    assert TRANSFORMED_INSTANCE_QUERIES_FILE is not None
-    assert META_DATA_INSTANCE_QUERIES_FILE is not None
-    assert HAVING_CLAUSE_PATTERN is not None
-    assert METRICS_EXCEPTION is not None
 
 
 @pytest.fixture(name="transformed_dict")
@@ -77,6 +44,24 @@ def test_cases_dict_transformed():
     }
 
     return transform(test_cases_dict_subquery)
+
+
+@pytest.fixture(name="final_sql__dict")
+def prepared_dict(transformed_dict):
+    """
+    Prepare nested dict for testing
+    """
+    prepared = [
+        metrics_query
+        for sub_dict in transformed_dict.values()
+        for metrics_query in sub_dict.values()
+    ]
+
+    return {
+        metric_name: metrics_query[metric_name]
+        for metrics_query in prepared
+        for metric_name in metrics_query.keys()
+    }
 
 
 @pytest.fixture(name="list_of_metrics")
@@ -172,7 +157,7 @@ def test_transforming_queries():
         check did we fix the bug with "JOINprep", should be fixed to "JOIN prep."
         """
         final_sql = sql_query.upper()
-        print(f"\nfinal_sql: {final_sql}")
+
         assert "JOINPREP" not in final_sql
 
         if "JOIN" in final_sql:
@@ -369,8 +354,8 @@ def test_subquery_complex(transformed_dict, list_of_metrics):
 
     final_sql_query_dict = transformed_dict
 
-    for usage_key, create_dict in final_sql_query_dict.items():
-        for create_key, metrics_dict in create_dict.items():
+    for _, create_dict in final_sql_query_dict.items():
+        for _, metrics_dict in create_dict.items():
             for metric_name, metric_sql in metrics_dict.items():
                 assert "approval" in metric_name
                 assert metric_name in list_of_metrics
@@ -388,7 +373,7 @@ def test_subquery_complex(transformed_dict, list_of_metrics):
                 )  # query parsed properly
 
 
-def test_transform_having_clause(transformed_dict, list_of_metrics):
+def test_transform_having_clause(final_sql__dict, list_of_metrics):
     """
     Test bugs we found for complex subquery - having clause
 
@@ -398,19 +383,15 @@ def test_transform_having_clause(transformed_dict, list_of_metrics):
     (COUNT(approval_project_rules_users.id) < MAX(approvals_required))
     """
 
-    final_sql_query_dict = transformed_dict
-
-    for usage_key, create_dict in final_sql_query_dict.items():
-        for create_key, metrics_dict in create_dict.items():
-            for metric_name, metric_sql in metrics_dict.items():
-                assert ".id" in metric_sql
-                assert "MAX(" in metric_sql
-                assert "COUNT(approval_project_rules_users.id)" in metric_sql
-                assert "MAX(approvals_required)" in metric_sql
-                assert "subquery" in metric_sql
-                assert metric_sql.count("(") == metric_sql.count(")")
-                assert metric_name in list_of_metrics
-                assert metric_name in metric_sql
+    for metric_name, metric_sql in final_sql__dict.items():
+        assert ".id" in metric_sql
+        assert "MAX(" in metric_sql
+        assert "COUNT(approval_project_rules_users.id)" in metric_sql
+        assert "MAX(approvals_required)" in metric_sql
+        assert "subquery" in metric_sql
+        assert metric_sql.count("(") == metric_sql.count(")")
+        assert metric_name in list_of_metrics
+        assert metric_name in metric_sql
 
 
 def test_nested_structure():

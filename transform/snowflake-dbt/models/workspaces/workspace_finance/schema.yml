@@ -1156,3 +1156,41 @@ models:
       - name: product_tier_name 
         tests:
           - not_null
+  - name: rpt_gcp_billing_skus_day
+    description: gcp billing data aggregated per day and mapped with SKU mapping (https://docs.google.com/spreadsheets/d/1Fx7Ah2wphM3GoAkPDFBT-89tia3Mgd4BrfWxAj9B-5Q/edit#gid=1350489934)
+    columns:
+      - name: day
+        description: date
+        tests:
+          - not_null
+      - name: gcp_project_id
+        description: gcp project name
+      - name: gcp_service_description
+        description: gcp service full name
+      - name: gcp_sku_description
+        description: gcp sku full name
+      - name: finance_sku_type
+        description: implements high-level sku buckets (Compute. Storage, etc...)
+      - name: finance_sku_subtype
+        description: implements sku sub-buckets
+      - name: usage_unit
+        description: usage unit (seconds, bytes-seconds, etc...)
+      - name: usage_amount
+        description: usage amount in usage_unit
+      - name: net_cost
+        description: gcp net cost for gitlab
+  - name: rpt_gcp_billing_service_mapping_day
+    description: GCP Billing Service mapping https://gitlab.com/gitlab-org/quality/engineering-analytics/finops-analysis/-/issues/12
+    columns:
+      - name: day
+        description: date
+      - name: gcp_project_id
+        description: GCP project id - the project id the resource is running in
+      - name: gcp_service_description
+        description: cloud service used by the resource
+      - name: gcp_sku_description
+        description: gcp service sub-category
+      - name: gitlab_service
+        description: gitlab service mapping
+      - name: net_cost
+        description: net cost paid by GitLab
