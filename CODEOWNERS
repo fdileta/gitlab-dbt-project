@@ -52,24 +52,24 @@ docker-compose.yml  @jjstark @paul_armstrong @vedprakash2021
 /transform/snowflake-dbt/models/legacy/covid19/     @pempey @iweeks
 
 /transform/snowflake-dbt/models/common/bridge/  @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
-/transform/snowflake-dbt/models/common/dimensions_local/financial/                   @jeanpeguero @michellecooper @iweeks
+/transform/snowflake-dbt/models/common/dimensions_local/financial/                   @chrissharp @michellecooper @iweeks
 /transform/snowflake-dbt/models/common/dimensions_local/general_and_administrative/  @pempey @iweeks
 /transform/snowflake-dbt/models/common/dimensions_local/product_and_engineering/     @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @pempey @iweeks
-/transform/snowflake-dbt/models/common/dimensions_local/sales_and_marketing/         @jeanpeguero @michellecooper @iweeks
+/transform/snowflake-dbt/models/common/dimensions_local/sales_and_marketing/         @chrissharp @michellecooper @iweeks
 /transform/snowflake-dbt/models/common/dimensions_shared/   @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
 /transform/snowflake-dbt/models/common/facts_general_and_administrative/             @pempey @iweeks
 /transform/snowflake-dbt/models/common/facts_product_and_engineering/                @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @pempey @iweeks
-/transform/snowflake-dbt/models/common/facts_sales_and_marketing/                    @jeanpeguero @michellecooper @iweeks
-/transform/snowflake-dbt/models/common/facts_financial/                              @jeanpeguero @michellecooper @iweeks
+/transform/snowflake-dbt/models/common/facts_sales_and_marketing/                    @chrissharp @michellecooper @iweeks
+/transform/snowflake-dbt/models/common/facts_financial/                              @chrissharp @michellecooper @iweeks
 
 /transform/snowflake-dbt/models/common_mapping/     @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
 /transform/snowflake-dbt/models/common_prep/        @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
 
 /transform/snowflake-dbt/models/common_mart/            @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks
-/transform/snowflake-dbt/models/common_mart_finance/    @jeanpeguero @michellecooper @iweeks
-/transform/snowflake-dbt/models/common_mart_marketing/  @jeanpeguero @michellecooper @iweeks
+/transform/snowflake-dbt/models/common_mart_finance/    @chrissharp @michellecooper @iweeks
+/transform/snowflake-dbt/models/common_mart_marketing/  @chrissharp @michellecooper @iweeks
 /transform/snowflake-dbt/models/common_mart_product/    @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @pempey @iweeks
-/transform/snowflake-dbt/models/common_mart_sales/      @jeanpeguero @michellecooper @iweeks
+/transform/snowflake-dbt/models/common_mart_sales/      @chrissharp @michellecooper @iweeks
 
 /transform/snowflake-dbt/models/legacy/smau_events/ @tpoole1 @chrissharp @snalamaru @mdrussell @iweeks
 /transform/snowflake-dbt/models/legacy/snapshots/   @tpoole1 @chrissharp @snalamaru @mdrussell @jeanpeguero @michellecooper @pempey @iweeks

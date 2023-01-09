@@ -378,7 +378,14 @@ The name (URL) of the host. This appears as `hostname` in the ping payload.
 
 {% docs ping_delivery_type %}
 
-How the product is delivered to the installation (Self-Managed, SaaS)
+How the product is delivered to the installation (Self-Managed, SaaS). Currently, GitLab Dedicated installations are assigned a delivery type of `Self-Managed`. `ping_delivery_type` is determined using dim_instance_id/uuid and is defined as 
+
+``` sql
+CASE
+  WHEN dim_instance_id = 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f' THEN 'SaaS' --dim_instance_id is synonymous with uuid
+  ELSE 'Self-Managed'
+END AS ping_delivery_type
+```
 
 {% enddocs %}
 
@@ -426,19 +433,40 @@ The id of the major minor version, defined as `major_version*100 + minor_version
 
 {% docs version_is_prerelease %}
 
-Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details [here](https://docs.gitlab.com/ee/policy/maintenance.html)
+Boolean flag which is set to True if the version is a pre-release Version of the GitLab App. See more details [here](https://docs.gitlab.com/ee/policy/maintenance.html). This is defined as `IFF(version ILIKE '%-pre', TRUE, FALSE)`.
 
 {% enddocs %}
 
-{% docs is_internal %}
+{% docs is_internal_ping_model %}
 
-Boolean flag set to True if the installation meets our defined "internal" criteria. However, this field seems to also capture some Self-Managed customers, so the best way to identify a gitlab.com installation is using `ping_delivery_type`
+Boolean flag set to True if the installation meets our defined "internal" criteria. However, this field seems to also capture some Self-Managed customers, so the best way to identify a gitlab.com installation is using `ping_delivery_type = 'SaaS'`. `is_internal` is defined as
+
+``` sql
+CASE
+  WHEN ping_delivery_type = 'SaaS'                  THEN TRUE
+  WHEN installation_type = 'gitlab-development-kit' THEN TRUE
+  WHEN hostname = 'gitlab.com'                      THEN TRUE
+  WHEN hostname ILIKE '%.gitlab.com'                THEN TRUE
+  ELSE FALSE 
+END AS is_internal 
+```
 
 {% enddocs %}
 
-{% docs is_staging %}
+{% docs is_staging_ping_model %}
 
-Boolean flag which is set to True if the installations meets our defined "staging" criteria (i.e., `staging` is in the host name). This is a directional identification and is not exhaustive of all staging installations
+Boolean flag which is set to True if the installations meets our defined "staging" criteria (i.e., `staging` is in the host name). This is a directional identification and is not exhaustive of all staging installations. `is_staging` is defined as
+
+``` sql
+CASE
+  WHEN hostname ILIKE 'staging.%' THEN TRUE
+  WHEN hostname IN (
+    'staging.gitlab.com',
+    'dr.gitlab.com'
+    )                             THEN TRUE
+  ELSE FALSE 
+END AS is_staging
+```
 
 {% enddocs %}
 
@@ -516,7 +544,7 @@ Boolean flag set to True if the subscription has a MRR > 0 on the month of ping 
 
 {% docs is_program_subscription %}
 
-Boolean flag set to True if the subscription is under an EDU or OSS Program
+Boolean flag set to True if the subscription is under an EDU or OSS Program. This is defined as `IFF(product_rate_plan_name ILIKE ANY ('%edu%', '%oss%'), TRUE, FALSE)`
 
 {% enddocs %}
 
@@ -1091,3 +1119,22 @@ The timestamp when this snapshot row was first inserted. This column can be used
 The timestamp when this row became invalidated. The most recent snapshot record will have `dbt_valid_to` set to null. When a new snapshot record is created, `dbt_valid_to` is updated and will match the new record's `dbt_valid_from` timestamp.
 
 {% enddocs %}
+
+{% docs order_type_name %}
+
+An attribute of an opportunity to designate what type or order it is. This is stamped on the close date of the opportunity. In its latest version, Order Type has logic incorporated to filter out additional CI Minutes and credits as First Order, per the [Salesforce Documentation](https://gitlab.my.salesforce.com/00N4M00000Ib7ly?setupid=OpportunityFields).
+
+{% enddocs %}
+
+{% docs order_type %}
+
+An attribute of an opportunity to designate what type or order it is. This is stamped on the close date of the opportunity. In its latest version, Order Type has logic incorporated to filter out additional CI Minutes and credits as First Order, per the [Salesforce Documentation](https://gitlab.my.salesforce.com/00N4M00000Ib7ly?setupid=OpportunityFields).
+
+{% enddocs %}
+
+{% docs order_type_live %}
+
+The current Order Type of an opportunity, potentially after it has been stamped on its close date. Per the [documentation in Salesforce](https://gitlab.my.salesforce.com/00N4M00000Ib8Ok?setupid=OpportunityFields), This field is used to track movement of values post deal close and is for analysis purposes only.
+
+{% enddocs %}
+
