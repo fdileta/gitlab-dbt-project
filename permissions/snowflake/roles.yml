@@ -89,6 +89,11 @@ databases:
     - jkim_prep:
         shared: no
 
+    - jng_prod:
+        shared: no
+    - jng_prep:
+        shared: no
+
     - jpeguero_prod:
         shared: no
     - jpeguero_prep:
@@ -3153,6 +3158,45 @@ roles:
                     - jkim_prep.*.*
                     - jkim_prod.*.*
 
+    - jng:
+        member_of:
+         - restricted_safe
+         - analytics_engineer_core
+        warehouses:
+            - dev_xs
+        owns:
+            databases:
+                - jng_prep
+                - jng_prod
+            schemas:
+                - jng_prep.*
+                - jng_prod.*
+            tables:
+                - jng_prep.*.*
+                - jng_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - jng_prep
+                    - jng_prod
+                write:
+                    - jng_prep
+                    - jng_prod
+            schemas:
+                read:
+                    - jng_prep.*
+                    - jng_prod.*
+                write:
+                    - jng_prep.*
+                    - jng_prod.*
+            tables:
+                read:
+                    - jng_prep.*.*
+                    - jng_prod.*.*
+                write:
+                    - jng_prep.*.*
+                    - jng_prod.*.*
+
     - jpeguero:
         member_of:
             - analyst_marketing
@@ -4868,6 +4912,11 @@ users:
         can_login: yes
         member_of:
             - jkim
+
+    - jng:
+        can_login: yes
+        member_of:
+            - jng
 
     - jpeguero:
         can_login: yes
