@@ -13,6 +13,11 @@ WITH map_merged_crm_account AS (
 {%- if model_type == 'live' %}
 
 {%- elif model_type == 'snapshot' %}
+), crm_user_snapshot AS (
+
+    SELECT * 
+    FROM {{ ref('dim_crm_user_daily_snapshot') }}
+
 ), snapshot_dates AS (
 
     SELECT *
@@ -39,6 +44,11 @@ WITH map_merged_crm_account AS (
           AND snapshot_dates.date_actual < COALESCE(valid_to, '9999-12-31'::TIMESTAMP)
 
 {%- endif %}
+
+), crm_user AS (
+
+    SELECT * 
+    FROM {{ ref('dim_crm_user') }}
 
 ), sfdc_account AS (
 
@@ -104,13 +114,7 @@ WITH map_merged_crm_account AS (
       industry,
       sub_industry,
       account_owner_team,
-      tsp_territory,
-      tsp_region,
-      tsp_sub_region,
-      tsp_area,
       gtm_strategy,
-      tsp_account_employees,
-      tsp_max_family_employees,
       account_demographics_sales_segment,
       account_demographics_geo,
       account_demographics_region,
@@ -213,23 +217,11 @@ WITH map_merged_crm_account AS (
       ultimate_parent_account.sub_industry                                AS parent_crm_account_sub_industry,
       sfdc_account.parent_account_industry_hierarchy                      AS parent_crm_account_industry_hierarchy,
       ultimate_parent_account.account_owner_team                          AS parent_crm_account_owner_team,
-      ultimate_parent_account.tsp_territory                               AS parent_crm_account_sales_territory,
-      ultimate_parent_account.tsp_region                                  AS parent_crm_account_tsp_region,
-      ultimate_parent_account.tsp_sub_region                              AS parent_crm_account_tsp_sub_region,
-      ultimate_parent_account.tsp_area                                    AS parent_crm_account_tsp_area,
       ultimate_parent_account.gtm_strategy                                AS parent_crm_account_gtm_strategy,
       CASE
         WHEN LOWER(ultimate_parent_account.gtm_strategy) IN ('account centric', 'account based - net new', 'account based - expand') THEN 'Focus Account'
         ELSE 'Non - Focus Account'
       END                                                                 AS parent_crm_account_focus_account,
-      ultimate_parent_account.tsp_account_employees                       AS parent_crm_account_tsp_account_employees,
-      ultimate_parent_account.tsp_max_family_employees                    AS parent_crm_account_tsp_max_family_employees,
-      CASE
-         WHEN ultimate_parent_account.tsp_max_family_employees > 2000 THEN 'Employees > 2K'
-         WHEN ultimate_parent_account.tsp_max_family_employees <= 2000 AND ultimate_parent_account.tsp_max_family_employees > 1500 THEN 'Employees > 1.5K'
-         WHEN ultimate_parent_account.tsp_max_family_employees <= 1500 AND ultimate_parent_account.tsp_max_family_employees > 1000  THEN 'Employees > 1K'
-         ELSE 'Employees < 1K'
-      END                                                                AS parent_crm_account_employee_count_band,
       ultimate_parent_account.created_date                               AS parent_crm_account_created_date,
       ultimate_parent_account.zi_technologies                            AS parent_crm_account_zi_technologies,
       ultimate_parent_account.zoom_info_website                          AS parent_crm_account_zoom_info_website,
@@ -261,8 +253,6 @@ WITH map_merged_crm_account AS (
         ELSE 'Non - Focus Account'
       END                                                                 AS crm_account_focus_account,
       sfdc_account.account_owner_user_segment                             AS crm_account_owner_user_segment,
-      sfdc_account.tsp_account_employees                                  AS crm_account_tsp_account_employees,
-      sfdc_account.tsp_max_family_employees                               AS crm_account_tsp_max_family_employees,
       sfdc_account.billing_country                                        AS crm_account_billing_country,
       sfdc_account.billing_country_code                                   AS crm_account_billing_country_code,
       sfdc_account.account_type                                           AS crm_account_type,
@@ -270,19 +260,6 @@ WITH map_merged_crm_account AS (
       sfdc_account.sub_industry                                           AS crm_account_sub_industry,
       sfdc_account.account_owner                                          AS crm_account_owner,
       sfdc_account.account_owner_team                                     AS crm_account_owner_team,
-      sfdc_account.tsp_territory                                          AS crm_account_sales_territory,
-      sfdc_account.tsp_region                                             AS crm_account_tsp_region,
-      sfdc_account.tsp_sub_region                                         AS crm_account_tsp_sub_region,
-      sfdc_account.tsp_area                                               AS crm_account_tsp_area,
-      sfdc_account.tsp_max_hierarchy_sales_segment                        AS tsp_max_hierarchy_sales_segment,
-      CASE
-         WHEN sfdc_account.tsp_max_family_employees > 2000 THEN 'Employees > 2K'
-         WHEN sfdc_account.tsp_max_family_employees <= 2000 AND sfdc_account.tsp_max_family_employees > 1500 THEN 'Employees > 1.5K'
-         WHEN sfdc_account.tsp_max_family_employees <= 1500 AND sfdc_account.tsp_max_family_employees > 1000  THEN 'Employees > 1K'
-         ELSE 'Employees < 1K'
-      END                                                                 AS crm_account_employee_count_band,
-      sfdc_account.tsp_account_employees,
-      sfdc_account.tsp_max_family_employees,
       sfdc_account.partner_vat_tax_id,
       sfdc_account.account_manager,
       sfdc_account.business_development_rep,
@@ -317,12 +294,9 @@ WITH map_merged_crm_account AS (
       sfdc_account.account_phone,
       sfdc_account.zoominfo_account_phone,
       sfdc_account.abm_tier,
-      sfdc_account.health_score,
       sfdc_account.health_number,
       sfdc_account.health_score_color,
       sfdc_account.partner_account_iban_number,
-      sfdc_account.federal_account                                        AS federal_account,
-      sfdc_account.fy22_new_logo_target_list,
       sfdc_account.gitlab_com_user,
       sfdc_account.zi_technologies                                        AS crm_account_zi_technologies,
       sfdc_account.zoom_info_website                                      AS crm_account_zoom_info_website,
@@ -465,7 +439,6 @@ WITH map_merged_crm_account AS (
       sfdc_account.count_active_ce_users,
       sfdc_account.count_open_opportunities,
       sfdc_account.count_using_ce,
-      sfdc_account.potential_arr_lam,
       sfdc_account.carr_this_account,
       sfdc_account.carr_account_family,
       sfdc_account.potential_users,
@@ -475,6 +448,8 @@ WITH map_merged_crm_account AS (
       {%- if model_type == 'live' %}
       sfdc_account.lam                                                    AS parent_crm_account_lam,
       sfdc_account.lam_dev_count                                          AS parent_crm_account_lam_dev_count,
+      crm_user.user_role_type,
+      crm_user.user_role_name,
       {%- elif model_type == 'snapshot' %}
       IFNULL(lam_corrections.estimated_capped_lam, sfdc_account.lam)      AS parent_crm_account_lam,
       IFNULL(lam_corrections.dev_count, sfdc_account.lam_dev_count)       AS parent_crm_account_lam_dev_count,
@@ -526,6 +501,8 @@ WITH map_merged_crm_account AS (
       ON sfdc_account.created_by_id = created_by.user_id
     LEFT JOIN sfdc_users AS last_modified_by
       ON sfdc_account.last_modified_by_id = last_modified_by.user_id
+    LEFT JOIN crm_user
+      ON sfdc_account.owner_id = crm_user.dim_crm_user_id
     {%- elif model_type == 'snapshot' %}
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
@@ -557,6 +534,9 @@ WITH map_merged_crm_account AS (
       ON sfdc_account.account_id = ptc_scores.account_id
         AND sfdc_account.snapshot_date >= ptc_scores.valid_from::DATE
         AND  sfdc_account.snapshot_date < ptc_scores.valid_to::DATE
+    LEFT JOIN crm_user_snapshot
+      ON sfdc_account.owner_id = crm_user_snapshot.dim_crm_user_id
+        AND crm_user_snapshot.snapshot_id = sfdc_account.snapshot_id
     
     {%- endif %}
 
