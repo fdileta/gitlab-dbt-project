@@ -155,7 +155,7 @@ class SnowflakeManager:
     
     def grant_clones(self):
 
-        logging.info("hello world")
+        logging.info(dir())
 
     def delete_clones(self):
         """
