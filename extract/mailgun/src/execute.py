@@ -94,10 +94,10 @@ def extract_logs(
                 items = data.get("items")
 
                 if items is None:
-                    break
+                    continue
 
                 if len(items) == 0:
-                    break
+                    continue
 
                 first_timestamp = items[0].get("timestamp")
                 str_stamp = datetime.datetime.fromtimestamp(first_timestamp).strftime(
@@ -121,10 +121,10 @@ def extract_logs(
                 items = data.get("items")
 
                 if items is None:
-                    break
+                    continue
 
                 if len(items) == 0:
-                    break
+                    continue
 
                 all_results = all_results[:] + items[:]
 
