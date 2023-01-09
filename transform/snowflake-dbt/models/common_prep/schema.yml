@@ -1797,6 +1797,7 @@ models:
       - name: model_updated_date
         description: '{{ doc("model_updated_date") }}'
 
+
   - name: prep_ping_instance_flattened
     description: ' {{ doc("prep_ping_instance_flattened") }} '
     columns:
@@ -1938,3 +1939,142 @@ models:
         description: '{{ doc("model_created_date") }}'
       - name: model_updated_date
         description: '{{ doc("model_updated_date") }}'
+
+  - name: prep_date
+    description: Join on this table to add additional date complexity
+    columns:
+        - name: date_day
+          description: '{{ doc("date_date_day") }}'
+
+        - name: date_actual
+          description: '{{ doc("date_date_actual") }}'
+
+        - name: day_name
+          description: '{{ doc("date_day_name") }}'
+
+        - name: month_actual
+          description: '{{ doc("date_month_actual") }}'
+
+        - name: year_actual
+          description: '{{ doc("date_year_actual") }}'
+
+        - name: quarter_actual
+          description: '{{ doc("date_quarter_actual") }}'
+
+        - name: day_of_week
+          description: '{{ doc("date_day_of_week") }}'
+
+        - name: first_day_of_week
+          description: '{{ doc("date_first_day_of_week") }}'
+
+        - name: week_of_year
+          description: '{{ doc("date_week_of_year") }}'
+
+        - name: day_of_month
+          description: '{{ doc("date_day_of_month") }}'
+
+        - name: day_of_quarter
+          description: '{{ doc("date_day_of_quarter") }}'
+
+        - name: day_of_year
+          description: '{{ doc("date_day_of_year") }}'
+
+        - name: fiscal_year
+          description: '{{ doc("date_fiscal_year") }}'
+
+        - name: fiscal_quarter
+          description: '{{ doc("date_fiscal_quarter") }}'
+
+        - name: day_of_fiscal_quarter
+          description: '{{ doc("date_day_of_fiscal_quarter") }}'
+
+        - name: day_of_fiscal_year
+          description: '{{ doc("date_day_of_fiscal_year") }}'
+
+        - name: month_name
+          description: '{{ doc("date_month_name") }}'
+
+        - name: first_day_of_month
+          description: '{{ doc("date_first_day_of_month") }}'
+
+        - name: last_day_of_month
+          description: '{{ doc("date_last_day_of_month") }}'
+
+        - name: first_day_of_year
+          description: '{{ doc("date_first_day_of_year") }}'
+
+        - name: last_day_of_year
+          description: '{{ doc("date_last_day_of_year") }}'
+
+        - name: first_day_of_quarter
+          description: '{{ doc("date_first_day_of_quarter") }}'
+
+        - name: last_day_of_quarter
+          description: '{{ doc("date_last_day_of_quarter") }}'
+
+        - name: first_day_of_fiscal_quarter
+          description: '{{ doc("date_first_day_of_fiscal_quarter") }}'
+
+        - name: last_day_of_fiscal_quarter
+          description: '{{ doc("date_last_day_of_fiscal_quarter") }}'
+
+        - name: first_day_of_fiscal_year
+          description: '{{ doc("date_first_day_of_fiscal_year") }}'
+
+        - name: last_day_of_fiscal_year
+          description: '{{ doc("date_last_day_of_fiscal_year") }}'
+
+        - name: week_of_fiscal_year
+          description: '{{ doc("date_week_of_fiscal_year") }}'
+
+        - name: month_of_fiscal_year
+          description: '{{ doc("date_month_of_fiscal_year") }}'
+
+        - name: last_day_of_week
+          description: '{{ doc("date_last_day_of_week") }}'
+
+        - name: quarter_name
+          description: '{{ doc("date_quarter_name") }}'
+
+        - name: fiscal_quarter_name
+          description: '{{ doc("date_fiscal_quarter_name") }}'
+
+        - name: fiscal_quarter_name_fy
+          description: '{{ doc("date_fiscal_quarter_name_fy") }}'
+
+        - name: fiscal_quarter_number_absolute
+          description: '{{ doc("date_fiscal_quarter_number_absolute") }}'
+
+        - name: fiscal_month_name
+          description: '{{ doc("date_fiscal_month_name") }}'
+
+        - name: fiscal_month_name_fy
+          description: '{{ doc("date_fiscal_month_name_fy") }}'
+
+        - name: holiday_desc
+          description: '{{ doc("date_holiday_desc") }}'
+
+        - name: is_holiday
+          description: '{{ doc("date_is_holiday") }}'
+
+        - name: last_month_of_fiscal_quarter
+          description: '{{ doc("date_last_month_of_fiscal_quarter") }}'
+
+        - name: is_first_day_of_last_month_of_fiscal_quarter
+          description: '{{ doc("date_is_first_day_of_last_month_of_fiscal_quarter") }}'
+
+        - name: last_month_of_fiscal_year
+          description: '{{ doc("date_last_month_of_fiscal_year") }}'
+
+        - name: is_first_day_of_last_month_of_fiscal_year
+          description: '{{ doc("date_is_first_day_of_last_month_of_fiscal_year") }}'
+          
+        - name: snapshot_date_fpa
+          description: '{{ doc("date_snapshot_date_fpa") }}'
+
+        - name: snapshot_date_billings
+          description: '{{ doc("date_snapshot_date_billings") }}'
+
+        - name: days_in_month_count
+          description: '{{ doc("date_days_in_month_count") }}'
+
