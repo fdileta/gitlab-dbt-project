@@ -328,7 +328,7 @@
     - analytics
   only:
     changes:
-      - "**/*.sql"
+      - "transform/snowflake-dbt/models/**/*.sql"
     refs:
       - merge_request
   allow_failure: true
