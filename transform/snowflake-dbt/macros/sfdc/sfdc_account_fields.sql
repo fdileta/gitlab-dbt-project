@@ -232,7 +232,6 @@ WITH map_merged_crm_account AS (
         WHEN LOWER(ultimate_parent_account.gtm_strategy) IN ('account centric', 'account based - net new', 'account based - expand') THEN 'Focus Account'
         ELSE 'Non - Focus Account'
       END                                                                 AS parent_crm_account_focus_account,
-
       ultimate_parent_account.tsp_account_employees                       AS parent_crm_account_tsp_account_employees,
       ultimate_parent_account.tsp_max_family_employees                    AS parent_crm_account_tsp_max_family_employees,
       CASE
