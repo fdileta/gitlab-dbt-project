@@ -7,6 +7,6 @@ WITH source AS (
     cte_ref="source",
     created_by="@pempey",
     updated_by="@pempey",
-    created_date="2022-08-11",
-    updated_date="2022-08-11"
+    created_date="2023-01-09",
+    updated_date="2023-01-09"
 ) }}

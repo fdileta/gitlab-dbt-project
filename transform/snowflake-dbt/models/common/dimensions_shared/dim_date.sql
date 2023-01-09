@@ -26,5 +26,5 @@ WITH dates AS (
     created_by="@msendal",
     updated_by="@pempey",
     created_date="2020-06-01",
-    updated_date="2022-08-11"
+    updated_date="2023-01-09"
 ) }}
