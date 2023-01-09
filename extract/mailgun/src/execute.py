@@ -90,13 +90,16 @@ def extract_logs(
                 except json.decoder.JSONDecodeError:
                     error("No response received")
                     break
-
                 items = data.get("items")
+
+                # Clear last page token
+                page_token = None
 
                 page_token = data.get("paging").get("next")
 
                 info(f"page token {page_token}")
                 info(f"len items {len(items)}")
+
                 if not page_token:
                     break
 
