@@ -43,6 +43,7 @@ sources:
         loaded_at_field: DATEADD(sec, dbt_updated_at, '1970-01-01')
       - name: workday_employee_directory_snapshots
       - name: workday_employee_mapping_snapshots
+      - name: workday_supervisory_org_snapshots
       - name: zuora_account_snapshots
       - name: zuora_amendment_snapshots
       - name: zuora_contact_snapshots
@@ -66,3 +67,4 @@ sources:
       - name: gitlab_dotcom_identities_snapshots
       - name: rpt_ping_metric_totals_w_estimates_monthly_snapshot
       - name: rpt_event_xmau_metric_monthly_snapshot
+      - name: dim_user_snapshot

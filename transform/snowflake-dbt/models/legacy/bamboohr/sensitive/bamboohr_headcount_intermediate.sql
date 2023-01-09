@@ -34,14 +34,6 @@
       SUM(hired_management)                             AS hired_management,
       SUM(separated_management)                         AS separated_management,
             
-
-      SUM(headcount_start_staff)                        AS headcount_start_staff,
-      SUM(headcount_end_staff)                          AS headcount_end_staff,
-      (SUM(headcount_start_staff) 
-        + SUM(headcount_end_staff))/2                   AS headcount_average_staff,
-      SUM(hired_staff)                                  AS hired_staff,
-      SUM(separated_staff)                              AS separated_staff,
-
       SUM(headcount_start_contributor)                  AS headcount_start_contributor,
       SUM(headcount_end_contributor)                    AS headcount_end_individual_contributor,
       (SUM(headcount_start_contributor) 
@@ -136,13 +128,13 @@ WITH dates AS (
       voluntary_separation + involuntary_separation                                 AS separation_count,
 
       IFF(dates.start_date = date_actual 
-          AND job_role_modified = 'Senior Leadership',1,0)                          AS headcount_start_leader,
+          AND job_role_modified = 'Dirctor+',1,0)                          AS headcount_start_leader,
       IFF(dates.end_date = date_actual
-          AND job_role_modified = 'Senior Leadership',1,0)                          AS headcount_end_leader,
+          AND job_role_modified = 'Dirctor+',1,0)                          AS headcount_end_leader,
       IFF(is_hire_date = True 
-          AND job_role_modified = 'Senior Leadership',1,0)                          AS hired_leaders,
+          AND job_role_modified = 'Dirctor+',1,0)                          AS hired_leaders,
       IFF(is_termination_date = True
-          AND job_role_modified = 'Senior Leadership',1,0)                          AS separated_leaders,
+          AND job_role_modified = 'Dirctor+',1,0)                          AS separated_leaders,
       
       IFF(dates.start_date = date_actual 
           AND job_role_modified = 'Manager',1,0)                                    AS headcount_start_manager,
@@ -161,15 +153,6 @@ WITH dates AS (
           AND job_role_modified != 'Individual Contributor',1,0)                    AS hired_management,
       IFF(is_termination_date = True
           AND job_role_modified != 'Individual Contributor',1,0)                    AS separated_management,   
-
-       IFF(dates.start_date = date_actual 
-          AND job_role_modified = 'Staff',1,0)                                      AS headcount_start_staff,
-      IFF(dates.end_date = date_actual
-          AND job_role_modified = 'Staff',1,0)                                      AS headcount_end_staff,
-      IFF(is_hire_date = True 
-          AND job_role_modified = 'Staff',1,0)                                      AS hired_staff,
-      IFF(is_termination_date = True
-          AND job_role_modified = 'Staff',1,0)                                      AS separated_staff, 
 
        IFF(dates.start_date = date_actual 
           AND job_role_modified = 'Individual Contributor',1,0)                     AS headcount_start_contributor,

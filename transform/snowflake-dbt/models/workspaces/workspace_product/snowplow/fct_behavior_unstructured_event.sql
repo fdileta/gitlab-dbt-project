@@ -10,7 +10,6 @@
 
 {{ simple_cte([
     ('events', 'prep_snowplow_unnested_events_all'),
-    ('dim_page', 'dim_behavior_website_page'),
     ])
 }}
 
@@ -36,6 +35,8 @@
       focus_form_node_name,
       dim_behavior_browser_sk,
       dim_behavior_operating_system_sk,
+      dim_behavior_website_page_sk,
+      dim_behavior_referrer_page_sk,
       environment
     FROM events
     WHERE event = 'unstruct'
@@ -61,7 +62,8 @@
 
       -- Surrogate Keys
       unstruct_event.dim_behavior_event_sk,
-      dim_page.dim_behavior_website_page_sk,
+      unstruct_event.dim_behavior_website_page_sk,
+      unstruct_event.dim_behavior_referrer_page_sk,
       unstruct_event.dim_behavior_browser_sk,
       unstruct_event.dim_behavior_operating_system_sk,
 
@@ -80,10 +82,6 @@
       focus_form_element_id,
       focus_form_node_name
     FROM unstruct_event
-    LEFT JOIN dim_page 
-      ON unstruct_event.clean_url_path = dim_page.clean_url_path 
-        AND unstruct_event.page_url_host = dim_page.page_url_host
-        AND unstruct_event.app_id = dim_page.app_id
       
 )
 

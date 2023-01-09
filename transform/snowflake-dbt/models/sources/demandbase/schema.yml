@@ -52,13 +52,6 @@ models:
           tests:
             - not_null
     - name: demandbase_keyword_historical_rollup_source
-      columns:
-        - name: start_date
-          tests:
-            - not_null
-        - name: keyword
-          tests:
-            - not_null
     - name: demandbase_keyword_set_keyword_source
       columns:
         - name: keyword

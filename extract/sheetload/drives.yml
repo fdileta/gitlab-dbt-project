@@ -59,6 +59,26 @@ folders:
     folder_name: zuora_revenue_revenue_waterfall_report
     table_name: zuora_revenue_revenue_waterfall_report
     table_replace_append: 1
+  - name: zuora_revenue_waterfall_report_with_wf_type_adjustments
+    owner: '@michellecooper'
+    folder_name: zuora_revenue_waterfall_report_with_wf_type_adjustments
+    table_name: zuora_revenue_waterfall_report_with_wf_type_adjustments
+    table_replace_append: 1
+  - name: zuora_revenue_waterfall_report_with_wf_type_unbilled_revenue
+    owner: '@michellecooper'
+    folder_name: zuora_revenue_waterfall_report_with_wf_type_unbilled_revenue
+    table_name: zuora_revenue_waterfall_report_with_wf_type_unbilled_revenue
+    table_replace_append: 1
+  - name: zuora_revenue_waterfall_report_with_wf_type_net_revenue_with_mje_flag_y
+    owner: '@michellecooper'
+    folder_name: zuora_revenue_waterfall_report_with_wf_type_net_revenue_with_mje_flag_y
+    table_name: zuora_revenue_waterfall_report_with_wf_type_net_revenue_with_mje_flag_y
+    table_replace_append: 1
+  - name: zuora_revenue_billing_waterfall_report_with_additional_columns
+    owner: '@michellecooper'
+    folder_name: zuora_revenue_billing_waterfall_with_additional_columns
+    table_name: zuora_revenue_billing_waterfall_report_with_additional_columns
+    table_replace_append: 1
   - name: marketing_press_sov
     owner: '@chrissharp'
     folder_name: marketing_press_sov

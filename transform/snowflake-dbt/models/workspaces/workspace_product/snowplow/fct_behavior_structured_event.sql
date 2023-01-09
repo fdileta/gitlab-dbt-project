@@ -23,7 +23,7 @@ WITH structured_event_renamed AS (
       session_id,
       session_index,
       platform,
-      page_url,
+      page_url_host_path,
       page_url_scheme,
       page_url_host,
       page_url_path,
@@ -32,6 +32,8 @@ WITH structured_event_renamed AS (
       app_id,
       dim_behavior_browser_sk,
       dim_behavior_operating_system_sk,
+      dim_behavior_website_page_sk,
+      dim_behavior_referrer_page_sk,
       gsc_environment,
       gsc_extra,
       gsc_namespace_id,
@@ -51,15 +53,6 @@ WITH structured_event_renamed AS (
 
     {% endif %}
 
-), dim_behavior_website_page AS (
-
-    SELECT 
-      dim_behavior_website_page.dim_behavior_website_page_sk,
-      dim_behavior_website_page.clean_url_path,
-      dim_behavior_website_page.page_url_host,
-      dim_behavior_website_page.app_id
-    FROM {{ ref('dim_behavior_website_page') }}
-
 ), structured_events_w_dim AS (
 
     SELECT
@@ -68,7 +61,8 @@ WITH structured_event_renamed AS (
       structured_event_renamed.event_id                                                                                                                        AS behavior_structured_event_pk,
 
       -- Foreign Keys
-      dim_behavior_website_page.dim_behavior_website_page_sk,
+      structured_event_renamed.dim_behavior_website_page_sk,
+      structured_event_renamed.dim_behavior_referrer_page_sk,
       structured_event_renamed.dim_behavior_browser_sk,
       structured_event_renamed.dim_behavior_operating_system_sk,
       structured_event_renamed.gsc_namespace_id                                                                                                                AS dim_namespace_id,
@@ -86,7 +80,7 @@ WITH structured_event_renamed AS (
       structured_event_renamed.session_id,
       structured_event_renamed.user_snowplow_domain_id,
       structured_event_renamed.contexts,
-      structured_event_renamed.page_url,
+      structured_event_renamed.page_url_host_path,
       structured_event_renamed.page_url_path,
       structured_event_renamed.page_url_scheme,
       structured_event_renamed.page_url_host,
@@ -101,10 +95,6 @@ WITH structured_event_renamed AS (
       structured_event_renamed.gsc_source
 
     FROM structured_event_renamed
-    LEFT JOIN dim_behavior_website_page
-      ON structured_event_renamed.clean_url_path = dim_behavior_website_page.clean_url_path
-        AND structured_event_renamed.page_url_host = dim_behavior_website_page.page_url_host
-        AND structured_event_renamed.app_id = dim_behavior_website_page.app_id
 
 )
 

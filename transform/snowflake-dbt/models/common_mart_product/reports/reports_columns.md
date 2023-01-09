@@ -98,7 +98,7 @@ Boolean flag set to True if a ping associated with the subscription was received
 
 The number of subscriptions or seats that meet the condition described in the estimation_grain. This is either a subscription reporting a metric or a subscription sending a ping from a version with that metric.
 
-Examples\: 
+Examples: 
 - If `estimation_grain = 'metric/version check - subscription based estimation'`, then this is a count of subscriptions that sent a ping from a version with the metric instrumented
 - If `estimation_grain = 'reported metric - seat based estimation'`, then this is a count of seats that reported the metric
 
@@ -108,7 +108,7 @@ Examples\:
 
 The number of subscriptions or seats that meet the condition described in the estimation_grain. This is either a subscription not sending a ping that month, not sending that particular metric, or sending a ping from a version without that metric (ex. an older version). This is defined as `total_count - reporting_count`
 
-Examples\: 
+Examples: 
 - If `estimation_grain = 'metric/version check - subscription based estimation'`, then this is a count of subscriptions that sent a ping from a version with the metric instrumented (they could be opted out of sending Service Ping or on an older version)
 - If `estimation_grain = 'reported metric - seat based estimation'`, then this is a count of seats that did not report the metric (they could be opted out of sending Service Ping, on an older version, or opted out of sending optional metrics)
 
@@ -118,7 +118,7 @@ Examples\:
 
 The total number of active subscriptions or seats that month, based on the estimation_grain.
 
-Examples\:
+Examples:
 - If `estimation_grain = 'metric/version check - subscription based estimation'`, then this is a count of active subscriptions that month
 - If `estimation_grain = 'reported metric - seat based estimation'`, then this is a count of seats associated with active subscriptions that month
 
@@ -126,17 +126,17 @@ Examples\:
 
 {% docs percent_reporting_estimation_model %}
 
-The percent of total subscriptions or seats that meet the condition described in the estimation_grain. This is calculated using the [`pct_w_counters` macro](https://dbt.gitlabdata.com/#!/macro/macro.gitlab_snowflake.pct_w_counters) as is defined as `reporting_count / (reporting_count + not_reporting_count)`
+The percent of total subscriptions or seats that meet the condition described in the estimation_grain. This is calculated using the [`pct_w_counters` macro](https://dbt.gitlabdata.com/#!/macro/macro.gitlab_snowflake.pct_w_counters) and is defined as `reporting_count / (reporting_count + not_reporting_count)`
 
 {% enddocs %}
 
 {% docs estimation_grain %}
 
-The estimation methodology being used. **The "official" methodology used for xMAU/PI reporting is `metric/version check - subscription based estimation`.** This value provides the context to understand `total_count`, `reporting_count`, `not_reporting_count`, and `percent_reporting`. 
+The estimation methodology being used. **The "official" methodology used for xMAU/PI reporting is "metric/version check - subscription based estimation".** This value provides the context to understand `total_count`, `reporting_count`, `not_reporting_count`, and `percent_reporting`. 
 
 estimation_grain is made up of two components: a condition and a measure (`condition - measure`). There are two conditions, `metric_version_check` (whether a subscription sent a ping from a version of GitLab with the metric instrumented) and `reported_metric` (whether a subscription reported the metric), and two measures `subscription based` (count of subscriptions) and `seat based` (count of seats).
 
-Examples\:
+Examples:
 - `estimation_grain = 'metric/version check - subscription based estimation'`: This is a methodology based on the count of subscriptions that sent a ping from on a version with the metric instrumented
 - `estimation_grain = 'reported metric - seat based estimation'`: This methodology is based on the count of seats that reported the metric
 

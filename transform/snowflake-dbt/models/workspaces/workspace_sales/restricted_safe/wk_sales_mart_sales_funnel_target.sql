@@ -150,9 +150,9 @@
 
   SELECT *
   FROM final
-  UNION
-  SELECT *
-  FROM fy24_target_placeholder
+  -- UNION
+  -- SELECT *
+  -- FROM fy24_target_placeholder
 
 )
 

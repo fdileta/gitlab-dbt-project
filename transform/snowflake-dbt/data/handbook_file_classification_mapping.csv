@@ -22,3 +22,4 @@ data/performance_indicators/customer_support_department.yml,support
 data/performance_indicators/ux_department.yml,ux
 data/performance_indicators/incubation_engineering_department.yml,incubation
 data/performance_indicators/engineering_function.yml,engineering
+/handbook/security/,security
