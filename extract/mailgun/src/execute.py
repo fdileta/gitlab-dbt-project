@@ -93,14 +93,18 @@ def extract_logs(
 
                 items = data.get("items")
 
+                page_token = data.get("paging").get("next")
+
+                if not page_token:
+                    break
+
+                if items is None or len(items) == 0:
+                    continue
+
                 first_timestamp = items[0].get("timestamp")
                 str_stamp = datetime.datetime.fromtimestamp(first_timestamp).strftime(
                     "%d-%m-%Y %H:%M:%S.%f"
                 )
-
-                if first_timestamp is None:
-                    break
-
                 info(f"Processed data starting on {str_stamp}")
 
                 all_results = all_results[:] + items[:]
@@ -118,10 +122,7 @@ def extract_logs(
 
                 items = data.get("items")
 
-                if items is None:
-                    continue
-
-                if len(items) == 0:
+                if items is None or len(items) == 0:
                     continue
 
                 all_results = all_results[:] + items[:]
