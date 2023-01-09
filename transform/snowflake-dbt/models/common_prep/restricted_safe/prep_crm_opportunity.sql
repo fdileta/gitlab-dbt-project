@@ -651,7 +651,6 @@
        ELSE '5. Other'
       END                                                                                       AS deal_category,
       COALESCE(sfdc_opportunity.reason_for_loss, sfdc_opportunity.downgrade_reason)               AS reason_for_loss_staged,
-      IFNULL(sfdc_opportunity.reason_for_loss, sfdc_opportunity.downgrade_reason) AS reason_for_loss_staged_test,
       CASE
         WHEN reason_for_loss_staged IN ('Do Nothing','Other','Competitive Loss','Operational Silos')
           OR reason_for_loss_staged IS NULL
@@ -880,39 +879,18 @@
           THEN net_arr
         ELSE 0
       END                                                AS open_1plus_net_arr,
-
       CASE
         WHEN is_eligible_open_pipeline = 1
           AND is_stage_3_plus = 1
             THEN net_arr
         ELSE 0
       END                                                AS open_3plus_net_arr,
-
       CASE
         WHEN is_eligible_open_pipeline = 1
           AND is_stage_4_plus = 1
             THEN net_arr
         ELSE 0
       END                                                AS open_4plus_net_arr,
-      CASE
-        WHEN (sfdc_opportunity_stage.is_won = 1 
-            OR (is_renewal = 1 
-                AND is_lost = 1))
-          THEN 1
-        ELSE 0
-      END                                                AS test_booked_net_arr_stage_flag,
-      CASE
-        WHEN (sfdc_opportunity_stage.is_won = 1 
-            OR (is_renewal = 1 
-                AND is_lost = 1))
-          THEN net_arr
-        ELSE 0 
-      END                                                 AS test_booked_net_arr,
-      CASE
-        WHEN test_booked_net_arr_stage_flag = 1
-          THEN net_arr
-        ELSE 0 
-      END                                                 AS test_booked_net_arr_with_flag,
       CASE
         WHEN (
                 sfdc_opportunity_stage.is_won = 1
