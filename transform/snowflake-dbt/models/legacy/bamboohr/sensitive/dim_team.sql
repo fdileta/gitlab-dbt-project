@@ -17,6 +17,8 @@ recursive_hierarchy AS (
         root.team_manager_name_id,
         root.team_superior_team_id,
         root.team_inactivated_date,
+        root.valid_from,
+        IFNULL(root.valid_to, CURRENT_DATE())                                            AS valid_to,
         TO_ARRAY(root.valid_to)                                                          AS valid_to_list,
         TO_ARRAY(root.valid_from)                                                        AS valid_from_list,
         TO_ARRAY(root.team_id)                                                           AS upstream_organizations
@@ -36,6 +38,8 @@ recursive_hierarchy AS (
         iter.team_manager_name_id,
         iter.team_superior_team_id,
         iter.team_inactivated_date,
+        iter.valid_from,
+        IFNULL(iter.valid_to, CURRENT_DATE())                                            AS valid_to,
         ARRAY_APPEND(anchor.valid_to_list, iter.valid_to)                                AS valid_to_list,
         ARRAY_APPEND(anchor.valid_from_list, iter.valid_from)                            AS valid_from_list,
         ARRAY_APPEND(anchor.upstream_organizations, iter.team_id)                        AS upstream_organizations
@@ -49,7 +53,7 @@ recursive_hierarchy AS (
 final AS (
 
     SELECT 
-        {{ dbt_utils.surrogate_key(['team_id', 'team_hierarchy_level', 'team_members_count','team_manager_inherited','team_inactivated','team_name','team_manager_name', 'team_manager_name_id', 'team_superior_team_id', 'team_inactivated_date']) }} 
+        {{ dbt_utils.surrogate_key(['team_id', 'team_hierarchy_level','team_manager_inherited','team_inactivated','team_name','team_manager_name', 'team_manager_name_id', 'team_superior_team_id', 'team_inactivated_date']) }} 
                                                                                          AS dim_team_sk,
         recursive_hierarchy.team_id, 
         recursive_hierarchy.team_hierarchy_level,
@@ -71,7 +75,9 @@ final AS (
         NULLIF(recursive_hierarchy.upstream_organizations[5],'')::VARCHAR                AS hierarchy_level_6,
         NULLIF(recursive_hierarchy.upstream_organizations[6],'')::VARCHAR                AS hierarchy_level_7,
         NULLIF(recursive_hierarchy.upstream_organizations[7],'')::VARCHAR                AS hierarchy_level_8,
-        NULLIF(recursive_hierarchy.upstream_organizations[8],'')::VARCHAR                AS hierarchy_level_9
+        NULLIF(recursive_hierarchy.upstream_organizations[8],'')::VARCHAR                AS hierarchy_level_9,
+        recursive_hierarchy.valid_from_list[ARRAY_SIZE(recursive_hierarchy.valid_from_list) - 1] AS valid_from,
+        recursive_hierarchy.valid_to_list[ARRAY_SIZE(recursive_hierarchy.valid_to_list) - 1]     AS valid_to
     FROM recursive_hierarchy
 
 )
