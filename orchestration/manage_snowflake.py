@@ -155,6 +155,12 @@ class SnowflakeManager:
     
     def grant_clones(self):
 
+        databases = {
+            "prep": self.prep_database,
+            "prod": self.prod_database,
+            "raw": self.raw_database,
+        }
+        
         logging.info(dir())
 
     def delete_clones(self):
