@@ -311,8 +311,6 @@ resource_labels as (
         ON
         export.source_primary_key = rule_1_ids.source_primary_key
         -- -- -- -- -- -- 
-        WHERE
-        invoice_month = '2022-11-01'
        {{ dbt_utils.group_by(n=14) }})
 SELECT
         billing_base_rules.day as day,
