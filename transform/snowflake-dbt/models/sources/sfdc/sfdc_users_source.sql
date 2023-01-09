@@ -23,6 +23,7 @@ WITH source AS (
       userroleid                                                        AS user_role_id,
       user_role_type__c                                                 AS user_role_type,
       start_date__c                                                     AS start_date,
+      ramping_quata__c                                                  AS ramping_quota,
       {{ sales_hierarchy_sales_segment_cleaning('user_segment__c') }}   AS user_segment,
       user_geo__c                                                       AS user_geo,
       user_region__c                                                    AS user_region,
