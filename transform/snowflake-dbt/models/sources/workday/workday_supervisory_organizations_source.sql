@@ -17,7 +17,6 @@ WITH source AS (
     team_superior_team_id::VARCHAR    AS team_superior_team_id,
     team_inactivated_date::TIMESTAMP  AS team_inactivated_date,
     _fivetran_deleted::BOOLEAN        AS is_deleted,
-    _fivetran_synced::TIMESTAMP       AS uploaded_at,
     dbt_valid_from::TIMESTAMP         AS valid_from,
     dbt_valid_to::TIMESTAMP           AS valid_to
   FROM source
