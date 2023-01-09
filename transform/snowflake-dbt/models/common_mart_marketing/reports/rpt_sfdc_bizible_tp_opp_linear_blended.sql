@@ -173,8 +173,8 @@
       rpt_sfdc_bizible_linear.bizible_referrer_page,
       rpt_sfdc_bizible_linear.bizible_referrer_page_raw,
       rpt_sfdc_bizible_linear.bizible_salesforce_campaign,
-	  rpt_sfdc_bizible_linear.dim_campaign_id,
-	  rpt_sfdc_bizible_linear.campaign_rep_role_name,
+	    rpt_sfdc_bizible_linear.dim_campaign_id,
+	    rpt_sfdc_bizible_linear.campaign_rep_role_name,
       rpt_sfdc_bizible_linear.pipe_name,
       CASE
         WHEN touchpoint_segment = 'Demand Gen' THEN 1

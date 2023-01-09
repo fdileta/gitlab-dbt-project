@@ -385,7 +385,7 @@ models:
         - not_null
         - unique
       tags: ["tdf", "mart", "arr", "retention"]
-  - name: rpt_lead_to_rev
+  - name: rpt_lead_to_revenue
     description: Maps a person (unconverted lead or a contact) to an opportunity through their associated Salesforce account and connects any of their related touchpoints.
     tests:
     - dbt_utils.unique_combination_of_columns:
