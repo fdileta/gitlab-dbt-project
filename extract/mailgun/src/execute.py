@@ -73,6 +73,7 @@ def extract_logs(
     formatted_start_date = utils.format_datetime(start_date)
     formatted_end_date = utils.format_datetime(end_date)
 
+    last_page_token = None
     for domain in domains:
 
         while True:
@@ -90,12 +91,16 @@ def extract_logs(
                 except json.decoder.JSONDecodeError:
                     error("No response received")
                     break
+
+
                 items = data.get("items")
 
-                # Clear last page token
-                page_token = None
-
                 page_token = data.get("paging").get("next")
+
+                if last_page_token == page_token:
+                    break
+                else:
+                    last_page_token = page_token
 
                 info(f"page token {page_token}")
                 info(f"len items {len(items)}")
