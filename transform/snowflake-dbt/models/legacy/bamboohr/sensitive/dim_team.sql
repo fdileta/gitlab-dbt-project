@@ -53,8 +53,7 @@ recursive_hierarchy AS (
 final AS (
 
     SELECT 
-        {{ dbt_utils.surrogate_key(['team_id', 'team_hierarchy_level','team_manager_inherited','team_inactivated','team_name','team_manager_name', 'team_manager_name_id', 'team_superior_team_id', 'team_inactivated_date']) }} 
-                                                                                         AS dim_team_sk,
+        {{ dbt_utils.surrogate_key(['team_id', 'valid_to', 'valid_from']) }}                                                                  AS dim_team_sk,
         recursive_hierarchy.team_id, 
         recursive_hierarchy.team_hierarchy_level,
         recursive_hierarchy.team_members_count,
