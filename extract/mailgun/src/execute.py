@@ -95,6 +95,8 @@ def extract_logs(
 
                 page_token = data.get("paging").get("next")
 
+                info(f"page token {page_token}")
+                info(f"len items {len(items)}")
                 if not page_token:
                     break
 
