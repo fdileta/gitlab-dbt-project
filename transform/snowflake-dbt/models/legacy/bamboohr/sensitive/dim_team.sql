@@ -18,7 +18,7 @@ recursive_hierarchy AS (
         root.team_superior_team_id,
         root.team_inactivated_date,
         root.valid_from,
-        root.valid_to,
+        IFNULL(root.valid_to, CURRENT_TIMESTAMP())::TIMESTAMP                                                                                 AS valid_to,
         TO_ARRAY(root.valid_to)                                                                                                               AS valid_to_list,
         TO_ARRAY(root.valid_from)                                                                                                             AS valid_from_list,
         TO_ARRAY(root.team_id)                                                                                                                AS upstream_organizations
@@ -39,7 +39,7 @@ recursive_hierarchy AS (
         iter.team_superior_team_id,
         iter.team_inactivated_date,
         iter.valid_from,
-        iter.valid_to,
+        IFNULL(iter.valid_to, CURRENT_TIMESTAMP())::TIMESTAMP                                                                                 AS valid_to,
         ARRAY_APPEND(anchor.valid_to_list, iter.valid_to)                                                                                     AS valid_to_list,
         ARRAY_APPEND(anchor.valid_from_list, iter.valid_from)                                                                                 AS valid_from_list,
         ARRAY_APPEND(anchor.upstream_organizations, iter.team_id)                                                                             AS upstream_organizations
@@ -47,10 +47,11 @@ recursive_hierarchy AS (
     INNER JOIN supervisory_orgs AS iter
         ON iter.team_superior_team_id = anchor.team_id
             AND NOT ARRAY_CONTAINS(iter.team_id::VARIANT, anchor.upstream_organizations)
+            
       
 ),
 
-final AS (
+cleaned AS (
 
     SELECT 
         {{ dbt_utils.surrogate_key(['team_id', 'valid_to', 'valid_from']) }}                                                                  AS dim_team_sk,
@@ -74,17 +75,17 @@ final AS (
         IFF(recursive_hierarchy.upstream_organizations[7] IS NULL, '--', recursive_hierarchy.upstream_organizations[7])::VARCHAR              AS hierarchy_level_8,
         IFF(recursive_hierarchy.upstream_organizations[8] IS NULL, '--', recursive_hierarchy.upstream_organizations[8])::VARCHAR              AS hierarchy_level_9,
         recursive_hierarchy.upstream_organizations                                                                                            AS hierarchy_levels_array,
-        recursive_hierarchy.valid_from_list[ARRAY_SIZE(recursive_hierarchy.valid_from_list) - 1]::TIMESTAMP                                   AS valid_from,
-        recursive_hierarchy.valid_to_list[ARRAY_SIZE(recursive_hierarchy.valid_to_list) - 1]::TIMESTAMP                                       AS valid_to,
-
-        IFF(recursive_hierarchy.team_inactivated IS NULL,
-          TRUE, FALSE)                                                                                                                        AS is_currently_valid
+        IFF(recursive_hierarchy.team_inactivated = 0,
+          TRUE, FALSE)                                                                                                                        AS is_currently_valid,
+        recursive_hierarchy.valid_from_list[ARRAY_SIZE(recursive_hierarchy.valid_from_list) - 1]::TIMESTAMP                                   AS hierarchy_valid_from,
+        recursive_hierarchy.valid_to_list[ARRAY_SIZE(recursive_hierarchy.valid_to_list) - 1]::TIMESTAMP                                       AS hierarchy_valid_to
     FROM recursive_hierarchy
+    {{ dbt_utils.group_by(n=24)}}
 
 )
 
 SELECT * 
-FROM final
+FROM cleaned
 
 
 
