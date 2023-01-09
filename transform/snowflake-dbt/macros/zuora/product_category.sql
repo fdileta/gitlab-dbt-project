@@ -5,6 +5,8 @@ CASE
     THEN 'SaaS - Ultimate'
   WHEN LOWER({{product_column}}) LIKE '%silver%'
     THEN 'SaaS - Premium'
+  WHEN LOWER({{product_column}}) LIKE '%dedicated - ultimate%'
+    THEN 'Dedicated - Ultimate'
   WHEN LOWER({{product_column}}) LIKE '%ultimate%'
     THEN 'Self-Managed - Ultimate'
   WHEN LOWER({{product_column}}) LIKE '%premium%'
@@ -64,6 +66,8 @@ CASE
                                     , 'Dedicated Engineer - 3 Month'
                                     , 'Dedicated Engineer - 6 Month (w/ Security Clearance)'
                                     , 'Dedicated Engineer - 6 Month'
+                                    , 'GitLab System Administration Training - Remote'
+                                    , 'Expert Services (48 Hours)'
                                     )
     THEN 'Support'
   WHEN LOWER({{product_column}}) LIKE 'gitlab geo%'

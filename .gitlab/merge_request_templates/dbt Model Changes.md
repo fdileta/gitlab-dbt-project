@@ -31,7 +31,8 @@ If you are the person who will be using this data and/or the dashboard it depend
 - [ ] If the periscope_query job failed, validate that the changes you've made don't affect the grain of the table or the expected output in Periscope.
 - [ ] If you are on the Data Team, please paste the output of `dbt test` when run locally below. Any failing tests should be fixed or explained prior to requesting a review.
 
-<summary> dbt test results </summary>
+<details>
+<summary> dbt Test Results </summary>
 
 <pre><code>
 
@@ -39,6 +40,7 @@ Paste the results of dbt test here, including the command.
 
 </code></pre>
 
+</details>
 
 #### Style & Structure
 
@@ -61,6 +63,24 @@ Paste the results of dbt test here, including the command.
 
 
 **What to do for failed pipelines** See our [handbook page](https://about.gitlab.com/handbook/business-ops/data-team/platform/ci-jobs/#what-to-do-if-a-pipeline-fails) 
+
+#### Performance
+<details>
+<summary><i>Click to toggle Performance</i></summary>
+The aim of the Performance sections is to bring awareness to the performance of the models that are being changed.  Not every change is expected to effect the performance of the model but understanding the model performance will support future development.  Use your discretion on the effort put into this section of the Merge Request as is it not intended to be a blocker to development.
+
+- [ ] Using the [dbt Model Performance runbook](https://gitlab.com/gitlab-data/runbooks/-/blob/main/dbt_performance/model_build_performance.md) retrieve the performance categories for any changed or new models.
+- [ ] Follow the [guidelines](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#guidance-for-checking-model-performance) in the handbook for improving the performance as needed.
+
+<details>
+<summary> Performance Categories Table </summary>
+
+| Model Name | Run Time Category | Size Category | Efficiency Category |
+|------------|-------------------|---------------|---------------------|
+|            |                   |               |                     |
+
+</details>
+</details>
 
 #### Auditing
 <details>
@@ -104,7 +124,10 @@ Example: You might be looking at the count of opportunities before and after, if
 
 - [ ] Does this MR change the **schema** or **model name** of any existing models?
   - [ ] Create an issue to change all existing periscope reporting to reference the new schema/name.
-  - [ ] After merging, ensure the old model is dropped from snowflake. This can be done by creating an issue specifying the tables/models to be dropped and assiging to a snowflake admin. 
+  - [ ] After merging, ensure the old model is dropped from snowflake. This can be done by creating an issue specifying the tables/models to be dropped and assiging to a snowflake admin.
+- [ ] Does this MR introduce a new **schema**?
+  - [ ] Create the schema using the corresponding role (on `RAW` using the `LOADER` role, on `PREP` and `PROD` using the `TRANSFORMER` role)
+  - [ ] Run the Monte Carlo permissions script (documented in the [Handbook](https://about.gitlab.com/handbook/business-technology/data-team/platform/monte-carlo/#note-on-dwh-permissions) and located in MC's official docs) with the corresponding database name as a parameter, for the permissions on this schema to be granted to the `data_observability` role
 </details>
 
 #### Snapshot model

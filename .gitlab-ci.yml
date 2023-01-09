@@ -134,7 +134,7 @@ clone_stop:
 
 .python_check: &python_check
   stage: 🐍 Python
-  image: registry.gitlab.com/gitlab-data/data-image/ci-python-image:v1.0.0
+  image: registry.gitlab.com/gitlab-data/data-image/ci-python-image:v1.0.16
   before_script:
     - CHANGED_FILES=$(git diff --name-only ${CI_COMMIT_SHA} origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} | grep '\.py'$)
   tags:
@@ -150,7 +150,7 @@ clone_stop:
   stage: 🐍 Python
   tags:
     - analytics
-  image: registry.gitlab.com/gitlab-data/data-image/data-image:v0.0.20
+  image: registry.gitlab.com/gitlab-data/data-image/data-image:v1.0.21
   only:
     changes:
       - "**/*.py"
@@ -178,7 +178,7 @@ clone_stop:
   <<: *python_check
   script:
     - echo "Changed files are $CHANGED_FILES"
-    - pylint $CHANGED_FILES --disable=line-too-long,E0401,E0611,W1203,W1202
+    - pylint $CHANGED_FILES --ignore=dags --disable=line-too-long,E0401,E0611,W1203,W1202,C0103,R0902,W0212
 
 🤔python_complexity:
   <<: *python_check

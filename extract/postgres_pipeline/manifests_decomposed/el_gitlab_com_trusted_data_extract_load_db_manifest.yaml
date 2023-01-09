@@ -546,6 +546,22 @@ tables:
         WHERE DATE(updated_at) > current_date - interval '8' day
         GROUP BY 1,2,3
         UNION ALL
+        SELECT 'protected_branch_merge_access_levels' AS table_name
+        , DATE(created_at) as created_date
+        , DATE(updated_at) as updated_date
+        , count(*) as number_of_records
+        FROM protected_branch_merge_access_levels
+        WHERE DATE(updated_at) > current_date - interval '8' day
+        GROUP BY 1,2,3
+        UNION ALL
+        SELECT 'protected_branch_push_access_levels' AS table_name
+        , DATE(created_at) as created_date
+        , DATE(updated_at) as updated_date
+        , count(*) as number_of_records
+        FROM protected_branch_push_access_levels
+        WHERE DATE(updated_at) > current_date - interval '8' day
+        GROUP BY 1,2,3
+        UNION ALL
         SELECT 'gitlab_db_protected_environment_approval_rules' AS table_name
         , DATE(created_at) as created_date
         , DATE(updated_at) as updated_date
@@ -665,6 +681,14 @@ tables:
         , DATE(updated_at) as updated_date
         , count(*) as number_of_records
         FROM users
+        WHERE DATE(updated_at) > current_date - interval '8' day
+        GROUP BY 1,2,3
+        UNION ALL
+        SELECT 'merge_request_predictions' AS table_name
+        , DATE(created_at) as created_date
+        , DATE(updated_at) as updated_date
+        , count(*) as number_of_records
+        FROM merge_request_predictions
         WHERE DATE(updated_at) > current_date - interval '8' day
         GROUP BY 1,2,3
   cluster_10:
@@ -855,14 +879,6 @@ tables:
         , DATE(updated_at) as updated_date
         , count(*) as number_of_records
         FROM merge_request_diffs
-        WHERE DATE(created_at) > current_date - interval '8' day
-        GROUP BY 1,2,3
-        UNION ALL
-        SELECT 'gitlab_db_experiment_subjects' AS table_name
-        , DATE(created_at) as created_date
-        , DATE(updated_at) as updated_date
-        , count(*) as number_of_records
-        FROM experiment_subjects
         WHERE DATE(created_at) > current_date - interval '8' day
         GROUP BY 1,2,3
   cluster_15:

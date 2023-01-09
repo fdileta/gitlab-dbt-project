@@ -134,6 +134,9 @@ WITH sfdc_lead AS (
       email_bounced_date                                                                AS marketo_email_bounced_date,
       is_unsubscribed                                                                   AS is_marketo_unsubscribed,
       compliance_segment_value                                                          AS marketo_compliance_segment_value,
+      is_pql_marketo,
+      is_paid_tier_marketo,
+      is_ptpt_contact_marketo,
       (ROW_NUMBER() OVER (PARTITION BY email ORDER BY updated_at DESC))                 AS record_number
 
     FROM marketo
@@ -257,6 +260,9 @@ WITH sfdc_lead AS (
       marketo_lead.marketo_email_bounced_date                                                                            AS marketo_email_hard_bounced_date,
       COALESCE(marketo_lead.is_marketo_unsubscribed, FALSE)                                                              AS is_marketo_opted_out,
       marketo_lead.marketo_compliance_segment_value                                                                      AS marketo_compliance_segment_value,
+      IFNULL(marketo_lead.is_pql_marketo, FALSE)                                                                         AS is_pql_marketo,
+      IFNULL(marketo_lead.is_paid_tier_marketo, FALSE)                                                                   AS is_paid_tier_marketo,
+      IFNULL(marketo_lead.is_ptpt_contact_marketo, FALSE)                                                                AS is_ptpt_contact_marketo,
       CASE
         WHEN sfdc.email_address IS NOT NULL THEN TRUE
         ELSE FALSE
@@ -327,5 +333,5 @@ WITH sfdc_lead AS (
     created_by="@rmistry",
     updated_by="@jpeguero",
     created_date="2021-01-19",
-    updated_date="2022-06-08"
+    updated_date="2022-08-31"
 ) }}

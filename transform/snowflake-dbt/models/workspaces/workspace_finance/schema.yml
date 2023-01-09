@@ -971,6 +971,11 @@ models:
         description: Annual Recurring Revenue value for given month
       - name: quantity
         description: Total quantity
+  - name: rpt_dropped_manual_true_up_charges
+    description: Report table for tracking true up changes from Zuora Revenue which have been dropped from the data based on historical snapshots. Exceptions have been added due to data quality issues where some subscriptions were mislabled as true ups incorrectly for a period of time, so these should not be considered dropped true ups.
+    columns:
+      - name: subscription_name
+        description: The name of a subscription in Zuora Revenue.
   - name: rpt_manual_true_up_charge
     description: Report table for tracking true up changes from Zuora Revenue which are added manually into ARR modeling.
     columns:
@@ -1106,6 +1111,10 @@ models:
     description: Zuora Revenue Unleased POB Report downloaded quarterly
   - name: driveload_zuora_revenue_unbill_rollforward_report
     description: Zuora Revenue Unbill Rollforward Report downloaded quarterly
+  - name: driveload_zuora_revenue_waterfall_report_with_wf_type_adjustments
+  - name: driveload_zuora_revenue_waterfall_report_with_wf_type_unbilled_revenue
+  - name: driveload_zuora_revenue_waterfall_report_with_wf_type_net_revenue_with_mje_flag_y
+  - name: driveload_zuora_revenue_billing_waterfall_report_with_additional_columns
   - name: netsuite_currency_exchange_rates
     description: Exchange rate between a transaction currency and base currency on a given day provided by Netsuite.
     columns:
@@ -1117,3 +1126,75 @@ models:
         description: Rate of exchange between the transaction and base currency
       - name: effective_date
         description: When the exchange rate was effective
+  - name: driveload_booking_to_billing_monthly_reconciliation
+    description: Output of Finance's analysis determining timing differences between bookings and billings
+  - name: rpt_arr_no_manual_adjustment_for_sfdc_reconciliation
+    description: Report view of [mart_arr](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.mart_arr) without the manual true up adjustments added from Zuora Revenue. This report is used exclusively for the montly Salesforce reconciliation process and is not to be used for financial reporting since it does not include the manually adjusted true up charges.
+    columns:
+      - name: primary_key
+        description: Primary key of the model (arr month, subscription name, product detail id),
+        tests:
+          - not_null
+          - unique
+      - name: billing_account_number
+        tests:
+          - not_null
+      - name: subscription_name_slugify
+        tests: 
+          - not_null
+      - name:  subscription_name
+        tests:
+          - not_null
+      - name: arr_month 
+        tests:
+          - not_null
+      - name: mrr
+        tests:
+          - not_null
+      - name: dim_billing_account_id
+        tests:
+          - not_null
+      - name: billing_account_name 
+        tests: 
+          - not_null
+      - name: product_tier_name 
+        tests:
+          - not_null
+  - name: rpt_gcp_billing_skus_day
+    description: gcp billing data aggregated per day and mapped with SKU mapping (https://docs.google.com/spreadsheets/d/1Fx7Ah2wphM3GoAkPDFBT-89tia3Mgd4BrfWxAj9B-5Q/edit#gid=1350489934)
+    columns:
+      - name: day
+        description: date
+        tests:
+          - not_null
+      - name: gcp_project_id
+        description: gcp project name
+      - name: gcp_service_description
+        description: gcp service full name
+      - name: gcp_sku_description
+        description: gcp sku full name
+      - name: finance_sku_type
+        description: implements high-level sku buckets (Compute. Storage, etc...)
+      - name: finance_sku_subtype
+        description: implements sku sub-buckets
+      - name: usage_unit
+        description: usage unit (seconds, bytes-seconds, etc...)
+      - name: usage_amount
+        description: usage amount in usage_unit
+      - name: net_cost
+        description: gcp net cost for gitlab
+  - name: rpt_gcp_billing_service_mapping_day
+    description: GCP Billing Service mapping https://gitlab.com/gitlab-org/quality/engineering-analytics/finops-analysis/-/issues/12
+    columns:
+      - name: day
+        description: date
+      - name: gcp_project_id
+        description: GCP project id - the project id the resource is running in
+      - name: gcp_service_description
+        description: cloud service used by the resource
+      - name: gcp_sku_description
+        description: gcp service sub-category
+      - name: gitlab_service
+        description: gitlab service mapping
+      - name: net_cost
+        description: net cost paid by GitLab

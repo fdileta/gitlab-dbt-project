@@ -333,7 +333,7 @@ Currently, the following tables are included in the model:
 * gitlab_dotcom_releases
 * gitlab_dotcom_requirements
 * gitlab_dotcom_secure_stage_ci_jobs
-* gitlab_dotcom_services
+* gitlab_dotcom_integrations
 * gitlab_dotcom_snippets
 * gitlab_dotcom_todos
 

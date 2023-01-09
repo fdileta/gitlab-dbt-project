@@ -11,16 +11,18 @@ WITH employee_directory_intermediate AS (
 
 ),
 
+
 cleaned AS (
 
   SELECT
     date_actual,
     employee_id,
     reports_to,
+    reports_to_id,
     full_name,
     work_email,
     gitlab_username,
-    region,
+    region_modified AS region,
     sales_geo_differential,
     jobtitle_speciality,
     job_role_modified,
@@ -50,7 +52,7 @@ cleaned AS (
     CASE
       WHEN date_actual < '2020-06-09'
         THEN FALSE
-      WHEN date_actual >= '2020-06-09' AND sales_geo_differential = 'n/a - Comp Calc'
+      WHEN date_actual >= '2020-06-09' AND LOWER(sales_geo_differential) = 'n/a - comp calc'
         THEN FALSE
       ELSE TRUE
     END AS exclude_from_location_factor

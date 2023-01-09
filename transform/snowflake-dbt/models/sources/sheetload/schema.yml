@@ -678,4 +678,48 @@ models:
         - not_null
     - name: ip_type
       description: Indicates if the original ip was in ipv4 or ipv6 format.
-
+- name: sheetload_sales_analytics_tableau_rls_users_source
+  description: Users for SS&A Tableau row-level-security
+  columns:
+    - name: email
+      tests:
+        - not_null
+    - name: username
+      tests:
+        - not_null
+    - name: role
+      tests:
+        - not_null
+- name: sheetload_sales_analytics_tableau_rls_roles_source
+  description: User roles for SS&A Tableau row-level-security
+  columns:
+    - name: role
+      tests:
+        - not_null
+    - name: key_segment_geo
+      tests:
+        - not_null
+- name: sheetload_ga360_custom_dimensions_source
+  description: Custom Dimension Name field from Google Analytics (GA360). Custom dimensions are subject to change or new dimensions may be added. This Google Sheet will automatically update at the 1st of every month powered by a Google Apps Script function.
+  columns: 
+    - name: dimension_name
+      tests:
+        - not_null 
+    - name: dimension_index
+      tests:
+        - not_null
+        - unique
+    - name: dimension_scope
+      tests:
+        - not_null
+- name: sheetload_toy_marketing_handbook_source
+  description: Toy dataset for ad-hoc Propensity to Purchase modeling
+- name: sheetload_leading_organization_entry_dates_source
+  description: The entry and exit dates of organizations that are admitted into our Leading Organization program
+  columns:
+    - name: contributor_organization
+      tests:
+        - not_null
+        - unique
+- name: sheetload_fy24_placeholder_target_source
+  description: Placeholder targets loaded to test the new target structure ahead of the new fiscal year.

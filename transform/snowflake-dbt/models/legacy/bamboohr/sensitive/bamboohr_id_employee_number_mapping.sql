@@ -13,6 +13,7 @@ WITH source AS (
       last_name,
       hire_date,
       termination_date,
+      first_inactive_date,
       CASE 
         WHEN age BETWEEN 18 AND 24 THEN '18-24'
         WHEN age BETWEEN 25 AND 29  THEN '25-29'
@@ -43,7 +44,7 @@ WITH source AS (
         greenhouse_candidate_id,
         uploaded_at                                                                    AS last_updated_date,
       CASE
-        WHEN COALESCE(ethnicity, 'Did Not Identify') NOT IN ('White','Asian','Did Not Identify')
+        WHEN COALESCE(ethnicity, 'Did Not Identify') NOT IN ('White','Asian','Did Not Identify','Declined to Answer')
             THEN TRUE
         ELSE FALSE END                                                                  AS urg_group
     FROM source

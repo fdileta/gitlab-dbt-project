@@ -12,7 +12,10 @@ WITH RECURSIVE employee_directory AS (
     last_name,
     hire_date,
     rehire_date,
+    region_modified,
+    country,
     termination_date,
+    first_inactive_date,
     hire_location_factor,
     last_work_email,
     (COALESCE(first_name,'') || ' ' || COALESCE(last_name,'')) AS full_name
@@ -82,7 +85,7 @@ direct_reports AS (
       LEFT JOIN employee_directory
         ON employee_directory.hire_date::DATE <= date_details.date_actual
           AND COALESCE(
-            employee_directory.termination_date::DATE, {{ max_date_in_bamboo_analyses() }}
+            employee_directory.first_inactive_date::DATE, {{ max_date_in_bamboo_analyses() }}
           ) >= date_details.date_actual
       LEFT JOIN department_info
         ON employee_directory.employee_id = department_info.employee_id
@@ -180,6 +183,7 @@ enriched AS (
     department_info.division_mapped_current,
     department_info.division_grouping,
     department_info.reports_to,
+    department_info.reports_to_id,
     location_factor.location_factor AS location_factor,
     location_factor.locality,
     job_role.gitlab_username,
@@ -213,40 +217,29 @@ enriched AS (
     IFF(
       employee_directory.hire_date < employment_status_records_check.employment_status_first_value,
       'Active', employment_status.employment_status) AS employment_status,
-    CASE
-      WHEN (LEFT(department_info.job_title, 5) = 'Staff'
-        OR LEFT(department_info.job_title, 13) = 'Distinguished'
-        OR LEFT(department_info.job_title, 9) = 'Principal')
-        AND COALESCE(
-          job_role.job_grade, job_info_mapping_historical.job_grade
-        ) IN ('8', '9', '9.5', '10')
-        THEN 'Staff'
-      WHEN department_info.job_title ILIKE '%Fellow%' THEN 'Staff'
-      WHEN
-        COALESCE(
-          job_role.job_grade, job_info_mapping_historical.job_grade
-        ) IN ('11', '12', '14', '15', 'CXO')
-        THEN 'Senior Leadership'
-      WHEN COALESCE(job_role.job_grade, job_info_mapping_historical.job_grade) LIKE '%C%'
-        THEN 'Senior Leadership'
-      WHEN (department_info.job_title LIKE '%VP%'
-        OR department_info.job_title LIKE '%Chief%'
-        OR department_info.job_title LIKE '%Senior Director%')
-        AND COALESCE(job_role.job_role,
-          job_info_mapping_historical.job_role,
-          department_info.job_role) = 'Leader'
-        THEN 'Senior Leadership'
-      WHEN COALESCE(job_role.job_grade, job_info_mapping_historical.job_grade) = '10'
-        THEN 'Manager'
-      WHEN COALESCE(job_role.job_role,
-        job_info_mapping_historical.job_role,
-        department_info.job_role) = 'Manager'
-        THEN 'Manager'
-      WHEN COALESCE(direct_reports.total_direct_reports, 0) = 0
+    CASE IFF(
+           date_details.date_actual BETWEEN '2019-11-01' AND '2020-02-27'
+           AND job_info_mapping_historical.job_role IS NOT NULL,
+           job_info_mapping_historical.job_role,
+           COALESCE(job_role.job_role, department_info.job_role))
+      WHEN 'Intern'
         THEN 'Individual Contributor'
-      ELSE COALESCE(job_role.job_role,
-        job_info_mapping_historical.job_role,
-        department_info.job_role) END AS job_role_modified,
+      WHEN 'Individual Contributor'
+        THEN 'Individual Contributor'
+      WHEN 'Manager'
+        THEN 'Manager'
+      WHEN 'Director'
+        THEN 'Director+'
+      WHEN 'Vice President'
+        THEN 'Director+'
+      WHEN 'Leader'
+        THEN 'Director+'
+      WHEN 'Chief Executive Officer'
+        THEN 'Director+'
+      ELSE IFF(date_details.date_actual BETWEEN '2019-11-01' AND '2020-02-27'
+             AND job_info_mapping_historical.job_role IS NOT NULL,
+             job_info_mapping_historical.job_role,
+             COALESCE(job_role.job_role, department_info.job_role)) END AS job_role_modified,
     IFF(promotion.compensation_change_reason IS NOT NULL, TRUE, FALSE) AS is_promotion,
     ROW_NUMBER() OVER
     (PARTITION BY employee_directory.employee_id ORDER BY date_details.date_actual) AS tenure_days
@@ -254,13 +247,13 @@ enriched AS (
   LEFT JOIN employee_directory
     ON employee_directory.hire_date::DATE <= date_details.date_actual
       AND COALESCE(
-        employee_directory.termination_date::DATE, {{ max_date_in_bamboo_analyses() }}
+        employee_directory.first_inactive_date::DATE, {{ max_date_in_bamboo_analyses() }}
       ) >= date_details.date_actual
       -- active employees that have been rehired will have a termination date less than 
       -- the rehire date and they need to be included while excluding those terminated after
       -- the rehire date
       OR (employee_directory.rehire_date::DATE <= date_details.date_actual
-      AND IFF(employee_directory.termination_date > employee_directory.rehire_date, employee_directory.termination_date,
+      AND IFF(employee_directory.first_inactive_date > employee_directory.rehire_date, employee_directory.first_inactive_date,
             {{ max_date_in_bamboo_analyses() }}) >= date_details.date_actual)
   LEFT JOIN department_info
     ON employee_directory.employee_id = department_info.employee_id

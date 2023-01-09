@@ -1,17 +1,22 @@
 """ Extracts data from the MailGun API event stream """
 import datetime
 import json
-import requests
 import sys
+import time
 from email import utils
+from logging import info, basicConfig, getLogger, error
+from os import environ as env
+from typing import Dict, List
+from dateutil import parser as date_parser
+
+import requests
+from requests.exceptions import SSLError
 from fire import Fire
+
 from gitlabdata.orchestration_utils import (
     snowflake_engine_factory,
     snowflake_stage_load_copy_remove,
 )
-from logging import info, basicConfig, getLogger, error
-from os import environ as env
-from typing import Dict, List
 
 config_dict = env.copy()
 
@@ -19,38 +24,67 @@ api_key = env.get("MAILGUN_API_KEY")
 domains = ["mg.gitlab.com"]
 
 
-def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
+def chunker(seq: List, size: int):
+    """
+
+    :param seq:
+    :param size:
+    :return:
+    """
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
+
+
+def get_logs(
+    domain: str, event: str, formatted_start_date: str, formatted_end_date: str
+) -> requests.Response:
     """
     Small convenience wrapper function for mailgun event requests,
     :param domain:
     :param event:
-    :param formatted_date:
+    :param formatted_start_date:
+    :param formatted_end_date:
     :return:
     """
     return requests.get(
         f"https://api.mailgun.net/v3/{domain}/events",
         auth=("api", api_key),
-        params={"begin": formatted_date, "ascending": "yes", "event": event},
+        params={
+            "begin": formatted_start_date,
+            "end": formatted_end_date,
+            "ascending": "yes",
+            "event": event,
+        },
     )
 
 
-def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
+def extract_logs(
+    event: str, start_date: datetime.datetime, end_date: datetime.datetime
+) -> List[Dict]:
     """
     Requests and retrieves the event logs for a particular event.
     :param start_date:
+    :param end_date:
     :param event:
     :return:
     """
     page_token = None
     all_results: List[Dict] = []
 
-    formatted_date = utils.format_datetime(start_date)
+    formatted_start_date = utils.format_datetime(start_date)
+    formatted_end_date = utils.format_datetime(end_date)
 
     for domain in domains:
 
         while True:
             if page_token:
-                response = requests.get(page_token, auth=("api", api_key))
+                try:
+                    response = requests.get(page_token, auth=("api", api_key))
+                except SSLError:
+                    # Not a particularly cultured retry, but handles SSL errors sometimes experienced here and has
+                    # no risk of infinite loops.
+                    error("SSL error received, waiting 30 seconds before retrying")
+                    time.sleep(30)
+                    response = requests.get(page_token, auth=("api", api_key))
                 try:
                     data = response.json()
                 except json.decoder.JSONDecodeError:
@@ -59,7 +93,8 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
 
                 items = data.get("items")
 
-                info(f"Data retrieved length: {len(items)}")
+                if items is None:
+                    break
 
                 if len(items) == 0:
                     break
@@ -73,7 +108,9 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
                 all_results = all_results[:] + items[:]
 
             else:
-                response = get_logs(domain, event, formatted_date)
+                response = get_logs(
+                    domain, event, formatted_start_date, formatted_end_date
+                )
 
                 try:
                     data = response.json()
@@ -82,7 +119,9 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
                     break
 
                 items = data.get("items")
-                info(f"Data retrieved length: {len(items)}")
+
+                if items is None:
+                    break
 
                 if len(items) == 0:
                     break
@@ -105,26 +144,40 @@ def load_event_logs(event: str, full_refresh: bool = False):
     """
     snowflake_engine = snowflake_engine_factory(config_dict, "LOADER")
 
-    file_name = f"{event}.json"
-
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
+        end_date = datetime.datetime.now()
     else:
-        start_date = datetime.datetime.now() - datetime.timedelta(hours=16)
+        # This extends the time window to handle late processing on the API.
+        start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
+            hours=2
+        )
+        end_date = start_date + datetime.timedelta(hours=13)
 
-    results = extract_logs(event, start_date)
+    info(
+        f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}"
+    )
+
+    results = extract_logs(event, start_date, end_date)
 
     info(f"Results length: {len(results)}")
 
-    with open(file_name, "w") as outfile:
-        json.dump(results, outfile)
+    # Stay under snowflakes max column size.
+    file_count = 0
+    for group in chunker(results, 5000):
+        file_count = file_count + 1
+        file_name = f"{event}_{file_count}.json"
 
-    snowflake_stage_load_copy_remove(
-        file_name,
-        f"mailgun.mailgun_load_{event}",
-        "mailgun.mailgun_events",
-        snowflake_engine,
-    )
+        with open(file_name, "w", encoding="utf-8") as outfile:
+            json.dump(group, outfile)
+
+        snowflake_stage_load_copy_remove(
+            file_name,
+            f"mailgun.mailgun_load_{event}",
+            "mailgun.mailgun_events",
+            snowflake_engine,
+            on_error="ABORT_STATEMENT",
+        )
 
 
 if __name__ == "__main__":

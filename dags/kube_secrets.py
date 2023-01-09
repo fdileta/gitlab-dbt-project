@@ -21,6 +21,11 @@ GITLAB_ANALYTICS_PRIVATE_TOKEN = Secret(
     "env", "GITLAB_ANALYTICS_PRIVATE_TOKEN", "airflow", "GITLAB_ANALYTICS_PRIVATE_TOKEN"
 )
 
+# gitlab internal handbook  private token
+GITLAB_INTERNAL_HANDBOOK_TOKEN = Secret(
+    "env", "GITLAB_INTERNAL_HANDBOOK_TOKEN", "airflow", "GITLAB_INTERNAL_HANDBOOK_TOKEN"
+)
+
 # GCP Related
 GCP_SERVICE_CREDS = Secret(
     "env", "GCP_SERVICE_CREDS", "airflow", "cloudsql-credentials"
@@ -300,3 +305,11 @@ SNOWFLAKE_DATA_SCIENCE_LOAD_ROLE = Secret(
     "airflow",
     "SNOWFLAKE_DATA_SCIENCE_LOAD_ROLE",
 )
+SNOWFLAKE_SALES_ANALYTICS_LOAD_ROLE = Secret(
+    "env",
+    "SNOWFLAKE_SALES_ANALYTICS_LOAD_ROLE",
+    "airflow",
+    "SNOWFLAKE_SALES_ANALYTICS_LOAD_ROLE",
+)
+
+CLARI_API_KEY = Secret("env", "CLARI_API_KEY", "airflow", "CLARI_API_KEY")

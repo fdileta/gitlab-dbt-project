@@ -290,6 +290,17 @@ Fact table representing marketing campaign details tracked in SFDC.
 
 {% enddocs %}
 
+{% docs fct_crm_account %}
+Factual customer table representing all existing and historical customers from SalesForce. There are customer definitions for external reporting and additional customer definitions for internal reporting defined in the [handbook](https://about.gitlab.com/handbook/sales/#customer).
+
+The Customer Account Management business process can be found in the [handbook](https://about.gitlab.com/handbook/finance/sox-internal-controls/quote-to-cash/#1-customer-account-management-and-conversion-of-lead-to-opportunity).
+
+The grain of the table is the SalesForce Account, also referred to as `DIM_CRM_ACCOUNT_ID`.
+
+Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
+
+{% enddocs %}
+
 {% docs fct_crm_attribution_touchpoint %}
 Fact table for attribution Bizible touchpoints with shared dimension keys relating these touchpoints to dim_crm_person, dim_crm_opportunity, and dim_crm_account. These touchpoints have revenue associated with them.
 
@@ -308,7 +319,7 @@ A fact table for salesforce opportunities with keys to connect opportunities to 
 
 {% docs fct_crm_opportunity_daily_snapshot %}
 
-A daily snapshot fact table for salesforce opportunities with keys to connect opportunities to shared dimensions. This table shows the state of the opportunity as it was on the day of the snapshot. 
+A daily snapshot fact table for salesforce opportunities with keys to connect opportunities to shared dimensions. This table shows the state of the opportunity as it was on the day of the snapshot.
 
 {% enddocs %}
 
@@ -447,18 +458,6 @@ Sales funnel targets set by the Finance team to measure performance of important
 
 {% enddocs %}
 
-{% docs fct_usage_ping_subscription_mapped_gmau %}
-
-This model contains **Self-Managed** instances data from every month _that a Usage Ping payload was received_. For a given subscription-uuid-hostname combination, values of each GMAU and Paid GMAU metric from the last Usage Ping value in that month are reported.
-
-The grain of this table is `hostname` per `uuid` per `dim_subscription_id` per `snapshot_month`. Since there are Self-Managed subscriptions that do not send Usage Ping payloads, it is possible for `uuid` and `hostname` to be null.
-
-This data model is used for the Customer Health Dashboards.
-
-Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
-
-{% enddocs %}
-
 {% docs fct_usage_ping_subscription_mapped_smau %}
 
 This model contains **Self-Managed** instances data from every month _that a Usage Ping payload was received_. For a given subscription-uuid-hostname combination, values of each SMAU metric from the last Usage Ping value in that month are reported.
@@ -501,17 +500,6 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 
 {% enddocs %}
 
-{% docs fct_product_usage_wave_1_3_metrics_monthly %}
-This table builds on the set of all Zuora subscriptions that are associated with a **Self-Managed** rate plans. Seat Link data from Customers DB (`fct_usage_self_managed_seat_link`) are combined with high priority Usage Ping metrics (`prep_usage_ping_subscription_mapped_wave_2_3_metrics`) to build out the set of facts included in this table.
-
-The grain of this table is `hostname` per `uuid` per `dim_subscription_id` per `snapshot_month`. Since there are Self-Managed subscriptions that do not send Usage Ping payloads, it is possible for `uuid` and `hostname` to be null.
-
-The data from this table will be used to create a mart table (`mart_product_usage_wave_1_3_metrics_monthly`) for Gainsight Customer Product Insights.
-
-Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
-
-{% enddocs %}
-
 {% docs fct_saas_product_usage_metrics_monthly %}
 This table builds on the set of all Zuora subscriptions that are associated with a **SaaS** rate plans. Historical namespace seat charges and billable user data (`gitlab_dotcom_gitlab_subscriptions_snapshots_namespace_id_base`) are combined with high priority Usage Ping metrics (`prep_saas_usage_ping_subscription_mapped_wave_2_3_metrics`) to build out the set of facts included in this table. Only the most recently collected namespace "Usage Ping" and membership data per `dim_subscription_id` each month are reported in this table.
 
@@ -523,25 +511,25 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 
 {% docs fct_event_valid %}
 
-**Description:** Atomic level GitLab.com Usage Event Data with Only Valid Events
+**Description:** Atomic level GitLab.com usage event data with only valid events
 - [Targets and Actions](https://docs.gitlab.com/ee/api/events.html) activity by Users and [Namespaces](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/namespace/) within the GitLab.com application are captured and refreshed periodically throughout the day.  Targets are objects ie. issue, milestone, merge_request and Actions have effect on Targets, ie. approved, closed, commented, created, etc.
-- Atomic (lowest grain) data  
 
 **Data Grain:**
-- event_id
-- event_created_at
+- event_pk
 
-**Filters:**
-- Use ONLY Valid Events for standard analysis and reporting:
-  - Remove Events where the Event Created Datetime < the User Created Datetime.
-    - These are usually events from projects that were created before the User and then imported in by the User after the User is created.  
-  - Keep Events where User Id = NULL.  These do not point to a particular User, ie. 'milestones' 
-  - Remove Events from blocked users
-- Rolling 24mos of Data  
+**Filters Applied to Model:**
+- Include valid events for standard analysis and reporting:
+  - Exclude events where the event created date < the user created date (`days_since_user_creation_at_event_date >= 0`)
+    - These are usually events from projects that were created before the GitLab.com user and then imported after the user is created 
+  - Exclude events from blocked users (based on the current user state)
+- Rolling 24 months of data
 
-**Business Logic in this Model:** 
-- Valid events where the Event Create DateTime is >= User Create DateTime
-- Events from blocked users are excluded
+**Business Logic in this Model:**
+- A namespace's plan information (ex: `plan_name_at_event_date`) is determined by the plan for the last event on a given day
+- The ultimate parent namespace's subscription, billing, and account information (ex: `dim_latest_subscription_id`) reflects the most recent available attributes associated with that namespace
+- `dim_active_product_tier_id` reflects the _current_ product tier of the namespace
+- Not all events have a user associated with them (ex: 'milestones'), and not all events have a namespace associated with them (ex: 'users_created'). Therefore it is expected that `dim_user_sk` or `dim_ultimate_parent_namespace_id` will be NULL for these events
+- `section_name`, `stage_name`, `group_name`, and xMAU metric flags (ex: `is_gmau`) are based on the _current_ event mappings and may not match the mapping at the time of the event
 
 **Other Comments:**
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
@@ -550,32 +538,28 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 
 {% docs fct_event %}
 
-**Description:** Atomic level GitLab.com Usage Event Data
+**Description:** Atomic level GitLab.com usage event data
 - [Targets and Actions](https://docs.gitlab.com/ee/api/events.html) activity by Users and [Namespaces](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/namespace/) within the GitLab.com application are captured and refreshed periodically throughout the day.  Targets are objects ie. issue, milestone, merge_request and Actions have effect on Targets, ie. approved, closed, commented, created, etc.
 - Atomic (lowest grain) data   
 
 **Data Grain:**
-- event_id
-- event_created_at
+- event_pk
 
-**Filters:**
-- None - `ALL Data` at the Atomic (`lowest level/grain`) is brought through from the Source for comprehensive analysis.  
-  - Futher filters may be needed for Standard Analysis and Reporting, ie. Limiting to Valid Events  
+**Filters Applied to Model:**
+- None - `ALL Data` at the Atomic (`lowest level/grain`) is brought through from the source for comprehensive analysis
 
-**Business Logic in this Model:** 
-- The Ultimate Parent Namespace, Plan, Subscription, Billing and Product Information for the Event is determined by the Event Date.
-- Each Event is identified as being used for different xMAU metrics (is_smau, is_gmau, is_umau)
-- `data_source` = 'GITLAB_DOTCOM'
+**Business Logic in this Model:**
+- None - this model does not contain any business logic
 
 **Other Comments:**
-- The `fct_event` table is built directly from the [Prep_Event table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_event) which brings all of the different types of events together.  A handbook page on this table can be found [here](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-product-events-data/) .
+- The `fct_event` table is built directly from the [prep_event lineage](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_event) which brings all of the different types of events together. A handbook page on this table can be found [here](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-product-events-data/) .
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
 
 {% enddocs %}
 
 {% docs fct_event_user_daily %}
 
-**Description:** GitLab.com Usage Event Data with Only Valid Events by Event_Date, User, Ultimate_Parent_Namespace and Event_Name
+**Description:** GitLab.com usage event data for valid events, grouped by date, user, ultimate parent namespace, and event name
 - [Targets and Actions](https://docs.gitlab.com/ee/api/events.html) activity by Users and [Namespaces](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/namespace/) within the GitLab.com application are captured and refreshed periodically throughout the day.  Targets are objects ie. issue, milestone, merge_request and Actions have effect on Targets, ie. approved, closed, commented, created, etc.  
 
 **Data Grain:**
@@ -584,17 +568,19 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 - dim_ultimate_parent_namespace_id
 - event_name
 
-**Filters:**
-- Use ONLY Valid Events for standard analysis and reporting:
-  - Remove Events where the Event Created Datetime < the User Created Datetime.
-    - These are usually events from projects that were created before the User and then imported in by the User after the User is created.  
-  - Keep Events where User Id = NULL.  These do not point to a particular User, ie. 'milestones' 
-  - Remove Events from blocked users
-- Rolling 24mos of Data  
+**Filters Applied to Model:**
+- `Inherited` - Include valid events for standard analysis and reporting:
+  - Exclude events where the event created date < the user created date (`days_since_user_creation_at_event_date >= 0`)
+    - These are usually events from projects that were created before the GitLab.com user and then imported after the user is created 
+  - Exclude events from blocked users (based on the current user state)
+- `Inherited` - Rolling 24 months of data
+- Exclude events not associated with a user (ex: 'milestones')
 
-**Business Logic in this Model:** 
-- Valid events where the Event Create DateTime is >= User Create DateTime
-- Events from blocked users are excluded
+**Business Logic in this Model:**
+- `Inherited` - A namespace's plan information (ex: `plan_name_at_event_date`) is determined by the plan for the last event on a given day
+- `Inherited` - The ultimate parent namespace's subscription, billing, and account information (ex: `dim_latest_subscription_id`) reflects the most recent available attributes associated with that namespace
+- `Inherited` - `dim_active_product_tier_id` reflects the _current_ product tier of the namespace
+- `Inherited` - `section_name`, `stage_name`, `group_name`, and xMAU metric flags (ex: `is_gmau`) are based on the _current_ event mappings and may not match the mapping at the time of the event
 
 **Other Comments:**
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
@@ -603,26 +589,25 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 
 {% docs fct_event_instance_daily %}
 
-**Description:** GitLab.com Usage Event Data Grouped by Date and Event for Valid Events
+**Description:** GitLab.com usage event data for valid events, grouped by date and event name
 - [Targets and Actions](https://docs.gitlab.com/ee/api/events.html) activity by Users and [Namespaces](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/namespace/) within the GitLab.com application are captured and refreshed periodically throughout the day.  Targets are objects ie. issue, milestone, merge_request and Actions have effect on Targets, ie. approved, closed, commented, created, etc.  
-- The data is aggregated by Date and Event and Namespace and includes supporting Attributes. 
 
 **Data Grain:**
 - event_date
 - event_name
 
-**Filters:**
-- Use Valid Events Only for standard analysis and reporting:
-  - Remove Events where the Event Created Datetime < the User Created Datetime.
-    - These are usually events from projects that were created before the User and then imported in by the User after the User is created.  
-  - Keep Events where User Id = NULL.  These do not point to a particular User, ie. 'milestones' 
-  - Remove Events from blocked users
-- Rolling 24mos of Data  
+**Filters Applied to Model:**
+- `Inherited` - Include valid events for standard analysis and reporting:
+  - Exclude events where the event created date < the user created date (`days_since_user_creation_at_event_date >= 0`)
+    - These are usually events from projects that were created before the GitLab.com user and then imported after the user is created 
+  - Exclude events from blocked users (based on the current user state)
+- `Inherited` - Rolling 24 months of data
 
-**Business Logic in this Model:** 
-- Valid events where the Event Create DateTime is >= User Create DateTime
-- Events from blocked users are excluded
-- Event, User and Ultimate_Namespace counts are included for the Aggregation Level
+**Business Logic in this Model:**
+- `Inherited` - A namespace's plan information (ex: `plan_name_at_event_date`) is determined by the plan for the last event on a given day
+- `Inherited` - The ultimate parent namespace's subscription, billing, and account information (ex: `dim_latest_subscription_id`) reflects the most recent available attributes associated with that namespace
+- `Inherited` - `dim_active_product_tier_id` reflects the _current_ product tier of the namespace
+- Not all events have a user associated with them (ex: 'milestones'), and not all events have a namespace associated with them (ex: 'users_created'). Therefore it is expected that `user_count = 0` or `ultimate_parent_namespace_count = 0` for these events.
 
 **Other Comments:**
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
@@ -631,29 +616,27 @@ Information on the Enterprise Dimensional Model can be found in the [handbook](h
 
 {% docs fct_event_namespace_daily %}
 
-**Description:** GitLab.com Usage Event Data Grouped by Date, Event, Namespace and Billing for Valid Events
+**Description:** GitLab.com usage event data for valid events, grouped by date, event name, and ultimate parent namespace
 - [Targets and Actions](https://docs.gitlab.com/ee/api/events.html) activity by Users and [Namespaces](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/namespace/) within the GitLab.com application are captured and refreshed periodically throughout the day.  Targets are objects ie. issue, milestone, merge_request and Actions have effect on Targets, ie. approved, closed, commented, created, etc.  
-- The data is aggregated by Date, Event and Namespace and includes supporting Attributes. 
 
 **Data Grain:**
 - event_date
 - event_name
 - dim_ultimate_parent_namespace_id
 
-**Filters:**
-- Use Valid Events Only for standard analysis and reporting:
-  - Remove Events where the Event Created Datetime < the User Created Datetime.
-    - These are usually events from projects that were created before the User and then imported in by the User after the User is created.  
-  - Keep Events where User Id = NULL.  These do not point to a particular User, ie. 'milestones' 
-  - Remove Events from blocked users
-- Rolling 24mos of Data  
+**Filters Applied to Model:**
+- `Inherited` - Include valid events for standard analysis and reporting:
+  - Exclude events where the event created date < the user created date (`days_since_user_creation_at_event_date >= 0`)
+    - These are usually events from projects that were created before the GitLab.com user and then imported after the user is created 
+  - Exclude events from blocked users (based on the current user state)
+- `Inherited` - Rolling 24 months of data
+- Exclude events not associated with a namespace (ex: 'users_created')
 
-**Business Logic in this Model:** 
-- Valid events where the Event Create DateTime is >= User Create DateTime
-- Events from blocked users are excluded
-- The Actual Ultimate Parent Namespace, Plan, Subscription, Billing and Product Information for the Event is determined by the Event Date.
-- Each Event is identified as being used for different xMAU metrics (is_smau, is_gmau, is_umau)
-- `data_source` = 'GITLAB_DOTCOM'
+**Business Logic in this Model:**
+- `Inherited` - A namespace's plan information (ex: `plan_name_at_event_date`) is determined by the plan for the last event on a given day
+- `Inherited` - The ultimate parent namespace's subscription, billing, and account information (ex: `dim_latest_subscription_id`) reflects the most recent available attributes associated with that namespace
+- `Inherited` - `dim_active_product_tier_id` reflects the _current_ product tier of the namespace
+- `Inherited` - `section_name`, `stage_name`, `group_name`, and xMAU metric flags (ex: `is_gmau`) are based on the _current_ event mappings and may not match the mapping at the time of the event
 
 **Other Comments:**
 - Note about the `action` event: This "event" captures everything from the [Events API](https://docs.gitlab.com/ee/api/events.html) - issue comments, MRs created, etc. While the `action` event is mapped to the Manage stage, the events included actually span multiple stages (plan, create, etc), which is why this is used for UMAU. Be mindful of the impact of including `action` during stage adoption analysis.
@@ -782,11 +765,11 @@ In Zuora Billing, an [Order](https://knowledgecenter.zuora.com/Billing/Subscript
 
 {% docs dim_order_action %}
 
-[Order Actions](https://knowledgecenter.zuora.com/Billing/Subscriptions/Orders/AA_Overview_of_Orders/Order_Actions) are the tasks which can be performed on subscriptions in a single Order (see `dim_order` for more details). 
+[Order Actions](https://knowledgecenter.zuora.com/Billing/Subscriptions/Orders/AA_Overview_of_Orders/Order_Actions) are the tasks which can be performed on subscriptions in a single Order (see `dim_order` for more details).
 
 The following actions are supported in the Orders module:
 
-- Create Subscription 
+- Create Subscription
 - Terms And Conditions
 - Renewal
 - Cancellation
@@ -946,6 +929,47 @@ Easy to join with the following tables:
 {% docs dim_user %}
 
 Dimension table that contains all Gitlab.com Users.
+
+Missing Column Values:
+* Unknown - Value is Null in source data
+* Not Found - Row Not found in source data
+The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:
+* role
+* last_activity_date             
+* last_sign_in_date               
+* setup_for_company    
+* jobs_to_be_done
+* for_business_use                 
+* employee_count
+* country
+* state
+
+{% enddocs %}
+
+{% docs dim_user_snapshot_bottom_up %}
+
+Snapshot table with Spined Dates that contains all Gitlab.com Users.
+
+Missing Column Values:
+* Unknown - Value is Null in source data
+* Not Found - Row Not found in source data
+
+The following Columns have a Varchar Data Type and are set up to handle Missing Column Values:
+* role
+* last_activity_date             
+* last_sign_in_date               
+* setup_for_company    
+* jobs_to_be_done
+* for_business_use                 
+* employee_count
+* country
+* state
+
+**Business Logic in this Model:**
+- `spined_date` - every date between dbt_valid_from and dbt_valid_to timeframes.  
+  - spined_date has a time of '00:00:00' which is less than a dbt_valid_from date with a time greater than 00:00:00, ie 2022-11-14 09:01:37.494.  In this case the spined_date for this snapshot record will be 2022-11-15.  
+
+
 {% enddocs %}
 
 {% docs dim_ci_runner %}
@@ -1011,50 +1035,6 @@ The grain of the table is the `dim_note_id`. This table is easily joinable with:
 - `dim_namespace` through `dim_namespace_id` and `ultimate_namespace_id`
 {% enddocs %}
 
-{% docs fct_monthly_subscription_service_ping_opt_in %}
-
-Factual model that allows to know if a specific active subscription sent us at least one payload on a given month M.
-This Factual model will help us calculate opt-in rate for paid and OSS/EDU subscriptions.
-
-We have the following keys available in the model:
-
-- `dim_subscription_id` to join to `dim_subscription`
-- `dim_date_id` to join to `dim_date`
-
-And the following measures as columns:
-
-- arr: arr generated on a given month for this subscription
-- quantity: quantity ordered
-- has_sent_payloads: if we receive a usage ping that we can match to this specific subscription
-- monthly_payload_counts: number of payloads received
-- monthly_host_counts: number of hosts that are linked to this specific subscription
-- umau: highest UMAU value
-
-Example query allowing us to calculate % of opt-in rate for EDU/OSS subscriptions:
-
-```
-SELECT dim_date_id, AVG(has_sent_payloads::INTEGER)
-FROM common.fct_monthly_subscription_service_ping_opt_in
-WHERE arr = 0
-GROUP BY 1
-ORDER BY 1 DESC
-LIMIT 100
-```
-
-{% enddocs %}
-
-{% docs fct_monthly_usage_data %}
-
-Union of models `prep_monthly_usage_data_28_days` and `prep_monthly_usage_data_all_time`
-
-{% enddocs %}
-
-{% docs fct_weekly_usage_data_7_days %}
-
-Union of models `prep_monthly_usage_data_28_days` and `prep_monthly_usage_data_all_time`
-
-{% enddocs %}
-
 {% docs fct_daily_event_400 %}
 
 Factual table built on top of prep_events tables that allows to explore usage data of free and paid users and namespaces from our SaaS instance gitlab.com.
@@ -1102,35 +1082,37 @@ This model maps directly to the [Gitlab Metrics Dictionary](https://metrics.gitl
 
 {% docs dim_ping_instance %}
 
-**Description:** Atomic Level Instance Service Ping data including Implementation Info along with JSON payloads with Usage Metrics
-- Atomic (lowest grain) data with a Single Record per Ping.
+**Description:** Atomic level instance Service Ping data including installation settings and metadata, along with JSON payloads with usage metrics
+- Atomic (lowest grain) data with a single record per ping
 
 **Data Grain:**
 - dim_ping_instance_id
 
-**Filters:**
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
+**Filters Applied to Model:**
+- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
+- `Inherited` - `version NOT LIKE '%VERSION%`
 
-**Business Logic in this Model:** 
-- `is_last_ping_of_month` = last ping created per calendar month per Installation (`dim_installation_id`)
-- `ping_delivery_type` = 'SaaS' WHERE UUID/Instance_id = ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f ELSE 'Self-Managed'
+**Business Logic in this Model:**
+- `is_last_ping_of_month` = last ping created per calendar month per installation (`dim_installation_id`)
+- `is_last_ping_of_week` = last ping created per calendar week per installation (`dim_installation_id`)
+- `ping_delivery_type` = `IFF(uuid/dim_instance_id = 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f', 'SaaS', 'Self-Managed')`
 - `is_internal` = TRUE WHERE:
-  - UUID/Instance_id = 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f' 
+  - uuid/dim_instance_id = 'ea8bf810-1d6f-4a6a-b4fd-93e8cbd8b57f'
   - (OR) installation_type = 'gitlab-development-kit'
-  - (OR) hostname = 'gitlab.com' 
+  - (OR) hostname = 'gitlab.com'
   - (OR) hostname LIKE '%.gitlab.com'
 - `is_staging` = TRUE WHERE:
   - hostname LIKE 'staging.%'
   - (OR) hostname IN ('staging.gitlab.com','dr.gitlab.com')
-- `major_minor_version` = major_version || '.' || minor_version 
-- `major_minor_version_id` = major_version * 100 + minor_version
-- `version_is_prerelease` = version LIKE '%-pre'
-- `cleaned_edition` = 'EE Free' WHERE license_expires_at < ping_created_at ELSE ping_edition 
+- `is_trial` = `IFF(ping_created_at < license_trial_ends_on, TRUE, FALSE)`
+- `major_minor_version` = `major_version || '.' || minor_version`
+- `major_minor_version_id` = `major_version * 100 + minor_version` (helpful for sorting or filtering versions)
+- `version_is_prerelease` = `IFF(version ILIKE '%-pre', TRUE, FALSE)`
+- `cleaned_edition` = `IFF(license_expires_at >= ping_created_at OR license_expires_at IS NULL, ping_edition, 'EE Free')`
 
 **Other Comments:**
-- The `dim_ping_instance` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping. 
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
+- The `dim_ping_instance` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping.
+- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not.
 - GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
@@ -1145,7 +1127,7 @@ This model maps directly to the [Gitlab Metrics Dictionary](https://metrics.gitl
 
 {% docs dim_ping_metric %}
 
-This model replaces `dim_usage_ping_metric` table that maps directly to the [Gitlab Metrics Dictionary](https://metrics.gitlab.com/). In addition to all metrics currently in the Service Ping, it also contains metrics that have been removed. 
+This model replaces `dim_usage_ping_metric` table that maps directly to the [Gitlab Metrics Dictionary](https://metrics.gitlab.com/). In addition to all metrics currently in the Service Ping, it also contains metrics that have been removed.
 
 Some other enhancements in this model include : addition of a surrogate key, exclusion and cleaning of some Product groups, and renaming Usage ping to Service Ping.
 
@@ -1161,33 +1143,60 @@ For this reason `metrics_path` is not unique.
 
 {% docs fct_performance_indicator_targets %}
 
-New fact table to replace `performance_indicators_yaml_historical`. 
+**Description:** Monthly performance indicator targets, based on the dates and targets provided in [performance indicator .yml files](https://gitlab.com/internal-handbook/internal-handbook.gitlab.io/-/tree/main/data/performance_indicators). This model is used to generate target values in the `[td_xmau]` and other related snippets.
 
-This new table will include all flattened target values for each metric for each month. Can just filter this fact table down in `td_xmau 2.0` snippet.
+**Data Grain:**
+- reporting_month
+- pi_metric_name
+
+**Filters Applied to Model:**
+- `pi_monthly_estimated_targets IS NOT NULL` (field from .yml file)
+
+**Business Logic in this Model:**
+- `reporting_month` is derived from the date provided in the `pi_monthly_estimated_targets` field of the .yml file
+  - Target end date: date specified in `pi_monthly_estimated_targets`
+  - Target start date: The day after the previous target end date _OR_, if a previous target is not specified, `2017-01-01` (date of earliest available product data)
+
+Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"2022-05-31":3000}`
+
+| reporting_month | target_value |
+| --- | --- |
+| 2017-01-01 | 1000 |
+| ... | 1000 |
+| 2022-02-01 | 1000 |
+| 2022-03-01 | 2000 |
+| 2022-04-01 | 3000 |
+| 2022-05-01 | 3000 |
+
+**Other Comments:**
+- More information on how to set these values on the [Product Manager Toolkit handbook page](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/xmau-analysis/product-manager-toolkit.html#how-to-show-dynamic-targets-from-pi-yaml-files)
 
 {% enddocs %}
 
 {% docs fct_ping_instance_metric %}
 
-**Description:** Atomic Level Instance Service Ping Metric data For All Metrics by Ping
-- The data includes a single row per Ping and Metric.  The basic Id's for Subscription, Product and Location are included. 
+**Description:** Atomic level instance Service Ping data by ping and metric for all metrics, including basic identifiers for easy joins out to dimension tables
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
 
 **Data Grain:**
 - dim_ping_instance_id
 - metrics_path
 
-**Filters:**
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
+**Filters Applied to Model:**
+- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
+- `Inherited` - `version NOT LIKE '%VERSION%`
 
-**Business Logic in this Model:** 
-- `data_source` = 'VERSION_DB'
-  - GitLab, GitLab Dedicated and Self-Managed Service Pings come through the Version Database.
-- Metrics that timed out (return -1) are set to a value of 0
+**Business Logic in this Model:**
+- Includes all metrics, regardless of time frame or whether they can be located in `dim_ping_metric`
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - Metrics that timed out (return -1) are set to a value of 0
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
 
 **Other Comments:**
-- The `fct_ping_instance_metric` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping. 
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
+- The `fct_ping_instance_metric` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping.
+- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not.
 - GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
@@ -1202,26 +1211,30 @@ This new table will include all flattened target values for each metric for each
 
 {% docs fct_ping_instance_metric_rolling_13_months %}
 
-**Description:** Atomic Level Instance Service Ping Metric data For All Metrics by Ping
-- The data includes a single row per Ping and Metric.  The basic Id's for Subscription, Product and Location are included. 
+**Description:** Atomic level instance Service Ping data by ping and metric for all metrics for the last 13 months, including basic identifiers for easy joins out to dimension tables. This model filters `fct_ping_instance_metric` to the last 13 months to improve query performance during data exploration and analysis.
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
+
+**Note:** This model is set to never full refresh. This means that new data will update daily but changes to past events will not be updated.
 
 **Data Grain:**
 - dim_ping_instance_id
 - metrics_path
 
-**Filters:**
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
-- Filters to a rolling 13 months of service pings by the ping_created_date
+**Filters Applied to Model:**
+- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
+- `Inherited` - `version NOT LIKE '%VERSION%`
+- Rolling 13 months of Service Pings data by the ping_created_date
 
-**Business Logic in this Model:** 
-- `data_source` = 'VERSION_DB'
-  - GitLab, GitLab Dedicated and Self-Managed Service Pings come through the Version Database.
-- Metrics that timed out (return -1) are set to a value of 0
+**Business Logic in this Model:**
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - Metrics that timed out (return -1) are set to a value of 0
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
 
 **Other Comments:**
-- The `fct_ping_instance_metric` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping. 
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
+- The `fct_ping_instance_metric` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping.
+- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not.
 - GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
@@ -1236,26 +1249,30 @@ This new table will include all flattened target values for each metric for each
 
 {% docs fct_ping_instance_metric_rolling_6_months %}
 
-**Description:** Atomic Level Instance Service Ping Metric data For All Metrics by Ping
-- The data includes a single row per Ping and Metric.  The basic Id's for Subscription, Product and Location are included. 
+**Description:** Atomic level instance Service Ping data by ping and metric for all metrics for the last 6 months, including basic identifiers for easy joins out to dimension tables. This model filters `fct_ping_instance_metric` to the last 6 months to improve query performance during data exploration and analysis.
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
+
+**Note:** This model is set to never full refresh. This means that new data will update daily but changes to past events will not be updated.
 
 **Data Grain:**
 - dim_ping_instance_id
 - metrics_path
 
-**Filters:**
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
-- Filters to a rolling 6 months of service pings by the ping_created_date
+**Filters Applied to Model:**
+- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
+- `Inherited` - `version NOT LIKE '%VERSION%`
+- Rolling 6 months of Service Pings data by the ping_created_date
 
-**Business Logic in this Model:** 
-- `data_source` = 'VERSION_DB'
-  - GitLab, GitLab Dedicated and Self-Managed Service Pings come through the Version Database.
-- Metrics that timed out (return -1) are set to a value of 0
+**Business Logic in this Model:**
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - Metrics that timed out (return -1) are set to a value of 0
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
 
 **Other Comments:**
-- The `fct_ping_instance_metric` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping. 
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
+- The `fct_ping_instance_metric` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping.
+- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not.
 - GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
@@ -1270,24 +1287,25 @@ This new table will include all flattened target values for each metric for each
 
 {% docs fct_ping_instance %}
 
-**Description:** Atomic Level Instance Service Ping with Identifiers by Ping
-- Atomic (lowest grain) information with basic Identifiers for easy joins out to Dimension Tables.  Includes Instance, Date, Product and Subscriptions id's. Metric detail is not included in the table.
-- The data includes a single row per Ping.  The basic Id's for Subscription, Product and Location are included.
+**Description:** Atomic level instance Service Ping data by ping, including basic identifiers for easy joins out to dimension tables. Metrics are not included in this model
+- Atomic (lowest grain) data with a single record per ping
+- Includes installation, instance, date, product, billing, and subscription identifiers
 
 **Data Grain:**
 - dim_ping_instance_id
 
-**Filters:**
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
+**Filters Applied to Model:**
+- `Inherited` - `uuid IS NOT NULL` (uuid is synonymous with dim_instance_id)
+- `Inherited` - `version NOT LIKE '%VERSION%`
 
-**Business Logic in this Model:** 
-- `data_source` = 'VERSION_DB'
-  - GitLab, GitLab Dedicated and Self-Managed Service Pings come through the Version Database.
+**Business Logic in this Model:**
+- `is_trial` = `IFF(ping_created_at < license_trial_ends_on, TRUE, FALSE)`
+- `dim_subscription_id` = `COALESCE(ping_payload.license_subscription_id, prep_subscription.dim_subscription_id)`
+- `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
 
 **Other Comments:**
-- The `fct_ping_instance` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping. 
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
+- The `fct_ping_instance` table is built directly from the [prep_ping_instance table](https://gitlab-data.gitlab.io/analytics/#!/model/model.gitlab_snowflake.prep_ping_instance) which brings in Instance Service Ping data one record per Service Ping.  Along with the Instance information a 'Payload' column with an array of Metrics is captured in the Service Ping.
+- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not.
 - GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
@@ -1302,136 +1320,211 @@ This new table will include all flattened target values for each metric for each
 
 {% docs fct_ping_instance_metric_7_day %}
 
-**Description:** Atomic Level Instance Service Ping Metric data For 7 Day Metrics by Ping and Metric
-- The data includes a single row per Ping and Metric.  The basic Id's for Subscription, Product and Location are included. 
+**Description:** Atomic level instance Service Ping data by ping and metric for 7-day metrics, including basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
 
 **Data Grain:**
 - dim_ping_instance_id
 - metrics_path
 
-**Filters:**
-- time_frame = '7d'
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
+**Filters Applied to Model:**
+- Include 7-day metrics (`time_frame = '7d'`)
 
-**Business Logic in this Model:** 
-- `data_source` = 'VERSION_DB'
-  - GitLab, GitLab Dedicated and Self-Managed Service Pings come through the Version Database.
-- Metrics that timed out (return -1) are set to a value of 0
+**Business Logic in this Model:**
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - Metrics that timed out (return -1) are set to a value of 0
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `Inherited` - `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
 
 **Other Comments:**
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
-- GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
+- Metric time frames are set in the metric definition yaml file and can be found in the [Service Ping Metrics Dictionary](https://metrics.gitlab.com/)
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
 - `dim_installation_id` is the unique identifier for the actual installation. It is a combination of `dim_instance_id` and `dim_host_id`. `dim_host_id` is required because there can be multiple installations that share the same `dim_instance_id` (ex: gitlab.com has several installations sharing the same dim_instance_id: gitlab.com, staging.gitlab.com, etc)
-- Multiple Instances can be hosted on each Implementation. Multiple Installations can be included within each Instance which is determined by Host_id. (Instance_id || Host_id = Installation_id)
-- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.  
-- The different types of Service Pings are shown here with the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping), [GitLab Hosted Implementation](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [GitLab Dedicated Implementation](https://docs.gitlab.com/ee/subscriptions/gitlab_dedicated/#gitlab-dedicated) service pings will function similar to Self-Managed Implementations.
+- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.
 - [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
 
 {% enddocs %}
 
 {% docs fct_ping_instance_metric_28_day %}
 
-**Description:** Atomic Level Instance Service Ping Metric data For 28 Day Metrics by Ping and Metric
-- The data includes a single row per Ping and Metric.  The basic Id's for Subscription, Product and Location are included. 
+**Description:** Atomic level instance Service Ping data by ping and metric for 28-day metrics, including basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
 
 **Data Grain:**
 - dim_ping_instance_id
 - metrics_path
 
-**Filters:**
-- time_frame = '28d'
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
+**Filters Applied to Model:**
+- Include 28-day metrics (`time_frame = '28d'`)
 
-**Business Logic in this Model:** 
-- `data_source` = 'VERSION_DB'
-  - GitLab, GitLab Dedicated and Self-Managed Service Pings come through the Version Database.
-- Metrics that timed out (return -1) are set to a value of 0
+**Business Logic in this Model:**
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - Metrics that timed out (return -1) are set to a value of 0
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `Inherited` - `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
 
 **Other Comments:**
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
-- GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
+- Metric time frames are set in the metric definition yaml file and can be found in the [Service Ping Metrics Dictionary](https://metrics.gitlab.com/)
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
 - `dim_installation_id` is the unique identifier for the actual installation. It is a combination of `dim_instance_id` and `dim_host_id`. `dim_host_id` is required because there can be multiple installations that share the same `dim_instance_id` (ex: gitlab.com has several installations sharing the same dim_instance_id: gitlab.com, staging.gitlab.com, etc)
-- Multiple Instances can be hosted on each Implementation. Multiple Installations can be included within each Instance which is determined by Host_id. (Instance_id || Host_id = Installation_id)
-- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.  
-- The different types of Service Pings are shown here with the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping), [GitLab Hosted Implementation](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [GitLab Dedicated Implementation](https://docs.gitlab.com/ee/subscriptions/gitlab_dedicated/#gitlab-dedicated) service pings will function similar to Self-Managed Implementations.
+- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.
 - [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
 
 {% enddocs %}
 
 {% docs fct_ping_instance_metric_monthly %}
 
-**Description:** Atomic Level Instance Service Ping data with Last Pings of the Month per Installation by Ping and Metric for 28_Day and All_Time metrics  
-- The basic Id's from the source for Subscription, Product and Location are included.
+**Description:** Atomic level instance Service Ping data for the last ping of the month per installation by ping and metric for 28-day and all-time metrics. This includes basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
 
 **Data Grain:**
 - dim_ping_instance_id
 - metrics_path
 
-**Filters:**
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
-- Includes metrics for 28 Day and All-Time timeframes
-- Include only the `Last Pings of the Month`
-- Include `has_timed_out = FALSE` - to remove Metrics that have timed out during ping generation
-- Include `metric_value IS NOT NULL` - Only include Metrics with valid Values
+**Filters Applied to Model:**
+- Exclude metrics that timed out during ping generation (`has_timed_out = FALSE`)
+- Include 28-day and all-time metrics (`time_frame IN ('28d', 'all')`)
+- Include metrics from the 'Last Ping of the Month' pings (`is_last_ping_of_month = TRUE`)
+- Exclude metrics without values (`metric_value IS NOT NULL`)
 
-**Business Logic in this Model:** 
-- `data_source` = 'VERSION_DB'
-  - GitLab, GitLab Dedicated and Self-Managed Service Pings come through the Version Database.
-- `is_last_ping_of_month` = last ping created per calendar month per Installation (`dim_installation_id`)
-- Metrics that timed out (return -1) are set to a value of 0
+**Business Logic in this Model:**
+- `is_last_ping_of_month` = last ping created per calendar month per installation (`dim_installation_id`)
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `Inherited` - `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
 
 **Other Comments:**
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
-- GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
+- Metric time frames are set in the metric definition yaml file and can be found in the [Service Ping Metrics Dictionary](https://metrics.gitlab.com/)
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
 - `dim_installation_id` is the unique identifier for the actual installation. It is a combination of `dim_instance_id` and `dim_host_id`. `dim_host_id` is required because there can be multiple installations that share the same `dim_instance_id` (ex: gitlab.com has several installations sharing the same dim_instance_id: gitlab.com, staging.gitlab.com, etc)
-- Multiple Instances can be hosted on each Implementation. Multiple Installations can be included within each Instance which is determined by Host_id. (Instance_id || Host_id = Installation_id)
-- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.  
-- The different types of Service Pings are shown here with the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping), [GitLab Hosted Implementation](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [GitLab Dedicated Implementation](https://docs.gitlab.com/ee/subscriptions/gitlab_dedicated/#gitlab-dedicated) service pings will function similar to Self-Managed Implementations.
+- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.
+- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+
+{% enddocs %}
+
+{% docs fct_ping_instance_metric_weekly %}
+
+**Description:** Atomic level instance Service Ping data for the last ping of the week per installation by ping and metric for 7-day metrics. This includes basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
+
+**Data Grain:**
+- dim_ping_instance_id
+- metrics_path
+
+**Filters Applied to Model:**
+- Exclude metrics that timed out during ping generation (`has_timed_out = FALSE`)
+- Include 7-day metrics (`time_frame = '7d'`)
+- Include metrics from the 'Last Ping of the Week' pings (`is_last_ping_of_week = TRUE`)
+- Exclude metrics without values (`metric_value IS NOT NULL`)
+
+**Business Logic in this Model:**
+- `is_last_ping_of_week` = last ping created per calendar week per installation (`dim_installation_id`)
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `Inherited` - `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
+
+**Other Comments:**
+- Metric time frames are set in the metric definition yaml file and can be found in the [Service Ping Metrics Dictionary](https://metrics.gitlab.com/)
+- `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
+- `dim_instance_id` is synonymous with `uuid` in the source data
+- `dim_installation_id` is the unique identifier for the actual installation. It is a combination of `dim_instance_id` and `dim_host_id`. `dim_host_id` is required because there can be multiple installations that share the same `dim_instance_id` (ex: gitlab.com has several installations sharing the same dim_instance_id: gitlab.com, staging.gitlab.com, etc)
+- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.
 - [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
 
 {% enddocs %}
 
 {% docs fct_ping_instance_metric_all_time %}
 
-**Description:** Atomic Level Instance Service Ping Metric data For All-Time Metrics by Ping and Metric
-- The data includes a single row per Ping and Metric.  The basic Id's for Subscription, Product and Location are included. 
+**Description:** Atomic level instance Service Ping data by ping and metric for all-time metrics, including basic identifiers for easy joins out ot dimension tables
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
 
 **Data Grain:**
 - dim_ping_instance_id
 - metrics_path
 
-**Filters:**
-- time_frame = 'all'
-- UUID is NOT NULL  -  Filter In-Valid Data from Source
-- version NOT LIKE '%VERSION%'  - Filter In-Valid Data from Source
+**Filters Applied to Model:**
+- Include all-time metrics (`time_frame = 'all'`)
 
-**Business Logic in this Model:** 
-- `data_source` = 'VERSION_DB'
-  - GitLab, GitLab Dedicated and Self-Managed Service Pings come through the Version Database.
-- Metrics that timed out (return -1) are set to a value of 0
+**Business Logic in this Model:**
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - Metrics that timed out (return -1) are set to a value of 0
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `Inherited` - `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
 
 **Other Comments:**
-- Sums, Counts and Percents of Usage (called metrics) is captured along with the Implementation Information at the Instance Level and sent to GitLab. The Instance Owner determines whether Service Ping data will be sent or not. 
-- GitLab implementations can be Customer Hosted (Self-Managed), GitLab Hosted (referred to as SaaS or Dotcom data) or GitLab Dedicated Hosted (where each Installation is Hosted by GitLab but on Separate Servers).  
+- Metric time frames are set in the metric definition yaml file and can be found in the [Service Ping Metrics Dictionary](https://metrics.gitlab.com/)
 - `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
 - `dim_instance_id` is synonymous with `uuid` in the source data
 - `dim_installation_id` is the unique identifier for the actual installation. It is a combination of `dim_instance_id` and `dim_host_id`. `dim_host_id` is required because there can be multiple installations that share the same `dim_instance_id` (ex: gitlab.com has several installations sharing the same dim_instance_id: gitlab.com, staging.gitlab.com, etc)
-- Multiple Instances can be hosted on each Implementation. Multiple Installations can be included within each Instance which is determined by Host_id. (Instance_id || Host_id = Installation_id)
-- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.  
-- The different types of Service Pings are shown here with the [Self-Managed Service Ping](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#self-managed-service-ping), [GitLab Hosted Implementation](https://about.gitlab.com/handbook/business-technology/data-team/data-catalog/saas-service-ping-automation/#saas-service-ping).
-- [GitLab Dedicated Implementation](https://docs.gitlab.com/ee/subscriptions/gitlab_dedicated/#gitlab-dedicated) service pings will function similar to Self-Managed Implementations.
+- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.
 - [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+
+{% enddocs %}
+
+
+{% docs fct_ping_instance_metric_wave %}
+
+The purpose of this data model is to identify the service pings that can be mapped to a subscription and to pivot thet set of [wave metrics required for Gainsight](https://gitlab.com/gitlab-data/analytics/-/blob/master/transform/snowflake-dbt/macros/version/ping_instance_wave_metrics.sql) from the `fct_ping_instance_metric` model, strip all the sensitive data out, and then report one value for each metric in that column.
+
+{% enddocs %}
+
+
+{% docs fct_ping_instance_metric_wave_monthly %}
+
+This table builds on the set of all Zuora subscriptions that are associated with a **Self-Managed** rate plans. Seat Link data from Customers DB (`fct_usage_self_managed_seat_link`) are combined with high priority Usage Ping metrics (`fct_ping_instance_metric_wave`) to build out the set of facts included in this table.
+
+The grain of this table is `hostname` per `dim_instance_id(uuid)` per `dim_subscription_id` per `snapshot_month`. Since there are Self-Managed subscriptions that do not send Usage Ping payloads, it is possible for `dim_instance_id` and `hostname` to be null.
+
+The data from this table will be used to create a mart tables -  `mart_product_usage_paid_user_metrics_monthly` and `mart_product_usage_wave_1_3_metrics_monthly_diff` for Gainsight Customer Product Insights.
+
+Information on the Enterprise Dimensional Model can be found in the [handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/edw/)
+
+{% enddocs %}
+
+{% docs fct_mrr_snapshot_model %}
+
+Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [fct_mrr](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.fct_mrr) model
+
+{% enddocs %}
+
+{% docs dim_subscription_snapshot_model %}
+
+Daily [snapshot](https://about.gitlab.com/handbook/business-technology/data-team/platform/dbt-guide/#snapshots) model of the [dim_subscription](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.dim_subscription) model
+
+{% enddocs %}
+
+
+{% docs bdg_metrics_redis_events %}
+## Overview
+This model records the many-to-many relationship between Service Ping Metrics and Redis events. It pulls from the metrics dictionary yml files via `dim_ping_metric`, and contains the
+metric name, the Redis event name, and the aggregate operator and attribute. It will be joined to Snowplow events that contain the Service Ping Context to get SaaS product usage data at the namespace level.
+
+## Aggregation Strategies
+[This thread](https://gitlab.com/gitlab-org/gitlab/-/issues/376244#note_1167575425) has a nice summary of the possible aggregation strategies. The important thing to know from an analyst perspective is that Redis-based metrics come in three basic varities:
+1. Have only one associated Redis event; if that event occurs, count the metric (will have NULL `aggregate_operator`)
+1. Have multiple associated Redis events; count the metric if _any_ Redis event in that list occurs (will have 'OR' `aggregate_operator`, also known as union)
+1. Have multiple associated Redis events; count the metric if _all_ Redis events in that list occur (will have 'AND' `aggregate_operator`, also known as intersection)
+
+As a result, this bridge table will be used a bit differently to count intersection metrics compared to how it will be used to count union metrics.
+
+{% enddocs %}
+
+{% docs dim_crm_task %}
+
+Dimension model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
+
+{% enddocs %}
+
+{% docs fct_crm_task %}
+
+Fact model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
 
 {% enddocs %}

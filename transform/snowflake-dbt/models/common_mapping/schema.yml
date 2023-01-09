@@ -51,6 +51,7 @@ models:
     columns:
       - name: dim_license_id
       - name: license_md5
+      - name: license_sha256
       - name: dim_subscription_id
       - name: dim_crm_account_id
       - name: ultimate_parent_account_id
@@ -199,3 +200,12 @@ models:
       - name: employee_id
       - name: user_id
       - name: gitlab_username
+      - name: notification_email
+
+  - name: map_latest_subscription_namespace_monthly
+    description: '{{ doc("map_latest_subscription_namespace_monthly") }}'
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - dim_namespace_id
+            - date_month

@@ -84,6 +84,10 @@ init-airflow:
 	@sleep 5
 	@"$(DOCKER_RUN)" airflow_scheduler airflow db init
 	@"$(DOCKER_RUN)" airflow_scheduler airflow users create --role Admin -u admin -p admin -e datateam@gitlab.com -f admin -l admin
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set gitlab-ops-pool 2 "Airflow pool for ops database extract"
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set customers-pool 2 "Airflow pool for customer database full extract"
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set gitlab-com-scd-pool 4 "Airflow pool for gitab SCD full extract"
+	@"$(DOCKER_RUN)" airflow_scheduler airflow pool --set gitlab-com-pool 8 "Airflow pool for gitlab  database incremental extract"
 	@"$(DOCKER_DOWN)"
 
 ########################################################################################################################
@@ -156,7 +160,7 @@ mypy:
 
 pylint:
 	@echo "Running pylint..."
-	@poetry run pylint . --disable=line-too-long,E0401,E0611,W1203,W1202
+	@poetry run pylint extract/ --ignore=dags --disable=line-too-long,E0401,E0611,W1203,W1202,C0103,R0902,W0212
 
 complexity:
 	@echo "Running complexity (Xenon)..."

@@ -98,6 +98,10 @@ sheets:
     owner: '@rkohnke'
     tabs:
       - fmm_kpi_targets
+  - name: ga360_customdimensions
+    owner: '@dennischarukulvanich'
+    tabs: 
+      - ga360_customdimensions
   - description:  table of active GCP Committed Use Discount (CUD)
     name: gcp_active_cud
     owner: '@dtownsend'
@@ -329,3 +333,23 @@ sheets:
     owner: '@hselim'
     tabs:
       - xactly_credit_sheetload
+  - name: sales_analytics_tableau_rls_users
+    owner: '@j_kim'
+    tabs: 
+      - sales_analytics_tableau_rls_users
+  - name: sales_analytics_tableau_rls_roles
+    owner: '@j_kim'
+    tabs: 
+      - sales_analytics_tableau_rls_roles
+  - name: toy_marketing_handbook
+    owner: '@jstemmer1'
+    tabs: 
+      - toy_marketing_handbook
+  - name: leading_organizations
+    owner: '@nick_vh'
+    tabs:
+      - leading_organization_entry_dates
+  - name: fy24_placeholder_target
+    owner: '@nfiguera'
+    tabs:
+      - fy24_placeholder_target

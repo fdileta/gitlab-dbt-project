@@ -73,7 +73,7 @@ SELECT
         IFF(acv_2__c >= 0, 1, 0)                        AS closed_deals, -- so that you can exclude closed deals that had negative impact
         competitors__c                                  AS competitors,
         critical_deal_flag__c                           AS critical_deal_flag,
-        {{sfdc_deal_size('incremental_acv_2__c', 'deal_size')}},
+        {{sfdc_deal_size('arr_net__c', 'deal_size')}},
         forecastcategoryname                            AS forecast_category_name,
         incremental_acv_2__c                            AS forecasted_iacv,
         iacv_created_date__c                            AS iacv_created_date,
@@ -196,6 +196,8 @@ SELECT
         END opportunity_deal_size,
         payment_schedule__c                             AS payment_schedule,
         comp_y2_iacv__c                                 AS comp_y2_iacv,
+        comp_new_logo_override__c                       AS comp_new_logo_override,
+        is_pipeline_created_eligible_flag__c            AS is_pipeline_created_eligible,
 
       -- ************************************
       -- sales segmentation deprecated fields - 2020-09-03

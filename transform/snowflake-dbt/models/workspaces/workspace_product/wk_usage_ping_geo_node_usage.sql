@@ -1,11 +1,12 @@
 {{ config({
     "materialized": "incremental",
-    "unique_key": "instance_path_id"
+    "unique_key": "instance_path_id",
+    "schema": "legacy"
     })
 }}
 
-WITH prep_usage_data_flattened AS ( 
-  
+WITH prep_usage_data_flattened AS (
+
     SELECT * FROM {{ ref('prep_ping_instance_flattened')}}
     {% if is_incremental() %}
 
@@ -28,13 +29,13 @@ WITH prep_usage_data_flattened AS (
 SELECT *
 FROM data,
 lateral flatten(input => metric_value,
-recursive => true) 
+recursive => true)
 
 )
 
-SELECT 
+SELECT
   {{ dbt_utils.surrogate_key(['flattened.dim_ping_instance_id', 'flattened.path']) }} AS instance_path_id,
-  flattened.dim_instance_id AS instance_id, 
+  flattened.dim_instance_id AS instance_id,
   flattened.dim_ping_instance_id AS ping_id,
   flattened.original_edition AS edition,
   flattened.dim_host_id AS host_id,

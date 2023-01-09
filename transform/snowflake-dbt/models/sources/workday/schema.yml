@@ -301,6 +301,7 @@ models:
           combination_of_columns:
             - employee_id
             - effective_date
+            - initiated_at
 
     columns:
       - name: employee_id
@@ -346,6 +347,37 @@ models:
       - name: unique_filter_key
         tests:
           - unique
+      - name: employee_number
+      - name: employee_id
+      - name: first_name
+      - name: last_name
+      - name: hire_date
+      - name: termination_date
+      - name: first_inactive_date
+      - name: greenhouse_candidate_id
+      - name: cost_center
+      - name: gitlab_username
+      - name: jobtitle_speciality_single_select
+      - name: jobtitle_speciality_multi_select
+      - name: locality
+      - name: nationality
+      - name: gender_dropdown
+      - name: region
+      - name: job_role
+      - name: sales_geo_differential
+      - name: date_of_birth
+      - name: employee_status_date
+      - name: employment_history_status
+      - name: ethnicity
+      - name: gender
+      - name: country
+      - name: age
+      - name: job_grade
+      - name: pay_frequency
+      - name: uploaded_at
+      - name: uploaded_row_number_desc
+      - name: source_system
+
 
   - name: blended_employment_status_source
     columns:
@@ -376,3 +408,32 @@ models:
       - name: unique_filter_key
         tests:
           - unique
+  
+  - name: workday_supervisory_organizations_source
+    columns:
+      - name: team_id
+        description: The unique organization identifier
+        tests:
+          - unique
+          - not_null
+      - name: team_hierarchy_level
+        description: Team level within the hierarchy. Organizations can be organized into hierarchies and enable reporting at different levels in the hierarchy
+      - name: team_members_count
+        description: Number of team members in the organization
+      - name: team_manager_inherited
+      - name: team_inactivated
+        description: Boolean. Tracks inactive teams
+      - name: team_manager_name
+        description: Organization's manager name
+      - name: team_name
+        description: Organization's name
+      - name: team_manager_name_id
+        description: Organization's manager employee ID
+      - name: team_superior_team_id
+        description: Organization's superior team ID
+      - name: team_inactivated_date
+        description: Date the organization became inactive
+      - name: is_deleted
+      - name: uploaded_at
+      - name: valid_from
+      - name: valid_to
