@@ -101,12 +101,14 @@ def extract_logs(
                     break
 
                 if items is None or len(items) == 0:
+                    info("Empty response received, retrying")
                     time.sleep(30)
                     response = requests.get(page_token, auth=("api", api_key))
                 try:
                     data = response.json()
                     items = data.get("items")
                     if items is None or len(items) == 0:
+                        info("Another empty response, ending")
                         break
                 except json.decoder.JSONDecodeError:
                     error("No response received")
