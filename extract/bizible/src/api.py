@@ -126,7 +126,7 @@ class BizibleSnowFlakeExtractor:
         self,
         start_date: datetime,
         end_date: datetime,
-        table_name: Dict,
+        table_name: str,
         date_column: str,
         full_refresh: bool = False,
     ) -> None:
