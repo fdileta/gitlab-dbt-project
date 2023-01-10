@@ -93,10 +93,20 @@ def extract_logs(
 
                 items = data.get("items")
 
-                if items is None:
-                    break
+                page_token = data.get("paging").get("next")
 
-                if len(items) == 0:
+                if items is None or len(items) == 0:
+                    info("Empty response received, retrying")
+                    time.sleep(60)
+                    response = requests.get(page_token, auth=("api", api_key))
+                try:
+                    data = response.json()
+                    items = data.get("items")
+                    if items is None or len(items) == 0:
+                        info("Another empty response, ending")
+                        break
+                except json.decoder.JSONDecodeError:
+                    error("No response received")
                     break
 
                 first_timestamp = items[0].get("timestamp")
@@ -120,10 +130,8 @@ def extract_logs(
 
                 items = data.get("items")
 
-                if items is None:
-                    break
-
-                if len(items) == 0:
+                # First request should return data, if not, quit.
+                if items is None or len(items) == 0:
                     break
 
                 all_results = all_results[:] + items[:]
