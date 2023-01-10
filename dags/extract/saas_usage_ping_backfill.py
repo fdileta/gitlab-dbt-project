@@ -43,7 +43,9 @@ DAG_DESCRIPTION = (
     "In order to have this DAG run properly, "
     "the variable NAMESPACE_BACKFILL_VAR should be filled"
 )
-BACKFILL_PARAMETERS = Variable.get("NAMESPACE_BACKFILL_VAR", deserialize_json=True, default_var=None)
+BACKFILL_PARAMETERS = Variable.get(
+    "NAMESPACE_BACKFILL_VAR", deserialize_json=True, default_var=None
+)
 
 secrets = [
     SNOWFLAKE_ACCOUNT,
@@ -177,19 +179,19 @@ def get_date(date_param: str) -> datetime:
     return datetime.strptime(res, "%Y-%m-%d")
 
 
-start_date = get_date(date_param="start_date")
-start_date = get_monday(day=start_date)
+if BACKFILL_PARAMETERS:
+    start_date = get_date(date_param="start_date")
+    start_date = get_monday(day=start_date)
 
-end_date = get_date(date_param="end_date")
+    end_date = get_date(date_param="end_date")
 
+    dag = DAG(
+        DAG_NAME,
+        default_args=default_args,
+        schedule_interval=None,
+        concurrency=2,
+        description=DAG_DESCRIPTION,
+    )
 
-dag = DAG(
-    DAG_NAME,
-    default_args=default_args,
-    schedule_interval=None,
-    concurrency=2,
-    description=DAG_DESCRIPTION,
-)
-
-for run in get_date_range(start=start_date, end=end_date):
-    generate_task(run_date=run)
+    for run in get_date_range(start=start_date, end=end_date):
+        generate_task(run_date=run)
