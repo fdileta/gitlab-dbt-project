@@ -1,35 +1,16 @@
-WITH unioned AS (
+{{ config(
+    materialized='table',
+    tags=["mnpi_exception", "product"]
+) }}
 
-    {{ dbt_utils.union_relations(
-        relations=[
-            ref('performance_indicators_cost_source'), 
-            ref('performance_indicators_corporate_finance_source'),
-            ref('performance_indicators_customer_support_source'),
-            ref('performance_indicators_dev_section_source'),              
-            ref('performance_indicators_development_department_source'),              
-            ref('performance_indicators_enablement_section_source'),          
-            ref('performance_indicators_engineering_source'),
-            ref('performance_indicators_finance_source'),
-            ref('performance_indicators_infrastructure_department_source'),
-            ref('performance_indicators_marketing_source'),
-            ref('performance_indicators_ops_section_source'),
-            ref('performance_indicators_people_success_source'),
-            ref('performance_indicators_product_source'),
-            ref('performance_indicators_quality_department_source'),
-            ref('performance_indicators_recruiting_source'),
-            ref('performance_indicators_sales_source'),
-            ref('performance_indicators_security_department_source'),
-            ref('performance_indicators_ux_department_source')
-            ]
-    ) }}
+WITH source AS (
 
-), final AS (
+  SELECT
+    {{ dbt_utils.star(from=ref('prep_performance_indicators_yaml'), except=['PERFORMANCE_INDICATOR_PK',
+'CREATED_BY', 'UPDATED_BY', 'MODEL_CREATED_DATE', 'MODEL_UPDATED_DATE', 'DBT_CREATED_AT', 'DBT_UPDATED_AT']) }}
+  FROM {{ ref('prep_performance_indicators_yaml') }}
 
-    SELECT *
-    FROM unioned
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY unique_key ORDER BY valid_from_date) =1 
- 
 )
 
 SELECT *
-FROM final
+FROM source

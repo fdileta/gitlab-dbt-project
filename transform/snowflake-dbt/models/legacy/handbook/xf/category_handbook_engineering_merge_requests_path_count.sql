@@ -33,6 +33,7 @@ WITH category_handbook_engineering_merge_requests AS (
            ELSE 0 END                                                                    AS path_count_quality,
       CASE WHEN LOWER(merge_request_path) LIKE '%/handbook/engineering/security/%' THEN 1
            WHEN LOWER(merge_request_path) LIKE '%data/performance_indicators/security_department.yml%' THEN 1
+           WHEN LOWER(merge_request_path) LIKE '%/handbook/security/%' THEN 1
            ELSE 0 END                                                                    AS path_count_security,
       CASE WHEN LOWER(merge_request_path) LIKE '%/handbook/support/%' THEN 1
            WHEN LOWER(merge_request_path) LIKE '%data/performance_indicators/customer_support_department.yml%' THEN 1

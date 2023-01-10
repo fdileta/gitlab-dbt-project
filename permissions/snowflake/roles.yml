@@ -89,6 +89,11 @@ databases:
     - jkim_prep:
         shared: no
 
+    - jng_prod:
+        shared: no
+    - jng_prep:
+        shared: no
+
     - jpeguero_prod:
         shared: no
     - jpeguero_prep:
@@ -2527,7 +2532,6 @@ roles:
             - reporter
             - restricted_safe
             - xactly
-
         warehouses:
             - dev_xs
 
@@ -2990,6 +2994,8 @@ roles:
 
     - hkacmarski:
         member_of:
+            - analyst_sales
+            - bi_tool_eval_read
             - reporter
             - restricted_safe
         warehouses:
@@ -3002,7 +3008,6 @@ roles:
             - restricted_safe
             - salesforce
             - xactly
-
         warehouses:
             - dev_xs
 
@@ -3062,10 +3067,6 @@ roles:
         warehouses:
             - dev_xs
 
-    - jameson: # De provisioned as part of Quarterly audit and security check.
-        member_of: []
-        warehouses: []
-
     - jbudreski:
         member_of:
             - reporter
@@ -3121,6 +3122,7 @@ roles:
             - xactly
             - sales_analytics
             - data_science_readonly
+            - marketo
         warehouses:
             - dev_xs
         owns:
@@ -3156,9 +3158,44 @@ roles:
                     - jkim_prep.*.*
                     - jkim_prod.*.*
 
-    - joshua:
-        member_of: []
-        warehouses: []
+    - jng:
+        member_of:
+         - restricted_safe
+         - analytics_engineer_core
+        warehouses:
+            - dev_xs
+        owns:
+            databases:
+                - jng_prep
+                - jng_prod
+            schemas:
+                - jng_prep.*
+                - jng_prod.*
+            tables:
+                - jng_prep.*.*
+                - jng_prod.*.*
+        privileges:
+            databases:
+                read:
+                    - jng_prep
+                    - jng_prod
+                write:
+                    - jng_prep
+                    - jng_prod
+            schemas:
+                read:
+                    - jng_prep.*
+                    - jng_prod.*
+                write:
+                    - jng_prep.*
+                    - jng_prod.*
+            tables:
+                read:
+                    - jng_prep.*.*
+                    - jng_prod.*.*
+                write:
+                    - jng_prep.*.*
+                    - jng_prod.*.*
 
     - jpeguero:
         member_of:
@@ -3488,9 +3525,23 @@ roles:
         warehouses:
             - dev_xs
 
-    - laddula:
-        member_of: []
-        warehouses: []
+    - lmai:
+        member_of:
+            - analyst_engineering
+            - bi_tool_eval_read
+        privileges:
+            databases:
+                read:
+                    - prep
+            schemas:
+                read:
+                    - prep.sensitive
+            tables: # https://gitlab.com/gitlab-com/team-member-epics/access-requests/-/issues/6311
+                read:
+                    - prep.sensitive.bamboohr_id_employee_number_mapping
+        warehouses:
+            - dev_xs
+
 
     - lvinueza:
         member_of:
@@ -3701,6 +3752,13 @@ roles:
                     - mlaanen_prep.*.*
                     - mlaanen_prod.*.*
 
+    - mnohr:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - mpetersen:
         member_of:
             - analyst_growth
@@ -3822,10 +3880,6 @@ roles:
                     - mvilain_prep.*.*
                     - mvilain_prod.*.*
 
-    - mwalker:
-        member_of: []
-        warehouses: []
-
     - mwawrzyniak:
         member_of:
             - analyst_growth
@@ -3885,6 +3939,7 @@ roles:
             - xactly
             - sales_analytics
             - data_science_readonly
+            - marketo
         warehouses:
             - dev_xs
         owns:
@@ -4370,6 +4425,18 @@ roles:
         warehouses:
             - dev_xs
 
+    - smishra:
+        member_of:
+            - adaptive
+            - analyst_finance
+            - customers_db
+            - analyst_marketing
+            - data_team_analyst
+            - restricted_safe
+            - xactly
+        warehouses:
+            - dev_xs
+
     - snalamaru:
         member_of:
             - engineer
@@ -4716,18 +4783,10 @@ users:
         member_of:
             - alu
 
-    - amartin:
-        can_login: no
-        member_of: []
-
     - aperez:
         can_login: yes
         member_of:
             - aperez
-
-    - ashaikh:
-        can_login: no
-        member_of: []
 
     - bi_tool_eval:
         can_login: yes
@@ -4789,10 +4848,6 @@ users:
         member_of:
             - degan
 
-    - dfelton:
-        can_login: no
-        member_of: []
-
     - dgupta:
         can_login: yes
         member_of:
@@ -4850,14 +4905,6 @@ users:
         can_login: yes
         member_of:
             - hselim
-        
-    - ian:
-        can_login: no
-        member_of: []
-
-    - isharan:
-        can_login: no
-        member_of: []
 
     - iweeks:
         can_login: yes
@@ -4884,9 +4931,10 @@ users:
         member_of:
             - jkim
 
-    - joshua:
-        can_login: no
-        member_of: []
+    - jng:
+        can_login: yes
+        member_of:
+            - jng
 
     - jpeguero:
         can_login: yes
@@ -4910,10 +4958,6 @@ users:
         can_login: yes
         member_of:
             - jstemmer
-
-    - judume:
-        can_login: no
-        member_of: []
 
     - juwong:
         can_login: yes
@@ -4950,13 +4994,10 @@ users:
         member_of:
             - kkarthikeyan
 
-    - laddula:
-        can_login: no
-        member_of: []
-
     - lmai:
-        can_login: no
-        member_of: []
+        can_login: yes
+        member_of:
+            - lmai
 
     - lvinueza:
         can_login: yes
@@ -4997,6 +5038,11 @@ users:
         can_login: yes
         member_of:
             - mlaanen
+
+    - mnohr:
+        can_login: yes
+        member_of:
+            - mnohr
 
     - mpetersen:
         can_login: yes
@@ -5075,10 +5121,6 @@ users:
             - periscope
             - reporter
 
-    - periscope_sensitive:
-        can_login: no
-        member_of: []
-
     - permission_bot:
         can_login: yes
         member_of:
@@ -5138,6 +5180,11 @@ users:
         member_of:
             - smccormack
 
+    - smishra:
+        can_login: yes
+        member_of:
+            - smishra
+
     - snalamaru:
         can_login: yes
         member_of:
@@ -5147,10 +5194,6 @@ users:
         can_login: yes
         member_of:
             - srehm
-
-    - statimatla:
-        can_login: no
-        member_of: []
 
     - stitch:
         can_login: yes

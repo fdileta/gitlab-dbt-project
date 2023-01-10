@@ -26,5 +26,9 @@ sources:
       - name: zuora_revenue_unreleased_pob_report
       - name: zuora_revenue_unbill_rollforward_report
       - name: zuora_revenue_revenue_waterfall_report
+      - name: zuora_revenue_waterfall_report_with_wf_type_adjustments
+      - name: zuora_revenue_waterfall_report_with_wf_type_unbilled_revenue
+      - name: zuora_revenue_waterfall_report_with_wf_type_net_revenue_with_mje_flag_y
+      - name: zuora_revenue_billing_waterfall_report_with_additional_columns
       - name: marketing_press_sov
       - name: booking_to_billing_monthly_reconciliation
