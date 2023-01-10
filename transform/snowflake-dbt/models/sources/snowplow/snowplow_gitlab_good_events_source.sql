@@ -4,8 +4,9 @@
 
 WITH source as (
 
-    SELECT * EXCLUDE (geo_zipcode, geo_latitude, geo_longitude)
-    FROM {{ source('gitlab_snowplow', 'events') }}
+  SELECT
+    {{ dbt_utils.star(from=source('gitlab_snowplow', 'events'), except=['geo_zipcode', 'geo_latitude', 'geo_longitude']) }}
+  FROM {{ source('gitlab_snowplow', 'events') }} 
 
 )
 
