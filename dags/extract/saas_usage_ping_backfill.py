@@ -43,7 +43,7 @@ DAG_DESCRIPTION = (
     "In order to have this DAG run properly, "
     "the variable NAMESPACE_BACKFILL_VAR should be filled"
 )
-BACKFILL_PARAMETERS = Variable.get("NAMESPACE_BACKFILL_VAR", deserialize_json=True)
+BACKFILL_PARAMETERS = Variable.get("NAMESPACE_BACKFILL_VAR", deserialize_json=True, default_var=None)
 
 secrets = [
     SNOWFLAKE_ACCOUNT,
