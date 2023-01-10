@@ -1,5 +1,5 @@
 .snowflake_dbt_jobs: &snowflake_dbt_jobs
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.14
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.22
   stage: ⚙️ dbt Run
   before_script:
     - cd transform/snowflake-dbt/
@@ -266,7 +266,7 @@
 
 .safe_models_check: &safe_models_check
   stage: 🛠 dbt Misc
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.14
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.22
   before_script:
     - cd transform/snowflake-dbt/
     - echo $BRANCH_NAME
@@ -328,7 +328,7 @@
     - analytics
   only:
     changes:
-      - "**/*.sql"
+      - "transform/snowflake-dbt/models/**/*.sql"
     refs:
       - merge_request
   allow_failure: true
@@ -348,7 +348,7 @@
 # ======
 .dbt_sql_lint: &dbt_sql_lint
   stage: 🛠 dbt Misc
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.14
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.22
   before_script:
     - cd transform/snowflake-dbt/
     - echo $BRANCH_NAME
@@ -376,6 +376,7 @@
   only:
     changes:
       - "transform/snowflake-dbt/models/**/*.sql"
+      - "transform/snowflake-dbt/analysis/**/*.sql"
     refs:
       - merge_request
   allow_failure: true
