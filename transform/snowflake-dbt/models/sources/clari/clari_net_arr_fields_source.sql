@@ -1,7 +1,7 @@
-{{ config({
-    "materialized": "incremental",
-    "unique_key": "field_id"
-    })
+{{ config(
+    materialized="incremental",
+    unique_key="field_id"
+    )
 }}
 
 WITH

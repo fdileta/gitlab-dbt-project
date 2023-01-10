@@ -1,13 +1,16 @@
+{{ config(
+    tags=["mnpi"]
+    )
+}}
 
 {{ simple_cte([
     ('entries', 'clari_net_arr_entries_source'),
     ('users', 'clari_net_arr_users_source'),
     ('fields', 'clari_net_arr_fields_source'),
     ('time_frames', 'clari_net_arr_time_frames_source')
-])
-}}
+]) }},
 
-with wk_sales_clari_net_arr_forecast AS (
+wk_sales_clari_net_arr_forecast AS (
   SELECT
     users.user_full_name,
     users.email,

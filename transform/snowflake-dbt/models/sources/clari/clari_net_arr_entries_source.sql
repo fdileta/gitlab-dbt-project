@@ -1,7 +1,8 @@
-{{ config({
-    "materialized": "incremental",
-    "unique_key": "entries_id"
-    })
+{{ config(
+    materialized="incremental",
+    unique_key="entries_id",
+    tags=["mnpi"]
+    )
 }}
 
 WITH

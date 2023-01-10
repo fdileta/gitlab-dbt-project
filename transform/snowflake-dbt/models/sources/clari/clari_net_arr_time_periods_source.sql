@@ -1,7 +1,7 @@
-{{ config({
-    "materialized": "incremental",
-    "unique_key": "fiscal_quarter"
-    })
+{{ config(
+    materialized="incremental",
+    unique_key="fiscal_quarter"
+    )
 }}
 
 WITH
