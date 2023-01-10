@@ -1,19 +1,10 @@
 """
 The main test routine for Automated Service Ping
 """
+
 from datetime import datetime, timedelta
-
 import pytest
-
-from extract.saas_usage_ping.usage_ping import (
-    UsagePing,
-    SCHEMA_NAME,
-    ENCODING,
-    NAMESPACE_FILE,
-    get_backfill_filter,
-    SQL_KEY,
-    REDIS_KEY,
-)
+from extract.saas_usage_ping.usage_ping import UsagePing, get_backfill_filter
 
 
 @pytest.fixture(name="metrics_definition_test_dict")
@@ -66,7 +57,7 @@ def get_usage_ping():
     """
     Return UsagePing object
     """
-    usage_ping = UsagePing
+    usage_ping = UsagePing()
     usage_ping.end_date = datetime.now()
     usage_ping.start_date_28 = usage_ping.end_date - timedelta(days=28)
 
@@ -79,49 +70,17 @@ def get_usage_ping_namespace_file(usage_ping):
     Fixture for namespace file
     """
 
-    return usage_ping._get_meta_data(
-        usage_ping, file_name="usage_ping_namespace_queries.json"
+    return usage_ping._get_meta_data_from_file(
+        file_name="usage_ping_namespace_queries.json"
     )
 
 
-def test_static_variables():
+def test_static_variables(usage_ping):
     """
     Check static variables
     """
-    assert SCHEMA_NAME == "saas_usage_ping"
-    assert ENCODING == "utf8"
-    assert NAMESPACE_FILE == "usage_ping_namespace_queries.json"
-
-
-def test_get_md5(usage_ping):
-    """
-    Simple MD5 test.
-    Know testing the private method is not aligned
-    with the best praxis,
-    but found it is sufficient
-    in this implementation.
-    """
-
-    input_timestamps = [
-        datetime(2021, 9, 1, 23, 10, 21).timestamp(),
-        datetime(2020, 8, 1, 23, 10, 22).timestamp(),
-        datetime(2021, 7, 1, 23, 10, 23).timestamp(),
-        "test_string",
-        "",
-        None,
-    ]
-
-    for check_time in input_timestamps:
-        res = usage_ping._get_md5(None, check_time)
-
-        # Check output data type
-        assert isinstance(res, str)
-        # Check is len 32 as it is expected length
-        assert len(res) == 32  # bytes in hex representation
-        # As this is one-way function,
-        # can't test it with many things
-        # let see to we have all details with various inputs
-        assert res is not None
+    assert usage_ping.utils.ENCODING == "utf8"
+    assert usage_ping.utils.NAMESPACE_FILE == "usage_ping_namespace_queries.json"
 
 
 def test_evaluate_saas_queries():
@@ -136,7 +95,7 @@ def test_evaluate_saas_queries():
     Note: The snowflake outputs cannot be compared because they can change over time
     """
 
-    def get_keys_in_nested_dict(nested_dict, keys=[]):
+    def get_keys_in_nested_dict(nested_dict, keys: list = []):
         for key, val in nested_dict.items():
             if isinstance(val, dict):
                 get_keys_in_nested_dict(val, keys)
@@ -145,7 +104,7 @@ def test_evaluate_saas_queries():
         return keys
 
     usage_ping_test = UsagePing()
-    connection = usage_ping_test.loader_engine.connect()
+    connection = usage_ping_test.engine_factory.connect()
     saas_queries = {
         "active_user_count": "SELECT 'active_user_count' AS counter_name,  COUNT(users.id) AS counter_value, TO_DATE(CURRENT_DATE) AS run_day   FROM prep.gitlab_dotcom.gitlab_dotcom_users_dedupe_source AS users WHERE (users.state IN ('active')) AND (users.user_type IS NULL OR users.user_type IN (6, 4))",
         "counts": {
@@ -175,7 +134,9 @@ def test_evaluate_saas_queries():
             }
         },
     }
-    results, errors = usage_ping_test.evaluate_saas_queries(connection, saas_queries)
+    results, errors = usage_ping_test.evaluate_saas_instance_sql_queries(
+        connection, saas_queries
+    )
 
     # check that the correct queries have suceeded and errored
     assert get_keys_in_nested_dict(results) == get_keys_in_nested_dict(expected_results)
@@ -222,7 +183,7 @@ def test_namespace_file_error(usage_ping):
     Test file loading
     """
     with pytest.raises(FileNotFoundError):
-        usage_ping._get_meta_data(usage_ping, file_name="THIS_DOES_NOT_EXITS.json")
+        usage_ping._get_meta_data_from_file(file_name="THIS_DOES_NOT_EXITS.json")
 
 
 def test_json_file_consistency_level(namespace_file):
@@ -239,6 +200,7 @@ def test_json_file_consistency_level(namespace_file):
         assert level == "namespace"
 
 
+#
 @pytest.mark.parametrize(
     "test_value, expected_value",
     [
@@ -274,7 +236,7 @@ def test_replace_placeholders(usage_ping):
     """
     sql = "SELECT 1 FROM TABLE WHERE created_at BETWEEN between_start_date AND between_end_date"
 
-    actual = usage_ping.replace_placeholders(usage_ping, sql=sql)
+    actual = usage_ping.replace_placeholders(sql=sql)
 
     assert "between_start_date" not in actual
     assert "between_end_date" not in actual
@@ -293,7 +255,7 @@ def test_check_data_source(metrics_definition_test_dict):
     usage_ping_test = UsagePing()
 
     # matching redis concat_metric_name
-    payload_source = REDIS_KEY
+    payload_source = usage_ping_test.utils.REDIS_KEY
     concat_metric_name = "counts.productivity_analytics_views"
     prev_concat_metric_name = "counts"
     res = usage_ping_test.check_data_source(
@@ -305,7 +267,7 @@ def test_check_data_source(metrics_definition_test_dict):
     assert res == "valid_source"
 
     # matching sql concat_metric_name
-    payload_source = SQL_KEY
+    payload_source = usage_ping_test.utils.SQL_KEY
     concat_metric_name = "usage_activity_by_stage.secure.user_preferences_group_overview_security_dashboard"
     prev_concat_metric_name = "usage_activity_by_stage.secure"
     res = usage_ping_test.check_data_source(
@@ -317,7 +279,7 @@ def test_check_data_source(metrics_definition_test_dict):
     assert res == "valid_source"
 
     # matching sql prev_concat_metric_name
-    payload_source = SQL_KEY
+    payload_source = usage_ping_test.utils.SQL_KEY
     concat_metric_name = (
         "usage_activity_by_stage.manage.user_auth_by_provider.two-factor"
     )
@@ -331,7 +293,7 @@ def test_check_data_source(metrics_definition_test_dict):
     assert res == "valid_source"
 
     # NON-MATCHING data source: redis payload, but metric definition shows data source as sql
-    payload_source = REDIS_KEY
+    payload_source = usage_ping_test.utils.REDIS_KEY
     concat_metric_name = (
         "usage_activity_by_stage.manage.user_auth_by_provider.two-factor"
     )
@@ -345,7 +307,7 @@ def test_check_data_source(metrics_definition_test_dict):
     assert res == "not_matching_source"
 
     # metric in payload is missing in metric_definition yaml file
-    payload_source = REDIS_KEY  # should be sql
+    payload_source = usage_ping_test.utils.REDIS_KEY  # should be sql
     concat_metric_name = "some_missing_key.some_missing_key2"
     prev_concat_metric_name = "some_missing_key"
     res = usage_ping_test.check_data_source(
@@ -376,7 +338,7 @@ def test_keep_valid_metric_definitions(metrics_definition_test_dict):
         },
     }
 
-    payload_source = REDIS_KEY
+    payload_source = usage_ping_test.utils.REDIS_KEY
     valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(
         payload, payload_source, metrics_definition_test_dict
     )
@@ -400,7 +362,7 @@ def test_metric_exceptions(metrics_definition_test_dict):
         "counts": {"clusters_platforms_eks": 0},
     }
 
-    payload_source = SQL_KEY
+    payload_source = usage_ping_test.utils.SQL_KEY
     valid_metric_dict = usage_ping_test.keep_valid_metric_definitions(
         payload, payload_source, metrics_definition_test_dict
     )
@@ -420,11 +382,13 @@ def test_run_metric_checks():
     usage_ping_test.run_metric_checks()  # nothing should happen
 
     # ensure that an error is raised if there's a missing definition
-    usage_ping_test.missing_definitions[SQL_KEY].append("some_missing_definition")
+    usage_ping_test.missing_definitions[usage_ping_test.utils.SQL_KEY].append(
+        "some_missing_definition"
+    )
     with pytest.raises(ValueError, match="Raising error to.*"):
         usage_ping_test.run_metric_checks()
 
-    usage_ping_test.missing_definitions[SQL_KEY] = []  # reset
+    usage_ping_test.missing_definitions[usage_ping_test.utils.SQL_KEY] = []  # reset
     usage_ping_test.run_metric_checks()  # nothing should happen
 
     # ensure that an error is raised if there's a dup key

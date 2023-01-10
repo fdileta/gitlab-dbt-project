@@ -325,9 +325,9 @@ models:
     - name: version_is_prerelease
       description: '{{ doc("version_is_prerelease") }}'
     - name: is_internal
-      description: '{{ doc("is_internal") }}'
+      description: '{{ doc("is_internal_ping_model") }}'
     - name: is_staging
-      description: '{{ doc("is_staging") }}'
+      description: '{{ doc("is_staging_ping_model") }}'
     - name: is_trial
       description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
@@ -447,9 +447,9 @@ models:
     - name: version_is_prerelease
       description: '{{ doc("version_is_prerelease") }}'
     - name: is_internal
-      description: '{{ doc("is_internal") }}'
+      description: '{{ doc("is_internal_ping_model") }}'
     - name: is_staging
-      description: '{{ doc("is_staging") }}'
+      description: '{{ doc("is_staging_ping_model") }}'
     - name: is_trial
       description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
@@ -560,9 +560,9 @@ models:
     - name: version_is_prerelease
       description: '{{ doc("version_is_prerelease") }}'
     - name: is_internal
-      description: '{{ doc("is_internal") }}'
+      description: '{{ doc("is_internal_ping_model") }}'
     - name: is_staging
-      description: '{{ doc("is_staging") }}'
+      description: '{{ doc("is_staging_ping_model") }}'
     - name: is_trial
       description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
@@ -683,9 +683,9 @@ models:
     - name: version_is_prerelease
       description: '{{ doc("version_is_prerelease") }}'
     - name: is_internal
-      description: '{{ doc("is_internal") }}'
+      description: '{{ doc("is_internal_ping_model") }}'
     - name: is_staging
-      description: '{{ doc("is_staging") }}'
+      description: '{{ doc("is_staging_ping_model") }}'
     - name: is_trial
       description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
@@ -810,9 +810,9 @@ models:
     - name: version_is_prerelease
       description: '{{ doc("version_is_prerelease") }}'
     - name: is_internal
-      description: '{{ doc("is_internal") }}'
+      description: '{{ doc("is_internal_ping_model") }}'
     - name: is_staging
-      description: '{{ doc("is_staging") }}'
+      description: '{{ doc("is_staging_ping_model") }}'
     - name: is_trial
       description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
@@ -937,9 +937,9 @@ models:
     - name: version_is_prerelease
       description: '{{ doc("version_is_prerelease") }}'
     - name: is_internal
-      description: '{{ doc("is_internal") }}'
+      description: '{{ doc("is_internal_ping_model") }}'
     - name: is_staging
-      description: '{{ doc("is_staging") }}'
+      description: '{{ doc("is_staging_ping_model") }}'
     - name: is_trial
       description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value
@@ -1064,9 +1064,9 @@ models:
     - name: version_is_prerelease
       description: '{{ doc("version_is_prerelease") }}'
     - name: is_internal
-      description: '{{ doc("is_internal") }}'
+      description: '{{ doc("is_internal_ping_model") }}'
     - name: is_staging
-      description: '{{ doc("is_staging") }}'
+      description: '{{ doc("is_staging_ping_model") }}'
     - name: is_trial
       description: '{{ doc("is_trial_ping_model") }}'
     - name: umau_value

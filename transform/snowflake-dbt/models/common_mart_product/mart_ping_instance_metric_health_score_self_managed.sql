@@ -20,7 +20,8 @@
 , fct_ping_instance_metric_with_license  AS (
     SELECT *
     FROM fct_ping_instance_metric
-    WHERE license_md5 IS NOT NULL
+    WHERE (license_md5 IS NOT NULL OR
+           license_sha256 IS NOT NULL)
 )
 
 , final AS (
@@ -31,6 +32,7 @@
     fct_ping_instance_metric_with_license.dim_instance_id                                      AS dim_instance_id, 
     fct_ping_instance_metric_with_license.dim_host_id                                          AS dim_host_id, 
     fct_ping_instance_metric_with_license.license_md5                                          AS license_md5,
+    fct_ping_instance_metric_with_license.license_sha256                                       AS license_sha256,
     fct_ping_instance_metric_with_license.dim_subscription_id                                  AS dim_subscription_id,
     fct_ping_instance_metric_with_license.dim_license_id                                       AS dim_license_id,
     fct_ping_instance.dim_crm_account_id                                                       AS dim_crm_account_id,
@@ -76,6 +78,7 @@
       dim_subscription_id,
       dim_license_id,
       license_md5,
+      license_sha256,
       dim_crm_account_id,
       dim_parent_crm_account_id,
       dim_location_country_id,
@@ -95,14 +98,14 @@
       {{ ping_instance_wave_metrics() }}
 
     FROM final
-    {{ dbt_utils.group_by(n=25)}}
+    {{ dbt_utils.group_by(n=26)}}
 
 )
 
 {{ dbt_audit(
     cte_ref="pivoted",
     created_by="@mdrussell",
-    updated_by="@mdrussell",
+    updated_by="@rbacovic",
     created_date="2022-10-12",
-    updated_date="2022-10-21"
+    updated_date="2022-12-01"
 ) }}

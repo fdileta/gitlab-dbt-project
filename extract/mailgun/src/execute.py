@@ -7,6 +7,7 @@ from email import utils
 from logging import info, basicConfig, getLogger, error
 from os import environ as env
 from typing import Dict, List
+from dateutil import parser as date_parser
 
 import requests
 from requests.exceptions import SSLError
@@ -33,32 +34,44 @@ def chunker(seq: List, size: int):
     return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
-def get_logs(domain: str, event: str, formatted_date: str) -> requests.Response:
+def get_logs(
+    domain: str, event: str, formatted_start_date: str, formatted_end_date: str
+) -> requests.Response:
     """
     Small convenience wrapper function for mailgun event requests,
     :param domain:
     :param event:
-    :param formatted_date:
+    :param formatted_start_date:
+    :param formatted_end_date:
     :return:
     """
     return requests.get(
         f"https://api.mailgun.net/v3/{domain}/events",
         auth=("api", api_key),
-        params={"begin": formatted_date, "ascending": "yes", "event": event},
+        params={
+            "begin": formatted_start_date,
+            "end": formatted_end_date,
+            "ascending": "yes",
+            "event": event,
+        },
     )
 
 
-def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
+def extract_logs(
+    event: str, start_date: datetime.datetime, end_date: datetime.datetime
+) -> List[Dict]:
     """
     Requests and retrieves the event logs for a particular event.
     :param start_date:
+    :param end_date:
     :param event:
     :return:
     """
     page_token = None
     all_results: List[Dict] = []
 
-    formatted_date = utils.format_datetime(start_date)
+    formatted_start_date = utils.format_datetime(start_date)
+    formatted_end_date = utils.format_datetime(end_date)
 
     for domain in domains:
 
@@ -95,7 +108,9 @@ def extract_logs(event: str, start_date: datetime.datetime) -> List[Dict]:
                 all_results = all_results[:] + items[:]
 
             else:
-                response = get_logs(domain, event, formatted_date)
+                response = get_logs(
+                    domain, event, formatted_start_date, formatted_end_date
+                )
 
                 try:
                     data = response.json()
@@ -131,16 +146,25 @@ def load_event_logs(event: str, full_refresh: bool = False):
 
     if full_refresh:
         start_date = datetime.datetime(2021, 2, 1)
+        end_date = datetime.datetime.now()
     else:
-        start_date = datetime.datetime.now() - datetime.timedelta(hours=16)
+        # This extends the time window to handle late processing on the API.
+        start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
+            hours=2
+        )
+        end_date = start_date + datetime.timedelta(hours=13)
 
-    results = extract_logs(event, start_date)
+    info(
+        f"Running from {start_date.strftime('%Y-%m-%dT%H:%M:%S%z')} to {end_date.strftime('%Y-%m-%dT%H:%M:%S%z')}"
+    )
+
+    results = extract_logs(event, start_date, end_date)
 
     info(f"Results length: {len(results)}")
 
     # Stay under snowflakes max column size.
     file_count = 0
-    for group in chunker(results, 8000):
+    for group in chunker(results, 5000):
         file_count = file_count + 1
         file_name = f"{event}_{file_count}.json"
 

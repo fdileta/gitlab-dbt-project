@@ -53,7 +53,6 @@
       SUM(IFF(eeoc_value = 'Female', percent_of_hires, NULL))                            AS female_hires,
       SUM(IFF(eeoc_value = 'Female', percent_of_headcount_manager, NULL))                AS female_managers,
       SUM(IFF(eeoc_value = 'Female', percent_of_headcount_leaders, NULL))                AS female_leaders,
-      SUM(IFF(eeoc_value = 'Female', percent_of_headcount_staff, NULL))                  AS female_staff,
       
       SUM(IFF(eeoc_field_name = 'region_modified'
               AND eeoc_value != 'NORAM', percent_of_headcount, NULL))                    AS non_noram_headcount,
@@ -103,7 +102,6 @@
       diversity_metrics.female_hires,
       diversity_metrics.female_managers,
       diversity_metrics.female_leaders,
-      diversity_metrics.female_staff,
       diversity_metrics.non_noram_headcount,
       diversity_metrics.percent_of_headcount_black_or_african_american,
       diversity_metrics.percent_of_urg_hires,

@@ -36,6 +36,7 @@ final AS (
     fct_crm_opportunity.deal_path AS deal_path_name,
     fct_crm_opportunity.order_type,
     fct_crm_opportunity.order_type_grouped,
+    fct_crm_opportunity.order_type_live,
     fct_crm_opportunity.dr_partner_engagement AS dr_partner_engagement_name,
     fct_crm_opportunity.alliance_type AS alliance_type_name,
     fct_crm_opportunity.alliance_type_short AS alliance_type_short_name,
@@ -536,7 +537,7 @@ final AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@michellecooper",
-    updated_by="@jpeguero",
+    updated_by="@michellecooper",
     created_date="2022-05-05",
-    updated_date="2022-10-20"
+    updated_date="2022-12-28"
   ) }}
