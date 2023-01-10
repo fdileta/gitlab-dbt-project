@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: wk_sales_clari_net_arr_forecast
+    description: Forecast table combining the different API sub-payloads together
+    columns:
+      - name: user_full_name
+        tests:
+          - not_null
+      - name: email
+        tests:
+          - not_null
+      - name: crm_user_id
+        tests:
+          - not_null
+      - name: sales_team_role
+        tests:
+          - not_null
+      - name: parent_role
+      - name: fiscal_quarter
+        tests:
+          - not_null
+      - name: field_name
+        tests:
+          - not_null
+      - name: week_number
+        tests:
+          - not_null
+      - name: week_start_date
+        tests:
+          - not_null
+      - name: week_end_date
+        tests:
+          - not_null
+      - name: field_type
+        tests:
+          - not_null
+      - name: forecast_value
+      - name: is_updated
