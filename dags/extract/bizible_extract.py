@@ -96,7 +96,6 @@ for table_name in tables:
             "TASK_INSTANCE": "{{ task_instance_key_str }}",
             "task_id": task_identifier,
             "START_TIME": "{{ execution_date }}",
-            "END_TIME": "{{ next_execution_date }}",
         },
         affinity=get_affinity(False),
         tolerations=get_toleration(False),
