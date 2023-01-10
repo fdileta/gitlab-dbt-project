@@ -97,9 +97,6 @@ def extract_logs(
 
                 page_token = data.get("paging").get("next")
 
-                if not page_token:
-                    break
-
                 if items is None or len(items) == 0:
                     info("Empty response received, retrying")
                     time.sleep(30)
@@ -135,8 +132,9 @@ def extract_logs(
 
                 items = data.get("items")
 
+                # First request should return data, if not, quit.
                 if items is None or len(items) == 0:
-                    continue
+                    break
 
                 all_results = all_results[:] + items[:]
 
