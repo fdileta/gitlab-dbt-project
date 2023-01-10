@@ -97,10 +97,6 @@ def extract_logs(
 
                 page_token = data.get("paging").get("next")
 
-                if final_page_token == page_token:
-                    info("Page tokens the same")
-                    break
-
                 if not page_token:
                     break
 
