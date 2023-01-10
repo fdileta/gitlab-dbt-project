@@ -25,11 +25,12 @@ parsed AS (
     REPLACE(value:timePeriodId, '_', '-')::varchar AS fiscal_quarter,
     CONCAT(value:timeFrameId::varchar, '_', fiscal_quarter) AS time_frame_id,
     value:userId::varchar AS user_id,
+    value:fieldId::varchar AS field_id,
 
     -- primary key, must be after aliased cols are derived else sql error
-    value:fieldId::varchar AS field_id,
-    -- logical info
     CONCAT_WS(' | ', fiscal_quarter, time_frame_id, user_id, field_id) AS entries_id,
+
+    -- logical info
     value:forecastValue::number(38, 1) AS forecast_value,
     value:currency::variant AS currency,
     value:isUpdated::boolean AS is_updated,

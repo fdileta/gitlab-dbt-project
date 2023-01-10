@@ -17,15 +17,14 @@ parsed AS (
     uploaded_at,
     CONCAT(value:timeFrameId::varchar, '_', fiscal_quarter) AS time_frame_id,
     value:startDate::date AS week_start_date,
-    -- dense_rank() for dups prior to qualify
     value:endDate::date AS week_end_date,
-    -- start week from 0
+    -- dense_rank() to account for dups prior to qualify
     DENSE_RANK() OVER (
       PARTITION BY
         fiscal_quarter
       ORDER BY
         time_frame_id
-    ) - 1 AS week_number
+    ) - 1 AS week_number -- start week from 0
   FROM
     source
   -- remove dups in case of overlapping data from daily/quarter loads
