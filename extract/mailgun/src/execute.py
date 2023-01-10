@@ -96,23 +96,25 @@ def extract_logs(
                 items = data.get("items")
 
                 page_token = data.get("paging").get("next")
-                final_page_token = data.get("paging").get("last")
 
                 if final_page_token == page_token:
                     info("Page tokens the same")
                     break
-                # else:
-                #     last_page_token = page_token
-#
-                info(f"page token {page_token}")
-                info(f"final page token {final_page_token}")
-                # info(f"len items {len(items)}")
 
                 if not page_token:
                     break
 
                 if items is None or len(items) == 0:
-                    continue
+                    time.sleep(30)
+                    response = requests.get(page_token, auth=("api", api_key))
+                try:
+                    data = response.json()
+                    items = data.get("items")
+                    if items is None or len(items) == 0:
+                        break
+                except json.decoder.JSONDecodeError:
+                    error("No response received")
+                    break
 
                 first_timestamp = items[0].get("timestamp")
                 str_stamp = datetime.datetime.fromtimestamp(first_timestamp).strftime(
