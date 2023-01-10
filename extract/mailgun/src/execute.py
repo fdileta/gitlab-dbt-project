@@ -73,7 +73,6 @@ def extract_logs(
     formatted_start_date = utils.format_datetime(start_date)
     formatted_end_date = utils.format_datetime(end_date)
 
-    last_page_token = None
     for domain in domains:
 
         while True:
