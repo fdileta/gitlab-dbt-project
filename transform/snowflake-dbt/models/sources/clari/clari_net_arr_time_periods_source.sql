@@ -6,15 +6,20 @@
 
 WITH
 source AS (
+  SELECT * FROM
+    {{ source('clari', 'net_arr') }}
+),
+
+intermediate AS (
   SELECT
-    value,
-    uploaded_at
+    d.value,
+    source.uploaded_at
   FROM
-    {{ source('clari', 'net_arr') }},
-    LATERAL FLATTEN(input => jsontext:data:timePeriods)
+    source,
+    LATERAL FLATTEN(input => jsontext:data:timePeriods) AS d
 
   {% if is_incremental() %}
-    WHERE uploaded_at > (SELECT MAX(uploaded_at) FROM {{this}})
+    WHERE uploaded_at > (SELECT MAX(uploaded_at) FROM {{ this }})
   {% endif %}
 ),
 
@@ -29,7 +34,8 @@ parsed AS (
     value:crmId::varchar AS crm_id,
     value:type::varchar AS time_period_type
   FROM
-    source
+    intermediate
+
   -- remove dups in case of overlapping data from daily/quarter loads
   QUALIFY
     ROW_NUMBER() OVER (

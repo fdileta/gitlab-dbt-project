@@ -2,13 +2,18 @@
 
 WITH
 source AS (
+  SELECT * FROM
+    {{ source('clari', 'net_arr') }}
+),
+
+intermediate AS (
   SELECT
-    value,
-    uploaded_at,
-    jsontext:api_fiscal_quarter AS fiscal_quarter
+    d.value,
+    source.uploaded_at,
+    source.jsontext:api_fiscal_quarter AS fiscal_quarter
   FROM
-    {{ source('clari', 'net_arr') }},
-    LATERAL FLATTEN(input => jsontext:data:timeFrames)
+    source,
+    LATERAL FLATTEN(input => jsontext:data:timeFrames) AS d
 ),
 
 parsed AS (
@@ -26,7 +31,8 @@ parsed AS (
         time_frame_id
     ) - 1 AS week_number -- start week from 0
   FROM
-    source
+    intermediate
+
   -- remove dups in case of overlapping data from daily/quarter loads
   QUALIFY
     ROW_NUMBER() OVER (
