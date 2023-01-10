@@ -3525,6 +3525,24 @@ roles:
         warehouses:
             - dev_xs
 
+    - lmai:
+        member_of:
+            - analyst_engineering
+            - bi_tool_eval_read
+        privileges:
+            databases:
+                read:
+                    - prep
+            schemas:
+                read:
+                    - prep.sensitive
+            tables: # https://gitlab.com/gitlab-com/team-member-epics/access-requests/-/issues/6311
+                read:
+                    - prep.sensitive.bamboohr_id_employee_number_mapping
+        warehouses:
+            - dev_xs
+
+
     - lvinueza:
         member_of:
             - analyst_finance
@@ -4975,6 +4993,11 @@ users:
         can_login: yes
         member_of:
             - kkarthikeyan
+
+    - lmai:
+        can_login: yes
+        member_of:
+            - lmai
 
     - lvinueza:
         can_login: yes
