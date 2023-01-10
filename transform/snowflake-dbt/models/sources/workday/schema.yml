@@ -433,5 +433,6 @@ models:
       - name: team_inactivated_date
         description: Date the organization became inactive
       - name: is_deleted
+      - name: uploaded_at
       - name: valid_from
       - name: valid_to
