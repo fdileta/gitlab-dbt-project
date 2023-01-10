@@ -8,7 +8,6 @@ from dateutil import rrule
 from datetime import datetime, timedelta
 
 from gitlabdata.orchestration_utils import (
-    query_dataframe,
     snowflake_stage_load_copy_remove,
     snowflake_engine_factory,
     bizible_snowflake_engine_factory,

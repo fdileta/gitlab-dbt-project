@@ -1,10 +1,9 @@
 from api import BizibleSnowFlakeExtractor
 from os import environ as env
 import logging
-import sys
 import datetime
 from fire import Fire
-from typing import Dict, Any
+from typing import Dict
 import yaml
 from dateutil import parser as date_parser
 
