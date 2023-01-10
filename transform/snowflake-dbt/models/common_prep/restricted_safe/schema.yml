@@ -67,11 +67,12 @@ models:
 
   - name: prep_crm_opportunity
     description: '{{ doc("prep_crm_opportunity") }}'
-    columns:
-      - name: dim_crm_opportunity_id
-        tests:
-          - not_null
-          - unique
+    tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - dim_crm_opportunity_id
+          - snapshot_id
+          - is_live
 
   - name: prep_quote
     description: '{{ doc("prep_quote") }}'
