@@ -99,7 +99,7 @@ def extract_logs(
 
                 if items is None or len(items) == 0:
                     info("Empty response received, retrying")
-                    time.sleep(30)
+                    time.sleep(60)
                     response = requests.get(page_token, auth=("api", api_key))
                 try:
                     data = response.json()
