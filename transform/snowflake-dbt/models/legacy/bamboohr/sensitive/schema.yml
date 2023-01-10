@@ -172,4 +172,11 @@ models:
       - name: employment_status
       - name: termination_reason
       - name: initiated_at
+  
+  - name: dim_team
+    columns:
+      - name: team_hierarchy_level
+        tests:
+          - accepted_values:
+              values: ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 
