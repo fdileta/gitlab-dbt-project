@@ -4,10 +4,13 @@
 
 WITH source as (
 
-    SELECT *
+    SELECT * EXCLUDE (geo_zipcode, geo_latitude, geo_longitude)
     FROM {{ source('gitlab_snowplow', 'events') }}
 
 )
 
-SELECT *
+SELECT *,
+  NULL AS geo_zipcode,
+  NULL AS geo_latitude,
+  NULL AS geo_longitude
 FROM source
