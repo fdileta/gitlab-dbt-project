@@ -91,7 +91,6 @@ def extract_logs(
                     error("No response received")
                     break
 
-
                 items = data.get("items")
 
                 page_token = data.get("paging").get("next")
