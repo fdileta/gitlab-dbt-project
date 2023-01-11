@@ -7,7 +7,7 @@
 
 WITH redis_clicks AS (
   SELECT
-    event_id,
+    -- event_id,
     behavior_at, 
     gsc_pseudonymized_user_id,
     gsc_namespace_id,
@@ -34,7 +34,7 @@ joined AS (
 
 final AS (
   SELECT
-    joined.event_id,
+    -- joined.event_id,
     joined.behavior_at,
     joined.gsc_pseudonymized_user_id,
     joined.gsc_namespace_id,
