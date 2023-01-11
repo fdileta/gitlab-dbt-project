@@ -58,15 +58,15 @@ WITH structured_event_renamed AS (
     SELECT
 
       -- Primary Key
-      structured_event_renamed.event_id                                                                                                                        AS behavior_structured_event_pk,
+      structured_event_renamed.event_id,                                                                                                                        AS behavior_structured_event_pk,
 
       -- Foreign Keys
       structured_event_renamed.dim_behavior_website_page_sk,
       structured_event_renamed.dim_behavior_referrer_page_sk,
       structured_event_renamed.dim_behavior_browser_sk,
       structured_event_renamed.dim_behavior_operating_system_sk,
-      structured_event_renamed.gsc_namespace_id                                                                                                                AS dim_namespace_id,
-      structured_event_renamed.gsc_project_id                                                                                                                  AS dim_project_id,
+      structured_event_renamed.gsc_namespace_id,                                                                                                                AS dim_namespace_id,
+      structured_event_renamed.gsc_project_id,                                                                                                                  AS dim_project_id,
       structured_event_renamed.dim_behavior_event_sk,
 
       -- Time Attributes
