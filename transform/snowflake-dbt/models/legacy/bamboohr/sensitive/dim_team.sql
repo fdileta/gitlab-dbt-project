@@ -9,8 +9,6 @@ WITH source AS (
         team_id,
         team_superior_team_id,
         team_hierarchy_level,
-        team_members_count,
-        team_manager_inherited,
         team_inactivated,
         team_name, 
         team_manager_name, 
@@ -19,7 +17,7 @@ WITH source AS (
         source.valid_from,
         IFNULL(source.valid_to, CURRENT_DATE()) AS valid_to
     FROM source
-    {{ dbt_utils.group_by(n=12)}}
+    {{ dbt_utils.group_by(n=10)}}
 
 ), team_superior_groups AS (
 
@@ -117,7 +115,6 @@ SELECT
     team_hierarchy.hierarchy_level_9,
     team_hierarchy.hierarchy_levels_array,
     ARRAY_SIZE(team_hierarchy.hierarchy_levels_array) AS team_hierarchy_level,
-    team_data.team_manager_inherited,
     team_data.team_inactivated,
     team_data.team_name, 
     team_data.team_manager_name, 
@@ -128,7 +125,7 @@ SELECT
 FROM team_hierarchy
 LEFT JOIN team_data
 ON team_hierarchy.team_superior_team_id = team_data.team_superior_team_id AND team_hierarchy.team_id = team_data.team_id
-{{ dbt_utils.group_by(n=21)}}
+{{ dbt_utils.group_by(n=20)}}
 
 )
 
