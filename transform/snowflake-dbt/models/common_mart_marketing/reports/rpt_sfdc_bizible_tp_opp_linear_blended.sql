@@ -64,6 +64,8 @@
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_referrer_page,
       rpt_sfdc_bizible_tp_person_lifecycle.bizible_referrer_page_raw,
       rpt_sfdc_bizible_tp_person_lifecycle.campaign_name AS bizible_salesforce_campaign,
+	  rpt_sfdc_bizible_tp_person_lifecycle.dim_campaign_id,
+	  rpt_sfdc_bizible_tp_person_lifecycle.campaign_rep_role_name,
       NULL AS pipe_name,
       CASE
         WHEN touchpoint_segment = 'Demand Gen' THEN 1
@@ -115,7 +117,7 @@
       0 AS won_custom_net_arr,
       0 AS won_linear_net_arr
     FROM rpt_sfdc_bizible_tp_person_lifecycle
-    {{ dbt_utils.group_by(n=51) }}
+    {{ dbt_utils.group_by(n=53) }}
     UNION ALL
     SELECT
       rpt_sfdc_bizible_linear.dim_crm_touchpoint_id,
@@ -171,6 +173,8 @@
       rpt_sfdc_bizible_linear.bizible_referrer_page,
       rpt_sfdc_bizible_linear.bizible_referrer_page_raw,
       rpt_sfdc_bizible_linear.bizible_salesforce_campaign,
+	    rpt_sfdc_bizible_linear.dim_campaign_id,
+	    rpt_sfdc_bizible_linear.campaign_rep_role_name,
       rpt_sfdc_bizible_linear.pipe_name,
       CASE
         WHEN touchpoint_segment = 'Demand Gen' THEN 1
@@ -294,7 +298,7 @@
         ELSE 0
       END AS won_linear_net_arr
     FROM rpt_sfdc_bizible_linear
-    {{ dbt_utils.group_by(n=51) }}
+    {{ dbt_utils.group_by(n=53) }}
 
 ), final AS (
 
@@ -323,5 +327,5 @@
     created_by="@rkohnke",
     updated_by="@rkohnke",
     created_date="2022-01-25",
-    updated_date="2022-10-07"
+    updated_date="2022-11-24"
 ) }}

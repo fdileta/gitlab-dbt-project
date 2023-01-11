@@ -22,8 +22,10 @@ Closes #
 
 ### Database Objects
 
-- [ ] If a referencing a new table make sure it exists in snowflake, or if it is being introduced in this MR that a refresh is run right after merge. 
-- [ ] If new schema in `PROD` or `PREP` dbs make sure to update [`grant_usage_in_schemas.sql` macro](https://gitlab.com/gitlab-data/analytics/-/blob/master/transform/snowflake-dbt/macros/warehouse/grant_usage_to_schemas.sql)
+- [ ] If referencing a new table make sure it exists in snowflake, or if it is being introduced in this MR that a refresh is run right after merge.
+- [ ] Create the schema using the corresponding role (on `RAW` using the `LOADER` role, on `PREP` and `PROD` using the `TRANSFORMER` role)
+- [ ] If new schema in `PROD`, make sure to update [`grant_usage_in_schemas.sql` macro](https://gitlab.com/gitlab-data/analytics/-/blob/master/transform/snowflake-dbt/macros/warehouse/grant_usage_to_schemas.sql)
+- [ ] Run the Monte Carlo permissions script (documented in the [Handbook](https://about.gitlab.com/handbook/business-technology/data-team/platform/monte-carlo/#note-on-dwh-permissions) and located in MC's official docs) with the corresponding database name as a parameter, for the permissions on this schema to be granted to the `data_observability` role
 - [ ] Confirm any new warehouses are created in Snowflake and matches size
 
 ### Before merging 

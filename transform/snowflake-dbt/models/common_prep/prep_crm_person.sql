@@ -46,6 +46,15 @@ WITH biz_person AS (
     INNER JOIN {{ ref('sfdc_lead_source') }}
       ON sfdc_contact_source.contact_id = sfdc_lead_source.converted_contact_id
 
+),  marketo_persons AS (
+
+    SELECT
+      marketo_lead_id,
+      sfdc_type,
+      sfdc_lead_id,
+      sfdc_contact_id
+    FROM {{ ref('marketo_lead_source') }}
+
 ),  crm_person_final AS (
 
     SELECT
@@ -57,6 +66,7 @@ WITH biz_person AS (
       contact_email_hash                            AS email_hash,
       email_domain,
       email_domain_type,
+      marketo_lead_id,
 
       --keys
       master_record_id,
@@ -147,9 +157,9 @@ WITH biz_person AS (
       zoominfo_mobile_phone_number,
       zoominfo_do_not_call_direct_phone,
       zoominfo_do_not_call_mobile_phone,
-	  last_transfer_date_time,
-	  time_from_last_transfer_to_sequence,
-	  time_from_mql_to_last_transfer,
+      last_transfer_date_time,
+      time_from_last_transfer_to_sequence,
+      time_from_mql_to_last_transfer,
       NULL                                           AS zoominfo_company_employee_count,
       zoominfo_contact_id
 
@@ -159,6 +169,8 @@ WITH biz_person AS (
       ON sfdc_contacts.contact_id = biz_person_with_touchpoints.bizible_contact_id
     LEFT JOIN was_converted_lead
       ON was_converted_lead.contact_id = sfdc_contacts.contact_id
+    LEFT JOIN marketo_persons
+      ON sfdc_contacts.contact_id = marketo_persons.sfdc_contact_id and sfdc_type = 'Contact'
 
     UNION
 
@@ -171,6 +183,7 @@ WITH biz_person AS (
       lead_email_hash                            AS email_hash,
       email_domain,
       email_domain_type,
+      marketo_lead_id,
 
       --keys
       master_record_id,
@@ -261,15 +274,17 @@ WITH biz_person AS (
       zoominfo_mobile_phone_number,
       zoominfo_do_not_call_direct_phone,
       zoominfo_do_not_call_mobile_phone,
-	  last_transfer_date_time,
-	  time_from_last_transfer_to_sequence,
-	  time_from_mql_to_last_transfer,
+      last_transfer_date_time,
+      time_from_last_transfer_to_sequence,
+      time_from_mql_to_last_transfer,
       zoominfo_company_employee_count,
       NULL AS zoominfo_contact_id
 
     FROM sfdc_leads
     LEFT JOIN biz_person_with_touchpoints
       ON sfdc_leads.lead_id = biz_person_with_touchpoints.bizible_lead_id
+    LEFT JOIN marketo_persons
+      ON sfdc_leads.lead_id = marketo_persons.sfdc_lead_id and sfdc_type = 'Lead'
     WHERE is_converted = 'FALSE'
 
 ), duplicates AS (
@@ -295,7 +310,7 @@ WITH biz_person AS (
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@rkohnke",
+    updated_by="@degan",
     created_date="2020-12-08",
-    updated_date="2022-11-01"
+    updated_date="2022-12-12"
 ) }}

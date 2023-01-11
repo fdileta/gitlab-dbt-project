@@ -161,7 +161,7 @@ clone_stop:
   stage: 🐍 Python
   tags:
     - analytics
-  image: registry.gitlab.com/gitlab-data/data-image/data-image:v0.0.20
+  image: registry.gitlab.com/gitlab-data/data-image/data-image:v1.0.21
   only:
     changes:
       - "**/*.py"
@@ -263,7 +263,7 @@ clone_stop:
 
 .pages_job_template: &pages_job_template
   stage: 📚 dbt Docs
-  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.2
+  image: registry.gitlab.com/gitlab-data/data-image/dbt-image:v1.0.22
   variables:
     SNOWFLAKE_ROLE: $SNOWFLAKE_TRANSFORM_ROLE
     SNOWFLAKE_WAREHOUSE: $SNOWFLAKE_TRANSFORM_WAREHOUSE

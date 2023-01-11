@@ -35,6 +35,14 @@ models:
         tests:
           - not_null
 
+  - name: prep_cluster_agent
+    description: Prep table to select the kubernetes with agents and add aditional information such as the ultimate_namespace_id.
+    columns:
+      - name: cluster_agent_id
+        tests:
+          - not_null
+          - unique
+
   - name: prep_dim_subscription_snapshot_base
     description: Base model for the dim_subscription snapshot data
     columns:
@@ -605,6 +613,12 @@ models:
           - not_null
           - unique
         tags: ["tdf", "common", "gainsight"]
+      - name: license_sha256
+        description: The license_sha256 is a secure hash created off the license file to be compliant with FIPS. This field can be used to join to the Service ping data.
+        tests: 
+          - not_null
+          - unique
+        tags: ["tdf", "common", "gainsight"]
       - name: dim_subscription_id
         description: The unique identifier of a version of a subscription.
       - name: subscription_name
@@ -676,6 +690,8 @@ models:
       - name: instance_user_count
       - name: historical_max_users
       - name: license_md5
+        description: JOIN key to dim_licenses and dim_license
+      - name: license_sha256
         description: JOIN key to dim_licenses and dim_license
       - name: instance_type
         description: Type of instance (Production/Non-Production)
@@ -814,8 +830,8 @@ models:
           - not_null
       - name: license_md5
         description: JOIN key to dim_licenses and dim_license
-        tests:
-          - not_null
+      - name: license_sha256
+        description: JOIN key to dim_licenses and dim_license
       - name: dim_subscription_id
         description: JOIN key to dim_subscription
       - name: ping_created_at
@@ -1643,53 +1659,144 @@ models:
         tests:
           - not_null
           - unique
-        description: The unique identifier of the ping
+        description: '{{ doc("dim_ping_instance_id") }}'
       - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
+        description: '{{ doc("dim_host_id") }}'
       - name: dim_instance_id
-        description:  The uuid of an instance from the dim_instances model.
+        description:  '{{ doc("dim_instance_id") }}'
+      - name: dim_installation_id
+        description:  '{{ doc("dim_installation_id") }}'
       - name: ping_created_at
-        description: The time when the ping was created
-      - name: ip_address_hash
-        description: The source_ip_hash associated with the instance
+        description: '{{ doc("ping_created_at") }}'
+      - name: original_edition
+        description: '{{ doc("original_edition") }}'
+      - name: id
+        description: '{{ doc("id_ping_model") }}'
       - name: version
-        description: The version associated with the instance (9., 10., 11., ... 14.)
+        description: '{{ doc("version_ping_model") }}'
+      - name: ip_address_hash
+        description: '{{ doc("ip_address_hash_ping_model") }}'
       - name: instance_user_count
-        description: The total count of users on the instance
+        description: '{{ doc("instance_user_count") }}'
       - name: license_md5
-        description: The license_md5 associated with the instance
+        description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
       - name: historical_max_users
-        description: The max user number the instance has had
+        description: '{{ doc("historical_max_users") }}'
       - name: license_user_count
-        description: The user count for the license
+        description: '{{ doc("license_user_count") }}'
       - name: license_starts_at
-        description: The date the license starts at
+        description: '{{ doc("license_starts_at") }}'
       - name: license_expires_at
-        description:  The date the license ends on
+        description:  '{{ doc("license_expires_at") }}'
       - name: license_add_ons
-        description: The add ones associated with the license
+        description: '{{ doc("license_add_ons") }}'
+      - name: recorded_at
+        description: '{{ doc("recorded_at_ping_model") }}'
+      - name: updated_at
+        description: '{{ doc("updated_at_ping_model") }}'
       - name: mattermost_enabled
-        description: Denotes whether mattermost is enabled
+        description: '{{ doc("mattermost_enabled") }}'
       - name: uuid
-        description: The unique id of the instance from the dim_instances model
+        description: '{{ doc("uuid_ping_model") }}'
       - name: hostname
-        description: The name (URL) of the host
+        description: '{{ doc("host_name") }}'
       - name: host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
+        description: '{{ doc("host_id") }}'
       - name: license_trial
-        description: Denoted whether the license is a trial or not
+        description: '{{ doc("license_trial_ping_model") }}'
       - name: source_license_id
-        description: The unique id of a source license
+        description: '{{ doc("source_license_id") }}'
       - name: installation_type
-        description: The type of installation associated with the instance (i.e. gitlab-development-kit, gitlab-helm-chart, gitlab-omnibus-helm-chart)
+        description: '{{ doc("installation_type") }}'
       - name: license_plan
-        description: The license plan associated with the instance (i.e. Ultimate, Premium)
+        description: '{{ doc("license_plan") }}'
       - name: database_adapter
-        description: The type of database adapter being used (i.e. mysql2, postgresql)
+        description: '{{ doc("database_adapter") }}'
       - name: database_version
-        description: The database version associated with the instance (i.e. 9.5.3)
+        description: '{{ doc("database_version") }}'
       - name: git_version
-        description: The version of gitlab the instance is running (i.e. 2.17.0, 2.33.1, 2.23.0)
+        description: '{{ doc("git_version") }}'
+      - name: gitlab_pages_enabled
+        description: '{{ doc("gitlab_pages_enabled") }}'
+      - name: gitlab_pages_version
+        description: '{{ doc("gitlab_pages_version") }}'
+      - name: container_registry_enabled
+        description: '{{ doc("container_registry_enabled") }}'
+      - name: elasticsearch_enabled
+        description: '{{ doc("elasticsearch_enabled") }}'
+      - name: geo_enabled
+        description: '{{ doc("geo_enabled") }}'
+      - name: gitlab_shared_runners_enabled
+        description: '{{ doc("gitlab_shared_runners_enabled") }}'
+      - name: gravatar_enabled
+        description: '{{ doc("gravatar_enabled") }}'
+      - name: ldap_enabled
+        description: '{{ doc("ldap_enabled") }}'
+      - name: omniauth_enabled
+        description: '{{ doc("omniauth_enabled") }}'
+      - name: reply_by_email_enabled
+        description: '{{ doc("reply_by_email_enabled") }}'
+      - name: signup_enabled
+        description: '{{ doc("signup_enabled") }}'
+      - name: prometheus_metrics_enabled
+        description: '{{ doc("prometheus_metrics_enabled") }}'
+      - name: usage_activity_by_stage
+        description: '{{ doc("usage_activity_by_stage") }}'
+      - name: usage_activity_by_stage_monthly
+        description: '{{ doc("usage_activity_by_stage_monthly") }}'
+      - name: gitaly_clusters
+        description: '{{ doc("gitaly_clusters") }}'
+      - name: gitaly_version
+        description: '{{ doc("gitaly_version") }}'
+      - name: gitaly_servers
+        description: '{{ doc("gitaly_servers") }}'
+      - name: gitaly_filesystems
+        description: '{{ doc("gitaly_filesystems") }}'
+      - name: gitpod_enabled
+        description: '{{ doc("gitpod_enabled") }}'
+      - name: object_store
+        description: '{{ doc("object_store") }}'
+      - name: is_dependency_proxy_enabled
+        description: '{{ doc("is_dependency_proxy_enabled") }}'
+      - name: recording_ce_finished_at
+        description: '{{ doc("recording_ce_finished_at") }}'
+      - name: recording_ee_finished_at
+        description: '{{ doc("recording_ee_finished_at") }}'
+      - name: stats_used
+        description: '{{ doc("stats_used") }}'
+      - name: counts
+        description: '{{ doc("stats_used") }}'
+      - name: is_ingress_modsecurity_enabled
+        description: '{{ doc("is_ingress_modsecurity_enabled") }}'
+      - name: topology
+        description: '{{ doc("topology") }}'
+      - name: is_grafana_link_enabled
+        description: '{{ doc("is_grafana_link_enabled") }}'
+      - name: analytics_unique_visits
+        description: '{{ doc("analytics_unique_visits") }}'
+      - name: raw_usage_data_id
+        description: '{{ doc("raw_usage_data_id") }}'
+      - name: container_registry_vendor
+        description: '{{ doc("container_registry_vendor") }}'
+      - name: container_registry_version
+        description: '{{ doc("container_registry_version") }}'
+      - name: main_edition
+        description: '{{ doc("ping_edition") }}'
+      - name: product_tier
+        description: '{{ doc("ping_product_tier") }}'
+      - name: raw_usage_data_payload
+        description: '{{ doc("raw_usage_data_payload") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
+
 
   - name: prep_ping_instance_flattened
     description: ' {{ doc("prep_ping_instance_flattened") }} '
@@ -1698,30 +1805,49 @@ models:
         tests:
           - not_null
           #- unique --Commenting this as the model is erroring out due to a waarehouse timeout limit of 1800 seconds
-        description: The unique ID of the prep_ping_instance_flattenned model consisting of `dim_ping_instance_id` and path
-      - name: dim_host_id
-        description: The unique id of a host from the dim_host model (brought in from source data).
-      - name: dim_instance_id
-        description: The unique uuid of an instance from the dim_instances model.
+        description: The unique ID of the prep_ping_instance_flattened model consisting of dim_ping_instance_id and path
       - name: dim_ping_instance_id
+        description: '{{ doc("dim_ping_instance_id") }}'
+      - name: dim_host_id
+        description: '{{ doc("dim_host_id") }}'
+      - name: dim_instance_id
+        description:  '{{ doc("dim_instance_id") }}'
+      - name: dim_installation_id
+        description:  '{{ doc("dim_installation_id") }}'
       - name: ping_created_at
-        description: The time when the ping was created
+        description: '{{ doc("ping_created_at") }}'
+      - name: ip_address_hash
+        description: '{{ doc("ip_address_hash_ping_model") }}'
+      - name: license_md5
+        description: '{{ doc("license_md5") }}'
+      - name: license_sha256
+        description: '{{ doc("license_sha256") }}'
+      - name: original_edition
+        description: '{{ doc("original_edition") }}'
       - name: main_edition
-        description: The edition of GitLab on the instance (EE, CE)
+        description: '{{ doc("ping_edition") }}'
       - name: product_tier
-        description: The product tier associated with the instance (Premium, Starter, Core, Ultimate)
-      - name: license_subscription_id
-        description: The unique id of a license subscription
+        description: '{{ doc("ping_product_tier") }}'
       - name: license_trial_ends_on
-        description: The date when the trial license ends
+        description: '{{ doc("license_trial_ends_on") }}'
+      - name: license_subscription_id
+        description: '{{ doc("license_subscription_id") }}'
       - name: umau_value
-        description: The unique monthly active user value for the instance
+        description: '{{ doc("umau_value") }}'
       - name: metrics_path
-        description: The unique JSON key path of identifier of the metric in the ping payload. This appears as key_path in the metric definition YAML files
+        description: '{{ doc("metrics_path") }}'
       - name: metric_value
-        description: The value associated with the metric path
+        description: '{{ doc("metric_value") }}'
       - name: has_timed_out
-        description: A flag to denote that it has timed out
+        description: '{{ doc("has_timed_out") }}'
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
 
   - name: prep_billing_account_user
     description: Zuora Billing users
@@ -1743,3 +1869,212 @@ models:
         description: Date the Zuora Billing user was created
       - name: is_integration_user
         description: A flag indentifying integration users based on Zuora Billing user last names.
+
+  - name: prep_crm_task
+    description: '{{ doc("prep_crm_task") }}'
+    columns:
+      - name: dim_crm_task_sk
+        description: The unique surrogate key of a [task activity](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) related to Salesforce account, opportunity, lead, or contact.
+        tests:
+          - unique
+          - not_null
+
+  - name: prep_performance_indicators_yaml
+    description: '{{ doc("prep_performance_indicators_yaml") }}'
+    columns:
+      - name: performance_indicator_pk
+        description: The unique composite ID for the prep_performance_indicators_yaml consisting of _dbt_source_relation and unique_key
+        tests:
+          - not_null
+          - unique
+      - name: _dbt_source_relation
+        description: Data source (in Snowflake) for performance indicator data (ex. `"PREP".gitlab_data_yaml.performance_indicators_ops_section_source`)
+      - name: unique_key
+        description: The unique composite ID for the PI's historical record, consisting of pi_name, org_name, pi_defintion, is_key, is_public, is_embedded, pi_target, pi_metric_target_name, pi_monthly_recorded_targets, pi_monthly_estimated_targets, and pi_url. This ID is generated by the [`create_pi_source_table` macro](https://dbt.gitlabdata.com/#!/macro/macro.gitlab_snowflake.create_pi_source_table) in the source models.
+      - name: pi_name
+        description: The `name` field from the PI yaml files
+      - name: org_name
+        description: The `org` field from the PI yaml files
+      - name: pi_definition
+        description: The `definition` field from the PI yaml files
+      - name: is_key
+        description: The `is_key` field from the PI yaml files
+      - name: is_primary
+        description: The `is_primary` field from the PI yaml files
+      - name: is_public
+        description: The `public` field from the PI yaml files
+      - name: is_embedded
+        description: Boolean flag set to True if the performance indicator has a chart embedded in the handbook, based on the `sisense_data` field in the PI yaml files. This is defined as `sisense_data IS NOT NULL`
+      - name: pi_target
+        description: The `target` field in the PI yaml files
+      - name: pi_metric_target_name
+        description: The `target_name` field in the PI yaml files
+      - name: pi_monthly_recorded_targets
+        description: The `monthly_recorded_targets` field in the PI yaml files
+      - name: pi_monthly_estimated_targets
+        description: The `monthly_estimated_targets` field in the PI yaml files. This field is used to generate targets in [`fct_performance_indicator_targets`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.fct_performance_indicator_targets)
+      - name: pi_metric_name
+        description: The `metric_name` field in the PI yaml files. This field is used to identify the target metric in [`fct_performance_indicator_targets`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.fct_performance_indicator_targets)
+      - name: telemetry_type
+        description: The `telemetry_type` field in the PI yaml files
+      - name: pi_url
+        description: The `urls` field from the PI yaml files
+      - name: sisense_chart_id
+        description: The `chart` value from the `sisense_data` field of the PI yaml files
+      - name: sisense_dashboard_id
+        description: The `dashboard` value from the `sisense_data` field of the PI yaml files
+      - name: snapshot_date
+        description: The date the snapshot record was created
+      - name: date_first_added
+        description: This identifies when the PI was first added. Note, since we started capturing the data on 2020-08-18, this will be the date for all performance indicators that existed before data collection started.
+      - name: valid_from_date
+        description: The first date the record was valid (YYYY-MM-DD). This column can be used to order the different "versions" of a record. This value is used to dedupe records.
+      - name: valid_to_date
+        description: The last date the record was valid (YYYY-MM-DD)
+      - name: created_by
+        description: '{{ doc("created_by") }}'
+      - name: updated_by
+        description: '{{ doc("updated_by") }}'
+      - name: model_created_date
+        description: '{{ doc("model_created_date") }}'
+      - name: model_updated_date
+        description: '{{ doc("model_updated_date") }}'
+
+  - name: prep_date
+    description: Join on this table to add additional date complexity
+    columns:
+        - name: date_day
+          description: '{{ doc("date_date_day") }}'
+
+        - name: date_actual
+          description: '{{ doc("date_date_actual") }}'
+
+        - name: day_name
+          description: '{{ doc("date_day_name") }}'
+
+        - name: month_actual
+          description: '{{ doc("date_month_actual") }}'
+
+        - name: year_actual
+          description: '{{ doc("date_year_actual") }}'
+
+        - name: quarter_actual
+          description: '{{ doc("date_quarter_actual") }}'
+
+        - name: day_of_week
+          description: '{{ doc("date_day_of_week") }}'
+
+        - name: first_day_of_week
+          description: '{{ doc("date_first_day_of_week") }}'
+
+        - name: week_of_year
+          description: '{{ doc("date_week_of_year") }}'
+
+        - name: day_of_month
+          description: '{{ doc("date_day_of_month") }}'
+
+        - name: day_of_quarter
+          description: '{{ doc("date_day_of_quarter") }}'
+
+        - name: day_of_year
+          description: '{{ doc("date_day_of_year") }}'
+
+        - name: fiscal_year
+          description: '{{ doc("date_fiscal_year") }}'
+
+        - name: fiscal_quarter
+          description: '{{ doc("date_fiscal_quarter") }}'
+
+        - name: day_of_fiscal_quarter
+          description: '{{ doc("date_day_of_fiscal_quarter") }}'
+
+        - name: day_of_fiscal_year
+          description: '{{ doc("date_day_of_fiscal_year") }}'
+
+        - name: month_name
+          description: '{{ doc("date_month_name") }}'
+
+        - name: first_day_of_month
+          description: '{{ doc("date_first_day_of_month") }}'
+
+        - name: last_day_of_month
+          description: '{{ doc("date_last_day_of_month") }}'
+
+        - name: first_day_of_year
+          description: '{{ doc("date_first_day_of_year") }}'
+
+        - name: last_day_of_year
+          description: '{{ doc("date_last_day_of_year") }}'
+
+        - name: first_day_of_quarter
+          description: '{{ doc("date_first_day_of_quarter") }}'
+
+        - name: last_day_of_quarter
+          description: '{{ doc("date_last_day_of_quarter") }}'
+
+        - name: first_day_of_fiscal_quarter
+          description: '{{ doc("date_first_day_of_fiscal_quarter") }}'
+
+        - name: last_day_of_fiscal_quarter
+          description: '{{ doc("date_last_day_of_fiscal_quarter") }}'
+
+        - name: first_day_of_fiscal_year
+          description: '{{ doc("date_first_day_of_fiscal_year") }}'
+
+        - name: last_day_of_fiscal_year
+          description: '{{ doc("date_last_day_of_fiscal_year") }}'
+
+        - name: week_of_fiscal_year
+          description: '{{ doc("date_week_of_fiscal_year") }}'
+
+        - name: month_of_fiscal_year
+          description: '{{ doc("date_month_of_fiscal_year") }}'
+
+        - name: last_day_of_week
+          description: '{{ doc("date_last_day_of_week") }}'
+
+        - name: quarter_name
+          description: '{{ doc("date_quarter_name") }}'
+
+        - name: fiscal_quarter_name
+          description: '{{ doc("date_fiscal_quarter_name") }}'
+
+        - name: fiscal_quarter_name_fy
+          description: '{{ doc("date_fiscal_quarter_name_fy") }}'
+
+        - name: fiscal_quarter_number_absolute
+          description: '{{ doc("date_fiscal_quarter_number_absolute") }}'
+
+        - name: fiscal_month_name
+          description: '{{ doc("date_fiscal_month_name") }}'
+
+        - name: fiscal_month_name_fy
+          description: '{{ doc("date_fiscal_month_name_fy") }}'
+
+        - name: holiday_desc
+          description: '{{ doc("date_holiday_desc") }}'
+
+        - name: is_holiday
+          description: '{{ doc("date_is_holiday") }}'
+
+        - name: last_month_of_fiscal_quarter
+          description: '{{ doc("date_last_month_of_fiscal_quarter") }}'
+
+        - name: is_first_day_of_last_month_of_fiscal_quarter
+          description: '{{ doc("date_is_first_day_of_last_month_of_fiscal_quarter") }}'
+
+        - name: last_month_of_fiscal_year
+          description: '{{ doc("date_last_month_of_fiscal_year") }}'
+
+        - name: is_first_day_of_last_month_of_fiscal_year
+          description: '{{ doc("date_is_first_day_of_last_month_of_fiscal_year") }}'
+          
+        - name: snapshot_date_fpa
+          description: '{{ doc("date_snapshot_date_fpa") }}'
+
+        - name: snapshot_date_billings
+          description: '{{ doc("date_snapshot_date_billings") }}'
+
+        - name: days_in_month_count
+          description: '{{ doc("date_days_in_month_count") }}'
+

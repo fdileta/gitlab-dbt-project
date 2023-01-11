@@ -18,10 +18,9 @@
     ping_created_date_month                                           AS ping_created_date_month,
     --ping_edition                                                      AS ping_edition,
     latest_subscription_id                                            AS latest_subscription_id,
-    licensed_user_count                                               AS licensed_user_count,
-    arr                                                               AS arr
+    licensed_user_count                                               AS licensed_user_count
   FROM latest_subscriptions
-    {{ dbt_utils.group_by(n=4)}}
+    {{ dbt_utils.group_by(n=3)}}
 
 ), subscription_info AS (
 
@@ -29,7 +28,6 @@
     ping_created_date_month                                           AS ping_created_date_month,
     --ping_edition                                                      AS ping_edition,
     1                                                                 AS key,
-    SUM(arr)                                                          AS total_arr,
     COUNT(DISTINCT latest_subscription_id)                            AS total_subscription_count,
     SUM(licensed_user_count)                                          AS total_licensed_users
   FROM dedupe_latest_subscriptions
@@ -55,7 +53,6 @@
       subscription_info.ping_created_date_month                                                                                           AS ping_created_date_month,
       metrics.metrics_path                                                                                                                AS metrics_path,
       metrics.ping_edition                                                                                                                AS ping_edition,
-      subscription_info.total_arr                                                                                                         AS total_arr,
       subscription_info.total_subscription_count                                                                                          AS total_subscription_count,
       subscription_info.total_licensed_users                                                                                              AS total_licensed_users
     FROM subscription_info
@@ -68,7 +65,7 @@
  {{ dbt_audit(
      cte_ref="sub_combo",
      created_by="@icooper-acp",
-     updated_by="@snalamaru",
+     updated_by="@jpeguero",
      created_date="2022-04-07",
-     updated_date="2022-06-08"
+     updated_date="2022-12-16"
  ) }}

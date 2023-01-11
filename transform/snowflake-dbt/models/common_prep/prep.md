@@ -633,3 +633,19 @@ Below are some additional details about the table:
 * Use case: `Service Ping metric-level prep table`
 
 {% enddocs %}
+
+{% docs prep_crm_task %}
+
+Prep model of all [Salesforce Tasks](https://help.salesforce.com/s/articleView?id=sf.tasks.htm&type=5) that record activities related to leads, contacts, opportunities, and accounts.
+
+{% enddocs %}
+
+{% docs prep_performance_indicators_yaml %}
+
+Prep table to UNION all performance indicator yaml files and to build [`fct_performance_indicator_targets`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.fct_performance_indicator_targets). This table replaces [`legacy.performance_indicators_yaml_historical`](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.performance_indicators_yaml_historical).
+
+This is modeled like a Type 2 Slowly Changing Dimension and therefore contains historical values from the PI files, starting on 2020-08-18 (when we started capturing this data). Instead of providing a snapshot for each day, this model captures a new record when changes occurred in the file, as noted by the `valid_from_date` and `valid_to_date`.
+
+All columns are pulled directly from the yaml files, with the exception of the following metadata columns: `performance_indicator_pk`, `_dbt_source_relation`, `unique_key`, `snapshot_date`, `date_first_added`, `valid_from_date`, `valid_to_date`.
+
+{% enddocs %}

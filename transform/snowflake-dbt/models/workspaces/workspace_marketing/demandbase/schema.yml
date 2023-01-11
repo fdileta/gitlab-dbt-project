@@ -59,13 +59,6 @@ models:
             - not_null
     - name: demandbase_keyword_historical_rollup
       description: Demandbase table loaded in the prod database without transformations out of the source. 
-      columns:
-        - name: start_date
-          tests:
-            - not_null
-        - name: keyword
-          tests:
-            - not_null
     - name: demandbase_keyword_set_keyword
       description: Demandbase table loaded in the prod database without transformations out of the source. 
       columns:

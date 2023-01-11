@@ -30,14 +30,10 @@
       fct_behavior_structured_event.behavior_at,
 
       -- Degenerate Dimensions (Event Attributes)
-      fct_behavior_structured_event.v_tracker,
+      fct_behavior_structured_event.tracker_version,
       fct_behavior_structured_event.session_index,
       fct_behavior_structured_event.app_id,
       fct_behavior_structured_event.session_id,
-      fct_behavior_structured_event.page_url,
-      fct_behavior_structured_event.page_url_scheme,
-      fct_behavior_structured_event.page_url_host,
-      fct_behavior_structured_event.page_url_fragment,
       fct_behavior_structured_event.user_snowplow_domain_id,
       fct_behavior_structured_event.contexts,
 

@@ -47,11 +47,13 @@
       fct_crm_touchpoint.bizible_count_first_touch,
       fct_crm_touchpoint.bizible_count_lead_creation_touch,
       fct_crm_touchpoint.bizible_count_u_shaped,
+      dim_crm_touchpoint.bizible_created_date,
 
       -- person info
       fct_crm_touchpoint.dim_crm_person_id,
       dim_crm_person.sfdc_record_id,
       dim_crm_person.sfdc_record_type,
+      dim_crm_person.marketo_lead_id,
       dim_crm_person.email_hash,
       dim_crm_person.email_domain,
       dim_crm_person.owner_id,
@@ -327,7 +329,7 @@
 {{ dbt_audit(
     cte_ref="final",
     created_by="@mcooperDD",
-    updated_by="@michellecooper",
+    updated_by="@degan",
     created_date="2021-02-18",
-    updated_date="2022-10-05"
+    updated_date="2022-12-12"
 ) }}

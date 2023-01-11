@@ -187,6 +187,10 @@ models:
             - not_null
             - unique
         tags: ["tdf", "mart", "sales_funnel"]
+      - name: order_type
+        description: '{{ doc("order_type") }}'
+      - name: order_type_live
+        description: '{{ doc("order_type_live") }}'
 
   - name: mart_crm_opportunity_daily_snapshot
     description: Model with single pane of glass sales and marketing metrics, snapshotted daily.
@@ -202,6 +206,10 @@ models:
       - name: snapshot_date
         tests:
           - not_null
+      - name: order_type
+        description: '{{ doc("order_type") }}'
+      - name: order_type_live
+        description: '{{ doc("order_type_live") }}'
 
   - name: mart_crm_opportunity_stamped_hierarchy_hist
     description: >-
@@ -216,6 +224,10 @@ models:
             - not_null
             - unique
         tags: ["tdf", "mart", "sales_funnel"]
+      - name: order_type
+        description: '{{ doc("order_type") }}'
+      - name: order_type_live
+        description: '{{ doc("order_type_live") }}'
 
   - name: mart_sales_funnel_target
     description: Model with Sales targets used for planning the go to market Sales and Marketing motion.
@@ -373,7 +385,7 @@ models:
         - not_null
         - unique
       tags: ["tdf", "mart", "arr", "retention"]
-  - name: rpt_lead_to_rev
+  - name: rpt_lead_to_revenue
     description: Maps a person (unconverted lead or a contact) to an opportunity through their associated Salesforce account and connects any of their related touchpoints.
     tests:
     - dbt_utils.unique_combination_of_columns:

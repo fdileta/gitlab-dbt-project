@@ -146,6 +146,10 @@ models:
           +schema: sensitive
           secure: true
 
+      clari:
+        +materialized: table
+        +schema: clari
+         
       container_registry:
         +schema: container_registry
 
@@ -220,6 +224,9 @@ models:
       google_analytics_360:
         +materialized: table
         +schema: google_analytics_360
+
+      google_search_console:
+        +schema: google_search_console 
 
       greenhouse:
         +schema: greenhouse
@@ -308,6 +315,7 @@ models:
 
       zengrc:
         +schema: zengrc
+        +materialized: view
 
       zoominfo:
         +schema: zoominfo
@@ -372,7 +380,10 @@ models:
       +schema: common_prep
       month_partition:
         +database: "{{ env_var('SNOWFLAKE_PREP_DATABASE') }}" #PREP
-        +schema: "dotcom_usage_events_{{ var('year', (run_started_at - modules.datetime.timedelta(2)).strftime('%Y')) }}_{{ var('month', (run_started_at - modules.datetime.timedelta(2)).strftime('%m')) }}"
+        dotcom_usage_events:
+          +schema: "dotcom_usage_events_{{ var('year', (run_started_at - modules.datetime.timedelta(2)).strftime('%Y')) }}_{{ var('month', (run_started_at - modules.datetime.timedelta(2)).strftime('%m')) }}"
+        snowplow:
+          +schema: "snowplow_{{ var('year', (run_started_at - modules.datetime.timedelta(1)).strftime('%Y')) }}_{{ var('month', (run_started_at - modules.datetime.timedelta(1)).strftime('%m')) }}"
       restricted_safe:
         +schema: restricted_safe_common_prep
         +tags: ["safe"]
@@ -584,6 +595,8 @@ models:
       workspace_engineering:
         +schema: workspace_engineering
         +materialized: table
+        zengrc:
+          +materialized: view
 
       workspace_people:
         +schema: workspace_people
