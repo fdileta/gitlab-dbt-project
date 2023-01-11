@@ -1,8 +1,25 @@
-
 WITH source AS (
 
     SELECT *
     FROM {{ ref('workday_supervisory_organizations_source') }}
+
+), team_data AS (
+
+    SELECT  
+        team_id,
+        team_superior_team_id,
+        team_hierarchy_level,
+        team_members_count,
+        team_manager_inherited,
+        team_inactivated,
+        team_name, 
+        team_manager_name, 
+        team_manager_name_id,
+        team_inactivated_date,
+        source.valid_from,
+        IFNULL(source.valid_to, CURRENT_DATE()) AS valid_to
+    FROM source
+    {{ dbt_utils.group_by(n=12)}}
 
 ), team_superior_groups AS (
 
@@ -33,15 +50,7 @@ WITH source AS (
 
     SELECT
         root.team_id                                                                                                                          AS team_id, 
-        root.team_hierarchy_level                                                                                                             AS team_hierarchy_level,
-        root.team_members_count                                                                                                               AS team_members_count,
-        root.team_manager_inherited                                                                                                           AS team_manager_inherited,
-        root.team_inactivated                                                                                                                 AS team_inactivated,
-        root.team_name                                                                                                                        AS team_name,
-        root.team_manager_name                                                                                                                AS team_manager_name,
-        root.team_manager_name_id                                                                                                             AS team_manager_name_id,
         root.team_superior_team_id                                                                                                            AS team_superior_team_id,
-        root.team_inactivated_date                                                                                                            AS team_inactivated_date,
         root.valid_from                                                                                                                       AS valid_from,
         root.valid_to                                                                                                                         AS valid_to,
         TO_ARRAY(root.valid_to)                                                                                                               AS valid_to_list,
@@ -54,15 +63,7 @@ WITH source AS (
 
     SELECT
         iter.team_id                                                                                                                          AS team_id, 
-        iter.team_hierarchy_level                                                                                                             AS team_hierarchy_level,
-        iter.team_members_count                                                                                                               AS team_members_count,
-        iter.team_manager_inherited                                                                                                           AS team_manager_inherited,
-        iter.team_inactivated                                                                                                                 AS team_inactivated,
-        iter.team_name                                                                                                                        AS team_name,
-        iter.team_manager_name                                                                                                                AS team_manager_name,
-        iter.team_manager_name_id                                                                                                             AS team_manager_name_id,
         iter.team_superior_team_id                                                                                                            AS team_superior_team_id,
-        iter.team_inactivated_date                                                                                                            AS team_inactivated_date,
         iter.valid_from                                                                                                                       AS valid_from,
         iter.valid_to                                                                                                                         AS valid_to,
         ARRAY_APPEND(anchor.valid_from_list, iter.valid_from)                                                                                 AS valid_from_list,
@@ -84,15 +85,7 @@ WITH source AS (
 
     SELECT 
         recursive_hierarchy.team_id                                                                                                           AS team_id, 
-        recursive_hierarchy.team_hierarchy_level                                                                                              AS team_hierarchy_level,
-        recursive_hierarchy.team_members_count                                                                                                AS team_members_count,
-        recursive_hierarchy.team_manager_inherited                                                                                            AS team_manager_inherited,
-        recursive_hierarchy.team_inactivated                                                                                                  AS team_inactivated,
-        recursive_hierarchy.team_name                                                                                                         AS team_name, 
-        recursive_hierarchy.team_manager_name                                                                                                 AS team_manager_name, 
-        recursive_hierarchy.team_manager_name_id                                                                                              AS team_manager_name_id,
         recursive_hierarchy.team_superior_team_id                                                                                             AS team_superior_team_id,
-        recursive_hierarchy.team_inactivated_date                                                                                             AS team_inactivated_date,
         IFF(recursive_hierarchy.upstream_organizations[0] IS NULL, '--', recursive_hierarchy.upstream_organizations[0])::VARCHAR              AS hierarchy_level_1,
         IFF(recursive_hierarchy.upstream_organizations[1] IS NULL, '--', recursive_hierarchy.upstream_organizations[1])::VARCHAR              AS hierarchy_level_2,
         IFF(recursive_hierarchy.upstream_organizations[2] IS NULL, '--', recursive_hierarchy.upstream_organizations[2])::VARCHAR              AS hierarchy_level_3,
@@ -103,44 +96,41 @@ WITH source AS (
         IFF(recursive_hierarchy.upstream_organizations[7] IS NULL, '--', recursive_hierarchy.upstream_organizations[7])::VARCHAR              AS hierarchy_level_8,
         IFF(recursive_hierarchy.upstream_organizations[8] IS NULL, '--', recursive_hierarchy.upstream_organizations[8])::VARCHAR              AS hierarchy_level_9,
         recursive_hierarchy.upstream_organizations                                                                                            AS hierarchy_levels_array,
-        recursive_hierarchy.valid_from_list                                                                                                   AS valid_from_list, 
-        recursive_hierarchy.valid_to_list                                                                                                     AS valid_to_list,
-        MAX(from_list.value::TIMESTAMP)                                                                                                       AS hierarchy_valid_from,
-        MIN(to_list.value::TIMESTAMP)                                                                                                         AS hierarchy_valid_to
+        recursive_hierarchy.valid_from,   
+        recursive_hierarchy.valid_to
     FROM recursive_hierarchy
-    INNER JOIN LATERAL FLATTEN(INPUT =>valid_from_list) from_list
-    INNER JOIN LATERAL FLATTEN(INPUT =>valid_to_list) to_list 
-    {{ dbt_utils.group_by(n=23)}}
-    HAVING hierarchy_valid_to > hierarchy_valid_from
+    {{ dbt_utils.group_by(n=14)}}
     
 ), final AS (
 
-    SELECT 
-        {{ dbt_utils.surrogate_key(['team_id', 'hierarchy_valid_from']) }} AS dim_team_sk,
-        team_id, 
-        team_hierarchy_level,
-        team_members_count,
-        team_manager_inherited,
-        team_inactivated,
-        team_name, 
-        team_manager_name, 
-        team_manager_name_id,
-        team_superior_team_id,
-        team_inactivated_date,
-        hierarchy_level_1,
-        hierarchy_level_2,
-        hierarchy_level_3,
-        hierarchy_level_4,
-        hierarchy_level_5,
-        hierarchy_level_6,
-        hierarchy_level_7,
-        hierarchy_level_8,
-        hierarchy_level_9,
-        hierarchy_levels_array,
-        hierarchy_valid_from,
-        hierarchy_valid_to
-    FROM team_hierarchy
+SELECT 
+    team_hierarchy.team_id, 
+    team_hierarchy.team_superior_team_id,
+    team_hierarchy.hierarchy_level_1,
+    team_hierarchy.hierarchy_level_2,
+    team_hierarchy.hierarchy_level_3,
+    team_hierarchy.hierarchy_level_4,
+    team_hierarchy.hierarchy_level_5,
+    team_hierarchy.hierarchy_level_6,
+    team_hierarchy.hierarchy_level_7,
+    team_hierarchy.hierarchy_level_8,
+    team_hierarchy.hierarchy_level_9,
+    team_hierarchy.hierarchy_levels_array,
+    ARRAY_SIZE(team_hierarchy.hierarchy_levels_array) AS team_hierarchy_level,
+    team_data.team_manager_inherited,
+    team_data.team_inactivated,
+    team_data.team_name, 
+    team_data.team_manager_name, 
+    team_data.team_manager_name_id,
+    team_data.team_inactivated_date,
+    team_hierarchy.valid_from,
+    team_hierarchy.valid_to
+FROM team_hierarchy
+LEFT JOIN team_data
+ON team_hierarchy.team_superior_team_id = team_data.team_superior_team_id AND team_hierarchy.team_id = team_data.team_id
+{{ dbt_utils.group_by(n=21)}}
+
 )
 
-SELECT * 
-FROM final
+SELECT *
+FROM FINAL
