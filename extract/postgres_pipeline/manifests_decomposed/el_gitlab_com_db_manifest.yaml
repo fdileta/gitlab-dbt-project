@@ -1076,7 +1076,6 @@ tables:
       , created_at
       , updated_at
       , cached_markdown_version
-      , cached_markdown_version
       , description
       , description_html
       , free_user_cap_over_limt_notified_at
