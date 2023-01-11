@@ -2034,6 +2034,7 @@ tables:
       , view_diffs_file_by_file
       , id
       , gitpod_enabled
+      , user_preferences
       FROM user_preferences
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
