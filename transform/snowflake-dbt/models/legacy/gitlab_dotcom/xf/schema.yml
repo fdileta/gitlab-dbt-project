@@ -323,7 +323,7 @@ models:
       - name: group_plan_is_paid
         description: Whether or not the group is subscribed to a paid plan. A subgroup inherits from the subscription of its ultimate parent group
       - name: member_count
-        description: The number of members that are presently associated with the group.
+        description: Do not use this count, it is incorrect. Use [gitlab_dotcom_memberships](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_memberships) for member counts.
       - name: project_count
         description: The number of projects that are presently associated with the group.
 
@@ -493,7 +493,7 @@ models:
           - not_null:
               severity: warn
       - name: member_count
-        description: The number of members that are presently associated with the namespace.
+        description: Do not use this count, it is incorrect. Use [gitlab_dotcom_memberships](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_memberships) for member counts.
       - name: project_count
         description: The number of projects that are presently associated with the namespace.
 
@@ -529,7 +529,7 @@ models:
           - not_null
           - unique
       - name: member_count
-        description: The number of members that are presently associated with the project.
+        description: Do not use this count, it is incorrect. Use [gitlab_dotcom_memberships](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_memberships) for member counts.
       - name: active_service_types
         description: The types of services currently active and associated with the project.
       - name: namespace_plan_is_paid
