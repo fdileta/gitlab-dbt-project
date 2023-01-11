@@ -130,4 +130,4 @@ ON team_hierarchy.team_superior_team_id = team_data.team_superior_team_id AND te
 )
 
 SELECT *
-FROM FINAL
+FROM final
