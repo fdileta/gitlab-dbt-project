@@ -10,8 +10,8 @@ WITH redis_clicks AS (
     -- event_id,
     behavior_at, 
     gsc_pseudonymized_user_id,
-    gsc_namespace_id,
-    gsc_project_id,
+    dim_namespace_id,
+    dim_project_id,
     gsc_plan,
     contexts
   FROM {{ ref('fct_behavior_structured_event') }}
@@ -29,7 +29,7 @@ joined AS (
     redis_clicks.*,
     namespaces.ultimate_parent_namespace_id
   FROM redis_clicks
-  LEFT JOIN namespaces ON namespaces.ultimate_parent_namespace_id = gsc_namespace_id
+  LEFT JOIN namespaces ON namespaces.ultimate_parent_namespace_id = redis_clicks.dim_namespace_id
 ),
 
 final AS (
@@ -37,8 +37,8 @@ final AS (
     -- joined.event_id,
     joined.behavior_at,
     joined.gsc_pseudonymized_user_id,
-    joined.gsc_namespace_id,
-    joined.gsc_project_id,
+    joined.dim_namespace_id,
+    joined.dim_project_id,
     joined.gsc_plan,
     joined.ultimate_parent_namespace_id,
     flat_contexts.value['data']['event_name']::VARCHAR AS redis_event_name
