@@ -19,7 +19,7 @@ flattened AS (
     clicks.behavior_structured_event_pk,
     clicks.behavior_at,
     flat_contexts.value['data']['event_name']::VARCHAR AS redis_event_name
-  FROM clicks
+  FROM clicks,
   LATERAL FLATTEN(input => TRY_PARSE_JSON(clicks.contexts), path => 'data') AS flat_contexts
   WHERE flat_contexts.value['schema']::VARCHAR = 'iglu:com.gitlab/gitlab_service_ping/jsonschema/1-0-0'
     {% if is_incremental() %}
