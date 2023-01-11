@@ -25,10 +25,10 @@ intermediate AS (
 
 parsed AS (
   SELECT
-    uploaded_at,
     value:fieldId::varchar AS field_id,
     value:fieldName::varchar AS field_name,
-    value:fieldType::varchar AS field_type
+    value:fieldType::varchar AS field_type,
+    uploaded_at
   FROM
     intermediate
 

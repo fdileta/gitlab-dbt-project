@@ -18,9 +18,8 @@ intermediate AS (
 
 parsed AS (
   SELECT
-    fiscal_quarter::varchar AS fiscal_quarter,
-    uploaded_at,
     CONCAT(value:timeFrameId::varchar, '_', fiscal_quarter) AS time_frame_id,
+    fiscal_quarter::varchar AS fiscal_quarter,
     value:startDate::date AS week_start_date,
     value:endDate::date AS week_end_date,
     -- dense_rank() to account for dups prior to qualify
@@ -29,7 +28,8 @@ parsed AS (
         fiscal_quarter
       ORDER BY
         time_frame_id
-    ) - 1 AS week_number -- start week from 0
+    ) - 1 AS week_number, -- start week from 0
+    uploaded_at
   FROM
     intermediate
 

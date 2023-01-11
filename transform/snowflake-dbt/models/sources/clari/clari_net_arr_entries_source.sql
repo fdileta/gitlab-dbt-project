@@ -27,7 +27,6 @@ parsed AS (
   SELECT
 
     -- foreign keys
-    uploaded_at,
     REPLACE(value:timePeriodId, '_', '-')::varchar AS fiscal_quarter,
     -- add fiscal_quarter to unique key: can be dup timeFrameId across quarters
     CONCAT(value:timeFrameId::varchar, '_', fiscal_quarter) AS time_frame_id,
@@ -42,9 +41,10 @@ parsed AS (
     value:currency::variant AS currency,
     value:isUpdated::boolean AS is_updated,
     value:updatedBy::varchar AS updated_by,
+    TO_TIMESTAMP(value:updatedOn::int / 1000) AS updated_on,
 
     -- metadata
-    TO_TIMESTAMP(value:updatedOn::int / 1000) AS updated_on
+    uploaded_at
   FROM
     intermediate
 

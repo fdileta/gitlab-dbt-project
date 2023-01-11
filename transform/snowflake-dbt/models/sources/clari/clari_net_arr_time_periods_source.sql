@@ -25,14 +25,14 @@ intermediate AS (
 
 parsed AS (
   SELECT
-    uploaded_at,
     REPLACE(value:timePeriodId, '_', '-')::varchar AS fiscal_quarter,
     value:startDate::date AS fiscal_quarter_start_date,
     value:endDate::date AS fiscal_quarter_end_date,
     value:label::varchar AS quarter,
     value:year::number AS year,
     value:crmId::varchar AS crm_id,
-    value:type::varchar AS time_period_type
+    value:type::varchar AS time_period_type,
+    uploaded_at
   FROM
     intermediate
 

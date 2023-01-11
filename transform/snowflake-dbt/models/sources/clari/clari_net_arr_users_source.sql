@@ -26,10 +26,9 @@ intermediate AS (
 parsed AS (
   SELECT
     -- primary key
-    uploaded_at,
+    value:userId::varchar AS user_id,
 
     -- logical info
-    value:userId::varchar AS user_id,
     value:crmId::varchar AS crm_user_id,
     value:email::varchar AS email,
     value:parentHierarchyId::varchar AS parent_role_id,
@@ -37,8 +36,9 @@ parsed AS (
     value:hierarchyId::varchar AS sales_team_role_id,
     value:hierarchyName::varchar AS sales_team_role,
     value:name::varchar AS user_full_name,
+    value:scopeId::variant AS scope_id,
 
-    value:scopeId::variant AS scope_id
+    uploaded_at
   FROM
     intermediate
 
