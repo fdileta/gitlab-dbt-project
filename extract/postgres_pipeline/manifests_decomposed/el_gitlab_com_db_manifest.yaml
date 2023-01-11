@@ -1065,6 +1065,27 @@ tables:
       FROM milestones
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
+  namespace_details:
+    dbt_source_model: true
+    export_schema: 'gitlab_com'
+    export_table: 'namespace_details'
+    export_table_primary_key: namespace_id
+    import_db: GITLAB_DB
+    import_query: |-
+      SELECT namespace_id
+      , created_at
+      , updated_at
+      , cached_markdown_version
+      , cached_markdown_version
+      , description
+      , description_html
+      , free_user_cap_over_limt_notified_at
+      , free_user_cap_over_limit_notified_at
+      , dashboard_notification_at
+      , dashboard_enforcement_at
+      FROM namespace_details
+      WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
+        AND '{END_TIMESTAMP}'::timestamp
   namespace_root_storage_statistics:
     dbt_snapshots: true
     dbt_source_model: true
@@ -2014,7 +2035,6 @@ tables:
       , view_diffs_file_by_file
       , id
       , gitpod_enabled
-      , use_legacy_web_ide
       FROM user_preferences
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
