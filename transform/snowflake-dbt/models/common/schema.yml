@@ -975,6 +975,8 @@ models:
           - not_null
       - name: dim_user_id_creator
         description: ID of the user who created the project
+      - name: member_count
+        description: Do not use this count, it is incorrect. Use [gitlab_dotcom_memberships](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_memberships) for member counts.
 
   - name: dim_revenue_contract
     description: '{{ doc("dim_revenue_contract") }}'
@@ -2987,8 +2989,6 @@ models:
       - name: dim_ci_runner_id
         description: ID of the runner with which the CI build has been run.
       - name: dim_ci_stage_id
-      - name: member_count
-        description: Do not use this count, it is incorrect. Use [gitlab_dotcom_memberships](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_memberships) for member counts.
 
   - name: dim_issue
     description: '{{ doc("dim_issue") }}'

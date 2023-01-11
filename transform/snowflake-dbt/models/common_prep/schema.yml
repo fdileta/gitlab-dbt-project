@@ -299,7 +299,7 @@ models:
       - name: gitlab_plan_seats
       - name: gitlab_plan_seats_in_use
       - name: gitlab_plan_max_seats_used
-      - name: current_member_count
+      - name: namespace_member_count
         description: Do not use this count, it is incorrect. Use [gitlab_dotcom_memberships](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_memberships) for member counts.
       - name: current_project_count
         description: The number of projects that are presently associated with the namespace.
@@ -2078,3 +2078,8 @@ models:
         - name: days_in_month_count
           description: '{{ doc("date_days_in_month_count") }}'
 
+  - name: prep_project
+    description: Prep table for project-level data. Used to build `dim_project`, in addition to other facts and dimensions
+    columns:
+      - name: member_count
+        description: Do not use this count, it is incorrect. Use [gitlab_dotcom_memberships](https://dbt.gitlabdata.com/#!/model/model.gitlab_snowflake.gitlab_dotcom_memberships) for member counts.
