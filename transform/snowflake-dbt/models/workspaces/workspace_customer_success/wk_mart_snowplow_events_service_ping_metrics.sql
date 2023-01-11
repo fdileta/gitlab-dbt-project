@@ -19,7 +19,7 @@ metric_bridge AS (
 
 joined AS (
   SELECT
-    -- service_ping_events.event_id,
+    service_ping_events.behavior_structured_event_pk,
     service_ping_events.behavior_at,
     service_ping_events.gsc_pseudonymized_user_id,
     service_ping_events.dim_namespace_id,
@@ -39,5 +39,5 @@ joined AS (
     created_by="@mdrussell",
     updated_by="@mdrussell",
     created_date="2022-12-21",
-    updated_date="2022-12-21"
+    updated_date="2023-01-11"
 ) }}
