@@ -10,7 +10,7 @@
     ('time_frames', 'clari_net_arr_time_frames_source')
 ]) }},
 
-with api_forecast AS (
+api_forecast AS (
   SELECT
     users.user_full_name,
     users.email,
@@ -32,13 +32,17 @@ with api_forecast AS (
   INNER JOIN time_frames ON entries.time_frame_id = time_frames.time_frame_id
   ORDER BY entries.fiscal_quarter, time_frames.week_number
 ),
-historical_forecast as (
-  select * from juwong_prep.static.STATIC_CLARI_NET_ARR_FORECAST
+
+-- Since the API isn't idempotent, using data from Driveload process
+historical_forecast AS (
+  SELECT * FROM static.sensitive.wk_sales_clari_net_arr_forecast_historical
 ),
+
 wk_sales_clari_net_arr_forecast AS (
-  select * from wk_sales_clari_net_arr_forecast
-  union
-  select * from historical_forecast )
+  SELECT * FROM api_forecast
+  UNION
+  SELECT * FROM historical_forecast
+)
 
 SELECT
   *
