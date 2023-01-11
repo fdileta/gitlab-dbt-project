@@ -44,7 +44,6 @@ wk_sales_clari_net_arr_forecast AS (
   SELECT * FROM historical_forecast
 )
 
-SELECT
-  *
+SELECT *
 FROM
   wk_sales_clari_net_arr_forecast

@@ -25,7 +25,7 @@ intermediate AS (
 
 parsed AS (
   SELECT
-    value:fieldId::varchar AS field_id,
+    value:fieldId::varchar   AS field_id,
     value:fieldName::varchar AS field_name,
     value:fieldType::varchar AS field_type,
     uploaded_at
@@ -43,7 +43,6 @@ parsed AS (
   ORDER BY field_id
 )
 
-SELECT
-  *
+SELECT *
 FROM
   parsed
