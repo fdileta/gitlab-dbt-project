@@ -230,19 +230,19 @@ WITH date_details AS (
 
        -- FO year
         SUM(CASE
-            WHEN o.order_type_live = '1. New - First Order'
+            WHEN o.order_type_stamped = '1. New - First Order'
             THEN o.net_arr
             ELSE 0 END) AS last_12m_booked_fo_net_arr,  -- ttm_fo_net_arr
 
         -- New Connected year
         SUM(CASE
-            WHEN o.order_type_live = '2. New - Connected'
+            WHEN o.order_type_stamped = '2. New - Connected'
             THEN o.net_arr
             ELSE 0 END) AS last_12m_booked_new_connected_net_arr, -- ttm_new_connected_net_arr
 
         -- Growth year
         SUM(CASE
-            WHEN o.order_type_live NOT IN ('2. New - Connected','1. New - First Order')
+            WHEN o.order_type_stamped NOT IN ('2. New - Connected','1. New - First Order')
             THEN o.net_arr
             ELSE 0 END) AS last_12m_booked_growth_net_arr,   --ttm_growth_net_arr
 
@@ -359,19 +359,19 @@ WITH date_details AS (
 
         -- First Order year
         SUM(CASE
-            WHEN o.order_type_live = '1. New - First Order'
+            WHEN o.order_type_stamped = '1. New - First Order'
             THEN o.booked_net_arr
             ELSE 0 END) AS fy_booked_fo_net_arr,
 
         -- New Connected year
         SUM(CASE
-            WHEN o.order_type_live = '2. New - Connected'
+            WHEN o.order_type_stamped = '2. New - Connected'
             THEN o.booked_net_arr
             ELSE 0 END) AS fy_booked_new_connected_net_arr,
 
         -- Growth year
         SUM(CASE
-            WHEN o.order_type_live NOT IN ('2. New - Connected','1. New - First Order')
+            WHEN o.order_type_stamped NOT IN ('2. New - Connected','1. New - First Order')
             THEN o.booked_net_arr
             ELSE 0 END) AS fy_booked_growth_net_arr,
 
