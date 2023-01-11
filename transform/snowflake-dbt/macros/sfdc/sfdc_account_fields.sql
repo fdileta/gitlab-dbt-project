@@ -10,14 +10,19 @@ WITH map_merged_crm_account AS (
     SELECT *
     FROM {{ ref('prep_crm_person') }}
 
+), crm_user AS (
+
+    SELECT * 
+    FROM
+    {%- if model_type == 'live' %}
+        {{ ref('dim_crm_user') }}
+    {%- elif model_type == 'snapshot' %}
+        {{ ref('dim_crm_user_daily_snapshot') }}
+    {% endif %}
+
 {%- if model_type == 'live' %}
 
 {%- elif model_type == 'snapshot' %}
-), crm_user_snapshot AS (
-
-    SELECT * 
-    FROM {{ ref('dim_crm_user_daily_snapshot') }}
-
 ), snapshot_dates AS (
 
     SELECT *
@@ -44,11 +49,6 @@ WITH map_merged_crm_account AS (
           AND snapshot_dates.date_actual < COALESCE(valid_to, '9999-12-31'::TIMESTAMP)
 
 {%- endif %}
-
-), crm_user AS (
-
-    SELECT * 
-    FROM {{ ref('dim_crm_user') }}
 
 ), sfdc_account AS (
 
@@ -482,11 +482,11 @@ WITH map_merged_crm_account AS (
       sfdc_account.number_of_licenses_this_account,
       sfdc_account.decision_maker_count_linkedin,
       sfdc_account.number_of_employees,
+      crm_user.user_role_type                                             AS user_role_type,
+      crm_user.user_role_name                                             AS owner_role,
       {%- if model_type == 'live' %}
       sfdc_account.lam                                                    AS parent_crm_account_lam,
       sfdc_account.lam_dev_count                                          AS parent_crm_account_lam_dev_count,
-      crm_user.user_role_type,
-      crm_user.user_role_name,
       {%- elif model_type == 'snapshot' %}
       IFNULL(lam_corrections.estimated_capped_lam, sfdc_account.lam)      AS parent_crm_account_lam,
       IFNULL(lam_corrections.dev_count, sfdc_account.lam_dev_count)       AS parent_crm_account_lam_dev_count,
@@ -571,9 +571,9 @@ WITH map_merged_crm_account AS (
       ON sfdc_account.account_id = ptc_scores.account_id
         AND sfdc_account.snapshot_date >= ptc_scores.valid_from::DATE
         AND  sfdc_account.snapshot_date < ptc_scores.valid_to::DATE
-    LEFT JOIN crm_user_snapshot
-      ON sfdc_account.owner_id = crm_user_snapshot.dim_crm_user_id
-        AND crm_user_snapshot.snapshot_id = sfdc_account.snapshot_id
+    LEFT JOIN crm_user
+      ON sfdc_account.owner_id = crm_user.dim_crm_user_id
+        AND sfdc_account.snapshot_id = crm_user.snapshot_id
     
     {%- endif %}
 
