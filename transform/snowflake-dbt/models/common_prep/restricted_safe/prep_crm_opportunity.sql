@@ -110,11 +110,11 @@
       snapshot_dates.first_day_of_fiscal_quarter                                                                    AS snapshot_fiscal_quarter_date,
       snapshot_dates.day_of_fiscal_quarter_normalised                                                               AS snapshot_day_of_fiscal_quarter_normalised,
       snapshot_dates.day_of_fiscal_year_normalised                                                                  AS snapshot_day_of_fiscal_year_normalised,
-      account_owner.user_segment  AS account_owner_user_segment,
-      account_owner.user_geo  AS account_owner_user_geo,
-      account_owner.user_region AS account_owner_user_region,
-      account_owner.user_area AS account_owner_user_area,
-      account_owner.user_segment_geo_region_area  AS account_owner_user_segment_geo_region_area,
+      account_owner.user_segment  AS crm_account_owner_sales_segment,
+      account_owner.user_geo  AS crm_account_owner_geo,
+      account_owner.user_region AS crm_account_owner_region,
+      account_owner.user_area AS crm_account_owner_area,
+      account_owner.user_segment_geo_region_area  AS crm_account_owner_sales_segment_geo_region_area,
       fulfillment_partner.account_name AS fulfillment_partner_account_name,
       fulfillment_partner.partner_track AS fulfillment_partner_partner_track,
       partner_account.account_name AS partner_account_account_name,
@@ -204,11 +204,11 @@
       snapshot_dates.first_day_of_fiscal_quarter                                                                    AS snapshot_fiscal_quarter_date,
       snapshot_dates.day_of_fiscal_quarter_normalised                                                               AS snapshot_day_of_fiscal_quarter_normalised,
       snapshot_dates.day_of_fiscal_year_normalised                                                                  AS snapshot_day_of_fiscal_year_normalised,
-      account_owner.user_segment  AS account_owner_user_segment,
-      account_owner.user_geo  AS account_owner_user_geo,
-      account_owner.user_region AS account_owner_user_region,
-      account_owner.user_area AS account_owner_user_area,
-      account_owner.user_segment_geo_region_area  AS account_owner_user_segment_geo_region_area,
+      account_owner.user_segment  AS crm_account_owner_sales_segment_segment,
+      account_owner.user_geo  AS crm_account_owner_geo,
+      account_owner.user_region AS crm_account_owner_region,
+      account_owner.user_area AS crm_account_owner_area,
+      account_owner.user_segment_geo_region_area  AS crm_account_owner_sales_segment_geo_region_area,
       fulfillment_partner.account_name AS fulfillment_partner_account_name,
       fulfillment_partner.partner_track AS fulfillment_partner_partner_track,
       partner_account.account_name AS partner_account_account_name,
@@ -325,23 +325,8 @@
       {{ get_date_id('sfdc_opportunity.subscription_end_date') }}                                 AS subscription_end_date_id,
       {{ get_date_id('sfdc_opportunity.sales_qualified_date') }}                                  AS sales_qualified_date_id,
 
-      -- account owner information
-      sfdc_opportunity.account_owner_user_segment AS crm_account_owner_sales_segment,
-      sfdc_opportunity.account_owner_user_geo AS crm_account_owner_geo,
-      sfdc_opportunity.account_owner_user_region AS crm_account_owner_region,
-      sfdc_opportunity.account_owner_user_area AS crm_account_owner_area,
-      sfdc_opportunity.account_owner_user_segment_geo_region_area AS crm_account_owner_sales_segment_geo_region_area,
-
-      -- -- opportunity owner information
-      -- sfdc_opportunity.opportunity_owner_user_segment,
-      -- sfdc_opportunity.opportunity_owner_user_geo,
-      -- sfdc_opportunity.opportunity_owner_user_region,
-      -- sfdc_opportunity.opportunity_owner_user_area,
-      -- sfdc_opportunity.opportunity_owner_role,
-      -- sfdc_opportunity.opportunity_owner_title,
-
       close_date.first_day_of_fiscal_quarter                                                      AS close_fiscal_quarter_date,
-      90 - DATEDIFF(DAY, sfdc_opportunity.snapshot_date, close_date.last_day_of_fiscal_quarter) AS close_day_of_fiscal_quarter_normalised,
+      90 - DATEDIFF(DAY, sfdc_opportunity.snapshot_date, close_date.last_day_of_fiscal_quarter)   AS close_day_of_fiscal_quarter_normalised,
 
       {{ get_date_id('sfdc_opportunity.iacv_created_date')}}                                      AS arr_created_date_id,
       sfdc_opportunity.iacv_created_date                                                          AS arr_created_date,
@@ -1002,16 +987,16 @@
       IFF(CONTAINS(sfdc_opportunity.competitors, 'Bamboo'),1,0) AS competitors_bamboo_flag,
       IFF(CONTAINS(sfdc_opportunity.competitors, 'AWS'),1,0) AS competitors_aws_flag,
       LOWER(
-        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.account_owner_user_segment, sfdc_opportunity.opportunity_owner_user_segment)
+        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.crm_account_owner_sales_segment, sfdc_opportunity.opportunity_owner_user_segment)
       )                                                     AS report_opportunity_user_segment,
       LOWER(
-        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.account_owner_user_geo, sfdc_opportunity.opportunity_owner_user_geo)
+        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.crm_account_owner_geo, sfdc_opportunity.opportunity_owner_user_geo)
       ) AS report_opportunity_user_geo,
       LOWER(
-        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.account_owner_user_region, sfdc_opportunity.opportunity_owner_user_region)
+        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.crm_account_owner_region, sfdc_opportunity.opportunity_owner_user_region)
       ) AS report_opportunity_user_region,
       LOWER(
-        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.account_owner_user_area, sfdc_opportunity.opportunity_owner_user_area)
+        IFF(sfdc_opportunity.close_date < close_date.current_first_day_of_fiscal_year, sfdc_opportunity.crm_account_owner_area, sfdc_opportunity.opportunity_owner_user_area)
       ) AS report_opportunity_user_area,
       LOWER(
         CONCAT(
