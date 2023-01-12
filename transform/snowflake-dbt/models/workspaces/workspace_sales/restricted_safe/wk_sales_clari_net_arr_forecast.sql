@@ -13,7 +13,7 @@
 api_forecast AS (
   SELECT
     users.user_full_name,
-    users.email,
+    users.user_email,
     users.crm_user_id,
     users.sales_team_role,
     users.parent_role,
@@ -37,7 +37,21 @@ wk_sales_clari_net_arr_forecast AS (
   SELECT * FROM api_forecast
   UNION
   -- Since the API isn't idempotent, using data from Driveload process
-  SELECT * FROM static.sensitive.wk_sales_clari_net_arr_forecast_historical
+  SELECT
+    user_full_name,
+    user_email,
+    crm_user_id,
+    sales_team_role,
+    parent_role,
+    fiscal_quarter,
+    field_name,
+    week_number,
+    week_start_date,
+    week_end_date,
+    field_type,
+    forecast_value,
+    is_updated
+  FROM static.sensitive.wk_sales_clari_net_arr_forecast_historical
 )
 
 SELECT *

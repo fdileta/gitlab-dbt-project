@@ -30,7 +30,7 @@ parsed AS (
 
     -- logical info
     value:crmId::varchar               AS crm_user_id,
-    value:email::varchar               AS email,
+    value:email::varchar               AS user_email,
     value:parentHierarchyId::varchar   AS parent_role_id,
     value:parentHierarchyName::varchar AS parent_role,
     value:hierarchyId::varchar         AS sales_team_role_id,
