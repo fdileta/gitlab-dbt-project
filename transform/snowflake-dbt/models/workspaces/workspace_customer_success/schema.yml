@@ -50,14 +50,14 @@ models:
   
   - name: wk_fct_snowplow_events_service_ping
     columns:
-      - name: event_id
+      - name: behavior_structured_event_pk
         tests:
           - unique
           - not_null
 
   - name: wk_mart_snowplow_events_service_ping_metrics
     columns:
-      - name: event_id
+      - name: behavior_structured_event_pk
         tests:
           - unique
           - not_null
