@@ -46,7 +46,7 @@ GIT_BRANCH = env["GIT_BRANCH"]
 pod_env_vars = {**gitlab_pod_env_vars, **{}}
 
 # This value is set based on the commit hash setter task in dbt_snapshot
-#pull_commit_hash = """export GIT_COMMIT="{{ var.value.dbt_hash }}" """
+# pull_commit_hash = """export GIT_COMMIT="{{ var.value.dbt_hash }}" """
 
 
 # Default arguments for the DAG
@@ -117,5 +117,4 @@ dbt_six_hourly_models_task = KubernetesPodOperator(
 (
     # dbt_evaluate_run_date_task
     dbt_six_hourly_models_task
-    
 )
