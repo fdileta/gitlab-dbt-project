@@ -37,7 +37,7 @@ final AS (
     redis_clicks.dim_namespace_id,
     redis_clicks.dim_project_id,
     redis_clicks.gsc_plan,
-    redis_clicks.ultimate_parent_namespace_id,
+    namespaces.ultimate_parent_namespace_id,
     contexts.redis_event_name
   FROM redis_clicks
   INNER JOIN contexts ON contexts.behavior_structured_event_pk = redis_clicks.behavior_structured_event_pk
