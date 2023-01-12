@@ -1355,6 +1355,20 @@ tables:
       , created_at
       , updated_at
       , repository_access_level
+      , pages_access_level
+      , forking_access_level
+      , metrics_dashboard_access_level
+      , requirements_access_level
+      , operations_access_level
+      , analytics_access_level
+      , security_and_compliance_access_level
+      , container_registry_access_level
+      , package_registry_access_level
+      , monitor_access_level
+      , infrastructure_access_level
+      , feature_flags_access_level
+      , environments_access_level
+      , releases_access_level
       FROM project_features
       WHERE updated_at BETWEEN '{BEGIN_TIMESTAMP}'::timestamp
         AND '{END_TIMESTAMP}'::timestamp
