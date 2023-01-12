@@ -115,7 +115,7 @@ models:
       - name: crm_user_id
         tests:
           - not_null
-      - name: email
+      - name: user_email
         tests:
           - not_null
       - name: parent_role_id

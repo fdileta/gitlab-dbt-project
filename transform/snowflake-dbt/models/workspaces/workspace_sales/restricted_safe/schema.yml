@@ -7,7 +7,7 @@ models:
       - name: user_full_name
         tests:
           - not_null
-      - name: email
+      - name: user_email
         tests:
           - not_null
       - name: crm_user_id
