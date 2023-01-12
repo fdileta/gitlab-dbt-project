@@ -13,7 +13,7 @@ WITH events AS (
   -- more details here: https://gitlab.com/gitlab-org/gitlab/-/issues/376244#note_1167575425
   WHERE aggregate_operator = 'OR'
     OR aggregate_operator IS NULL
-)
+),
 
 final AS (
   SELECT
@@ -24,3 +24,11 @@ final AS (
   FROM events
   {{ dbt_utils.group_by(n = 3) }}
 )
+
+{{ dbt_audit(
+    cte_ref="final",
+    created_by="@mdrussell",
+    updated_by="@mdrussell",
+    created_date="2022-12-21",
+    updated_date="2023-01-11"
+) }}
