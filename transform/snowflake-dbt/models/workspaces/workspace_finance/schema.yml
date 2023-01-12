@@ -1212,6 +1212,6 @@ models:
       - name: gitlab_service
         description: gitlab service mapping
       - name: finance_pl
-        description: net cost paid by GitLab
+        description: Finance P&L mapping
       - name: net_cost
         description: net cost paid by GitLab
