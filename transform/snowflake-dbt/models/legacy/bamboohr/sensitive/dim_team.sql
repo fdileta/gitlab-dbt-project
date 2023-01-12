@@ -166,7 +166,12 @@ final AS (
     team_data.team_manager_name_id,
     team_data.team_inactivated_date,
     GREATEST(team_hierarchy.hierarchy_valid_from, team_data.valid_from) AS valid_from,
-    LEAST(team_hierarchy.hierarchy_valid_to, team_data.valid_to)        AS valid_to
+    LEAST(team_hierarchy.hierarchy_valid_to, team_data.valid_to)        AS valid_to,
+    CASE 
+        WHEN team_hierarchy.team_id = 'SUP-ORG-TOP' THEN TRUE
+        WHEN DATE(valid_to) = {{ var('tomorrow') }} THEN TRUE
+        ELSE FALSE
+    END                                                                 AS is_current
   FROM team_hierarchy
   LEFT JOIN team_data
     ON team_hierarchy.team_superior_team_id = team_data.team_superior_team_id
