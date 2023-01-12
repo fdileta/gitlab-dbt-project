@@ -174,7 +174,9 @@ WITH sfdc_opportunity_snapshot_history_xf AS (
         is_lost                         AS end_is_lost
     FROM sfdc_opportunity_snapshot_history_xf        
     WHERE (snapshot_day_of_fiscal_quarter_normalised = 90 
-          OR snapshot_date = CURRENT_DATE)
+          -- JK 2023-01-12: due to dbt run schedule, it could be that current date is ahead of snapshot_date
+          -- and this would cause NULL values when we want to look at current quarter values (normalized Q day < 90)
+          OR snapshot_date = DATEADD('day', -1, CURRENT_DATE))
 
 ), pipeline_type AS (
 
