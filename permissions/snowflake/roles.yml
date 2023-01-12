@@ -2992,6 +2992,13 @@ roles:
             - transforming_xs
             - transforming_xl
 
+    - gweaver:
+        member_of:
+            - reporter
+            - restricted_safe
+        warehouses:
+            - dev_xs
+
     - hkacmarski:
         member_of:
             - analyst_sales
@@ -4895,6 +4902,11 @@ users:
         can_login: yes
         member_of:
             - grafana
+
+    - gweaver:
+        can_login: yes
+        member_of:
+            - gweaver
 
     - hkacmarski:
         can_login: yes
