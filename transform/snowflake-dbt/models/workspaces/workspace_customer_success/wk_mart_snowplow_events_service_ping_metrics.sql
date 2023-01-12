@@ -31,7 +31,7 @@ joined AS (
     metric_bridge.aggregate_attribute,
     metric_bridge.metrics_status
   FROM service_ping_events
-  INNER JOIN metric_bridge ON service_ping_events.redis_event_name = metric_bridge.metrics_path
+  INNER JOIN metric_bridge ON service_ping_events.redis_event_name = metric_bridge.redis_event
 )
 
 {{ dbt_audit(
