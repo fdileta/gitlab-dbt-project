@@ -4779,6 +4779,7 @@ users:
             - data_science_loader
             - sales_analytics
             - reporter
+            - static_sensitive
 
     - alpcohen:
         can_login: yes
