@@ -12,7 +12,7 @@ WITH source AS (
       "DELETED"::TEXT                                                      AS deleted,
       "CreatedById"::TEXT                                                  AS created_by_id,
       TO_TIMESTAMP(CONVERT_TIMEZONE('UTC', "CreatedDate"))::TIMESTAMP      AS created_date,
-      "UpdatedById"                                                        AS updated_by_id,
+      "UpdatedById"::TEXT                                                  AS updated_by_id,
       TO_TIMESTAMP(CONVERT_TIMEZONE('UTC',"UpdatedDate"))::TIMESTAMP       AS updated_date,
       TO_TIMESTAMP_NTZ(CAST(_uploaded_at AS INT))::TIMESTAMP               AS uploaded_at
     FROM source
