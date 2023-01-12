@@ -19,7 +19,7 @@ intermediate AS (
     LATERAL FLATTEN(input => jsontext:data:fields) AS d
 
   {% if is_incremental() %}
-    WHERE source.uploaded_at > (SELECT MAX(t.uploaded_at) FROM {{ this }} as t)
+    WHERE source.uploaded_at > (SELECT MAX(t.uploaded_at) FROM {{ this }} AS t)
   {% endif %}
 ),
 

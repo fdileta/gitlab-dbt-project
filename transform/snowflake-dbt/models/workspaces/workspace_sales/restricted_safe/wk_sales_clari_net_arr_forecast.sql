@@ -33,15 +33,11 @@ api_forecast AS (
   ORDER BY entries.fiscal_quarter, time_frames.week_number
 ),
 
--- Since the API isn't idempotent, using data from Driveload process
-historical_forecast AS (
-  SELECT * FROM static.sensitive.wk_sales_clari_net_arr_forecast_historical
-),
-
 wk_sales_clari_net_arr_forecast AS (
   SELECT * FROM api_forecast
   UNION
-  SELECT * FROM historical_forecast
+  -- Since the API isn't idempotent, using data from Driveload process
+  SELECT * FROM static.sensitive.wk_sales_clari_net_arr_forecast_historical
 )
 
 SELECT *
