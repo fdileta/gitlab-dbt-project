@@ -69,3 +69,10 @@ models:
             - date_month
             - ultimate_parent_namespace_id
             - metrics_path
+
+  - name: redis_namespace_snowplow_clicks_workspace
+    columns:
+      - name: event_id
+        tests:
+          - unique
+          - not_null

@@ -1,6 +1,7 @@
 {{
   config(
     materialized='incremental',
+    unique_key='behavior_structured_event_pk',
     tags=["mnpi_exception"]
   )
 }}
