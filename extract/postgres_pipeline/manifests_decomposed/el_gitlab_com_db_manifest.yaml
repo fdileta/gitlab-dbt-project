@@ -1075,9 +1075,6 @@ tables:
       SELECT namespace_id
       , created_at
       , updated_at
-      , cached_markdown_version
-      , description
-      , description_html
       , free_user_cap_over_limt_notified_at
       , free_user_cap_over_limit_notified_at
       , dashboard_notification_at
