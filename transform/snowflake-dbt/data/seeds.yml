@@ -22,4 +22,6 @@ seeds:
   - name: gitlab_dotcom_access_levels
     description: '{{ doc("gitlab_dotcom_access_levels") }}'
   - name: gcp_billing_service_allocation
-    description: CSV containing the static allocation % on Free/Paid/Internal P&L mappings for GCP billing
+    description: CSV containing the static allocation % on Free/Paid/Internal P&L mappings for GCP billing https://docs.google.com/spreadsheets/d/1UQ2Vuo0wZUtbeSiKhnKpuID-fHTPcQadJslbC2i3KTA/edit#gid=1216145786
+  - name: gcp_billing_sandbox_projects
+    description: CSV containing the list of Sandbox projects for Internal cost mapping. Src https://docs.google.com/spreadsheets/d/1LhpRF1b7OzCmQpk0p6196UkrQtU5DHa12CdYuP_OfSw/edit#gid=724604829

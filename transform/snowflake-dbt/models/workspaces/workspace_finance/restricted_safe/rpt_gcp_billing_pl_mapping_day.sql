@@ -10,6 +10,14 @@ WITH services AS (
 
 ),
 
+allocation as (
+
+    SELECT * FROM {{ ref{'gcp_billing_service_allocation.csv'} }}
+
+),
+
+
+
 hvs AS (
 SELECT
 inte.day,
