@@ -1199,7 +1199,7 @@ models:
       - name: net_cost
         description: net cost paid by GitLab
   - name: rpt_gcp_billing_pl_mapping_day
-    description: GCP Billing Service mapping https://gitlab.com/gitlab-org/quality/engineering-analytics/finops-analysis/-/issues/12
+    description: GCP Billing P&L mapping 
     columns:
       - name: day
         description: date
