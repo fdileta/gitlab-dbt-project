@@ -19,3 +19,5 @@ sources:
 
     tables:
       - name: users
+      - name: order_action_rate_plan
+        identifier: orderactionrateplan
