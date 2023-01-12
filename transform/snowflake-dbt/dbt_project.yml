@@ -146,6 +146,10 @@ models:
           +schema: sensitive
           secure: true
 
+      clari:
+        +materialized: table
+        +schema: clari
+         
       container_registry:
         +schema: container_registry
 

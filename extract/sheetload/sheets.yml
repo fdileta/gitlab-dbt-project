@@ -349,7 +349,3 @@ sheets:
     owner: '@nick_vh'
     tabs:
       - leading_organization_entry_dates
-  - name: fy24_placeholder_target
-    owner: '@nfiguera'
-    tabs:
-      - fy24_placeholder_target

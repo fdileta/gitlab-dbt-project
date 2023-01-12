@@ -1,10 +1,11 @@
 from api import BizibleSnowFlakeExtractor
 from os import environ as env
 import logging
-import sys
+import datetime
 from fire import Fire
-from typing import Dict, Any
+from typing import Dict
 import yaml
+from dateutil import parser as date_parser
 
 
 def manifest_reader(file_path: str) -> Dict[str, Dict]:
@@ -30,6 +31,11 @@ def filter_manifest(manifest_dict: Dict, load_only_table: str = None) -> Dict:
 
 def main(file_path: str, load_only_table: str = None) -> None:
     config_dict = env.copy()
+    start_date = date_parser.parse(config_dict["START_TIME"]) - datetime.timedelta(
+        hours=2
+    )
+    end_date = start_date + datetime.timedelta(hours=13)
+    logging.info(f"Running from {start_date} to {end_date}")
     extractor = BizibleSnowFlakeExtractor(config_dict)
 
     logging.info(f"Reading manifest at location: {file_path}")
@@ -44,7 +50,9 @@ def main(file_path: str, load_only_table: str = None) -> None:
             date_column = table_dict.get("date_column")
         else:
             date_column = ""
-        extractor.extract_latest_bizible_file(table, date_column)
+        extractor.process_bizible_file(
+            start_date, end_date, table, date_column, full_refresh=False
+        )
 
 
 if __name__ == "__main__":

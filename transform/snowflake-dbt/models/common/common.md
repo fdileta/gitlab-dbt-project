@@ -1376,6 +1376,35 @@ Example: `pi_monthly_estimated_targets`: `{"2022-02-28":1000,"2022-03-31":2000,"
 
 {% enddocs %}
 
+{% docs fct_ping_instance_metric_none_null %}
+
+**Description:** Atomic level instance Service Ping data by ping and metric for `none` and NULL timeframe metrics, including basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
+- The data includes a single row per ping and metric
+- Includes installation, instance, date, product, billing, and subscription identifiers
+
+**Data Grain:**
+- dim_ping_instance_id
+- metrics_path
+
+**Filters Applied to Model:**
+- Include `none` and `NULL` metrics (`time_frame = 'none' or NULL`)
+
+**Business Logic in this Model:**
+- `Inherited` - `has_timed_out` = `IFF(value = -1, TRUE, FALSE)`
+- `Inherited` - Metrics that timed out (return -1) are set to a value of 0
+- `Inherited` - `umau_value` = metric value from `usage_activity_by_stage_monthly.manage.events`
+- `Inherited` - `dim_subscription_id` = `COALESCE(prep_subscription.dim_subscription_id, ping_payload.license_subscription_id)`
+
+**Other Comments:**
+- Metric time frames are set in the metric definition yaml file and can be found in the [Service Ping Metrics Dictionary](https://metrics.gitlab.com/)
+- `dim_ping_instance_id` is the unique identifier for the service ping and is synonymous with `id` in the source data
+- `dim_instance_id` is synonymous with `uuid` in the source data
+- `dim_installation_id` is the unique identifier for the actual installation. It is a combination of `dim_instance_id` and `dim_host_id`. `dim_host_id` is required because there can be multiple installations that share the same `dim_instance_id` (ex: gitlab.com has several installations sharing the same dim_instance_id: gitlab.com, staging.gitlab.com, etc)
+- Service Ping data is captured at a particular point in time with `all-time, 7_day and 28_day` metrics.  The metrics are only pertinent to the Ping Date and Time and can not be aggregated across Ping Dates. Service Pings are normally compared WoW, MoM, YoY,  etc.
+- [Service Ping Guide](https://docs.gitlab.com/ee/development/service_ping/) shows a technical overview of the Service Ping data flow.
+
+{% enddocs %}
+
 {% docs fct_ping_instance_metric_monthly %}
 
 **Description:** Atomic level instance Service Ping data for the last ping of the month per installation by ping and metric for 28-day and all-time metrics. This includes basic identifiers for easy joins out to dimension tables. This is a filtered version of `fct_ping_instance_metric`
