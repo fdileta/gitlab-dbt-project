@@ -1,0 +1,11 @@
+service,free,paid,internal
+gitaly compute and storage,0.96,0.04,0.00
+gitaly networking,0.56,0.15,0.29
+registry storage,0.49,0.45,0.06
+registry networking,0.25,0.60,0.15
+artifacts,0.49,0.45,0.06
+lfs,0.49,0.45,0.06
+package,0.49,0.45,0.06
+ci,0.36,0.21,0.43
+databases,0.40,0.54,0.06
+haproxy,0.40,0.54,0.06
