@@ -143,11 +143,15 @@ WITH map_merged_crm_account AS (
       score                                                                                                    AS score,
       decile                                                                                                   AS decile,
       score_group                                                                                              AS score_group,
-      is_current                                                                                               AS is_current,
       MIN(score_date)                                                                                          AS valid_from,
-      COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), CURRENT_DATE())        AS valid_to
-    FROM {{ ref('pte_scores_source') }}
-    {{ dbt_utils.group_by(n=5)}}
+      COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), {{ var('tomorrow') }}) AS valid_to,
+      CASE 
+        WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_from DESC) = 1 
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                                      AS is_current
+    FROM {{ ref('pte_scores_source') }}    
+    {{ dbt_utils.group_by(n=4)}}
     ORDER BY valid_from, valid_to
 
 
@@ -158,11 +162,15 @@ WITH map_merged_crm_account AS (
       score                                                                                                    AS score,
       decile                                                                                                   AS decile,
       score_group                                                                                              AS score_group,
-      is_current                                                                                               AS is_current,
       MIN(score_date)                                                                                          AS valid_from,
-      COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), CURRENT_DATE())        AS valid_to
-    FROM {{ ref('ptc_scores_source') }}
-    {{ dbt_utils.group_by(n=5)}}
+      COALESCE(LEAD(valid_from) OVER (PARTITION BY crm_account_id ORDER BY valid_from), {{ var('tomorrow') }}) AS valid_to,
+      CASE 
+        WHEN ROW_NUMBER() OVER (PARTITION BY crm_account_id ORDER BY valid_from DESC) = 1 
+          THEN TRUE
+        ELSE FALSE
+      END                                                                                                      AS is_current
+    FROM {{ ref('ptc_scores_source') }}    
+    {{ dbt_utils.group_by(n=4)}}
     ORDER BY valid_from, valid_to
 
 ), final AS (
@@ -329,7 +337,7 @@ WITH map_merged_crm_account AS (
       sfdc_account.forbes_2000_rank,
       sfdc_account.parent_account_industry_hierarchy,
       sfdc_account.sales_development_rep,
-      sfdc_account.admin_manual_source_number_of_employees,
+	  sfdc_account.admin_manual_source_number_of_employees,
       sfdc_account.admin_manual_source_account_address,      
 
       --degenerative dimensions
