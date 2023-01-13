@@ -23,12 +23,9 @@ WITH source AS (
       data_by_row['grouping']::INT                          AS score_group,
       data_by_row['insights']::VARCHAR                      AS insights,
       data_by_row['renewal_date']::TIMESTAMP                AS renewal_date,
-      uploaded_at::TIMESTAMP                                AS uploaded_at,
-      MAX(score_date) OVER (PARTITION BY crm_account_id)    AS max_score_date,
-      IFF(score_date = max_score_date, 1, 0)                AS is_current
+      uploaded_at::TIMESTAMP                                AS uploaded_at
 
     FROM intermediate
-    {{ dbt_utils.group_by(n=9) }}
 
 )
 SELECT * 
