@@ -6,3 +6,7 @@ models:
 
   - name: rpt_delta_arr_parent_product_month_8th_calendar_day
     description: '{{ doc("rpt_delta_arr_parent_product_month_8th_calendar_day") }}'
+
+  - name: rpt_crm_opportunity_snapshot_8th_calendar_day
+    description: Snapshot of mart_crm_opportunity_daily_snapshot taken on the 8th calendar day after month-end close.
+
