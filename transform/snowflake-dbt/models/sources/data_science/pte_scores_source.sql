@@ -30,4 +30,3 @@ WITH source AS (
 )
 SELECT *
 FROM parsed
-
