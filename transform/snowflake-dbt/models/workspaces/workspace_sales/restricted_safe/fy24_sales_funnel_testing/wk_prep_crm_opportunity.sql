@@ -167,6 +167,18 @@ WITH first_contact  AS (
   INNER JOIN {{ ref('prep_crm_user') }}
     ON sfdc_opportunity_source.owner_id = prep_crm_user.dim_crm_user_id
 
+), sfdc_opportunity_prep AS (
+
+   SELECT 
+     sfdc_opportunity_source.*,
+     NULL AS user_business_unit_stamped
+   FROM {{ ref('sfdc_opportunity_source')}}
+
+   UNION ALL 
+
+   SELECT *
+   FROM {{ ref('fy24_mock_opportunities') }}
+
 ), sfdc_opportunity AS (
 
     SELECT
@@ -196,7 +208,7 @@ WITH first_contact  AS (
               THEN 0
           ELSE 1
         END                                                                                         AS is_open,
-        { dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"])}}
+        {{ dbt_utils.star(from=ref('sfdc_opportunity_source'), except=["ACCOUNT_ID", "OPPORTUNITY_ID", "OWNER_ID", "ORDER_TYPE_STAMPED", "IS_WON", "ORDER_TYPE", "OPPORTUNITY_TERM","SALES_QUALIFIED_SOURCE", "DBT_UPDATED_AT", "CREATED_DATE", "SALES_ACCEPTED_DATE", "CLOSE_DATE", "NET_ARR", "DEAL_SIZE"])}}
     FROM {{ ref('sfdc_opportunity_source') }}
     WHERE account_id IS NOT NULL
       AND is_deleted = FALSE
@@ -1095,7 +1107,15 @@ WITH first_contact  AS (
         )
         THEN 'Mid-Market'
       ELSE 'SMB'
-    END AS account_owner_team_stamped_cro_level
+    END AS account_owner_team_stamped_cro_level,
+    CASE
+      WHEN sfdc_opportunity.close_date BETWEEN '2022-02-01' AND '2023-01-31'
+        THEN CONCAT(sfdc_opportunity.crm_opp_owner_sales_segment_stamped, sfdc_opportunity.crm_opp_owner_geo_stamped, sfdc_opportunity.crm_opp_owner_region_stamped, sfdc_opportunity.crm_opp_owner_area_stamped, close_date.fiscal_year)
+      WHEN close_date.fiscal_year >= 2024 AND LOWER(sfdc_opportunity.crm_opp_owner_business_unit_stamped) = 'comm'
+        THEN CONCAT(sfdc_opportunity.crm_opp_owner_business_unit_stamped, sfdc_opportunity.crm_opp_owner_geo_stamped, sfdc_opportunity.crm_opp_owner_region_stamped, sfdc_opportunity.crm_opp_owner_sales_segment_stamped, sfdc_opportunity.crm_opp_owner_area_stamped, close_date.fiscal_year)
+      WHEN close_date.fiscal_year >= 2024 AND LOWER(sfdc_opportunity.crm_opp_owner_business_unit_stamped) = 'entg'
+        THEN CONCAT(sfdc_opportunity.crm_opp_owner_business_unit_stamped, sfdc_opportunity.crm_opp_owner_geo_stamped, sfdc_opportunity.crm_opp_owner_region_stamped, sfdc_opportunity.crm_opp_owner_area_stamped, sfdc_opportunity.crm_opp_owner_sales_segment_stamped, close_date.fiscal_year)
+    END AS dim_crm_opp_owner_hierarchy_sk
 
     FROM sfdc_opportunity
     INNER JOIN sfdc_opportunity_stage

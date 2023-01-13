@@ -21,3 +21,5 @@ seeds:
     description: '{{ doc("director_location_factors") }}'
   - name: gitlab_dotcom_access_levels
     description: '{{ doc("gitlab_dotcom_access_levels") }}'
+  - name: fy24_mock_opportunities
+    description: '{{ doc("fy24_mock_opportunities") }}'
