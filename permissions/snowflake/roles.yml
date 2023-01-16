@@ -2995,6 +2995,7 @@ roles:
             - loader
             - reporter
             - transformer
+            - static_sensitive_readonly
         warehouses:
             - loading
             - dev_l
