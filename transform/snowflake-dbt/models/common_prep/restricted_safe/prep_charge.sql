@@ -133,7 +133,7 @@
       zuora_order_action.order_id,
       ARRAY_AGG(zuora_order_action.order_action_id) within GROUP (ORDER BY zuora_order_action.order_action_id ASC) AS order_action_id_array
     FROM zuora_rate_plan
-    INNER JOIN PREP.ZUORA.ZUORA_RATE_PLAN_CHARGE_SOURCE as zuora_rate_plan_charge
+    INNER JOIN zuora_rate_plan_charge
       ON zuora_rate_plan.rate_plan_id = zuora_rate_plan_charge.rate_plan_id
     LEFT JOIN zuora_order_action_rate_plan
       ON zuora_rate_plan.rate_plan_id = zuora_order_action_rate_plan.rate_plan_id
@@ -247,7 +247,7 @@
 
       -- orders fields
       order_action.order_id,
-      order_action_id_array
+      order_action.order_action_id_array
 
     FROM zuora_rate_plan
     INNER JOIN zuora_rate_plan_charge
@@ -351,7 +351,7 @@
 
       -- orders fields
       NULL                                                                                  AS order_id,
-      NULL                                                                                  AS order_action_id
+      NULL                                                                                  AS order_action_id_array
 
     FROM manual_charges_prep
     INNER JOIN active_zuora_subscription
