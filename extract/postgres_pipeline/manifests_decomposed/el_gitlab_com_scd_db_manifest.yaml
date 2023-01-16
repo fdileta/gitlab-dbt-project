@@ -525,24 +525,22 @@ tables:
       , pipeline_id 
       FROM packages_build_infos
   pages_domains:
-    dbt_source_model: true
-    export_schema: 'gitlab_com'
-    export_table: 'pages_domains'
-    export_table_primary_key: id
-    import_db: GITLAB_DB
-    import_query: |-
+    dbt_source_model: true 
+    export_schema: 'gitlab_com' 
+    export_table: 'pages_domains' 
+    export_table_primary_key: id 
+    import_db: GITLAB_DB 
+    import_query: |- 
       SELECT id
       , project_id
-      , certificate
-      , domain
       , CAST(verified_at AS VARCHAR) AS verified_at
-      , verification_code
-      , CAST(enabled_until AS VARCHAR) AS enabled_until
-      , CAST(remove_at AS VARCHAR) AS remove_at
+      , CAST(enabled_until AS VARCHAR) AS enabled_until 
+      , CAST(remove_at AS VARCHAR) AS remove_at 
       , auto_ssl_enabled
-      , CAST(certificate_valid_not_before AS VARCHAR) AS certificate_valid_not_before
-      , CAST(certificate_valid_not_after AS VARCHAR) AS certificate_valid_not_after
-      , certificate_source
+      , wildcard
+      , usage
+      , scope
+      , auto_ssl_failed
       FROM pages_domains
   path_locks:
     advanced_metadata: true
@@ -602,24 +600,6 @@ tables:
       SELECT project_id
       , framework_id
       FROM project_compliance_framework_settings
-  pages_domains:
-    dbt_source_model: true 
-    export_schema: 'gitlab_com' 
-    export_table: 'pages_domains' 
-    export_table_primary_key: id 
-    import_db: GITLAB_DB 
-    import_query: |- 
-      SELECT id
-      , project_id
-      , verified_at
-      , enabled_until 
-      , remove_at 
-      , auto_ssl_enabled
-      , wildcard
-      , usage
-      , scope
-      , auto_ssl_failed
-      FROM pages_domains
   project_error_tracking_settings:
     export_schema: "gitlab_com"
     export_table: project_error_tracking_settings
