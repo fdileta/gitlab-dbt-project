@@ -105,3 +105,11 @@ models:
 
   - name: prep_snowplow_page_views_all
     description: View combining all snowplow_page_view partitions.
+
+  - name: fct_behavior_structured_event_service_ping_context
+    description: Derived fact table that parses out the Redis event from the Service Ping context which can optionally be sent with an event.
+    columns:
+      - name: behavior_structured_event_pk
+        tests:
+          - not_null
+          - unique    
