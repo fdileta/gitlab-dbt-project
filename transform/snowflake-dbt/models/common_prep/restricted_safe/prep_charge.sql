@@ -131,7 +131,7 @@
     SELECT 
       zuora_rate_plan_charge.rate_plan_charge_id AS dim_charge_id,
       zuora_order_action.order_id,
-      ARRAY_AGG(zuora_order_action.order_action_id) within GROUP (ORDER BY zuora_order_action.order_action_id ASC) AS order_action_id_array
+      ARRAY_AGG(zuora_order_action.order_action_id) WITHIN GROUP (ORDER BY zuora_order_action.order_action_id ASC) AS order_action_id_array
     FROM zuora_rate_plan
     INNER JOIN zuora_rate_plan_charge
       ON zuora_rate_plan.rate_plan_id = zuora_rate_plan_charge.rate_plan_id
