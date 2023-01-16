@@ -81,6 +81,13 @@ SELECT
   ptpt_score_date,
   ptpt_past_score_group,
 
+  -- Namespace notification dates
+  user_limit_namespace_id,
+  user_limit_notification_at,
+  user_limit_enforcement_at,
+  is_impacted_by_user_limit,
+  is_impacted_by_user_limit_change,
+
   -- METADATA COLUMNS FOR USE IN PUMP (NOT INTEGRATION)
   last_changed
 
@@ -91,4 +98,5 @@ WHERE rlike(email_address, '^[A-Z0-9.+_%-]+@[A-Z0-9.-]+\\.[A-Z]+$','i')
       AND sfdc_record_id IS NOT NULL
     )
     OR is_ptpt_contact_change = TRUE
+    OR is_impacted_by_user_limit_change = TRUE
   )

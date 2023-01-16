@@ -137,6 +137,7 @@ WITH sfdc_lead AS (
       is_pql_marketo,
       is_paid_tier_marketo,
       is_ptpt_contact_marketo,
+      is_impacted_by_user_limit_marketo,
       (ROW_NUMBER() OVER (PARTITION BY email ORDER BY updated_at DESC))                 AS record_number
 
     FROM marketo
@@ -263,6 +264,7 @@ WITH sfdc_lead AS (
       IFNULL(marketo_lead.is_pql_marketo, FALSE)                                                                         AS is_pql_marketo,
       IFNULL(marketo_lead.is_paid_tier_marketo, FALSE)                                                                   AS is_paid_tier_marketo,
       IFNULL(marketo_lead.is_ptpt_contact_marketo, FALSE)                                                                AS is_ptpt_contact_marketo,
+      IFNULL(marketo_lead.is_impacted_by_user_limit_marketo, FALSE)                                                      AS is_impacted_by_user_limit_marketo,
       CASE
         WHEN sfdc.email_address IS NOT NULL THEN TRUE
         ELSE FALSE

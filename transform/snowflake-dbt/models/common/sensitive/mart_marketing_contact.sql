@@ -817,6 +817,8 @@
       namespace_notifications.user_limit_enforcement_at,
       IFF(namespace_notifications.user_limit_notification_at IS NOT NULL OR namespace_notifications.user_limit_enforcement_at IS NOT NULL,
         TRUE, FALSE)                              AS is_impacted_by_user_limit,
+      IFF(is_impacted_by_user_limit = TRUE OR (is_impacted_by_user_limit = FALSE AND marketing_contact.is_impacted_by_user_limit_marketo = TRUE), TRUE, FALSE)
+                                                  AS is_impacted_by_user_limit_change,
 
       usage_metrics.usage_umau_28_days_user,
       usage_metrics.usage_action_monthly_active_users_project_repo_28_days_user,
@@ -989,7 +991,8 @@
       'user_limit_namespace_id',
       'user_limit_notification_at',
       'user_limit_enforcement_at',
-      'is_impacted_by_user_limit'
+      'is_impacted_by_user_limit',
+      'is_impacted_by_user_limit_change'
       ]
 ) }}
 

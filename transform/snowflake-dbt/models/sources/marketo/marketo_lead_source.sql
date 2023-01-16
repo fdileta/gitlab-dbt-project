@@ -32,6 +32,7 @@ WITH source AS (
       pql_product_qualified_lead_c::BOOLEAN     AS is_pql_marketo,
       cdbispaidtier_c::BOOLEAN                  AS is_paid_tier_marketo,
       ptpt_is_contact_c::BOOLEAN                AS is_ptpt_contact_marketo,
+      cdb_impacted_by_user_limit_c::BOOLEAN     AS is_impacted_by_user_limit_marketo,
       updated_at::TIMESTAMP                     AS updated_at
 
     FROM source
