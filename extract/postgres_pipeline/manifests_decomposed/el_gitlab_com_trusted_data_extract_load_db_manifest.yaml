@@ -203,6 +203,14 @@ tables:
         FROM status_page_published_incidents
         WHERE DATE(updated_at) > current_date - interval '8' day
         GROUP BY 1,2,3
+        UNION ALL
+        SELECT 'gitlab_db_namespace_details' AS table_name
+        , DATE(created_at) as created_date
+        , DATE(updated_at) as updated_date
+        , count(*) as number_of_records
+        FROM namespace_details
+        WHERE DATE(updated_at) > current_date - interval '8' day
+        GROUP BY 1,2,3
   cluster_2:
     dbt_source_model: true
     export_schema: 'gitlab_dotcom'
@@ -1003,11 +1011,4 @@ tables:
         FROM notes
         WHERE updated_at > current_timestamp - interval '8' day
         GROUP BY 1,2,3
-        UNION ALL
-        SELECT 'gitlab_db_namespace_details' AS table_name
-        , DATE(created_at) as created_date
-        , DATE(updated_at) as updated_date
-        , count(*) as number_of_records
-        FROM namespace_details
-        WHERE DATE(updated_at) > current_date - interval '8' day
-        GROUP BY 1,2,3
+        
