@@ -356,3 +356,11 @@ models:
         description: Past ptpt_score_date givene to the ptpt_namespace_id
       - name: is_ptpt_contact
         description: Flag if marketing contact has a ptpt score
+      - name: is_impacted_by_user_limit
+        description: Flag that indicates if marketing contact is affected by namespace user limit campaign
+      - name: user_limit_namespace_id
+        description: Namespace id corresponding to the user limit campaign
+      - name: user_limit_notification_at
+        description: Date time indicating when the marketing contact user_limit_namespace_id entered the user limit notification state. More information about this field can be seen [HERE](https://gitlab.com/gitlab-org/gitlab/-/issues/375748)
+      - name: user_limit_enforcement_at
+        description: Date time indicating when the marketing contact user_limit_namespace_id entered the user limit enforcement state. More information about this field can be seen [HERE](https://gitlab.com/gitlab-org/gitlab/-/issues/375748)

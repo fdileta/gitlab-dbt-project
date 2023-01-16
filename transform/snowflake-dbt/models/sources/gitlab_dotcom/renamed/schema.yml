@@ -1157,6 +1157,15 @@ models:
         tests:
           - not_null
 
+  - name: gitlab_dotcom_namespace_details_source
+    description: Base model for Gitlab.com namespace details. More information about this model can be seen [HERE](https://gitlab.com/gitlab-org/gitlab/-/issues/375748)
+    columns:
+      - name: namespace_id
+        tags: ["tdf","gitlab_dotcom"]
+        tests:
+          - not_null
+          - unique
+
   - name: gitlab_dotcom_namespace_statistics_source
     description: Base model for Gitlab.com namespace statistics
     columns:
