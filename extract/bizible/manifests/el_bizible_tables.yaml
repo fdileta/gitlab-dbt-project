@@ -49,8 +49,6 @@ tables:
     date_column: _modified_date
   biz_opportunities:
     date_column: _modified_date
-  biz_sessions:
-    date_column: _modified_date
   biz_user_touchpoints:
     date_column: _modified_date
   biz_attribution_touchpoints:
