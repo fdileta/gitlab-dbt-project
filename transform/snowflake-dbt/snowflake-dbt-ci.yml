@@ -69,6 +69,7 @@ dbt_seed:
 🐭specify_model:
   <<: *snowflake_dbt_jobs
   script:
+   - echo $CI_MERGE_REQUEST_DIFF_ID
    - dbt run $CI_PROFILE_TARGET ${REFRESH:-"--full-refresh"} --models +dim_subscription || FAILED=true
    - if [ $FAILED ]; then exit 1; fi
 
