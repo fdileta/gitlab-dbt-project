@@ -74,6 +74,7 @@ WITH edm_opty AS (
     edm_opty.sales_type                            AS sales_type,
     edm_opty.stage_name                            AS stage_name,
     edm_opty.order_type                            AS order_type_stamped,
+    edm_opty.order_type_live                       AS order_type_live,
 
     ----------------------------------------------------------
     ----------------------------------------------------------

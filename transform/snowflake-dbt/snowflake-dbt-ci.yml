@@ -173,7 +173,7 @@ specify_dbt_parameters:
     - dbt test $CI_PROFILE_TARGET --models $CHANGED_FILES || FAILED=true
     - if [ $FAILED ]; then exit 1; fi
 
-➕🐘🏭⛏specify_selector_build_xl:
+🐘🏭⛏specify_selector_build_xl:
   <<: *snowflake_dbt_jobs
   script:
     - *xl_warehouse
