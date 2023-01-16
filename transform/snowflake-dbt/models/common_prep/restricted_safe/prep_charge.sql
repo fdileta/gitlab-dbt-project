@@ -1,9 +1,14 @@
-WITH map_merged_crm_account AS (
+{{ simple_cte([
+    ('map_merged_crm_account', 'map_merged_crm_account'),
+    ('zuora_rate_plan', 'zuora_rate_plan_source'),
+    ('zuora_rate_plan_charge', 'zuora_rate_plan_charge_source'),
+    ('zuora_order_action_rate_plan','zuora_query_api_order_action_rate_plan_source'),
+    ('zuora_order_action', 'zuora_order_action_source'),
+    ('revenue_contract_line', 'zuora_revenue_revenue_contract_line_source')
 
-    SELECT *
-    FROM {{ ref('map_merged_crm_account') }}
+])}}
 
-), sfdc_account AS (
+, sfdc_account AS (
 
     SELECT *
     FROM {{ ref('sfdc_account_source') }}
@@ -24,16 +29,6 @@ WITH map_merged_crm_account AS (
     --Exclude Batch20 which are the test accounts. This method replaces the manual dbt seed exclusion file.
       AND LOWER(batch) != 'batch20'
 
-), zuora_rate_plan AS (
-
-    SELECT *
-    FROM {{ ref('zuora_rate_plan_source') }}
-
-), zuora_rate_plan_charge AS (
-
-    SELECT *
-    FROM {{ ref('zuora_rate_plan_charge_source') }}
-
 ), zuora_subscription AS (
 
     SELECT *
@@ -47,11 +42,6 @@ WITH map_merged_crm_account AS (
     FROM zuora_subscription
     WHERE subscription_status IN ('Active', 'Cancelled')
 
-), revenue_contract_line AS (
-
-    SELECT *
-    FROM {{ ref('zuora_revenue_revenue_contract_line_source') }}
-  
 ), mje AS (
 
     SELECT 
@@ -135,6 +125,21 @@ WITH map_merged_crm_account AS (
     WHERE adjustment IS NOT NULL
       AND ABS(ROUND(adjustment,5)) > 0
     {{ dbt_utils.group_by(n=7) }}
+
+), order_action AS (
+
+    SELECT 
+      zuora_rate_plan_charge.rate_plan_charge_id AS dim_charge_id,
+      zuora_order_action.order_id,
+      ARRAY_AGG(zuora_order_action.order_action_id) within GROUP (ORDER BY zuora_order_action.order_action_id ASC) AS order_action_id_array
+    FROM zuora_rate_plan
+    INNER JOIN PREP.ZUORA.ZUORA_RATE_PLAN_CHARGE_SOURCE as zuora_rate_plan_charge
+      ON zuora_rate_plan.rate_plan_id = zuora_rate_plan_charge.rate_plan_id
+    LEFT JOIN zuora_order_action_rate_plan
+      ON zuora_rate_plan.rate_plan_id = zuora_order_action_rate_plan.rate_plan_id
+    INNER JOIN zuora_order_action
+      ON zuora_order_action_rate_plan.order_action_id = zuora_order_action.order_action_id
+    {{ dbt_utils.group_by(n=2) }}
 
 ), non_manual_charges AS (
 
@@ -239,7 +244,10 @@ WITH map_merged_crm_account AS (
         WHEN is_paid_in_full = FALSE THEN months_of_future_billings * zuora_rate_plan_charge.mrr
         ELSE 0
       END                                                               AS estimated_total_future_billings,
-      0                                                                 AS is_manual_charge
+
+      -- orders fields
+      order_action.order_id,
+      order_action_id_array
 
     FROM zuora_rate_plan
     INNER JOIN zuora_rate_plan_charge
@@ -254,6 +262,8 @@ WITH map_merged_crm_account AS (
       ON map_merged_crm_account.dim_crm_account_id = sfdc_account.account_id
     LEFT JOIN ultimate_parent_account
       ON sfdc_account.ultimate_parent_account_id = ultimate_parent_account.account_id
+    LEFT JOIN order_action
+      ON order_action.dim_charge_id = zuora_rate_plan_charge.rate_plan_charge_id
 
  ), manual_charges_prep AS (
   
@@ -338,7 +348,11 @@ WITH map_merged_crm_account AS (
         WHEN is_paid_in_full = FALSE THEN months_of_future_billings * manual_charges_prep.mrr
         ELSE 0
       END                                                                                   AS estimated_total_future_billings,
-      1                                                                                     AS is_manual_charge
+
+      -- orders fields
+      NULL                                                                                  AS order_id,
+      NULL                                                                                  AS order_action_id
+
     FROM manual_charges_prep
     INNER JOIN active_zuora_subscription
       ON manual_charges_prep.subscription_name = active_zuora_subscription.subscription_name
@@ -390,5 +404,5 @@ WITH map_merged_crm_account AS (
     created_by="@iweeks",
     updated_by="@michellecooper",
     created_date="2021-04-28",
-    updated_date="2022-02-03"
+    updated_date="2022-07-15"
 ) }}

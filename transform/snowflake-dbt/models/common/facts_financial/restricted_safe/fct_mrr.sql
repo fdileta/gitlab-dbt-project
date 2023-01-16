@@ -21,6 +21,8 @@
       prep_charge.dim_crm_account_id,
       prep_charge.subscription_status,
       prep_charge.unit_of_measure,
+      prep_charge.order_id,
+      prep_charge.order_action_id_array,
       SUM(prep_charge.mrr)                                                                  AS mrr,
       SUM(prep_charge.arr)                                                                  AS arr,
       SUM(prep_charge.quantity)                                                             AS quantity
@@ -35,7 +37,7 @@
       /* This excludes Education customers (charge name EDU or OSS) with free subscriptions.
          Pull in seats from Paid EDU Plans with no ARR */
       AND (mrr != 0 OR LOWER(prep_charge.rate_plan_charge_name) = 'max enrollment')
-    {{ dbt_utils.group_by(n=9) }}
+    {{ dbt_utils.group_by(n=11) }}
 )
 
 {{ dbt_audit(
